@@ -1,0 +1,573 @@
+% Encoding: UTF-8
+
+@Article{Lopes2018,
+  author        = {Nuno P. Lopes and John Regehr},
+  title         = {Future Directions for Optimizing Compilers},
+  year          = {2018},
+  __markedentry = {[dbakhval:]},
+  abstract      = {As software becomes larger, programming languages become higher-level, and processors continue to fail to be clocked faster, we'll increasingly require compilers to reduce code bloat, eliminate abstraction penalties, and exploit interesting instruction sets. At the same time, compiler execution time must not increase too much and also compilers should never produce the wrong output. This paper examines the problem of making optimizing compilers faster, less buggy, and more capable of generating high-quality output.},
+  date          = {2018-09-06},
+  eprint        = {http://arxiv.org/abs/1809.02161v1},
+  eprintclass   = {cs.PL},
+  eprinttype    = {arXiv},
+  file          = {:http\://arxiv.org/pdf/1809.02161v1:PDF},
+  keywords      = {cs.PL},
+}
+
+@Manual{IntelSDM,
+  title        = {Intel® 64 and IA-32 Architectures Software Developer Manuals},
+  organization = {Intel® Corporation},
+  year         = {2020},
+  url          = {https://software.intel.com/en-us/articles/intel-sdm},
+}
+
+@Manual{IntelOptimizationManual,
+  title        = {Intel® 64 and IA-32 Architectures Optimization Reference Manual},
+  organization = {Intel® Corporation},
+  year         = {2020},
+  url          = {https://software.intel.com/content/www/us/en/develop/download/intel-64-and-ia-32-architectures-optimization-reference-manual.html},
+}
+
+@Manual{IntelRDTSC,
+  author       = {Gabriele Paoloni},
+  title        = {How to Benchmark Code Execution Times on Intel® IA-32 and IA-64 Instruction Set Architectures},
+  organization = {Intel® Corporation},
+  year         = {2010},
+  url          = {https://www.intel.com/content/dam/www/public/us/en/documents/white-papers/ia-32-ia-64-benchmark-code-execution-paper.pdf},
+}
+
+@Manual{Domo2017,
+  title        = {Data Never Sleeps 5.0},
+  organization = {Domo, Inc},
+  year         = {2017},
+  url          = {https://www.domo.com/learn/data-never-sleeps-5?aid=ogsm072517_1&sf100871281=1},
+}
+
+@Manual{Statista2018,
+  title  = {Volume of data/information created worldwide from 2010 to 2025},
+  organization = {Statista, Inc},
+  year   = {2018},
+  url    = {https://www.statista.com/statistics/871513/worldwide-data-created/},
+}
+
+@Article{Mytkowicz09,
+  author     = {Mytkowicz, Todd and Diwan, Amer and Hauswirth, Matthias and Sweeney, Peter F.},
+  title      = {Producing Wrong Data without Doing Anything Obviously Wrong!},
+  journal    = {SIGPLAN Not.},
+  year       = {2009},
+  volume     = {44},
+  number     = {3},
+  pages      = {265–276},
+  month      = mar,
+  issn       = {0362-1340},
+  address    = {New York, NY, USA},
+  doi        = {10.1145/1508284.1508275},
+  issue_date = {February 2009},
+  keywords   = {measurement, bias, performance},
+  numpages   = {12},
+  publisher  = {Association for Computing Machinery},
+  url        = {https://doi.org/10.1145/1508284.1508275},
+}
+
+@InProceedings{Curtsinger13,
+  author    = {Curtsinger, Charlie and Berger, Emery D.},
+  title     = {STABILIZER: Statistically Sound Performance Evaluation},
+  booktitle = {Proceedings of the Eighteenth International Conference on Architectural Support for Programming Languages and Operating Systems},
+  year      = {2013},
+  series    = {ASPLOS ’13},
+  pages     = {219–228},
+  address   = {New York, NY, USA},
+  publisher = {Association for Computing Machinery},
+  doi       = {10.1145/2451116.2451141},
+  isbn      = {9781450318709},
+  keywords  = {measurement bias, randomization, performance evaluation},
+  location  = {Houston, Texas, USA},
+  numpages  = {10},
+  url       = {https://doi.org/10.1145/2451116.2451141},
+}
+
+@Article{Chen2016,
+  author        = {Jiahao Chen and Jarrett Revels},
+  title         = {Robust benchmarking in noisy environments},
+  year          = {2016},
+  __markedentry = {[dbakhval:6]},
+  abstract      = {We propose a benchmarking strategy that is robust in the presence of timer error, OS jitter and other environmental fluctuations, and is insensitive to the highly nonideal statistics produced by timing measurements. We construct a model that explains how these strongly nonideal statistics can arise from environmental fluctuations, and also justifies our proposed strategy. We implement this strategy in the BenchmarkTools Julia package, where it is used in production continuous integration (CI) pipelines for developing the Julia language and its ecosystem.},
+  date          = {2016-08-15},
+  eprint        = {http://arxiv.org/abs/1608.04295v1},
+  eprintclass   = {cs.PF},
+  eprinttype    = {arXiv},
+  file          = {:http\://arxiv.org/pdf/1608.04295v1:PDF},
+  keywords      = {cs.PF, 68N30, B.8.1; D.2.5},
+}
+
+@dataset{dataset,
+author = {Yasin, Ahmad},
+year = {2016},
+month = {10},
+pages = {},
+title = {TopDown-Yasin-ISPASS14-data}
+}
+
+@inproceedings{TMA_ISPASS,
+author = {Yasin, Ahmad},
+year = {2014},
+month = {03},
+pages = {35-44},
+title = {A Top-Down method for performance analysis and counters architecture},
+isbn = {978-1-4799-3606-9},
+doi = {10.1109/ISPASS.2014.6844459}
+}
+
+@Article{LBR2016,
+  author = {Andi Kleen},
+  title  = {An introduction to last branch records},
+  year   = {2016},
+  url    = {https://lwn.net/Articles/680985/},
+}
+
+@Article{LemireBranchless,
+  author = {Daniel Lemire},
+  title  = {Making Your Code Faster by Taming Branches},
+  year   = {2020},
+  url    = {https://www.infoq.com/articles/making-code-faster-taming-branches/},
+}
+
+@Article{IntelAvoidingBrMisp,
+  author = {Rajiv Kapoor},
+  title  = {Avoiding the Cost of Branch Misprediction},
+  year   = {2009},
+  url    = {https://software.intel.com/en-us/articles/avoiding-the-cost-of-branch-misprediction},
+}
+
+@inproceedings{Nowak2014TheOO,
+  title={The overhead of profiling using PMU hardware counters},
+  author={Andrzej Nowak and Georgios Bitzes},
+  year={2014}
+}
+
+@inproceedings{HfSort,
+author = {Ottoni, Guilherme and Maher, Bertrand},
+title = {Optimizing Function Placement for Large-Scale Data-Center Applications},
+year = {2017},
+isbn = {9781509049318},
+publisher = {IEEE Press},
+booktitle = {Proceedings of the 2017 International Symposium on Code Generation and Optimization},
+pages = {233–244},
+numpages = {12},
+location = {Austin, USA},
+series = {CGO ’17}
+}
+
+@inproceedings{AutoFDO,
+title	= {AutoFDO: Automatic Feedback-Directed Optimization for Warehouse-Scale Applications},
+author	= {Dehao Chen and David Xinliang Li and Tipp Moseley},
+year	= {2016},
+booktitle	= {CGO 2016 Proceedings of the 2016 International Symposium on Code Generation and Optimization},
+pages	= {12-23},
+address	= {New York, NY, USA}
+}
+
+@article{BBReordering,
+  author    = {Andy Newell and Sergey Pupyrev},
+  title     = {Improved Basic Block Reordering},
+  journal   = {CoRR},
+  volume    = {abs/1809.04676},
+  year      = {2018},
+  url       = {http://arxiv.org/abs/1809.04676},
+  archivePrefix = {arXiv},
+  eprint    = {1809.04676},
+  timestamp = {Fri, 05 Oct 2018 11:34:52 +0200},
+  biburl    = {https://dblp.org/rec/journals/corr/abs-1809-04676.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+
+@article{BOLT,
+  author    = {Maksim Panchenko and
+               Rafael Auler and
+               Bill Nell and
+               Guilherme Ottoni},
+  title     = {{BOLT:} {A} Practical Binary Optimizer for Data Centers and Beyond},
+  journal   = {CoRR},
+  volume    = {abs/1807.06735},
+  year      = {2018},
+  url       = {http://arxiv.org/abs/1807.06735},
+  archivePrefix = {arXiv},
+  eprint    = {1807.06735},
+  timestamp = {Mon, 13 Aug 2018 16:46:24 +0200},
+  biburl    = {https://dblp.org/rec/journals/corr/abs-1807-06735.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+
+@inproceedings{Prefetching,
+author = {Iacobovici, Sorin and Kadambi, Sudarshan and Chou, Yuan and Abraham, Santosh},
+year = {2004},
+month = {01},
+pages = {1-11},
+title = {Effective stream-based and execution-based data prefetching},
+doi = {10.1145/1006209.1006211}
+}
+
+@online{PrefetchSlides,
+author = {{Nima Honarmand}},
+title = {Memory Prefetching},
+url = {https://compas.cs.stonybrook.edu/~nhonarmand/courses/sp15/cse502/slides/13-prefetch.pdf},
+organization = {Stony Brook University},
+date = {2015-03-01}
+}
+
+@book{Hennessy,
+author = {Hennessy, John L. and Patterson, David A.},
+title = {Computer Architecture, Fifth Edition: A Quantitative Approach},
+year = {2011},
+isbn = {012383872X},
+publisher = {Morgan Kaufmann Publishers Inc.},
+address = {San Francisco, CA, USA},
+edition = {5th}
+}
+
+@misc{fogOptimizeCpp,
+  title={Optimizing software in C++: An optimization guide for Windows, Linux and Mac platforms},
+  author={Fog, Agner},
+  year={2004},
+  url = {https://www.agner.org/optimize/optimizing_cpp.pdf},
+}
+
+@article{fogMicroarchitecture,
+  title={The microarchitecture of Intel, AMD and VIA CPUs: An optimization guide for assembly programmers and compiler makers},
+  author={Fog, Agner},
+  journal={Copenhagen University College of Engineering},
+  url = {https://www.agner.org/optimize/microarchitecture.pdf},
+  year={2012}
+}
+
+@article{fogInstructions,
+  title={Instruction tables: Lists of instruction latencies, throughputs and micro-operation breakdowns for Intel, AMD and VIA CPUs},
+  author={Fog, Agner and others},
+  journal={Copenhagen University College of Engineering},
+  url = {https://www.agner.org/optimize/instruction_tables.pdf},
+  year={2011}
+}
+
+@article{GooglePaper,
+author = {Kanev, Svilen and Darago, Juan Pablo and Hazelwood, Kim and Ranganathan, Parthasarathy and Moseley, Tipp and Wei, Gu-Yeon and Brooks, David},
+title = {Profiling a Warehouse-Scale Computer},
+year = {2015},
+issue_date = {January 2016},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+volume = {43},
+number = {3S},
+issn = {0163-5964},
+url = {https://doi.org/10.1145/2872887.2750392},
+doi = {10.1145/2872887.2750392},
+journal = {SIGARCH Comput. Archit. News},
+month = jun,
+pages = {158–169},
+numpages = {12}
+}
+  
+@misc{EytzingerArray,
+    title={Array Layouts for Comparison-Based Searching},
+    author={Paul-Virak Khuong and Pat Morin},
+    year={2015},
+    eprint={1509.05053},
+    archivePrefix={arXiv},
+    primaryClass={cs.DS}
+}
+
+@article{GoogleWideProfiling,
+title	= {Google-Wide Profiling: A Continuous Profiling Infrastructure for Data Centers},
+author	= {Gang Ren and Eric Tune and Tipp Moseley and Yixin Shi and Silvius Rus and Robert Hundt},
+year	= {2010},
+URL	= {http://www.computer.org/portal/web/csdl/doi/10.1109/MM.2010.68},
+journal	= {IEEE Micro},
+pages	= {65-79}
+}
+
+@Manual{IntelCpuMetrics,
+  title={CPU Metrics Reference},
+  organization = {Intel® Corporation},
+  year={2020},
+  url = {https://software.intel.com/en-us/vtune-help-cpu-metrics-reference}
+}
+
+@Manual{IntelVTuneGuide,
+  title={Intel® VTune™ Profiler User Guide},
+  organization = {Intel® Corporation},
+  year={2020},
+  url = {https://software.intel.com/content/www/us/en/develop/documentation/vtune-help/top/analyze-performance/hardware-event-based-sampling-collection.html}
+}
+
+@inproceedings{CozPaper,
+author = {Curtsinger, Charlie and Berger, Emery},
+year = {2015},
+month = {10},
+pages = {184-197},
+title = {Coz: Finding Code that Counts with Causal Profiling},
+doi = {10.1145/2815400.2815409}
+}
+
+@book{Akinshin2019,
+  author    = {Akinshin, Andrey}, 
+  title     = {Pro .NET Benchmarking},
+  publisher = {Apress},
+  year      = {2019},
+  edition   = {1},
+  pages     = {690},
+  isbn      = {978-1-4842-4940-6},
+  doi       = {10.1007/978-1-4842-4941-3}
+}
+
+@book{SystemsPerformance,
+author = {Gregg, Brendan},
+title = {Systems Performance: Enterprise and the Cloud},
+year = {2013},
+isbn = {0133390098},
+publisher = {Prentice Hall Press},
+address = {USA},
+edition = {1st}
+}
+
+@article{GAPP,
+   title={GAPP: A Fast Profiler for Detecting Serialization Bottlenecks in Parallel Linux Applications},
+   ISBN={9781450369916},
+   url={http://dx.doi.org/10.1145/3358960.3379136},
+   DOI={10.1145/3358960.3379136},
+   journal={Proceedings of the ACM/SPEC International Conference on Performance Engineering},
+   publisher={ACM},
+   author={Nair, Reena and Field, Tony},
+   year={2020},
+   month={Apr}
+}
+
+@inproceedings{Mytkowicz,
+author = {Mytkowicz, Todd and Diwan, Amer and Hauswirth, Matthias and Sweeney, Peter F.},
+title = {Producing Wrong Data without Doing Anything Obviously Wrong!},
+year = {2009},
+isbn = {9781605584065},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/1508244.1508275},
+doi = {10.1145/1508244.1508275},
+booktitle = {Proceedings of the 14th International Conference on Architectural Support for Programming Languages and Operating Systems},
+pages = {265–276},
+numpages = {12},
+keywords = {performance, measurement, bias},
+location = {Washington, DC, USA},
+series = {ASPLOS XIV}
+}
+
+@inproceedings{STABILIZER,
+author = {Curtsinger, Charlie and Berger, Emery},
+year = {2013},
+month = {03},
+pages = {219-228},
+title = {STABILIZER: statistically sound performance evaluation},
+volume = {48},
+journal = {ACM SIGPLAN Notices},
+doi = {10.1145/2451116.2451141}
+}
+
+@misc{RobustBenchmarking,
+    title={Robust benchmarking in noisy environments},
+    author={Jiahao Chen and Jarrett Revels},
+    year={2016},
+    eprint={1608.04295},
+    archivePrefix={arXiv},
+    primaryClass={cs.PF}
+}
+
+@misc{IntelBlueprint,
+  title        = {Runtime Performance Optimization Blueprint: Intel® Architecture Optimization With Large Code Pages},
+  author       = {Suresh Srinivas, et al.},
+  organization = {Intel® Corporation},
+  year         = {2019},
+  url          = {https://www.intel.com/content/www/us/en/develop/articles/runtime-performance-optimization-blueprint-intel-architecture-optimization-with-large-code.html},
+}
+
+@online{HennessyGoogleIO,
+  title = {The future of computing},
+  year = {2018},
+  organization = {Youtube},
+  author = {John L. Hennessy},
+  url = {https://youtu.be/Azt8Nc-mtKM?t=329},
+}
+
+@article {Leisersoneaam9744,
+	author = {Leiserson, Charles E. and Thompson, Neil C. and Emer, Joel S. and Kuszmaul, Bradley C. and Lampson, Butler W. and Sanchez, Daniel and Schardl, Tao B.},
+	title = {There{\textquoteright}s plenty of room at the Top: What will drive computer performance after Moore{\textquoteright}s law?},
+	volume = {368},
+	number = {6495},
+	elocation-id = {eaam9744},
+	year = {2020},
+	doi = {10.1126/science.aam9744},
+	publisher = {American Association for the Advancement of Science},
+	issn = {0036-8075},
+	URL = {https://science.sciencemag.org/content/368/6495/eaam9744},
+	eprint = {https://science.sciencemag.org/content/368/6495/eaam9744.full.pdf},
+	journal = {Science}
+}
+
+@inproceedings{UnderstandingPerfRegress,
+author = {Jin, Guoliang and Song, Linhai and Shi, Xiaoming and Scherpelz, Joel and Lu, Shan},
+title = {Understanding and Detecting Real-World Performance Bugs},
+year = {2012},
+isbn = {9781450312059},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/2254064.2254075},
+doi = {10.1145/2254064.2254075},
+booktitle = {Proceedings of the 33rd ACM SIGPLAN Conference on Programming Language Design and Implementation},
+pages = {77–88},
+numpages = {12},
+keywords = {performance bugs, characteristics study, rule-based bug detection},
+location = {Beijing, China},
+series = {PLDI ’12}
+}
+  
+@inproceedings{MongoDBChangePointDetection,
+author = {Daly, David and Brown, William and Ingo, Henrik and O’Leary, Jim and Bradford, David},
+title = {The Use of Change Point Detection to Identify Software Performance Regressions in a Continuous Integration System},
+year = {2020},
+isbn = {9781450369916},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/3358960.3375791},
+doi = {10.1145/3358960.3375791},
+booktitle = {Proceedings of the ACM/SPEC International Conference on Performance Engineering},
+pages = {67–75},
+numpages = {9},
+keywords = {testing, performance, change points, continuous integration},
+location = {Edmonton AB, Canada},
+series = {ICPE ’20}
+}
+  
+@inproceedings{Evergreen,
+author = {Ingo, Henrik and Daly, David},
+title = {Automated System Performance Testing at MongoDB},
+year = {2020},
+isbn = {9781450380010},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/3395032.3395323},
+doi = {10.1145/3395032.3395323},
+booktitle = {Proceedings of the Workshop on Testing Database Systems},
+articleno = {3},
+numpages = {6},
+keywords = {MongoDB, performance, distributed databases, testing, databases, cloud, Python},
+location = {Portland, Oregon},
+series = {DBTest ’20}
+}
+  
+@article{ChangePointAnalysis,
+author = {David S. Matteson and Nicholas A. James},
+title = {A Nonparametric Approach for Multiple Change Point Analysis of Multivariate Data},
+journal = {Journal of the American Statistical Association},
+volume = {109},
+number = {505},
+pages = {334-345},
+year  = {2014},
+publisher = {Taylor & Francis},
+doi = {10.1080/01621459.2013.849605},
+URL = {https://doi.org/10.1080/01621459.2013.849605},
+}
+
+@incollection{AutoPerf,
+title = {A Zero-Positive Learning Approach for Diagnosing Software Performance Regressions},
+author = {Alam, Mejbah and Gottschlich, Justin and Tatbul, Nesime and Turek, Javier S and Mattson, Tim and Muzahid, Abdullah},
+booktitle = {Advances in Neural Information Processing Systems 32},
+editor = {H. Wallach and H. Larochelle and A. Beygelzimer and F. d\textquotesingle Alch\'{e}-Buc and E. Fox and R. Garnett},
+pages = {11627--11639},
+year = {2019},
+publisher = {Curran Associates, Inc.},
+url = {http://papers.nips.cc/paper/9337-a-zero-positive-learning-approach-for-diagnosing-software-performance-regressions.pdf}
+}
+
+@misc{liu2019largescale,
+    title={Large-Scale Online Experimentation with Quantile Metrics},
+    author={Min Liu and Xiaohui Sun and Maneesh Varshney and Ya Xu},
+    year={2019},
+    eprint={1903.08762},
+    archivePrefix={arXiv},
+    primaryClass={stat.AP}
+}
+
+@article{IntelPTPaper,  
+author={S. D. {Sharma} and M. {Dagenais}},  
+journal={The Journal of Engineering},   
+title={Hardware-assisted instruction profiling and latency detection},   
+year={2016},  
+volume={2016},  
+number={10},  
+pages={367-376},
+}
+
+@inproceedings{PMC_virtual,
+author = {Du, Jiaqing and Sehrawat, Nipun and Zwaenepoel, Willy},
+title = {Performance Profiling in a Virtualized Environment},
+year = {2010},
+publisher = {USENIX Association},
+address = {USA},
+booktitle = {Proceedings of the 2nd USENIX Conference on Hot Topics in Cloud Computing},
+pages = {2},
+numpages = {1},
+location = {Boston, MA},
+series = {HotCloud'10}
+}
+
+@article{Mula_Lemire_2019,
+   title={Base64 encoding and decoding at almost the speed of a memory copy},
+   volume={50},
+   ISSN={1097-024X},
+   url={http://dx.doi.org/10.1002/spe.2777},
+   DOI={10.1002/spe.2777},
+   number={2},
+   journal={Software: Practice and Experience},
+   publisher={Wiley},
+   author={Muła, Wojciech and Lemire, Daniel},
+   year={2019},
+   month={Nov},
+   pages={89–97}
+}
+
+@inproceedings{ISPC_Paper,
+  author={M. {Pharr} and W. R. {Mark}},
+  booktitle={2012 Innovative Parallel Computing (InPar)}, 
+  title={ispc: A SPMD compiler for high-performance CPU programming}, 
+  year={2012},
+  volume={},
+  number={},
+  pages={1-13}
+}
+
+@article{CacheLocking,
+author = {Mittal, Sparsh},
+year = {2016},
+month = {05},
+pages = {},
+title = {A Survey Of Techniques for Cache Locking},
+volume = {21},
+journal = {ACM Transactions on Design Automation of Electronic Systems},
+doi = {10.1145/2858792}
+}
+
+@book{EngineeringACompilerBook,
+  title={Engineering a Compiler},
+  author={Cooper, K.D. and Torczon, L.},
+  isbn={9780120884780},
+  lccn={2011288670},
+  series={Morgan Kaufmann},
+  url={https://books.google.co.in/books?id=CGTOlAEACAAJ},
+  year={2012},
+  publisher={Morgan Kaufmann}
+}
+
+@article{Grosser2012PollyP,
+  title={Polly - Performing Polyhedral Optimizations on a Low-Level Intermediate Representation},
+  author={Tobias Grosser and Armin Gr{\"o}{\ss}linger and C. Lengauer},
+  journal={Parallel Process. Lett.},
+  year={2012},
+  volume={22}
+}
+
+@Comment{jabref-meta: databaseType:bibtex;}

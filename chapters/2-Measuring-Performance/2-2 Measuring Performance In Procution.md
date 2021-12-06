@@ -1,0 +1,17 @@
+---
+typora-root-url: ..\..\img
+---
+
+## Measuring Performance In Production
+
+When an application runs on shared infrastructure (typical in a public cloud), there usually will be other workloads from other customers running on the same servers. With technologies like virtualization and containers becoming more popular, public cloud providers try to fully utilize the capacity of their servers. Unfortunately, it creates additional obstacles for measuring performance in such an environment. Sharing resources with neighbor processes can influence performance measurements in unpredictable ways.
+
+Analyzing production workloads by recreating them in a lab can be tricky. Sometimes it's not possible to synthesize exact behavior for "in-house" performance testing. This is why more and more often, cloud providers and hyperscalers choose to profile and monitor performance directly on production systems [@GoogleWideProfiling]. Measuring performance when there are "no other players" may not reflect real-world scenarios. It would be a waste of time to implement code optimizations that perform well in a lab environment but not in a production environment. Having said that, it doesn't eliminate the need for continuous "in-house" testing to catch performance problems early. Not all performance regressions can be caught in a lab, but engineers should design performance benchmarks representative of real-world scenarios.
+
+It's becoming a trend for large service providers to implement telemetry systems that monitor performance on user devices. One such example is the Netflix Icarus[^1] telemetry service, which runs on thousands of different devices spread all around the world. Such a telemetry system helps Netflix understand how real users perceive Netflix's app performance. It allows engineers to analyze data collected from many devices and to find issues that would be impossible to find otherwise. This kind of data allows making better-informed decisions on where to focus the optimization efforts.
+
+One important caveat of monitoring production deployments is measurement overhead. Because any kind of monitoring affects the performance of a running service, it's recommended to use only lightweight profiling methods. According to [@GoogleWideProfiling]: "To conduct continuous profiling on datacenter machines serving real traffic, extremely low overhead is paramount". Usually, acceptable aggregated overhead is considered below 1%. Performance monitoring overhead can be reduced by limiting the set of profiled machines as well as using longer time intervals.
+
+Measuring performance in such production environments means that we must accept its noisy nature and use statistical methods to analyze results. A good example of how large companies like LinkedIn use statistical methods to measure and compare quantile-based metrics (e.g., 90th percentile Page Load Times) in their A/B testing in the production environment can be found in [@liu2019largescale].
+
+[^1]: Presented at CMG 2019, [https://www.youtube.com/watch?v=4RG2DUK03_0](https://www.youtube.com/watch?v=4RG2DUK03_0).

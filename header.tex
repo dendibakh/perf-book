@@ -1,0 +1,141 @@
+\usepackage{titlesec}
+\titleformat{\section}
+{\normalfont\LARGE\bfseries}{\thesection}{1em}{}
+\titlespacing{\section}{0pt}{0pt}{30pt}
+\newcommand{\sectionbreak}{\clearpage}
+
+    %%%% pandoc-fignos: required package
+    \usepackage{caption}
+
+    %% pandoc-fignos: environment to disable figure caption prefixes
+    \makeatletter
+    \newcounter{figno}
+    \newenvironment{fignos:no-prefix-figure-caption}{
+      \caption@ifcompatibility{}{
+        \let\oldthefigure\thefigure
+        \let\oldtheHfigure\theHfigure
+        \renewcommand{\thefigure}{figno:\thefigno}
+        \renewcommand{\theHfigure}{figno:\thefigno}
+        \stepcounter{figno}
+        \captionsetup{labelformat=empty}
+      }
+    }{
+      \caption@ifcompatibility{}{
+        \captionsetup{labelformat=default}
+        \let\thefigure\oldthefigure
+        \let\theHfigure\oldtheHfigure
+        \addtocounter{figure}{-1}
+      }
+    }
+    \makeatother
+
+%%%% This is for listings
+\usepackage{xcolor}
+\usepackage{listings}
+
+\lstset{
+    basicstyle=\ttfamily,
+    keywordstyle=\color[rgb]{0.13,0.29,0.53}\bfseries,
+    stringstyle=\color[rgb]{0.31,0.60,0.02},
+    commentstyle=\color[rgb]{0.56,0.35,0.01}\itshape,
+    numberstyle=\footnotesize,
+    stepnumber=1,
+    numbersep=5pt,
+    backgroundcolor=\color[RGB]{248,248,248},
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2,
+    captionpos=b,
+    breaklines=true,
+    breakatwhitespace=true,
+    breakautoindent=true,
+    escapeinside={\%*}{*)},
+    linewidth=\textwidth,
+    basewidth=0.5em,
+    extendedchars=false,
+}
+\newcommand{\passthrough}[1]{#1}
+
+\usepackage{fancyhdr}
+\setlength{\headheight}{15pt}
+
+\pagestyle{fancy}
+
+\fancyhf{}
+\fancyfoot[C]{\thepage}
+\fancyhead[RE]{\textit{ \nouppercase{\leftmark}} }
+\fancyhead[RO]{\textit{ \nouppercase{\rightmark}} }
+
+\usepackage[nottoc]{tocbibind}
+\usepackage[authoryear]{natbib}
+
+\usepackage[most]{tcolorbox}
+\newtcolorbox{myquote}{colback=yellow!7!white,grow to right by=-10mm,grow to left by=-10mm, boxrule=0pt,boxsep=0pt,breakable}
+\newcommand{\personal}[1]{\begin{myquote} \textbf{Personal Experience:} #1 \end{myquote}}
+\newcommand{\personalOpinion}[1]{\begin{myquote} \textbf{Personal Opinion:} #1 \end{myquote}}
+
+\usepackage{color}
+\definecolor{darkred}{rgb}{0.5,0,0}
+\definecolor{darkgreen}{rgb}{0,0.5,0}
+\definecolor{darkblue}{rgb}{0,0,0.5}
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks,
+  linkcolor=darkblue,
+  filecolor=darkgreen,
+  urlcolor=darkblue,
+  citecolor=darkblue,
+  pdfsubject={performance analysis},
+  pdfkeywords={performance analysis},
+}
+
+\usepackage{pmboxdraw}
+\usepackage{subfig}
+
+\newcommand{\pcdoc}{Pandoc-crossref documentation}
+\makeatletter
+\@ifpackageloaded{subfig}{}{\usepackage{subfig}}
+\@ifpackageloaded{caption}{}{\usepackage{caption}}
+\captionsetup[subfloat]{margin=0.5em}
+\@ifpackageloaded{float}{}{\usepackage{float}}
+\floatstyle{ruled}
+\@ifundefined{c@chapter}{\newfloat{codelisting}{h}{lop}}{\newfloat{codelisting}{h}{lop}[chapter]}
+\floatname{codelisting}{Listing}
+\newcommand*\listoflistings{\listof{codelisting}{List of Listings}}
+\makeatother
+
+\usepackage{graphicx}
+\graphicspath{{img/}}
+
+% support for glossary
+%\usepackage{glossaries}
+%\makenoidxglossaries
+%\input{glossary.tex}
+
+\renewcommand*\contentsname{}
+
+\usepackage{multicol}
+
+\usepackage{footnotebackref}
+
+\usepackage{bookmark}
+\usepackage{etoolbox}
+
+\makeatletter
+\newcommand*{\AddChapterPrefixInBookmarks}{%
+  \if@mainmatter
+    \ifnum\bookmarkget{level}=0 %
+      \preto\bookmark@text{\@chapapp\space}%
+    \fi
+  \fi
+}
+\makeatother
+
+\bookmarksetup{
+  numbered,
+  addtohook=\AddChapterPrefixInBookmarks,
+}
+
+% this one to skip adding the title and the author
+\AtBeginDocument{\let\maketitle\relax}
