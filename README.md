@@ -20,3 +20,7 @@ python.exe export_book.py && pdflatex book.tex && bibtex book && pdflatex book.t
 ```
 
 First compilation may be slow due to installation of required packets.
+
+## License
+
+[Apache License 2.0](LICENSE)
