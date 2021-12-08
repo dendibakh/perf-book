@@ -23,4 +23,4 @@ First compilation may be slow due to installation of required packets.
 
 ## License
 
-[Apache License 2.0](LICENSE)
+[Creative Commons Zero v1.0 Universal](LICENSE)
