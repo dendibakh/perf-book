@@ -36,7 +36,7 @@ a.c:5:3: remark: unrolled loop by a factor of 4 with run-time trip count [-Rpass
   ^
 ```
 
-By checking the optimization report above, we could see that the loop was not vectorized, but it was unrolled instead. It's not always easy for a developer to recognize the existence of vector dependency in the loop on line 5 in [@lst:optReport]. The value that is loaded by `c[i-1]` depends on the store from the previous iteration (see operations #2 and #3 in Figure @fig:VectorDep). The dependency can be revealed by manually unrolling a few first iterations of the loop:
+By checking the optimization report above, we could see that the loop was not vectorized, but it was unrolled instead. It's not always easy for a developer to recognize the existence of vector dependency in the loop on line 6 in [@lst:optReport]. The value that is loaded by `c[i-1]` depends on the store from the previous iteration (see operations #2 and #3 in Figure @fig:VectorDep). The dependency can be revealed by manually unrolling a few first iterations of the loop:
 
 ```cpp
 // iteration 1
