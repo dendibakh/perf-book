@@ -28,6 +28,7 @@ Once it's determined that the difference is statistically significant via the hy
 
 <div id="fig:Averages">
 ![Averages only](/1/Averages1.png){#fig:Averages1 width=30%}
+
 ![Full measurement intervals](/1/Averages2.png){#fig:Averages2 width=30%}
 
 Two histograms showing how averages could be misleading.

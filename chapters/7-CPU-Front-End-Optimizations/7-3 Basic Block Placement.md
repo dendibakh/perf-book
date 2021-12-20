@@ -16,6 +16,7 @@ Figure @fig:BBLayout shows two possible physical layouts for this snippet of cod
 
 <div id="fig:BBLayout">
 ![default layout](/5/BBLayout_Default.jpg){#fig:BB_default width=30%}
+
 ![improved layout](/5/BBLayout_Better.jpg){#fig:BB_better width=30%}
 
 Two different machine code layouts.

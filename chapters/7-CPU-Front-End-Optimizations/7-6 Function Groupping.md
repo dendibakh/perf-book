@@ -10,6 +10,7 @@ Figure @fig:FunctionGrouping gives a graphical representation of grouping `foo`,
 
 <div id="fig:FunctionGrouping">
 ![default layout](/5/FunctionGrouping_Default.jpg){#fig:FuncGroup_default width=35%}
+
 ![improved layout](/5/FunctionGrouping_Better.jpg){#fig:FuncGroup_better width=32%}
 
 Grouping hot functions together.
