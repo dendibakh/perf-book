@@ -209,7 +209,7 @@ $ perf report -n --sort symbol_from,symbol_to -F +cycles,srcline_from,srcline_to
      0.58%   3804      24      dec.c:174    dec.c:174   
 ```
 
-Several not significant lines were removed from the output of `perf record` in order to make it fit on the page. If we now focus on the branch in which source and destination is `dec.c:174`[^10], we can find multiple lines associated with it. Linux `perf` sorts entries by overhead first, which requires us to manually filter entries for the branch which we are interested in. In fact, if we filter them, we will get the latency distribution for the basic block that ends with this branch, as shown in the table {@tbl:bb_latency}. Later user can plot this data and get a chart similar to Figure @fig:LBR_timing_BB.
+Several not significant lines were removed from the output of `perf record` in order to make it fit on the page. If we now focus on the branch in which source and destination is `dec.c:174`[^10], we can find multiple lines associated with it. Linux `perf` sorts entries by overhead first, which requires us to manually filter entries for the branch which we are interested in. In fact, if we filter them, we will get the latency distribution for the basic block that ends with this branch, as shown in the table {@tbl:bb_latency}. Later we can plot this data and get a chart similar to Figure @fig:LBR_timing_BB.
 
 ----------------------------------------------
 Cycles  Number of samples  Probability density

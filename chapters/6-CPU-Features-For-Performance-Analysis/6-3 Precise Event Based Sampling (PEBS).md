@@ -17,13 +17,13 @@ $ dmesg | grep PEBS
 [    0.061116] Performance Events: PEBS fmt1+, IvyBridge events, 16-deep LBR, full-width counters, Intel PMU driver.
 ```
 
-Linux `perf` doesn't export the raw PEBS output as it does for LBR[^5]. Instead, it processes PEBS records and extracts only the subset of data depending on a particular need. So, it's not possible to access the collection of raw PEBS records with Linux `perf`. Although, Linux `perf` provides some PEBS data processed from raw samples, which can be accessed by `perf report -D`.  To dump raw PEBS records, one can use [`pebs-grabber`](https://github.com/andikleen/pmu-tools/tree/master/pebs-grabber)[^1] tool.
+Linux `perf` doesn't export the raw PEBS output as it does for LBR[^5]. Instead, it processes PEBS records and extracts only the subset of data depending on a particular need. So, it's not possible to access the collection of raw PEBS records with Linux `perf`. However, Linux `perf` provides some PEBS data processed from raw samples, which can be accessed by `perf report -D`.  To dump raw PEBS records, one can use [`pebs-grabber`](https://github.com/andikleen/pmu-tools/tree/master/pebs-grabber)[^1] tool.
 
 There is a number of benefits that the PEBS mechanism brings to performance monitoring, which we will discuss in the next section.
 
 ### Precise events
 
-One of the major problems in profiling is pinpointing the exact instruction that caused a particular performance event. As discussed in [@sec:profiling], interrupt-based sampling is based on counting specific performance events and waiting until it overflows. When an overflow interrupt happens, it takes a processor some amount of time to stop the execution and tag instruction that caused the overflow. This is especially difficult for modern complex out-of-order CPU architectures.
+One of the major problems in profiling is pinpointing the exact instruction that caused a particular performance event. As discussed in [@sec:profiling], interrupt-based sampling is based on counting specific performance events and waiting until it overflows. When an overflow interrupt happens, it takes a processor some amount of time to stop the execution and tag the instruction that caused the overflow. This is especially difficult for modern complex out-of-order CPU architectures.
 
 It introduces the notion of a skid, which is defined as the distance between the IP that caused the event to the IP where the event is tagged (in the IP field inside the PEBS record). Skid makes it difficult to discover the instruction, which is actually causing the performance issue. Consider an application with a big number of cache misses and the hot assembly code that looks like this:
 
@@ -35,7 +35,7 @@ It introduces the notion of a skid, which is defined as the distance between the
 
 The profiler might attribute `load3` as the instruction that causes a large number of cache misses, while in reality, `load1` is the instruction to blame. This usually causes a lot of confusion for beginners. Interested readers could learn more about underlying reasons for such issues on [Intel Developer Zone website](https://software.intel.com/en-us/vtune-help-hardware-event-skid)[^4].
 
-The problem with the skid is mitigated by having the processor itself store the instruction pointer (along with other information) in a PEBS record. The `EventingIP` field in the PEBS record indicates the instruction that caused the event. This needs to be supported by the hardware and is typically available only for a subset of supported events, called "Precise Events". A complete list of precise events for specific microarchitecture can be found in  [@IntelSDM, Volume 3B, Chapter 18]. Below listed precise events for the Skylake Microarchitecture:
+The problem with the skid is mitigated by having the processor itself store the instruction pointer (along with other information) in a PEBS record. The `EventingIP` field in the PEBS record indicates the instruction that caused the event. This needs to be supported by the hardware and is typically available only for a subset of supported events, called "Precise Events". A complete list of precise events for specific microarchitecture can be found in  [@IntelSDM, Volume 3B, Chapter 18]. Listed below are precise events for the Skylake Microarchitecture:
 
 ```
 INST_RETIRED.*
@@ -60,7 +60,7 @@ $ perf record -e cpu/event=0xd1,umask=0x20,name=MEM_LOAD_RETIRED.L3_MISS/ppp -- 
 
 ### Lower sampling overhead
 
-Frequently generating interrupts and having an analysis tool itself capture program state inside the interrupt service routine is very costly since it involves OS interaction. This is why some hardware allows automatically sampling multiple times to a dedicated buffer without any interrupts. Only when the dedicated buffer is full, the processor raises interrupt, and the buffer gets flushed to memory. This has a lower overhead than traditional interrupt-based sampling. 
+Frequently generating interrupts and having an analysis tool itself capture program state inside the interrupt service routine is very costly since it involves OS interaction. This is why some hardware allows automatically sampling multiple times to a dedicated buffer without any interrupts. Only when the dedicated buffer is full, the processor raises an interrupt, and the buffer gets flushed to memory. This has a lower overhead than traditional interrupt-based sampling. 
 
 When a performance counter is configured for PEBS, an overflow condition in the counter will arm the PEBS mechanism. On the subsequent event following overflow, the processor will generate a PEBS event. On a PEBS event, the processor stores the PEBS record in the PEBS buffer area, clears the counter overflow status and reloads the counter with the initial value. If the buffer is full, the CPU will raise an interrupt. [@IntelSDM, Volume 3B, Chapter 18]
 
@@ -78,7 +78,7 @@ If the performance event supports Data Linear Address (DLA) facility, and it is 
 
 One of the most important use cases for this PEBS extension is detecting [True/False sharing](https://en.wikipedia.org/wiki/False_sharing)[^3], which we will discuss in [@sec:TrueFalseSharing]. Linux `perf c2c` tool heavily relies on DLA data to find contested memory accesses, which could experience True/False sharing.
 
-Also, with the help of Data Address Profiling, user can get general statistics about memory accesses in the program:
+Also, with the help of Data Address Profiling, the user can get general statistics about memory accesses in the program:
 
 ```bash
 $ perf mem record -- ./a.exe
