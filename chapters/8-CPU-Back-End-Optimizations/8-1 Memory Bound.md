@@ -10,4 +10,4 @@ The statement that memory hierarchy performance is very important is backed by F
 
 ![The gap in performance between memory and processors. *© Image from [@Hennessy].*](/5/ProcessorMemoryGap.png){#fig:CpuMemGap width=90%}
 
-In TMA, `Memory Bound` estimates a fraction of slots where the CPU pipeline is likely stalled due to demand load or store instructions. The first step to solving such a performance problem is to locate the memory accesses that contribute to the high `Memory Bound` metric (see [@sec:secTMA_locate]). Once guilty memory access is identified, several optimization strategies could be applied. Below we will discuss a few typical cases.
+In TMA, `Memory Bound` estimates a fraction of slots where the CPU pipeline is likely stalled due to demand for load or store instructions. The first step to solving such a performance problem is to locate the memory accesses that contribute to the high `Memory Bound` metric (see [@sec:secTMA_locate]). Once guilty memory access is identified, several optimization strategies could be applied. Below we will discuss a few typical cases.

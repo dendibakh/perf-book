@@ -120,7 +120,7 @@ $ perf report -n --stdio --no-children
 
 When using Intel Vtune Profiler, one can collect call stacks data by checking the corresponding "Collect stacks" box while configuring analysis[^2]. When using command-line interface specify `-knob enable-stack-collection=true` option.
 
-\personal{Mechanism of collecting call stacks is very important to understand. I've seen some developers that are not familiar with the concept try to obtain this information by using a debugger. They do this by interrupting the execution of a program and analyze the call stack (like `backtrace` command in `gdb` debugger). Developers should allow profiling tools to do the job, which is much faster and gives more accurate data.}
+\personal{The mechanism of collecting call stacks is very important to understand. I've seen some developers that are not familiar with the concept try to obtain this information by using a debugger. They do this by interrupting the execution of a program and analyze the call stack (like `backtrace` command in `gdb` debugger). Developers should allow profiling tools to do the job, which is much faster and gives more accurate data.}
 
 ### Flame Graphs
 

@@ -116,7 +116,7 @@ S0-C0-T0 BE_Bound.Mem_Bound.Store_Bound:  0.69 % Stalls
 S0-C0-T0 BE_Bound.Core_Bound.Divider:     8.56 % Clocks
 S0-C0-T0 BE_Bound.Core_Bound.Ports_Util: 11.31 % Clocks
 ```
-We found the bottleneck to be in `DRAM_Bound`. This tells us that many memory accesses miss in all levels of caches and go all the way down to the main memory. We can also confirm if we collect the absolute number of L3 cache misses (DRAM hit) for the program. For Skylake architecture, the `DRAM_Bound` metric is calculated using the `CYCLE_ACTIVITY.STALLS_L3_MISS` performance event. Let’s collect it:
+We found the bottleneck to be in `DRAM_Bound`. This tells us that many memory accesses miss in all levels of caches and go all the way down to the main memory. We can also confirm this if we collect the absolute number of L3 cache misses (DRAM hit) for the program. For Skylake architecture, the `DRAM_Bound` metric is calculated using the `CYCLE_ACTIVITY.STALLS_L3_MISS` performance event. Let’s collect it:
 
 ```bash
 $ perf stat -e cycles,cycle_activity.stalls_l3_miss -- ./a.out
@@ -130,7 +130,7 @@ According to the definition of `CYCLE_ACTIVITY.STALLS_L3_MISS`, it counts cycles
 
 As the second step in the TMA process, we would locate the place in the code where the bottleneck occurs most frequently. In order to do so, one should sample the workload using a performance event that corresponds to the type of bottleneck that was identified during Step 1.
 
-A recommended way to find such an event is to run `toplev` tool with the `--show-sample` option that will suggest the `perf record` command line that can be used to locate the issue. For the purpose of understanding the mechanics of TMA, we also present the manual way to find an event associated with a particular performance bottleneck. Correspondence between performance bottlenecks and performance events that should be used for locating the place in the code where such bottlenecks take place can be done with the help of [TMA metrics](https://download.01.org/perfmon/TMA_Metrics.xlsx)[^2] table introduced earlier in the chapter. The `Locate-with` column denotes a performance event that should be used to locate the exact place in the code where the issue occurs. For the purpose of our example, in order to find memory accesses that contribute to such a high value of the `DRAM_Bound` metric (miss in the L3 cache), we should sample on `MEM_LOAD_RETIRED.L3_MISS_PS` precise event as shown in the listing above:
+A recommended way to find such an event is to run `toplev` tool with the `--show-sample` option that will suggest the `perf record` command line that can be used to locate the issue. For the purpose of understanding the mechanics of TMA, we also present the manual way to find an event associated with a particular performance bottleneck. Correspondence between performance bottlenecks and performance events that should be used for locating the place in the code where such bottlenecks take place can be done with the help of [TMA metrics](https://download.01.org/perfmon/TMA_Metrics.xlsx)[^2] table introduced earlier in the chapter. The `Locate-with` column denotes a performance event that should be used to locate the exact place in the code where the issue occurs. For the purpose of our example, in order to find memory accesses that contribute to such a high value of the `DRAM_Bound` metric (miss in the L3 cache), we should sample on `MEM_LOAD_RETIRED.L3_MISS_PS` precise event as shown in the listing below:
 
 ```bash
 $ perf record -e cpu/event=0xd1,umask=0x20,name=MEM_LOAD_RETIRED.L3_MISS/ppp ./a.out
@@ -209,7 +209,7 @@ $ perf stat -e cycles,cycle_activity.stalls_l3_miss -- ./a.out
        6,498080824 seconds time elapsed
 ```
 
-TMA is an iterative process, so we now need to repeat the process starting from the Step1. Likely it will move the bottleneck into some other bucket, in this case, Retiring. This was an easy example demonstrating the workflow of TMA methodology. Analyzing real-world application is unlikely to be that easy. The next entire chapter in this book is organized in a way to be conveniently used with the TMA process. E.g., its sections are broken down to reflect each high-level category of performance bottlenecks. The idea behind such a structure is to provide some kind of checklist which developer can use to drive code changes after performance issue has been found. For instance, when developers see that the application they are working on is `Memory Bound`, they can look up [@sec:MemBound] for ideas.
+TMA is an iterative process, so we now need to repeat the process starting from the Step1. Likely it will move the bottleneck into some other bucket, in this case, Retiring. This was an easy example demonstrating the workflow of TMA methodology. Analyzing real-world application is unlikely to be that easy. The next entire chapter in this book is organized in a way to be conveniently used with the TMA process. E.g., its sections are broken down to reflect each high-level category of performance bottlenecks. The idea behind such a structure is to provide some kind of checklist which developers can use to drive code changes after a performance issue has been found. For instance, when developers see that the application they are working on is `Memory Bound`, they can look up [@sec:MemBound] for ideas.
 
 ### Summary
 
