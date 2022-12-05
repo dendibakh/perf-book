@@ -15,8 +15,16 @@ You need to install:
 # Building a book (pdf)
 
 Run:
-```
+```bash
+# Linux bash & Mac
 python.exe export_book.py && pdflatex book.tex && bibtex book && pdflatex book.tex && pdflatex book.tex
+
+# Windows Powershell
+function Run-Block-With-Error($block) {
+    $ErrorActionPreference="Stop"
+    Invoke-Command -ScriptBlock $block
+}
+Run-Block-With-Error {python.exe export_book.py; pdflatex book.tex; bibtex book; pdflatex book.tex; pdflatex book.tex}
 ```
 
 First compilation may be slow due to installation of required packets.
