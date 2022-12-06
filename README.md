@@ -39,7 +39,7 @@ function Run-Block-With-Error($block) {
 Run-Block-With-Error {python.exe export_book.py; pdflatex book.tex; bibtex book; pdflatex book.tex; pdflatex book.tex}
 ```
 
-As a result, `book.pdf` will be generated. First compilation may be slow due to installation of required packets.
+As a result, `book.pdf` will be generated. The first compilation may be slow due to the installation of required packets.
 
 ## License
 
