@@ -2,7 +2,7 @@
 
 This is a repository with source files of the book "Performance Analysis and Tuning on Modern CPU" by Denis Bakhvalov, et al.
 
-**Second edition work in progress!** Planned changes are outlined in the google [document](https://docs.google.com/document/d/1tr2qRDe72VSBYypIANYjJLM_zCdPB6S9m4LmXsQb0vQ/edit?usp=sharing). Planned new table of contents is in [new_toc.md](new_toc.md).
+**Second edition work in progress!** Planned changes are outlined in the google [document](https://docs.google.com/document/d/1tr2qRDe72VSBYypIANYjJLM_zCdPB6S9m4LmXsQb0vQ/edit?usp=sharing). The planned new table of contents is in [new_toc.md](new_toc.md).
 
 My goal is to accumulate as much knowledge as possible from all the best experts in the industry. And of course, share that knowledge with you. Contributions are welcome.
 
