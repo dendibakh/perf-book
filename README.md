@@ -16,6 +16,8 @@ There are many ways how you can help.
 
 Check out the [discussions](https://github.com/dendibakh/perf-book/discussions) page to start.
 
+For examples on how to add images, table, code listings, etc, see [how-to.md](how-to.md).
+
 # Building a book (pdf)
 
 Requirements:
