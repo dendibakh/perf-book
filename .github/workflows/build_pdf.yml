@@ -30,4 +30,5 @@ jobs:
           $ErrorActionPreference="Stop"        
           Invoke-Command -ScriptBlock $block   
         }
+      run:
         Run-Block-With-Error {python.exe export_book.py; pdflatex book.tex; bibtex book; pdflatex book.tex; pdflatex book.tex}
