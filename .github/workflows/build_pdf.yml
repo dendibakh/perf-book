@@ -26,8 +26,8 @@ jobs:
       shell: powershell
       working-directory: ${{github.workspace}}
       run: 
-        function Run-Block-With-Error($block) { \
-          $ErrorActionPreference="Stop"         \
-          Invoke-Command -ScriptBlock $block    \
-        } \
+        function Run-Block-With-Error($block) {
+          $ErrorActionPreference="Stop"        
+          Invoke-Command -ScriptBlock $block   
+        }
         Run-Block-With-Error {python.exe export_book.py; pdflatex book.tex; bibtex book; pdflatex book.tex; pdflatex book.tex}
