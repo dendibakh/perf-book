@@ -31,15 +31,9 @@ jobs:
           Invoke-Command -ScriptBlock $block
         }
         Run-Block-With-Error {python.exe export_book.py; pdflatex book.tex; bibtex book; pdflatex book.tex; pdflatex book.tex}
+        mv book.pdf perf-book.pdf
     
-    #- name: upload PDF
-      #working-directory: ${{github.workspace}}
-      #uses: actions/upload-artifact@v2
-      #with:
-       # name: WebApp2
-      #path: book.pdf
-
     - uses: actions/upload-artifact@v3
       with:
-        name: upload PDF
-        path: book.pdf
+        name: Performance Analysis and Tuning on Modern CPUs
+        path: perf-book.pdf
