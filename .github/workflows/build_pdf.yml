@@ -25,10 +25,10 @@ jobs:
     - name: prepare
       shell: powershell
       working-directory: ${{github.workspace}}
-      run: 
-        function Run-Block-With-Error($block) {
-          $ErrorActionPreference="Stop"        
-          Invoke-Command -ScriptBlock $block   
+      run: |
+        function Run-Block-With-Error($block) { \
+          $ErrorActionPreference="Stop"         \
+          Invoke-Command -ScriptBlock $block    \
         }
 
     - name: build PDF
