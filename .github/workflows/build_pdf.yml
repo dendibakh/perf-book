@@ -22,7 +22,7 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: build PDF
+    - name: prepare
       shell: powershell
       working-directory: ${{github.workspace}}
       run: 
@@ -30,5 +30,16 @@ jobs:
           $ErrorActionPreference="Stop"        
           Invoke-Command -ScriptBlock $block   
         }
+
+    - name: build PDF
+      shell: powershell
+      working-directory: ${{github.workspace}}        
       run:
         Run-Block-With-Error {python.exe export_book.py; pdflatex book.tex; bibtex book; pdflatex book.tex; pdflatex book.tex}
+    
+    - name: upload PDF
+      working-directory: ${{github.workspace}}
+      uses: actions/upload-artifact@v2
+      with:
+        name: WebApp2
+      path: book.pdf
