@@ -6,7 +6,7 @@ typora-root-url: ..\..\img
 
 Every modern CPU provides means to monitor performance, which are combined into the Performance Monitoring Unit (PMU). It incorporates features that help developers in analyzing the performance of their applications. An example of a PMU in a modern Intel CPU is provided in figure @fig:PMU. Most modern PMUs have a set of Performance Monitoring Counters (PMC) that can be used to collect various performance events that happen during the execution of a program. Later in [@sec:counting], we will discuss how PMCs can be used in performance analysis. Also, there could be other features that enhance performance analysis, like LBR, PEBS, and PT, for which entire chapter 6 is devoted.
 
-![Performance Monitoring Unit of a modern Intel CPU.](/uarch/PMU.png){#fig:PMU width=70%}
+![Performance Monitoring Unit of a modern Intel CPU.](../../img/uarch/PMU.png){#fig:PMU width=70%}
 
 As CPU design evolves with every new generation, so do their PMUs. It is possible to determine the version of the PMU in your CPU using the `cpuid` command, as shown on [@lst:QueryPMU].[^1] Characteristics of each Intel PMU version, as well as changes to the previous version, can be found in [@IntelSDM, Volume 3B, Chapter 18].
 
@@ -30,7 +30,7 @@ Architecture Performance Monitoring Features (0xa/edx):
 
 If we imagine a simplified view of the processor, it may look something like what is shown in Figure @fig:PMC. As we discussed earlier in this chapter, a modern CPU has caches, branch predictor, execution pipeline, and other units. When connected to multiple units, a PMC can collect interesting statistics from them. For example, it can count how many clock cycles have passed, how many instructions executed, how many cache misses or branch mispredictions happened during that time, and other performance events.
 
-![Simplified view of a CPU with a performance monitoring counter.](/uarch/PMC.png){#fig:PMC width=60%}
+![Simplified view of a CPU with a performance monitoring counter.](../../img/uarch/PMC.png){#fig:PMC width=60%}
 
 Typically, PMCs are 48 bit wide, which allows analysis tools to run longer without interrupting the program's execution[^2]. Performance counters are HW registers implemented as Model Specific Registers (MSR). That means that the number of counters and their width can vary from model to model, and you can not rely on the same number of counters in your CPU. You should always query that first, using tools like `cpuid`, for example. PMCs are accessible via the `RDMSR` and `WRMSR` instructions, which can only be executed from kernel space.
 

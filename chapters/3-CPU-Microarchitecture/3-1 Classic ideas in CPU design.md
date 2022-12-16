@@ -20,7 +20,7 @@ Pipelining is the foundational technique used to make CPUs fast wherein multiple
 4. Memory access (MEM)
 5. Write back (WB)
 
-![Simple 5-stage pipeline diagram.](/uarch/Pipelining.png){#fig:Pipelining width=70%}
+![Simple 5-stage pipeline diagram.](../../img/uarch/Pipelining.png){#fig:Pipelining width=70%}
 
 Figure @fig:Pipelining shows an ideal pipeline view of the 5-stage pipeline CPU. In cycle 1, instruction x enters the IF stage of the pipeline. In the next cycle, as instruction x moves to the ID stage, the next instruction in the program enters the IF stage, and so on. Once the pipeline is full, as in cycle 5 above, all pipeline stages of the CPU are busy working on different instructions. Without pipelining, instruction `x+1` couldn't start its execution until instruction `x` finishes its work.
 
@@ -68,7 +68,7 @@ The pipeline example in Figure @fig:Pipelining shows all instructions moving thr
 
 Dynamic scheduling of these instructions is enabled by sophisticated hardware structures such as scoreboards and techniques such as register renaming to reduce data hazards. [Tomasulo algorithm](https://en.wikipedia.org/wiki/Tomasulo_algorithm)[^4] implemented in the IBM360 and [Scoreboading](https://en.wikipedia.org/wiki/Scoreboarding)[^5] implemented in the CDC6600 in the 1960s are pioneering efforts to support dynamic scheduling and out-of-order execution that have influenced all modern CPU architectures. The scoreboard hardware is used to schedule the in-order retirement and all machine state updates. It keeps track of data dependencies of every instruction and where in the pipe the data is available. Most implementations strive to balance the hardware cost with the potential return. Typically, the size of the scoreboard determines how far ahead the hardware can look for scheduling such independent instructions. 
 
-![The concept of Out-Of-Order execution.](/uarch/OOO.png){#fig:OOO width=80%}
+![The concept of Out-Of-Order execution.](../../img/uarch/OOO.png){#fig:OOO width=80%}
 
 Figure @fig:OOO details the concept underlying out-of-order execution with an example. Assume instruction x+1 cannot execute in cycles 4 and 5 due to some conflict. An in-order CPU would stall all subsequent instructions from entering the EXE pipeline stage. In an OOO CPU, subsequent instructions that do not have any conflicts (e.g., instruction x+2) can enter and complete its execution. All instructions still retire in order, i.e., the instructions complete the WB stage in the program order.
 
@@ -76,7 +76,7 @@ Figure @fig:OOO details the concept underlying out-of-order execution with an ex
 
 Most modern CPUs are superscalar i.e., they can issue more than one instruction in a given cycle. Issue-width is the maximum number of instructions that can be issued during the same cycle. Typical issue-width of current generation CPUs ranges from 2-6. To ensure the right balance, such superscalar engines also support more than one execution unit and/or pipelined execution units. CPUs also combine superscalar capability with deep pipelines and out-of-order execution to extract the maximum ILP for a given piece of software. 
 
-![The pipeline diagram for a simple 2-way superscalar CPU.](/uarch/SuperScalar.png){#fig:SuperScalar width=55%}
+![The pipeline diagram for a simple 2-way superscalar CPU.](../../img/uarch/SuperScalar.png){#fig:SuperScalar width=55%}
 
 Figure @fig:SuperScalar shows an example CPU that supports 2-wide issue width, i.e., in each cycle, two instructions are processed in each stage of the pipeline. Superscalar CPUs typically support multiple, independent execution units to keep the instructions in the pipeline flowing through without conflicts. Replicated execution units increase the throughput of the machine in contrast with simple pipelined processors shown in figure @fig:Pipelining.
 
@@ -98,10 +98,10 @@ else
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 <div id="fig:Speculative">
-![No speculation](/uarch/Speculative1.png){#fig:NoSpeculation width=60%}
+![No speculation](../../img/uarch/Speculative1.png){#fig:NoSpeculation width=60%}
 
 
-![Speculative execution](/uarch/Speculative2.png){#fig:SpeculativeExec width=60%}
+![Speculative execution](../../img/uarch/Speculative2.png){#fig:SpeculativeExec width=60%}
 
 The concept of speculative execution.
 </div>
@@ -157,7 +157,7 @@ $$
 
 Every block in the m-way set-associative cache has an address tag associated with it. In addition, the tag also contains state bits such as valid bits to indicate whether the data is valid. Tags can also contain additional bits to indicate access information, sharing information, etc. that will be described in later sections. 
 
-![Address organization for cache lookup.](/uarch/CacheLookup.png){#fig:CacheLookup width=80%}
+![Address organization for cache lookup.](../../img/uarch/CacheLookup.png){#fig:CacheLookup width=80%}
 
 The figure @fig:CacheLookup shows how the address generated from the pipeline is used to check the caches. The lowest order address bits define the offset within a given block; the block offset bits (5 bits for 32-byte cache lines, 6 bits for 64-byte cache lines). The set is selected using the index bits based on the formulas described above. Once the set is selected, the tag bits are used to compare against all the tags in that set. If one of the tags matches the tag of the incoming request and the valid bit is set, a cache hit results. The data associated with that block entry (read out of the data array of the cache in parallel to the tag lookup) is provided to the execution pipeline. A cache miss occurs in cases where the tag is not a match.
 
@@ -227,7 +227,7 @@ Virtual memory is the mechanism to share the physical memory attached to a CPU w
 
 In a CPU that supports virtual memory, programs use virtual addresses for their accesses. These virtual addresses are translated to a physical address by dedicated hardware tables that provide a mapping between virtual addresses and physical addresses. These tables are referred to as page tables. The address translation mechanism is shown below. The virtual address is split into two parts. The virtual page number is used to index into the page table (the page table can either be a single level or nested) to produce a mapping between the virtual page number and the corresponding physical page. The page offset from the virtual address is then used to access the physical memory location at the same offset in the mapped physical page. A page fault results if a requested page is not in the main memory. The operating system is responsible for providing hints to the hardware to handle page faults such that one of the least recently used pages can be swapped out to make space for the new page.
 
-![Address organization for cache lookup.](/uarch/VirtualMem.png){#fig:VirtualMem width=70%}
+![Address organization for cache lookup.](../../img/uarch/VirtualMem.png){#fig:VirtualMem width=70%}
 
 CPUs typically use a hierarchical page table format to map virtual address bits efficiently to the available physical memory. A page miss in such a system would be expensive, requiring traversing through the hierarchy. To reduce the address translation time, CPUs support a hardware structure called translation lookaside buffer (TLB) to cache the most recently used translations.
 
@@ -246,7 +246,7 @@ for (int i = 0; i < N; ++i) {
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-![Example of scalar and SIMD operations.](/uarch/SIMD.png){#fig:SIMD width=80%}
+![Example of scalar and SIMD operations.](../../img/uarch/SIMD.png){#fig:SIMD width=80%}
 
 Most of the popular CPU architectures feature vector instructions, including x86, PowerPC, ARM, and RISC-V. In 1996 Intel released a new instruction set, MMX, which was a SIMD instruction set that was designed for multimedia applications. Following MMX, Intel introduced new instruction sets with added capabilities and increased vector size: SSE, AVX, AVX2, AVX512. As soon as the new instruction sets became available, work began to make them usable to software engineers. At first, the new SIMD instructions were programmed in assembly. Later, special compiler intrinsics were introduced. Today all of the major compilers support vectorization for the popular processors.
 

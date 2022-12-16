@@ -19,7 +19,7 @@ You can also insert LaTex tags directly into the *.md files as shown below. They
 ### Simple image
 
 ```
-![40 Years of Microprocessor Trend Data.](/1/40-years-processor-trend.png){#fig:40YearsProcessorTrend width=90%}
+![40 Years of Microprocessor Trend Data.](../img/1/40-years-processor-trend.png){#fig:40YearsProcessorTrend width=90%}
 ```
 reference it in the text with `@fig:40YearsProcessorTrend`
 
@@ -27,8 +27,8 @@ reference it in the text with `@fig:40YearsProcessorTrend`
 
 ```
 <div id="fig:BBLayout">
-![default layout](/5/BBLayout_Default.jpg){#fig:BB_default width=30%}
-![improved layout](/5/BBLayout_Better.jpg){#fig:BB_better width=30%}
+![default layout](../../img/5/BBLayout_Default.jpg){#fig:BB_default width=30%}
+![improved layout](../../img/5/BBLayout_Better.jpg){#fig:BB_better width=30%}
 
 Two different layouts for the code snippet.
 </div>

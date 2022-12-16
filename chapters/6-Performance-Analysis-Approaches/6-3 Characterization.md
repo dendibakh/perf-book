@@ -1,4 +1,4 @@
-﻿---
+---
 typora-root-url: ..\..\img
 ---
 
@@ -12,7 +12,7 @@ In [@sec:TMA], we will closely look at Top-Down Microarchitecture Analysis (TMA)
 
 PMCs are a very important instrument of low-level performance analysis. They can provide unique information about the execution of our program. PMCs are generally used in two modes: "Counting" and "Sampling". Counting mode is used for workload characterization, while Sampling mode is used for finding hotspots, which we will discuss in [@sec:profiling]. The idea behind Counting is very simple: we want to count the number of certain performance events during the time our program was running. Figure @fig:Counting illustrates the process of counting performance events in the time perspective. 
 
-![Counting performance events.](/2/CountingFlow.png){#fig:Counting width=90%}
+![Counting performance events.](../../img/2/CountingFlow.png){#fig:Counting width=90%}
 
 The steps outlined in figure @fig:Counting roughly represent what a typical analysis tool will do to count performance events. This process is implemented in the `perf stat` tool, which can be used to count various HW events, like the number of instructions, cycles, cache-misses, etc. Below is the example of output from `perf stat`:
 
@@ -82,9 +82,9 @@ There are situations when we want to count many different events at the same tim
 If there are more events than counters, the analysis tool uses time multiplexing to give each event a chance to access the monitoring hardware. Figure @fig:Multiplexing shows an example of multiplexing between 8 performance events with only 4 PMCs available.
 
 <div id="fig:Multiplexing">
-![](/2/Multiplexing1.png){#fig:Multiplexing1 width=60%}
+![](../../img/2/Multiplexing1.png){#fig:Multiplexing1 width=60%}
 
-![](/2/Multiplexing2.png){#fig:Multiplexing2 width=60%}
+![](../../img/2/Multiplexing2.png){#fig:Multiplexing2 width=60%}
 
 Multiplexing between 8 performance events with only 4 PMCs available.
 </div>

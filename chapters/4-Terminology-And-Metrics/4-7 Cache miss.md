@@ -1,4 +1,4 @@
-﻿---
+---
 typora-root-url: ..\..\img
 ---
 

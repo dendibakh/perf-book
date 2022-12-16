@@ -15,9 +15,9 @@ if (cond)
 Figure @fig:BBLayout shows two possible physical layouts for this snippet of code. Figure @fig:BB_default is the layout most compiler will emit by default, given no hints provided. The layout that is shown in figure @fig:BB_better can be achieved if we invert the condition `cond` and place hot code as a fall-through.
 
 <div id="fig:BBLayout">
-![default layout](/5/BBLayout_Default.jpg){#fig:BB_default width=30%}
+![default layout](../../img/5/BBLayout_Default.jpg){#fig:BB_default width=30%}
 
-![improved layout](/5/BBLayout_Better.jpg){#fig:BB_better width=30%}
+![improved layout](../../img/5/BBLayout_Better.jpg){#fig:BB_better width=30%}
 
 Two different machine code layouts.
 </div>

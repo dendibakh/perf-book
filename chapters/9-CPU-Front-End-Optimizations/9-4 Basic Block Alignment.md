@@ -36,9 +36,9 @@ The code itself is pretty reasonable[^4] for Skylake architecture, but its layou
 To fix this, we can shift the loop instructions forward by 16 bytes using NOPs so that the whole loop will reside in one cache line. Figure @fig:Loop_better shows the effect of doing this with NOP instructions highlighted in blue. Note that since the benchmark runs nothing but this hot loop, it is pretty much guaranteed that both cache lines will remain in L1I-cache. The reason for the better performance of the layout @fig:Loop_better is not trivial to explain and will involve a fair amount of microarchitectural details[^1], which we will avoid in this book.
 
 <div id="fig:LoopLayout">
-![default layout](/5/LoopAlignment_Default.png){#fig:Loop_default width=90%}
+![default layout](../../img/5/LoopAlignment_Default.png){#fig:Loop_default width=90%}
 
-![improved layout](/5/LoopAlignment_Better.png){#fig:Loop_better width=90%}
+![improved layout](../../img/5/LoopAlignment_Better.png){#fig:Loop_better width=90%}
 
 Two different alignments for the loop.
 </div>

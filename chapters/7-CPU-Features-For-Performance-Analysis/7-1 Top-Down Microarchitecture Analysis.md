@@ -8,11 +8,11 @@ Top-Down Microarchitecture Analysis Methodology (TMA) is a very powerful techniq
 
 At a high-level, TMA identifies what was stalling the execution of every hotspot in the program. The bottleneck can be related to one of the four components: Front End Bound, Back End Bound, Retiring, Bad Speculation. Figure @fig:TMA_concept illustrates this concept. Here is a short guide on how to read this diagram. As we know from [@sec:uarch], there are internal buffers in the CPU that keep track of information about instructions that are being executed. Whenever new instruction gets fetched and decoded, new entries in those buffers are allocated. If uop for instruction was not allocated during a particular cycle of execution, it could be for two reasons: we were not able to fetch and decode it (Front End Bound), or Back End was overloaded with work and resources for new uop could not be allocated (Back End Bound). Uop that was allocated and scheduled for execution but not retired is related to the Bad Speculation bucket. An example of such a uop can be some instruction that was executed speculatively but later was proven to be on a wrong program path and was not retired. Finally, Retiring is the bucket where we want all our uops to be, although there are exceptions. A high Retiring value for non-vectorized code may be a good hint for users to vectorize the code (see [@sec:Vectorization]). Another situation when we might see high Retiring value but slow overall performance may happen in the program that operates on denormal floating-point values making such operations extremely slow (see [@sec:SlowFPArith]).
 
-![The concept behind TMA's top-level breakdown. *© Image from [@TMA_ISPASS]*](/4/TMAM_diag.png){#fig:TMA_concept width=90%}
+![The concept behind TMA's top-level breakdown. *© Image from [@TMA_ISPASS]*](../../img/4/TMAM_diag.png){#fig:TMA_concept width=90%}
 
 Figure @fig:TMA_concept gives a breakdown for every instruction in a program. However, analyzing every single instruction in the workload is definitely overkill, and of course, TMA doesn’t do that. Instead, we are usually interested in knowing what is stalling the program as a whole. To accomplish this goal, TMA observes the execution of the program by collecting specific metrics (ratios of PMCs). Based on those metrics, it characterizes application by relating it to one of the four high-level buckets. There are nested categories for each high-level bucket (see Figure @fig:TMA) that give a better breakdown of the CPU performance bottlenecks in the program. We run the workload several times[^14], each time focusing on specific metrics and drilling down until we get to the more detailed classification of performance bottleneck. For example, initially, we collect metrics for four main buckets: `Front End Bound`, `Back End Bound`, `Retiring`, `Bad Speculation`. Say, we found out that the big portion of the program execution was stalled by memory accesses (which is a `Back End Bound` bucket, see Figure @fig:TMA). The next step is to run the workload again and collect metrics specific for the `Memory Bound` bucket only (drilling down). The process is repeated until we know the exact root cause, for example, `L3 Bound`.
 
-![The TMA hierarchy of performance bottlenecks. *© Image by Ahmad Yasin.*](/4/TMAM.png){#fig:TMA width=90%}
+![The TMA hierarchy of performance bottlenecks. *© Image by Ahmad Yasin.*](../../img/4/TMAM.png){#fig:TMA width=90%}
 
 In a real-world application, performance could be limited by multiple factors. E.g., it can experience a large number of branch mispredicts (`Bad Speculation`) and cache misses (`Back End Bound`) at the same time. In this case, TMA will drill down into multiple buckets simultaneously and will identify the impact that each type of bottleneck makes on the performance of a program. Analysis tools such as Intel VTune Profiler, AMD uprof, and Linux `perf` can calculate all the metrics with a single run of the benchmark.[^15]
 
@@ -24,15 +24,15 @@ After we identified the performance bottleneck in the program, we would be inter
 
 TMA is featured through the "[Microarchitecture Exploration](https://software.intel.com/en-us/vtune-help-general-exploration-analysis)"[^3] analysis in the latest Intel VTune Profiler. Figure @fig:Vtune_GE shows analysis summary for [7-zip benchmark](https://github.com/llvm-mirror/test-suite/tree/master/MultiSource/Benchmarks/7zip) [^4]. On the diagram, you can see that a significant amount of execution time was wasted due to CPU `Bad Speculation` and, in particular, due to mispredicted branches.
 
-![Intel VTune Profiler "Microarchitecture Exploration" analysis.](/4/Vtune_GE.png){#fig:Vtune_GE width=90%}
+![Intel VTune Profiler "Microarchitecture Exploration" analysis.](../../img/4/Vtune_GE.png){#fig:Vtune_GE width=90%}
 
 The beauty of the tool is that you can click on the metric you are interested in, and the tool will get you to the page that shows top functions that contribute to that particular metric. For example, if you click on the `Bad Speculation` metric, you will see something like what is shown in Figure @fig:Vtune_GE_func. [^19]
 
-!["Microarchitecture Exploration" Bottom-up view.](/4/Vtune_GE_function_view.png){#fig:Vtune_GE_func width=90%}
+!["Microarchitecture Exploration" Bottom-up view.](../../img/4/Vtune_GE_function_view.png){#fig:Vtune_GE_func width=90%}
 
 From there, if you double click on the `LzmaDec_DecodeReal2` function, Intel® VTune™ Profiler will get you to the source level view like the one that is shown in Figure @fig:Vtune_GE_code. The highlighted line contributes to the biggest number of branch mispredicts in the `LzmaDec_DecodeReal2` function.
 
-!["Microarchitecture Exploration" source code and assembly view.](/4/Vtune_GE_code_view.png){#fig:Vtune_GE_code width=90%}
+!["Microarchitecture Exploration" source code and assembly view.](../../img/4/Vtune_GE_code_view.png){#fig:Vtune_GE_code width=90%}
 
 ### TMA in Linux Perf {#sec:secTMA_perf}
 
@@ -215,7 +215,7 @@ TMA is an iterative process, so we now need to repeat the process starting from 
 
 TMA is great for identifying CPU performance bottlenecks in the code. Ideally, when we run it on some application, we would like to see the Retiring metric at 100%.  This would mean that this application fully saturates the CPU. It is possible to achieve results close to this on a toy program. However, real-world applications are far from getting there. Figure @fig:TMA_metrics_SPEC2006 shows top-level TMA metrics for [SPEC CPU2006](http://spec.org/cpu2006/)[^13] benchmark for Skylake CPU generation. Keep in mind that the numbers are likely to change for other CPU generations as architects constantly try to improve the CPU design. The numbers are also likely to change for other instruction set architectures (ISA) and compiler versions.
 
-![Top Level TMA metrics for SPEC CPU2006. *© Image by Ahmad Yasin, [http://cs.haifa.ac.il/~yosi/PARC/yasin.pdf](http://cs.haifa.ac.il/~yosi/PARC/yasin.pdf).*](/4/TMAM_metrics_SPEC2006.png){#fig:TMA_metrics_SPEC2006 width=90%}
+![Top Level TMA metrics for SPEC CPU2006. *© Image by Ahmad Yasin, [http://cs.haifa.ac.il/~yosi/PARC/yasin.pdf](http://cs.haifa.ac.il/~yosi/PARC/yasin.pdf).*](../../img/4/TMAM_metrics_SPEC2006.png){#fig:TMA_metrics_SPEC2006 width=90%}
 
 Using TMA on a code that has major performance flaws is not recommended because it will likely steer you in the wrong direction, and instead of fixing real high-level performance problems, you will be tuning bad code, which is just a waste of time. Similarly, make sure the environment doesn’t get in the way of profiling. For example, if you drop filesystem cache and run the benchmark under TMA, it will likely show that your application is Memory Bound, which in fact, may be false when filesystem cache is warmed up.
 

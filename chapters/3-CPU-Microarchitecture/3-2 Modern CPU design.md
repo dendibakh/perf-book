@@ -4,7 +4,7 @@ typora-root-url: ..\..\img
 
 ## Modern CPU design
 
-![Block diagram of a CPU Core in the Intel Skylake Microarchitecture. *© Image from [@IntelOptimizationManual].*](/uarch/skylake_block_diagram_v2.png){#fig:Skylake_diag width=95%}
+![Block diagram of a CPU Core in the Intel Skylake Microarchitecture. *© Image from [@IntelOptimizationManual].*](../../img/uarch/skylake_block_diagram_v2.png){#fig:Skylake_diag width=95%}
 
 The block diagram in figure @fig:Skylake_diag shows the details of Intel’s 6th generation core, Skylake, that was announced in 2015 and is widely spread all over the world. The Skylake core is split into an in-order front-end that fetches and decodes x86 instructions into u-ops and an 8-way superscalar, out-of-order backend. 
 

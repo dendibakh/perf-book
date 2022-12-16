@@ -6,27 +6,27 @@ typora-root-url: ..\..\img
 
 Intel VTune Profiler has a dedicated type of analysis for multithreaded applications called [Threading Analysis](https://software.intel.com/en-us/vtune-help-threading-analysis). Its summary window (see fig. @fig:MT_VtuneThreadSummary) displays statistics on the overall application execution, identifying all the metrics we described in [@sec:secMT_metrics]. From Effective CPU Utilization Histogram, we could learn several interesting facts about the captured application behavior. First, on average, only 5 HW threads (logical cores on the diagram) were utilized at the same time. Second, almost never all 8 HW threads were active at the same time.
 
-![Intel VTune Profiler Threading Analysis summary for [x264](https://openbenchmarking.org/test/pts/x264) benchmark from [Phoronix test suite](https://www.phoronix-test-suite.com/).](/5/VtuneThreadingSummary.png){#fig:MT_VtuneThreadSummary width=80%}
+![Intel VTune Profiler Threading Analysis summary for [x264](https://openbenchmarking.org/test/pts/x264) benchmark from [Phoronix test suite](https://www.phoronix-test-suite.com/).](../../img/5/VtuneThreadingSummary.png){#fig:MT_VtuneThreadSummary width=80%}
 
 ### Find Expensive Locks
 
 Next, the workflow suggests that we identify the most contended synchronization objects. Figure @fig:MT_VtuneThreadObjects shows the list of such objects. We can see that `__pthread_cond_wait` definitely stands out, but since we might have dozens of conditional variables in the program, we need to know which one is the reason for poor CPU utilization.
 
-![Intel VTune Profiler Threading Analysis showing the most contended synchronization objects for [x264](https://openbenchmarking.org/test/pts/x264) benchmark.](/5/VtuneThreadingWaitingObjects.png){#fig:MT_VtuneThreadObjects width=90%}
+![Intel VTune Profiler Threading Analysis showing the most contended synchronization objects for [x264](https://openbenchmarking.org/test/pts/x264) benchmark.](../../img/5/VtuneThreadingWaitingObjects.png){#fig:MT_VtuneThreadObjects width=90%}
 
 In order to know this, we can simply click on `__pthread_cond_wait`, which will get us to the Bottom-Up view that is shown on fig. @fig:MT_VtuneLockCallStack. We can see the most frequent path (47% of wait time) that lead to threads waiting on conditional variable: `__pthread_cond_wait <- x264_8_frame_cond_wait <- mb_analyse_init`.
 
-![Intel VTune Profiler Threading Analysis showing the call stack for the most contended conditional variable in [x264](https://openbenchmarking.org/test/pts/x264) benchmark.](/5/VtuneThreadingLockCallStack.png){#fig:MT_VtuneLockCallStack width=90%}
+![Intel VTune Profiler Threading Analysis showing the call stack for the most contended conditional variable in [x264](https://openbenchmarking.org/test/pts/x264) benchmark.](../../img/5/VtuneThreadingLockCallStack.png){#fig:MT_VtuneLockCallStack width=90%}
 
 We can next jump into the source code of `x264_8_frame_cond_wait` by double-clicking on the corresponding row in the analysis (see fig. @fig:MT_VtuneLockSourceCode). Next, we can study the reason behind the lock and possible ways to make thread communication in this place more efficient. [^15]
 
-![Source code view for x264_8_frame_cond_wait function in [x264](https://openbenchmarking.org/test/pts/x264) benchmark.](/5/VtuneThreadingLockSourceCode.png){#fig:MT_VtuneLockSourceCode width=90%}
+![Source code view for x264_8_frame_cond_wait function in [x264](https://openbenchmarking.org/test/pts/x264) benchmark.](../../img/5/VtuneThreadingLockSourceCode.png){#fig:MT_VtuneLockSourceCode width=90%}
 
 ### Platform View
 
 Another very useful feature of Intel VTune Profiler is Platform View (see fig. @fig:MT_VtunePlatform), which allows us to observe what each thread was doing in any given moment of program execution. This is very helpful for understanding the behavior of the application and finding potential performance headrooms. For example, we can see that during the time interval from 1s to 3s, only two threads were consistently utilizing ~100% of the corresponding CPU core (threads with TID 7675 and 7678). CPU utilization of other threads was bursty during that time interval. 
 
-![Vtune Platform view for [x264](https://openbenchmarking.org/test/pts/x264) benchmark.](/5/VtuneThreadingPlatformView.png){#fig:MT_VtunePlatform width=90%}
+![Vtune Platform view for [x264](https://openbenchmarking.org/test/pts/x264) benchmark.](../../img/5/VtuneThreadingPlatformView.png){#fig:MT_VtunePlatform width=90%}
 
 Platform View also has zooming and filtering capabilities. This allows us to understand what each thread was executing during a specified time frame. To see this, select the range on the timeline, right-click and choose Zoom In and Filter In by Selection. Intel VTune Profiler will display functions or sync objects used during this time range.
 

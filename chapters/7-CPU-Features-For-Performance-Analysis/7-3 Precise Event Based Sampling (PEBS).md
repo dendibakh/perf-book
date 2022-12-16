@@ -8,7 +8,7 @@ The Processor Event-Based Sampling (PEBS) is another very useful feature in CPUs
 
 The set of additional data has a defined format, which is called the PEBS record. When a performance counter is configured for PEBS, the processor saves the contents of the PEBS buffer, which is later stored in memory. The record contains the architectural state of the processor, for instance, the state of the general-purpose registers (`EAX`, `EBX`, `ESP`, etc.), instruction pointer register (`EIP`), flags register (`EFLAGS`) and more. The content layout of a PEBS record varies across different implementations that support PEBS. See [@IntelSDM, Volume 3B, Chapter 18.6.2.4 Processor Event-Based Sampling (PEBS)] for details of enumerating PEBS record format. PEBS Record Format for Intel Skylake CPU is shown in Figure @fig:PEBS_record.
 
-![PEBS Record Format for 6th Generation, 7th Generation and 8th Generation Intel Core Processor Families. *© Image from [@IntelSDM, Volume 3B, Chapter 18].*](/4/PEBS_record.png){#fig:PEBS_record width=90%}
+![PEBS Record Format for 6th Generation, 7th Generation and 8th Generation Intel Core Processor Families. *© Image from [@IntelSDM, Volume 3B, Chapter 18].*](../../img/4/PEBS_record.png){#fig:PEBS_record width=90%}
 
 Users can check if PEBS is enabled by executing `dmesg`:
 

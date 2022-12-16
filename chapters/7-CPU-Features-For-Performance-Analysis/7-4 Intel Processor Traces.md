@@ -14,17 +14,17 @@ Similar to LBR, Intel PT works by recording branches. At runtime, whenever a CPU
 
 An example of encoding for a small instruction sequence is shown in Figure @fig:PT_encoding. Instructions like `PUSH`, `MOV`, `ADD`, and `CMP` are ignored because they don't change the control flow. However, `JE` instruction may jump to `.label`, so its result needs to be recorded. Later there is an indirect call for which destination address is saved.
 
-![Intel Processor Traces encoding](/4/PT_encoding.jpg){#fig:PT_encoding width=90%}
+![Intel Processor Traces encoding](../../img/4/PT_encoding.jpg){#fig:PT_encoding width=90%}
 
 At the time of analysis, we bring together the application binary and collected PT trace. SW decoder needs the application binary file in order to reconstruct the execution flow of the program. It starts from the entry point and then uses collected traces as a lookup reference to determine the control flow. Figure @fig:PT_decoding shows an example of decoding Intel Processor Traces. Suppose that the `PUSH` instruction is an entry point of the application binary file. Then `PUSH`, `MOV`, `ADD`, and `CMP` are reconstructed as-is without looking into encoded traces. Later SW decoder encounters `JE` instruction, which is a conditional branch and for which we need to look up the outcome. According to the traces on fig. @fig:PT_decoding, `JE` was taken (`T`), so we skip the next `MOV` instruction and go to the `CALL` instruction. Again, `CALL(edx)` is an instruction that changes the control flow, so we look up the destination address in encoded traces, which is `0x407e1d8`. Instructions highlighted in yellow were executed when our program was running. Note that this is an *exact* reconstruction of program execution; we did not skip any instruction. Later we can map assembly instructions back to the source code by using debug information and have a log of source code that was executed line by line.
 
-![Intel Processor Traces decoding](/4/PT_decoding.jpg){#fig:PT_decoding width=90%}
+![Intel Processor Traces decoding](../../img/4/PT_decoding.jpg){#fig:PT_decoding width=90%}
 
 ### Timing Packets {#sec:PTtimings}
 
 With Intel PT, not only execution flow can be traced but also timing information. In addition to saving jump destinations, PT can also emit timing packets. Figure @fig:PT_timings provides a visualization of how time packets can be used to restore timestamps for instructions. As in the previous example, we first see that `JNZ` was not taken, so we update it and all the instructions above with timestamp 0ns. Then we see a timing update of 2ns and `JE` being taken, so we update it and all the instructions above `JE` (and below `JNZ`) with timestamp 2ns. After that, there is an indirect call, but no timing packet is attached to it, so we do not update timestamps. Then we see that 100ns elapsed, and `JB` was not taken, so we update all the instructions above it with the timestamp of 102ns.
 
-![Intel Processor Traces timings](/4/PT_timings.jpg){#fig:PT_timings width=90%}
+![Intel Processor Traces timings](../../img/4/PT_timings.jpg){#fig:PT_timings width=90%}
 
 In the example shown in figure @fig:PT_timings, instruction data (control flow) is perfectly accurate, but timing information is less accurate. Obviously, `CALL(edx)`, `TEST`, and `JB` instructions were not happening at the same time, yet we do not have more accurate timing information for them. Having timestamps allows us to align the time interval of our program with some other event in the system, and it's easy to compare to wall clock time. Trace timing in some implementations can further be improved by a cycle-accurate mode, in which the hardware keeps a record of cycle counts between normal packets (see more details in [@IntelSDM, Volume 3C, Chapter 36]).
 
