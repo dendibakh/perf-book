@@ -9,9 +9,9 @@ Following the principles described in previous sections, hot functions can be gr
 Figure @fig:FunctionGrouping gives a graphical representation of grouping `foo`, `bar`, and `zoo`. The default layout (see fig. @fig:FuncGroup_default) requires four cache line reads, while in the improved version (see fig. @fig:FuncGroup_better), code of `foo`, `bar` and `zoo` fits in only three cache lines. Additionally, when we call `zoo` from `foo`, the beginning of `zoo` is already in the I-cache since we fetched that cache line already.
 
 <div id="fig:FunctionGrouping">
-![default layout](../../img/5/FunctionGrouping_Default.jpg){#fig:FuncGroup_default width=35%}
+![default layout](../../img/mt-perf/FunctionGrouping_Default.jpg){#fig:FuncGroup_default width=35%}
 
-![improved layout](../../img/5/FunctionGrouping_Better.jpg){#fig:FuncGroup_better width=32%}
+![improved layout](../../img/mt-perf/FunctionGrouping_Better.jpg){#fig:FuncGroup_better width=32%}
 
 Grouping hot functions together.
 </div>

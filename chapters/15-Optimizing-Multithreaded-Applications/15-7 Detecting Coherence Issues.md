@@ -15,7 +15,7 @@ One of the most well-known cache coherency protocols is MESI (**M**odified **E**
 * **Shared** – cache line is present here and in other cache lines and matches its value in RAM
 * **Invalid** – cache line is unused (i.e., does not contain any RAM location)
 
-![MESI States Diagram. *© Image by University of Washington via courses.cs.washington.edu.*](../../img/5/MESI_Cache_Diagram.jpg){#fig:MESI width=60%}
+![MESI States Diagram. *© Image by University of Washington via courses.cs.washington.edu.*](../../img/mt-perf/MESI_Cache_Diagram.jpg){#fig:MESI width=60%}
 
 When fetched from memory, each cache line has one of the states encoded into its tag. Then the cache line state keeps transiting from one state to another[^25]. In reality, CPU vendors usually implement slightly improved variants of MESI. For example, Intel uses [MESIF](https://en.wikipedia.org/wiki/MESIF_protocol)[^26], which adds a Forwarding (F) state, while AMD employs [MOESI](https://en.wikipedia.org/wiki/MOESI_protocol)[^27], which adds the Owning (O) state. But these protocols still maintain the essence of the base MESI protocol.
 
@@ -63,7 +63,7 @@ S s;
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-![False Sharing: two threads access the same cache line. *© Image by Intel Developer Zone via software.intel.com.*](../../img/5/FalseSharing.jpg){#fig:FalseSharing width=50%}
+![False Sharing: two threads access the same cache line. *© Image by Intel Developer Zone via software.intel.com.*](../../img/mt-perf/FalseSharing.jpg){#fig:FalseSharing width=50%}
 
 False sharing is a frequent source of performance issues for multithreaded applications. Because of that, modern analysis tools have built-in support for detecting such cases. TMA characterizes applications that experience true/false sharing as Memory Bound. Typically, in such cases, you would see a high value for [Contested Accesses](https://software.intel.com/en-us/vtune-help-contested-accesses)[^18] metric.
 

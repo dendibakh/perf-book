@@ -8,7 +8,7 @@ Modern Intel and AMD CPUs have a feature called Last Branch Record (LBR), where 
 
 Thanks to the LBR mechanism, the CPU can continuously log branches to a set of model-specific registers (MSRs) in parallel with executing the program, causing minimal slowdown[^15]. Hardware logs the “from” and “to” address of each branch along with some additional metadata (see Figure @fig:LbrAddr). The registers act like a ring buffer that is continuously overwritten and provides only 32 most recent branch outcomes[^1]. If we collect a long enough history of source-destination pairs, we will be able to unwind the control flow of our program, just like a call stack with limited depth.
 
-![64-bit Address Layout of LBR MSR. *© Image from [@IntelSDM].*](../../img/4/LBR_ADDR.png){#fig:LbrAddr width=90%}
+![64-bit Address Layout of LBR MSR. *© Image from [@IntelSDM].*](../../img/pmu-features/LBR_ADDR.png){#fig:LbrAddr width=90%}
 
 With LBRs, we can sample branches, but during each sample, look at the previous branches inside the LBR stack that were executed. This gives reasonable coverage of the control flow in the hot code paths but does not overwhelm us with too much information, as only a smaller number of the total branches are examined. It is important to keep in mind that this is still sampling, so not every executed branch can be examined. CPU generally executes too fast for that to be feasible.[@LBR2016]
 
@@ -179,7 +179,7 @@ Suppose we have two entries in the LBR stack:
 
 Given that information, we know that there was one occurrence when the basic block that starts at offset `400618` was executed in 5 cycles. If we collect enough samples, we could plot a probability density function of the latency for that basic block (see figure @fig:LBR_timing_BB). This chart was compiled by analyzing all LBR entries that satisfy the rule described above. For example, the basic block was executed in ~75 cycles only 4% of the time, but more often, it was executed between 260 and 314 cycles. This block has a random load inside a huge array that doesn’t fit in CPU L3 cache, so the latency of the basic block largely depends on this load. There are two important spikes on the chart that is shown in Figure @fig:LBR_timing_BB: first, around 80 cycles corresponds to the L3 cache hit, and the second spike, around 300 cycles, corresponds to L3 cache miss where the load request goes all the way down to the main memory.
 
-![Probability density function for latency of the basic block that starts at address `0x400618`.](../../img/4/LBR_timing_BB.jpg){#fig:LBR_timing_BB width=90%}
+![Probability density function for latency of the basic block that starts at address `0x400618`.](../../img/pmu-features/LBR_timing_BB.jpg){#fig:LBR_timing_BB width=90%}
 
 This information can be used for further fine-grained tuning of this basic block. This example might benefit from memory prefetching, which we will discuss in [@sec:memPrefetch]. Also, this cycle information can be used for timing loop iterations, where every loop iteration ends with a taken branch (back edge).
 

@@ -40,9 +40,9 @@ void cold2() __attribute__((noinline)) { // cold code (2) }
 Figure @fig:FunctionSplitting gives a graphical representation of this transformation. Because we left just the `CALL` instruction inside the hot path, it's likely that the next hot instruction will reside in the same cache line. This improves the utilization of CPU Front-End data structures like I-cache and DSB.
 
 <div id="fig:FunctionSplitting">
-![default layout](../../img/5/FunctionSplitting_Default.jpg){#fig:FuncSplit_default width=45%}
+![default layout](../../img/mt-perf/FunctionSplitting_Default.jpg){#fig:FuncSplit_default width=45%}
 
-![improved layout](../../img/5/FunctionSplitting_Improved.jpg){#fig:FuncSplit_better width=45%}
+![improved layout](../../img/mt-perf/FunctionSplitting_Improved.jpg){#fig:FuncSplit_better width=45%}
 
 Splitting cold code into a separate function.
 </div>
