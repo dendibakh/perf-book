@@ -12,13 +12,13 @@ It is highly recommended to get not just a single measurement but to run the ben
 
 Consider two distributions of performance measurements collected for two versions of a program in Figure @fig:CompDist. This chart displays the probability we get a particular timing for a given version of a program. For example, there is a ~32% chance the version `A` will finish in ~102 seconds. It's tempting to say that `A` is faster than `B`. However, it is true only with some probability `P`. This is because there are some measurements of `B` that are faster than `A`. Even in the situation when all the measurements of `B` are slower than every measurement of `A` probability `P` is not equal to `100%`. This is because we can always produce one additional sample for `B`, which may be faster than some samples of `A`.
 
-![Comparing 2 performance measurement distributions.](../../img/1/CompDist2.png){#fig:CompDist width=80%}
+![Comparing 2 performance measurement distributions.](../../img/measurements/CompDist2.png){#fig:CompDist width=80%}
 
 An interesting advantage of using distribution plots is that it allows you to spot unwanted behavior of the benchmark[^3]. If the distribution is bimodal, the benchmark likely experiences two different types of behavior. A common cause of bimodally distributed measurements is code that has both a fast and a slow path, such as accessing a cache (cache hit vs. cache miss) and acquiring a lock (contended lock vs. uncontended lock). To "fix" this, different functional patterns should be isolated and benchmarked separately.
 
 Data scientists often present measurements by plotting the distributions and avoid calculating speedup ratios. This eliminates biased conclusions and allows readers to interpret the data themselves. One of the popular ways to plot distributions is by using box plots (see Figure @fig:BoxPlot), which allow comparisons of multiple distributions on the same chart.
 
-![Box plots.](../../img/1/BoxPlot2.jpg){#fig:BoxPlot width=60%}
+![Box plots.](../../img/measurements/BoxPlot2.jpg){#fig:BoxPlot width=60%}
 
 While visualizing performance distributions may help you discover certain anomalies, developers shouldn't use them for calculating speedups. In general, it's hard to estimate the speedup by looking at performance measurement distributions. Also, as discussed in the previous section, it doesn't work for automated benchmarking systems. Usually, we want to get a scalar value that will represent a speedup ratio between performance distributions of 2 versions of a program, for example, "version `A` is faster than version `B` by `X%`".
 
@@ -27,9 +27,9 @@ The statistical relationship between the two distributions is identified using H
 Once it's determined that the difference is statistically significant via the hypothesis test, then the speedup can be calculated as a ratio between the means or geometric means, but there are caveats. On a small collection of samples, the mean and geometric mean can be affected by outliers. Unless distributions have low variance, do not consider averages alone. If the variance in the measurements is on the same order of magnitude as the mean, the average is not a representative metric. Figure @fig:Averages shows an example of 2 versions of the program. By looking only at averages (@fig:Averages1), it's tempting to say that version `A` is a 20% speedup over version `B`. However, taking into account the variance of the measurements (@fig:Averages2), we can see that it is not always the case. If we take the worse score for version `A` and the best score for version `B`, we can say that version `B` is a 20% speedup over version `A`. For normal distributions, a combination of mean, standard deviation, and standard error can be used to gauge a speedup between two versions of a program. Otherwise, for skewed or multimodal samples, one would have to use percentiles that are more appropriate for the benchmark, e.g., min, median, 90th, 95th, 99th, max, or some combination of these.
 
 <div id="fig:Averages">
-![Averages only](../../img/1/Averages1.png){#fig:Averages1 width=30%}
+![Averages only](../../img/measurements/Averages1.png){#fig:Averages1 width=30%}
 
-![Full measurement intervals](../../img/1/Averages2.png){#fig:Averages2 width=30%}
+![Full measurement intervals](../../img/measurements/Averages2.png){#fig:Averages2 width=30%}
 
 Two histograms showing how averages could be misleading.
 </div>

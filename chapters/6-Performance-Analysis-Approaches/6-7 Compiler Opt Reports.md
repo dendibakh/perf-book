@@ -48,7 +48,7 @@ By checking the optimization report above, we could see that the loop was not ve
 ...
 ```
 
-![Visualizing the order of operations in [@lst:optReport].](../../img/2/VectorDep.png){#fig:VectorDep width=50%}
+![Visualizing the order of operations in [@lst:optReport].](../../img/perf-analysis/VectorDep.png){#fig:VectorDep width=50%}
 
 If we were to vectorize the code in [@lst:optReport], it would result in the wrong values written in the array `a`. Assuming a CPU SIMD unit can process four floats at a time, we would get the code that can be expressed with the following pseudocode:
 

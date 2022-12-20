@@ -8,7 +8,7 @@ There are many features in HW and SW that are intended to increase performance. 
 
 If we start two runs of the benchmark, one right after another on a "cold" processor[^1], the first run could possibly work for some time in "overclocked" mode and then decrease its frequency back to the base level. However, it's possible that the second run might not have this advantage and will operate at the base frequency without entering "turbo mode". Even though we run the exact same version of the program two times, the environment in which they run is not the same. Figure @fig:FreqScaling shows a situation where dynamic frequency scaling can cause variance in measurements. Such a scenario can frequently happen when benchmarking on laptops since usually they have limited heat dissipation.
 
-![Variance in measurements caused by frequency scaling.](../../img/1/FreqScaling.jpg){#fig:FreqScaling width=80%}
+![Variance in measurements caused by frequency scaling.](../../img/measurements/FreqScaling.jpg){#fig:FreqScaling width=80%}
 
 Frequency Scaling is an HW feature, but variations in measurements might also come from SW features. Let's consider the example of a filesystem cache. If we benchmark an application that does lots of file manipulation, the filesystem can play a big role in performance. When the first iteration of the benchmark runs, the required entries in the filesystem cache could be missing. However, the filesystem cache will be warmed-up when running the same benchmark a second time, making it significantly faster than the first run.
 

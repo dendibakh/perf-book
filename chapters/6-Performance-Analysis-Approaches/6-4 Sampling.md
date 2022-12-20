@@ -22,7 +22,7 @@ User-mode sampling incurs more runtime overhead than EBS. The average overhead o
 
 In this section, we will discuss the scenario of using PMCs with EBS. Figure @fig:Sampling illustrates the counter overflow feature of the PMU, which is used to trigger performance monitoring interrupt (PMI). 
 
-![Using performance counter for sampling](../../img/2/SamplingFlow.png){#fig:Sampling width=90%}
+![Using performance counter for sampling](../../img/perf-analysis/SamplingFlow.png){#fig:Sampling width=90%}
 
 In the beginning, we configure the event that we want to sample on. Identifying hotspots means knowing where the program spends most of the time. So sampling on cycles is very natural, and it is a default for many profiling tools. But it's not necessarily a strict rule; we can sample on any performance event we want. For example, if we would like to know the place where the program experiences the biggest number of L3-cache misses, we would sample on the corresponding event, i.e., `MEM_LOAD_RETIRED.L3_MISS`.
 
@@ -73,13 +73,13 @@ Percent | Source code & Disassembly of x264 for cycles:ppp
 
 Most profilers with Graphical User Interface (GUI), like Intel VTune Profiler, can show source code and associated assembly side-by-side, as shown in figure @fig:SourceCode_View. 
 
-![Intel® VTune™ Profiler source code and assembly view for [x264](https://openbenchmarking.org/test/pts/x264) benchmark.](../../img/2/Vtune_source_level.png){#fig:SourceCode_View width=90%}
+![Intel® VTune™ Profiler source code and assembly view for [x264](https://openbenchmarking.org/test/pts/x264) benchmark.](../../img/perf-analysis/Vtune_source_level.png){#fig:SourceCode_View width=90%}
 
 ### Collecting Call Stacks {#sec:secCollectCallStacks}
 
 Often when sampling, we might encounter a situation when the hottest function in a program gets called by multiple callers. An example of such a scenario is shown on figure @fig:CallStacks. The output from the profiling tool might reveal that function `foo` is one of the hottest functions in the program, but if it has multiple callers, we would like to know which one of them call `foo` the most number of times. It is a typical situation for applications that have library functions like `memcpy` or `sqrt` appear in the hotspots. To understand why a particular function appeared as a hotspot, we need to know which path in the Control Flow Graph (CFG) of the program caused it.
 
-![Control Flow Graph: hot function "foo" has multiple callers.](../../img/2/CallStacksCFG.png){#fig:CallStacks width=50%}
+![Control Flow Graph: hot function "foo" has multiple callers.](../../img/perf-analysis/CallStacksCFG.png){#fig:CallStacks width=50%}
 
 Analyzing the logic of all the callers of `foo` might be very time-consuming. We want to focus only on those callers that caused `foo` to appear as a hotspot. In other words, we want to know the hottest path in the CFG of a program. Profiling tools achieve this by capturing the call stack of the process along with other information at the time of collecting performance samples. Then, all collected stacks are grouped, allowing us to see the hottest path that led to a particular function.
 
@@ -126,7 +126,7 @@ When using Intel Vtune Profiler, one can collect call stacks data by checking th
 
 A popular way of visualizing the profiling data and the most frequent code-paths in the program is by using flame graphs. It allows us to see which function calls take the biggest portion of execution time. Figure @fig:FlameGraph shows the example of a flame graph for  [x264](https://openbenchmarking.org/test/pts/x264) benchmark. From the mentioned flame graph we can see that the path that takes the most amount of execution time is `x264 -> threadpool_thread_internal -> slices_write -> slice_write -> x264_8_macroblock_analyse `. The original output is interactive and allows us to zoom into a particular code path. The flame graph was generated with [opensource scripts](https://github.com/brendangregg/FlameGraph)[^9] developed by Brendan Gregg. There are other tools capable of emitting flame graphs, perhaps KDAB [Hotspot](https://github.com/KDAB/hotspot)[^11]being the most popular alternative.
 
-![A Flame Graph for [x264](https://openbenchmarking.org/test/pts/x264) benchmark.](../../img/2/Flamegraph.jpg){#fig:FlameGraph width=90%}
+![A Flame Graph for [x264](https://openbenchmarking.org/test/pts/x264) benchmark.](../../img/perf-analysis/Flamegraph.jpg){#fig:FlameGraph width=90%}
 
 [^1]: Profiling(wikipedia) - [https://en.wikipedia.org/wiki/Profiling_(computer_programming)](https://en.wikipedia.org/wiki/Profiling_(computer_programming)).
 [^2]: See more details in [Intel® VTune™ Profiler User Guide](https://software.intel.com/content/www/us/en/develop/documentation/vtune-help/top/analyze-performance/hardware-event-based-sampling-collection/hardware-event-based-sampling-collection-with-stacks.html).
