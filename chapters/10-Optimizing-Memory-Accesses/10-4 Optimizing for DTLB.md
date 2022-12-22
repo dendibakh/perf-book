@@ -2,7 +2,7 @@
 typora-root-url: ..\..\img
 ---
 
-### Optimizing For DTLB {#sec:secDTLB}
+## Optimizing For DTLB {#sec:secDTLB}
 
 As described in [@sec:uarch], the TLB is a fast but finite per-core cache for virtual-to-physical address translations of memory addresses. Without it, every memory access by an application would require a time-consuming page walk of the kernel page table to calculate the correct physical address for each referenced virtual address. 
 
@@ -16,7 +16,7 @@ Large pages can be used for code, data, or both. Large pages for data are good t
 
 On Linux OS, there are two ways of using large pages in an application: Explicit and Transparent Huge Pages.
 
-#### Explicit Hugepages.
+### Explicit Hugepages.
 
 Are available as a part of the system memory, exposed as a huge page file system (`hugetlbfs`), applications can access it using system calls, e.g., `mmap`. One can check Huge Pages appropriately configured on the system through `cat /proc/meminfo` and look at `HugePages_Total` entries. Huge pages can be reserved at boot time or at run time. Reserving at boot time increases the possibility of success because the memory has not yet been significantly fragmented. Exact instructions for reserving huge pages can be found in [Red Hat Performance Tuning Guide](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/performance_tuning_guide/sect-red_hat_enterprise_linux-performance_tuning_guide-memory-configuring-huge-pages#sect-Red_Hat_Enterprise_Linux-Performance_tuning_guide-Memory-Configuring-huge-pages-at-run-time) [^22].
 
@@ -28,7 +28,7 @@ For more fine-grained control over accesses to large pages from the code (i.e., 
 * `mmap` using a file from a mounted `hugetlbfs` filesystem ([exampe code](https://elixir.bootlin.com/linux/latest/source/tools/testing/selftests/vm/hugepage-mmap.c)[^26]).
 * `shmget` using the `SHM_HUGETLB` flag ([exampe code](https://elixir.bootlin.com/linux/latest/source/tools/testing/selftests/vm/hugepage-shm.c)[^27]).
 
-#### Transparent Hugepages.
+### Transparent Hugepages.
 
 Linux also offers Transparent Hugepage Support (THP), which manages large pages[^21] automatically and is transparent for applications. Under Linux, you can enable THP, which dynamically switches to huge pages when large blocks of memory are needed. The THP feature has two modes of operation: system-wide and per-process. When THP is enabled system-wide, the kernel tries to assign huge pages to any process when it is possible to allocate such, so huge pages do not need to be reserved manually. If THP is enabled per-process, the kernel only assigns huge pages to individual processes' memory areas attributed to the `madvise` system call. You can check if THP enabled in the system with:\
 
@@ -39,7 +39,7 @@ always [madvise] never
 
 If the values are `always` (system-wide) or `madvise` (per-process), then THP is available for your application. With the `madvise` option, THP is enabled only inside memory regions attributed with `MADV_HUGEPAGE` via `madvise` system call. Complete specification for every option can be found in Linux kernel [documentation](https://www.kernel.org/doc/Documentation/vm/transhuge.txt)[^28] regarding THP.
 
-#### Explicit vs. Transparent Hugepages.
+### Explicit vs. Transparent Hugepages.
 
 Whilst Explicit Huge Pages (EHP) are reserved in virtual memory upfront, THPs are not. In the background, the kernel attempts to allocate a THP, and if it fails, it will default to the standard 4k page. This all happens transparently to the user. The allocation process can potentially involve a number of kernel processes responsible for making space in the virtual memory for a future THP (which may include swapping memory to the disk, fragmentation, or compacting pages[^20]). Background maintenance of transparent huge pages incurs non-deterministic latency overhead from the kernel as it manages the inevitable fragmentation and swapping issues. EHP is not subject to memory fragmentation and cannot be swapped to the disk. 
 

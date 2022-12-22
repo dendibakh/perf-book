@@ -2,7 +2,7 @@
 typora-root-url: ..\..\img
 ---
 
-### Inlining Functions
+## Inlining Functions
 
 Function inlining is replacing a call to a function `F` with the code for `F` specialized with the actual arguments of the call. Inlining is one of the most important compiler optimizations. Not only because it eliminates the overhead of calling a function[^1], but also it enables other optimizations. This happens because when a compiler inlines a function, the scope of compiler analysis widens to a much larger chunk of code. However, there are disadvantages as well: inlining can potentially increase the code size and compile time[^20].
 

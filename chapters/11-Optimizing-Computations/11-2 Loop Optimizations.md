@@ -2,7 +2,7 @@
 typora-root-url: ..\..\img
 ---
 
-### Loop Optimizations
+## Loop Optimizations
 
 Loops are the heart of nearly all high performance (HPC) programs. Since loops represent a piece of code that is executed a large number of times, they are where the majority of the execution time is spent. Small changes in such a critical piece of code may have a high impact on the performance of a program. That's why it is so important to carefully analyze the performance of hot loops in a program and know possible options to improve them.
 
@@ -12,7 +12,7 @@ In this section, we will take a look at the most well-known loop optimizations t
 
 Compilers can automatically recognize an opportunity to perform a certain loop transformation. However, sometimes developer's interference may be required to reach the desired outcome. In the second part of this section, we will take a look at possible ways to discover performance improvement opportunities in the loops. Understanding what transformations were performed on a given loop and what optimizations compiler failed to do is one of the keys to successful performance tuning. In the end, we will consider an alternative way of optimizing loops with polyhedral frameworks.
 
-#### Low-level optimizations.
+### Low-level optimizations.
 
 First, we will consider simple loop optimizations that transform the code inside a single loop: Loop Invariant Code Motion, Loop Unrolling, Loop Strength Reduction, and Loop Unswitching. Such optimizations usually help improve the performance of loops with high arithmetic intensity (see [@sec:roofline]), i.e., when a loop is bound by CPU compute capabilities. Generally, compilers are good at doing such transformations; however, there are still cases when a compiler might need a developer's support. We will talk about that in subsequent sections.
 
@@ -70,7 +70,7 @@ for (i = 0; i < N; i++) {               if (c)
                                           }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-#### High-level optimizations.
+### High-level optimizations.
 
 There is another class of loop transformations that change the structure of loops and often affect multiple nested loops. We will take a look at Loop Interchange, Loop Blocking (Tiling), and Loop Fusion and Distribution (Fission). This set of transformations aims at improving memory accesses and eliminating memory bandwidth and memory latency bottlenecks. From a compiler perspective, doing high-level loop transformations legally and automatically is very difficult. It is often hard to justify the benefit of making any of the optimizations mentioned in this paragraph. In that sense, developers are in a better position since they only have to care about the legality of the transformation in their particular piece of code, not about every possible scenario that may happen. Unfortunately, that also means that often times, we have to do such transformations manually.
 
@@ -117,7 +117,7 @@ Loop Fusion helps to reduce the loop overhead (see discussion in Loop Unrolling)
 
 However, loop fusion does not always improve performance. Sometimes it is better to split a loop into multiple passes, pre-filter the data, sort and reorganize it, etc. By distributing the large loop into multiple smaller ones, we limit the amount of data required for each iteration of the loop, effectively increasing the temporal locality of memory accesses. This helps in situations with a high cache contention, which typically happens in large loops. Loop distribution also reduces register pressure since, again, fewer operations are being done within each iteration of the loop. Also, breaking a big loop into multiple smaller ones will likely be beneficial for the performance of the CPU Front-End because of better instruction cache utilization (see [@sec:secFEOpt]). Finally, when distributed, each small loop can be further optimized separately by the compiler.
 
-#### Discovering loop optimization opportunities.
+### Discovering loop optimization opportunities.
 
 As we discussed at the beginning of this section, compilers will do the heavy-lifting part of optimizing your loops. You can count on them on making all the obvious improvements in the code of your loops, like eliminating unnecessary work, doing various peephole optimizations, etc. Sometimes a compiler is clever enough to generate the fast versions of the loops by default, and other times we have to do some rewriting ourselves to help the compiler. As we said earlier, from a compiler's perspective, doing loop transformations legally and automatically is very difficult. Often, compilers have to be conservative when they cannot prove the legality of a transformation. 
 
@@ -140,7 +140,7 @@ Next, developers should identify the bottlenecks in the loop and assess performa
 
 \personal{Even though there are well-known optimization techniques for a particular set of computational problems, for a large part, loop optimizations are sort of "black art" that comes with experience. I recommend you to rely on a compiler and only complement it with making needed transformations yourself. Finally, keep the code as simple as possible and do not introduce unreasonable complicated changes if the performance benefits are negligible.}
 
-#### Use Loop Optimization Frameworks
+### Use Loop Optimization Frameworks
 
 Over the years, researchers have developed techniques to determine the legality of loop transformations and automatically transform the loops. One such invention is the [polyhedral framework](https://en.wikipedia.org/wiki/Loop_optimization#The_polyhedral_or_constraint-based_framework)[^3]. [GRAPHITE](https://gcc.gnu.org/wiki/Graphite)[^4] was among the first set of polyhedral tools that were integrated into a production compiler. GRAPHITE performs a set of classical loop optimizations based on the polyhedral information, extracted from GIMPLE, GCC’s low-level intermediate representation. GRAPHITE has demonstrated the feasibility of the approach.
 

@@ -2,11 +2,11 @@
 typora-root-url: ..\..\img
 ---
 
-### Cache-Friendly Data Structures {#sec:secCacheFriendly}
+## Cache-Friendly Data Structures {#sec:secCacheFriendly}
 
 A variable can be fetched from the cache in just a few clock cycles, but it can take more than a hundred clock cycles to fetch the variable from RAM memory if it is not in the cache. There is a lot of information written on the importance of writing cache-friendly algorithms and data structures, as it is one of the key items in the recipe for a well-performing application. The key pillar of cache-friendly code is the principles of temporal and spatial locality (see [@sec:MemHierar]), which goal is to allow efficient fetching of required data from caches. When designing a cache-friendly code, it's helpful to think in terms of cache lines, not only individual variables and their places in memory.
 
-#### Access data sequentially.
+### Access data sequentially.
 
 The best way to exploit the spatial locality of the caches is to make sequential memory accesses. By doing so, we allow the HW prefetcher (see [@sec:HwPrefetch]) to recognize the memory access pattern and bring in the next chunk of data ahead of time. An example of a C-code that does such cache-friendly accesses is shown on [@lst:CacheFriend]. The code is "cache-friendly" because it accesses the elements of the matrix in the order in which they are laid out in memory ([row-major traversal](https://en.wikipedia.org/wiki/Row-_and_column-major_order)[^6]). Swapping the order of indexes in the array (i.e., `matrix[column][row]`) will result in column-major order traversal of the matrix, which does not exploit spatial locality and hurts performance.
 
@@ -20,13 +20,13 @@ for (row = 0; row < NUMROWS; row++)
 
 The example presented in [@lst:CacheFriend] is classical, but usually, real-world applications are much more complicated than this. Sometimes you need to go an additional mile to write cache-friendly code. For instance, the standard implementation of binary search in a sorted large array does not exploit spatial locality since it tests elements in different locations that are far away from each other and do not share the same cache line. The most famous way of solving this problem is storing elements of the array using the Eytzinger layout [@EytzingerArray]. The idea of it is to maintain an implicit binary search tree packed into an array using the BFS-like layout, usually seen with binary heaps. If the code performs a large number of binary searches in the array, it may be beneficial to convert it to the Eytzinger layout.
 
-#### Use appropriate containers. 
+### Use appropriate containers. 
 
 There is a wide variety of ready-to-use containers in almost any language. But it's important to know their underlying storage and performance implications. A good step-by-step guide for choosing appropriate C++ containers can be found in [@fogOptimizeCpp, Chapter 9.7 Data structures, and container classes].
 
 Additionally, choose the data storage, bearing in mind what the code will do with it. Consider a situation when there is a need to choose between storing objects in the array versus storing pointers to those objects while the object size is big. An array of pointers take less amount of memory. This will benefit operations that modify the array since an array of pointers requires less memory being transferred. However, a linear scan through an array will be faster when keeping the objects themselves since it is more cache-friendly and does not require indirect memory accesses.[^8]
 
-#### Packing the data.
+### Packing the data.
 
 Memory hierarchy utilization can be improved by making the data more compact. There are many ways to pack data. One of the classic examples is to use bitfields. An example of code when packing data might be profitable is shown on [@lst:PackingData1]. If we know that `a`, `b`, and `c` represent enum values which take a certain number of bits to encode, we can reduce the storage of the struct `S` (see [@lst:PackingData2]).
 
@@ -70,7 +70,7 @@ struct S2 {
 }; // S2 is sizeof(int) * 2
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-#### Aligning and padding. {#sec:secMemAlign}
+### Aligning and padding. {#sec:secMemAlign}
 
 Another technique to improve the utilization of the memory subsystem is to align the data. There could be a situation when an object of size 16 bytes occupies two cache lines, i.e., it starts on one cache line and ends in the next cache line. Fetching such an object requires two cache line reads, which could be avoided would the object be aligned properly. [@lst:AligningData] shows how memory objects can be aligned using C++11 `alignas` keyword.
 
@@ -121,13 +121,13 @@ One of the most important areas for alignment considerations is the SIMD code. W
 __m512 * ptr = new __m512[N];
 ```
 
-#### Dynamic memory allocation.
+### Dynamic memory allocation.
 
 First of all, there are many drop-in replacements for `malloc`, which are faster, more scalable[^15], and address [fragmentation](https://en.wikipedia.org/wiki/Fragmentation_(computing))[^20] problems better. You can have a few percent performance improvement just by using a non-standard memory allocator. A typical issue with dynamic memory allocation is when at startup threads race with each other trying to allocate their memory regions at the same time[^5]. One of the most popular memory allocation libraries are [jemalloc](http://jemalloc.net/)[^17] and [tcmalloc](https://github.com/google/tcmalloc)[^18].
 
 Secondly, it is possible to speed up allocations using custom allocators, for example, [arena allocators](https://en.wikipedia.org/wiki/Region-based_memory_management)[^16]. One of the main advantages is their low overhead since such allocators don't execute system calls for every memory allocation. Another advantage is its high flexibility. Developers can implement their own allocation strategies based on the memory region provided by the OS. One simple strategy could be to maintain two different allocators with their own arenas (memory regions): one for the hot data and one for the cold data. Keeping hot data together creates opportunities for it to share cache lines, which improves memory bandwidth utilization and spatial locality. It also improves TLB utilization since hot data occupies less amount of memory pages. Also, custom memory allocators can use thread-local storage to implement per-thread allocation and get rid of any synchronization between threads. This becomes useful when an application is based on a thread pool and does not spawn a large number of threads.
 
-#### Tune the code for memory hierarchy.
+### Tune the code for memory hierarchy.
 
 The performance of some applications depends on the size of the cache on a particular level. The most famous example here is improving matrix multiplication with [loop blocking](https://en.wikipedia.org/wiki/Loop_nest_optimization) (tiling). The idea is to break the working size of the matrix into smaller pieces (tiles) such that each tile will fit in the L2 cache[^9]. Most of the architectures provide `CPUID`-like instruction[^11], which allows us to query the size of caches. Alternatively, one can use [cache-oblivious algorithms](https://en.wikipedia.org/wiki/Cache-oblivious_algorithm)[^19] whose goal is to work reasonably well for any size of the cache.
 

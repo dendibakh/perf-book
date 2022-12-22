@@ -2,7 +2,9 @@
 typora-root-url: ..\..\img
 ---
 
-# CPU Back-End Optimizations
+# Optimizing Memory Accesses
+
+## CPU Back-End Optimizations
 
 CPU Back-End (BE) component is discussed in [@sec:uarchBE]. Most of the time, inefficiencies in CPU BE can be described as a situation when FE has fetched and decoded instructions, but BE is overloaded and can't handle new instructions. Technically speaking, it is a situation when FE cannot deliver uops due to a lack of required resources for accepting new uops in the Backend. An example of it may be a stall due to data-cache miss or a stall due to the divider unit being overloaded.
 
