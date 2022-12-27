@@ -1,0 +1,5 @@
+## Exercises
+
+As supplemental material for this book, we developed a collection of free lab assignments that are available at [https://github.com/dendibakh/perf-ninja](https://github.com/dendibakh/perf-ninja). Performance Ninja is an online course where you can practice the skill of low-level performance analysis and tuning. We will offer you lab assignments from that repository throughout the book. For example, when you see `perf-ninja::warmup`, this corresponds to the lab assignment that is located in `labs/misc/warmup` folder of the aforementioned repository.
+
+You can solve those assignments on your local machine or submit your code for automated benchmarking. If you choose the latter, follow the instructions on the "Get Started" page of the repo. If you're stuck on a problem, you can check the videos associated with the lab. Those videos explain a possible solution to a problem.
