@@ -42,5 +42,3 @@ The complete list of performance events for Intel CPUs can be found in [@IntelSD
 
 [^1]: The same information can be extracted from the kernel message buffer by using the `dmesg` command.
 [^2]: When the value of PMCs overflows, the execution of a program must be interrupted. SW then should save the fact of overflow.
-
-\sectionbreak

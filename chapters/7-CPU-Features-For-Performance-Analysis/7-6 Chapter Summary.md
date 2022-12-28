@@ -2,7 +2,7 @@
 typora-root-url: ..\..\img
 ---
 
-## Chapter Summary
+## Chapter Summary {.unlisted .unnumbered}
 
 * Utilizing HW features for low-level tuning is recommended only once all high-level performance issues are fixed. Tuning poorly designed algorithms is a bad investment of a developer's time. Once all the major performance problems get eliminated, one can use CPU performance monitoring features to analyze and further tune their application. 
 * Top-Down Microarchitecture Analysis (TMA) methodology is a very powerful technique for identifying ineffective usage of CPU microarchitecture by the program. It is a robust and formal methodology that is easy to use even for inexperienced developers. TMA is an iterative process that consists of multiple steps, including characterizing the workload and locating the exact place in the source code where the bottleneck occurs. We advise that TMA should be a starting point of analysis for every low-level tuning effort. TMA is available on Intel and AMD[^1] processors.
@@ -12,7 +12,7 @@ typora-root-url: ..\..\img
 
 Performance profilers leverage HW features presented in this chapter to enable many different types of analysis.
 
-[^1]: Although at the time of writing, AMD processors only support the first level of TMA metrics, i.e., Front End Bound, Back End Bound, Retiring, and Bad Speculation.
+[^1]: At the time of writing, AMD processors only support the first level of TMA metrics, i.e., Front End Bound, Back End Bound, Retiring, and Bad Speculation.
 [^2]: ARM CoreSight: [https://developer.arm.com/ip-products/system-ip/coresight-debug-and-trace](https://developer.arm.com/ip-products/system-ip/coresight-debug-and-trace)
 
 \sectionbreak

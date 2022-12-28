@@ -2,7 +2,7 @@
 typora-root-url: ..\..\img
 ---
 
-## Chapter Summary
+## Chapter Summary {.unlisted .unnumbered}
 
 * Debugging performance issues is usually harder than debugging functional bugs due to measurement instability.
 * You can never stop optimizing unless you set a particular goal. To know if you reached the desired goal, you need to come up with meaningful definitions and metrics for how you will measure that. Depending on what you care about, it could be throughput, latency, operations per second (roofline performance), etc. 

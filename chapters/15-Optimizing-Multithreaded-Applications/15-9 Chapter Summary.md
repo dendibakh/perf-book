@@ -2,7 +2,7 @@
 typora-root-url: ..\..\img
 ---
 
-## Chapter Summary
+## Chapter Summary {.unlisted .unnumbered}
 
 * Applications not taking advantage of modern multicore CPUs are lagging behind their competitors. Preparing software to scale well with a growing amount of CPU cores is very important for the future success of the application.
 * When dealing with the single-threaded application, optimizing one portion of the program usually yields positive results on performance. However, it's not necessarily the case for multithreaded applications. This effect is widely known as Amdahl's law, which constitutes that the speedup of a parallel program is limited by its serial part.

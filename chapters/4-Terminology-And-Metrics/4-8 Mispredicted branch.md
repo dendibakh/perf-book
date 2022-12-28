@@ -24,5 +24,3 @@ $ perf stat -e branches,branch-misses -- a.exe
 # or simply do:
 $ perf stat -- a.exe
 ```
-
-\sectionbreak

@@ -2,7 +2,7 @@
 typora-root-url: ..\..\img
 ---
 
-## Chapter Summary {#sec:secApproachesSummary}
+## Chapter Summary {#sec:secApproachesSummary .unlisted .unnumbered}
 
 * Latency and throughput are often the ultimate metrics of the program performance. When seeking ways to improve them, we need to get more detailed information on how the application executes. Both HW and SW provide data that can be used for performance monitoring.
 

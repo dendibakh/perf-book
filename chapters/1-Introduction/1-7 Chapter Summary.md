@@ -2,7 +2,7 @@
 typora-root-url: ..\..\img
 ---
 
-## Chapter Summary
+## Chapter Summary {.unlisted .unnumbered}
 
 * HW is not getting that much performance boosts in single-threaded performance as it used to in the past years. That's why performance tuning is becoming more important than it has been for the last 40 years. The computing industry is changing now much more heavily than at any time since the 90s.
 * According to [@Leisersoneaam9744], SW tuning will be one of the key drivers for performance gains in the near future. The importance of performance tuning should not be underestimated. For large distributed applications, every small performance improvement results in immense cost savings.
