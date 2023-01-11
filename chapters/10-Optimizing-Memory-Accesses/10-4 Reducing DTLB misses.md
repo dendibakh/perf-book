@@ -2,7 +2,7 @@
 typora-root-url: ..\..\img
 ---
 
-## Optimizing For DTLB {#sec:secDTLB}
+## Reducing DTLB misses {#sec:secDTLB}
 
 As described in [@sec:uarch], the TLB is a fast but finite per-core cache for virtual-to-physical address translations of memory addresses. Without it, every memory access by an application would require a time-consuming page walk of the kernel page table to calculate the correct physical address for each referenced virtual address. 
 
@@ -15,6 +15,8 @@ As we just learned, one way to reduce the number of ITLB misses is to use the la
 Large pages can be used for code, data, or both. Large pages for data are good to try if your workload has a large heap. Large memory applications such as relational database systems (e.g., MySQL, PostgreSQL, Oracle, etc.) and Java applications configured with large heap regions frequently benefit from using large pages. One example of using huge pages for optimizing runtimes is presented in [@IntelBlueprint], showing how this feature improves performance and reduces ITLB misses (up to 50%) in three applications in three environments. However, as it is with many other features, large pages are not for every application. An application that wants to allocate only one byte of data would be better off using a 4k page rather than a huge one; that way, memory is used more efficiently. 
 
 On Linux OS, there are two ways of using large pages in an application: Explicit and Transparent Huge Pages.
+
+Add instructions from [https://github.com/dendibakh/perf-ninja/blob/main/labs/memory_bound/huge_pages_1/HugePagesSetupTips.md](https://github.com/dendibakh/perf-ninja/blob/main/labs/memory_bound/huge_pages_1/HugePagesSetupTips.md)
 
 ### Explicit Hugepages.
 
