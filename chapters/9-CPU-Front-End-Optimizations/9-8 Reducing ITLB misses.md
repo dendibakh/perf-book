@@ -2,7 +2,7 @@
 typora-root-url: ..\..\img
 ---
 
-## Optimizing for ITLB {#sec:FeTLB}
+## Reducing ITLB misses {#sec:FeTLB}
 
 Another important area of tuning FE efficiency is virtual-to-physical address translation of memory addresses. Primarily those translations are served by TLB (see [@sec:uarch]), which caches most recently used memory page translations in dedicated entries. When TLB cannot serve the translation request, a time-consuming page walk of the kernel page table takes place to calculate the correct physical address for each referenced virtual address. When TMA points to a high [ITLB Overhead](https://software.intel.com/content/www/us/en/develop/documentation/vtune-help/top/reference/cpu-metrics-reference/front-end-bound/itlb-overhead.html) [^11], the advice in this section may become handy. 
 
