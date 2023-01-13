@@ -4,6 +4,8 @@ typora-root-url: ..\..\img
 
 ## Modern CPU design
 
+[TODO]: update to GoldenCove uarch.
+
 ![Block diagram of a CPU Core in the Intel Skylake Microarchitecture. *© Image from [@IntelOptimizationManual].*](../../img/uarch/skylake_block_diagram_v2.png){#fig:Skylake_diag width=95%}
 
 The block diagram in figure @fig:Skylake_diag shows the details of Intel’s 6th generation core, Skylake, that was announced in 2015 and is widely spread all over the world. The Skylake core is split into an in-order front-end that fetches and decodes x86 instructions into u-ops and an 8-way superscalar, out-of-order backend. 
@@ -27,6 +29,9 @@ Some very complicated instructions may require more UOPs than decoders can handl
 The Instruction Decode Queue (IDQ) provides the interface between the in-order front-end and the out-of-order backend. IDQ queues up the UOPs in order. The IDQ has a total of 128 UOPs, 64 UOPs per hardware thread. 
 
 [TODO]: describe TLB hierarchy. Add image. Describe numbers.
+Golden Cove's hierarchy is presented in figure @fig:GLC_TLB. L1 ITLB covers the memory space of 256 * 4KB equals 1MB, while L1 DTLB covers only 384 KB. L2 STLB is a larger storage and can accomdate 2048 most recent data and instruction page address translations, which covers a total of 8MB of memory space. Situation changes somewhat if huge pages are used.
+
+![TLB hierarchy of Golden Cove.](../../img/uarch/GLC_TLB_hierarchy.png){#fig:GLC_TLB width=70%}
 
 ### CPU Back-End {#sec:uarchBE}
 
@@ -40,8 +45,3 @@ The Reservation Station/Scheduler (RS) is the structure that tracks the availabi
 * Ports 2 and 3 are used for address generation and for load operations.
 * Port 4 is used for store operations.
 * Port 7 is used for address generation.
-
-
-TO ADD:
-* On modern laptop processors, L1 can hold up to a few hundred recent translations1, and L2 can hold a few thousand. Now, with the default page size on x86 of 4KB, every such entry in the TLB is a mapping for a 4KB page. Given that, L1 TLB can cover up to 1MB of memory, and L2 cover up to 10 MB.
-* [TODO]: maybe add more data on 4- and 5-level page tables.
