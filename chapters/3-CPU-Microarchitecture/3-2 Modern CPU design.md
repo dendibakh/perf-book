@@ -26,6 +26,8 @@ Some very complicated instructions may require more UOPs than decoders can handl
 
 The Instruction Decode Queue (IDQ) provides the interface between the in-order front-end and the out-of-order backend. IDQ queues up the UOPs in order. The IDQ has a total of 128 UOPs, 64 UOPs per hardware thread. 
 
+[TODO]: describe TLB hierarchy. Add image. Describe numbers.
+
 ### CPU Back-End {#sec:uarchBE}
 
 The CPU Back-End employs an Out-Of-Order engine that executes instructions and stores results.
@@ -38,3 +40,8 @@ The Reservation Station/Scheduler (RS) is the structure that tracks the availabi
 * Ports 2 and 3 are used for address generation and for load operations.
 * Port 4 is used for store operations.
 * Port 7 is used for address generation.
+
+
+TO ADD:
+* On modern laptop processors, L1 can hold up to a few hundred recent translations1, and L2 can hold a few thousand. Now, with the default page size on x86 of 4KB, every such entry in the TLB is a mapping for a 4KB page. Given that, L1 TLB can cover up to 1MB of memory, and L2 cover up to 10 MB.
+* [TODO]: maybe add more data on 4- and 5-level page tables.
