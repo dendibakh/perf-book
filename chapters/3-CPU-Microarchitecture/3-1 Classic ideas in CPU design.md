@@ -245,11 +245,15 @@ Failure to provide a physical address mapping is called a *page fault*. It occur
 
 A search in a hierarchical page table could be expensive, requiring traversing through the hierarchy potentially making several indirect accesses. Such traversal is usually called *page walk*. To reduce the address translation time, CPUs support a hardware structure called translation lookaside buffer (TLB) to cache the most recently used translations. Similar to regular caches, TLBs are often designed as a hierarchy of L1 ITLB (Instructions), L1 DTLB (Data), followed by a shared (instructions and data) L2 STLB. To lower the memory access latency, TLB and cache lookups happen in parallel, because data caches operate on virtual addresses and do not require prior address translation
 
-TLB hierarchy keep translations for a relatively large memory space. Still, misses in TLB can be very costly. To speed up handling of TLB misses, CPUs have a mechanism called *HW page walker*. Such unit can perform a page walk directly in HW by issuing the required instructions to traverse the page table, all without interrupting the kernel. This is the reason why the format of the page table is dictated by the CPU, to which OS’es have to comply. High-end processors have several HW page walkers that can handle multiple TLB misses simultaneously. With all the acceleration offered by modern CPUs, TLB misses cause performance bottlenecks for many applications. We will discuss how to reduce the frequency of such events in the second part of the book.
+TLB hierarchy keep translations for a relatively large memory space. Still, misses in TLB can be very costly. To speed up handling of TLB misses, CPUs have a mechanism called *HW page walker*. Such unit can perform a page walk directly in HW by issuing the required instructions to traverse the page table, all without interrupting the kernel. This is the reason why the format of the page table is dictated by the CPU, to which OS’es have to comply. High-end processors have several HW page walkers that can handle multiple TLB misses simultaneously. With all the acceleration offered by modern CPUs, TLB misses cause performance bottlenecks for many applications.
 
 ## Huge pages
 
-[TODO]
+Having a small page size allows to manage the available memory more efficiently and reduce fragmentation. The drawback though is that it requires to have more page table entries to cover the same memory region. Consider two page sizes: 4KB, which is a default on x86, and 2MB *huge page*[^6] size. For an application that operates on 10MB data, we need 2560 entries in first case, and just 5 entries if we would map the address space onto huge pages. Example of an address that points to the data within a huge page is shown in figure @fig:HugePageVirtualAddress. Just like with a default page size, the exact address format when using huge pages is dictated by the HW, but luckily we as programmers usually don't have to worry about it.
+
+![Virtual address that points within a 2MB page.](../../img/uarch/HugePageVirtualAddress.png){#fig:HugePageVirtualAddress width=80%}
+
+Using huge pages drastically reduces the pressure on the TLB hierarchy, and thus greatly increases the chance of a TLB hit. The downsides of using huge pages are memory fragmentation and, in some cases, non-deterministic page allocation latency. It is harder for the operating system to manage large blocks memory and to ensure effective utilization of available memory. To satisfy a 2MB huge page allocation request at runtime, an OS needs to find a contiguous chunk of 2MB. If unable to find, it needs to reorganize the pages, resulting in longer allocation latency. We will discuss how to use huge pages to reduce the frequency of TLB misses in the second part of the book.
 
 ## SIMD Multiprocessors {#sec:SIMD}
 
@@ -275,4 +279,4 @@ Most of the popular CPU architectures feature vector instructions, including x86
 [^3]: Architectural state - [https://en.wikipedia.org/wiki/Architectural_state](https://en.wikipedia.org/wiki/Architectural_state).
 [^4]: Tomasulo algorithm - [https://en.wikipedia.org/wiki/Tomasulo_algorithm](https://en.wikipedia.org/wiki/Tomasulo_algorithm).
 [^5]: Scoreboarding - [https://en.wikipedia.org/wiki/Scoreboarding](https://en.wikipedia.org/wiki/Scoreboarding).
-
+[^6]: Sometimes, people also use the term *large page*.
