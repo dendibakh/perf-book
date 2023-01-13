@@ -12,11 +12,11 @@ On Linux and Windows systems, applications are loaded into memory into 4KB pages
 
 As we just learned, one way to reduce the number of ITLB misses is to use the larger page size. Thankfully, TLB is capable of caching entries for 2MB and 1GB pages as well. If the aforementioned application employed 2MB pages instead of the default 4KB pages, it would reduce TLB pressure by a factor of 512. Likewise, if it updated from using 2MB pages to 1GB pages, it would reduce TLB pressure by yet another factor of 512. That is quite an improvement! Using a larger page size may be beneficial for some applications because less space is used in the cache for storing translations, allowing more space to be available for the application code. Huge pages typically lead to fewer page walks, and the penalty for walking the kernel page table in the event of a TLB miss is reduced since the table itself is more compact.
 
-Large pages can be used for code, data, or both. Large pages for data are good to try if your workload has a large heap. Large memory applications such as relational database systems (e.g., MySQL, PostgreSQL, Oracle, etc.) and Java applications configured with large heap regions frequently benefit from using large pages. One example of using huge pages for optimizing runtimes is presented in [@IntelBlueprint], showing how this feature improves performance and reduces ITLB misses (up to 50%) in three applications in three environments. However, as it is with many other features, large pages are not for every application. An application that wants to allocate only one byte of data would be better off using a 4k page rather than a huge one; that way, memory is used more efficiently. 
+Large pages can be used for code, data, or both. Large pages for data are good to try if a workload has a large heap.
 
 On Linux OS, there are two ways of using large pages in an application: Explicit and Transparent Huge Pages.
 
-Add instructions from [https://github.com/dendibakh/perf-ninja/blob/main/labs/memory_bound/huge_pages_1/HugePagesSetupTips.md](https://github.com/dendibakh/perf-ninja/blob/main/labs/memory_bound/huge_pages_1/HugePagesSetupTips.md)
+[TODO]: Add instructions from [https://github.com/dendibakh/perf-ninja/blob/main/labs/memory_bound/huge_pages_1/HugePagesSetupTips.md](https://github.com/dendibakh/perf-ninja/blob/main/labs/memory_bound/huge_pages_1/HugePagesSetupTips.md)
 
 ### Explicit Hugepages.
 
