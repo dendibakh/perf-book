@@ -37,6 +37,10 @@ On Linux OS, there are two ways of using large pages in an application: Explicit
 
 ### Explicit hugepages
 
+**[TODO:] describe how to reserve at boot time.**
+
+Explicit huge pages can be reserved at boot time or at run time. Exact instructions for reserving huge pages can be found in [Red Hat Performance Tuning Guide](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/performance_tuning_guide/sect-red_hat_enterprise_linux-performance_tuning_guide-memory-configuring-huge-pages#sect-Red_Hat_Enterprise_Linux-Performance_tuning_guide-Memory-Configuring-huge-pages-at-run-time) [^22].
+
 To explicitly allocate a fixed number of huge pages, one can use [libhugetlbfs](https://github.com/libhugetlbfs/libhugetlbfs). The following command preallocates 128 huge pages.
 
 ```bash
