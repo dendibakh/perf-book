@@ -73,7 +73,7 @@ Hugepagesize:       2048 kB
 Hugetlb:          262144 kB <== 256MB of space occupied
 ```
 
-Use explicit huge pages in the code with:
+Developers can utilize explicit huge pages in the code by calling `mmap` with `MAP_HUGETLB` flag ([full example](https://github.com/torvalds/linux/blob/master/tools/testing/selftests/vm/map_hugetlb.c)[^25]):
 
 ```cpp
 void ptr = mmap(nullptr, size, PROT_READ | PROT_WRITE,
@@ -81,6 +81,11 @@ void ptr = mmap(nullptr, size, PROT_READ | PROT_WRITE,
 ...
 munmap(ptr, size);
 ```
+
+Other alternatives include:
+
+* `mmap` using a file from a mounted `hugetlbfs` filesystem ([exampe code](https://github.com/torvalds/linux/blob/master/tools/testing/selftests/vm/hugepage-mmap.c)[^26]).
+* `shmget` using the `SHM_HUGETLB` flag ([exampe code](https://github.com/torvalds/linux/blob/master/tools/testing/selftests/vm/hugepage-shm.c)[^27]).
 
 ### Transparent hugepages
 
@@ -102,3 +107,8 @@ AnonHugePages:     61440 kB     <== 30 transparent huge pages are in use
 HugePages_Total:     128
 HugePages_Free:      128        <== explicit huge pages are not used
 ```
+
+[^22]: Red Hat Performance Tuning Guide - [https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/performance_tuning_guide/sect-red_hat_enterprise_linux-performance_tuning_guide-memory-configuring-huge-pages#sect-Red_Hat_Enterprise_Linux-Performance_tuning_guide-Memory-Configuring-huge-pages-at-run-tim](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/performance_tuning_guide/sect-red_hat_enterprise_linux-performance_tuning_guide-memory-configuring-huge-pages#sect-Red_Hat_Enterprise_Linux-Performance_tuning_guide-Memory-Configuring-huge-pages-at-run-time).
+[^25]: MAP_HUGETLB example - [https://github.com/torvalds/linux/blob/master/tools/testing/selftests/vm/map_hugetlb.c](https://github.com/torvalds/linux/blob/master/tools/testing/selftests/vm/map_hugetlb.c).
+[^26]: Mounted `hugetlbfs` filesystem - [https://github.com/torvalds/linux/blob/master/tools/testing/selftests/vm/hugepage-mmap.c](https://github.com/torvalds/linux/blob/master/tools/testing/selftests/vm/hugepage-mmap.c).
+[^27]: SHM_HUGETLB example - [https://github.com/torvalds/linux/blob/master/tools/testing/selftests/vm/hugepage-shm.c](https://github.com/torvalds/linux/blob/master/tools/testing/selftests/vm/hugepage-shm.c).
