@@ -1,2 +1,3 @@
 ## Questions and Exercises {.unlisted .unnumbered}
 
+1. Experiment with using Huge Pages for code section. Take a large application (access to source code is a plus but not necessary), with a binary size of more than 100MB. Try to remap its code section onto huge pages using one of the methods described in [@sec:FeTLB]. Observe any changes in performance, huge page allocation in `/proc/meminfo`, CPU performance counters that measure ITLB loads and misses.
