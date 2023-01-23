@@ -33,7 +33,7 @@ for (int i = 0; i < N; ++i)             for (int i = 0; i < N; ++i) {
 Listing: Loop Unrolling
 
 ~~~~ {#lst:Unrol .cpp}
-for (int i = 0; i < N; ++i)             for (int i = 0; i < N; i+=2) {
+for (int i = 0; i < N; ++i)             for (int i = 0; i+1 < N; i+=2) {
   a[i] = b[i] * c[i];          =>         a[i] = b[i] * c[i];
                                           a[i+1] = b[i+1] * c[i+1];
                                         }
@@ -117,6 +117,20 @@ Loop Fusion helps to reduce the loop overhead (see discussion in Loop Unrolling)
 
 However, loop fusion does not always improve performance. Sometimes it is better to split a loop into multiple passes, pre-filter the data, sort and reorganize it, etc. By distributing the large loop into multiple smaller ones, we limit the amount of data required for each iteration of the loop, effectively increasing the temporal locality of memory accesses. This helps in situations with a high cache contention, which typically happens in large loops. Loop distribution also reduces register pressure since, again, fewer operations are being done within each iteration of the loop. Also, breaking a big loop into multiple smaller ones will likely be beneficial for the performance of the CPU Front-End because of better instruction cache utilization (see [@sec:secFEOpt]). Finally, when distributed, each small loop can be further optimized separately by the compiler.
 
+**Loop Unroll and Jam**. 
+Increase ILP of the inner loop.
+Describe issues with vectorization.
+
+Listing: Loop Unroll and Jam
+
+~~~~ {#lst:unrolljam .cpp}
+for (int i = 0; i < N; i++)             for (int i = 0; i+1 < N; i+=2)
+  for (int j = 0; j < M; j++)             for (int j = 0; j < M; j++) {
+    diffs += a[i][j] - b[i][j];    =>       diffs += a[i][j] - b[i][j];
+                                            diffs += a[i+1][j] - b[i+1][j];
+                                          }
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 ### Discovering loop optimization opportunities.
 
 As we discussed at the beginning of this section, compilers will do the heavy-lifting part of optimizing your loops. You can count on them on making all the obvious improvements in the code of your loops, like eliminating unnecessary work, doing various peephole optimizations, etc. Sometimes a compiler is clever enough to generate the fast versions of the loops by default, and other times we have to do some rewriting ourselves to help the compiler. As we said earlier, from a compiler's perspective, doing loop transformations legally and automatically is very difficult. Often, compilers have to be conservative when they cannot prove the legality of a transformation. 
@@ -140,11 +154,11 @@ Next, developers should identify the bottlenecks in the loop and assess performa
 
 \personal{Even though there are well-known optimization techniques for a particular set of computational problems, for a large part, loop optimizations are sort of "black art" that comes with experience. I recommend you to rely on a compiler and only complement it with making needed transformations yourself. Finally, keep the code as simple as possible and do not introduce unreasonable complicated changes if the performance benefits are negligible.}
 
-### Use Loop Optimization Frameworks
+### Loop Optimization Frameworks
 
 Over the years, researchers have developed techniques to determine the legality of loop transformations and automatically transform the loops. One such invention is the [polyhedral framework](https://en.wikipedia.org/wiki/Loop_optimization#The_polyhedral_or_constraint-based_framework)[^3]. [GRAPHITE](https://gcc.gnu.org/wiki/Graphite)[^4] was among the first set of polyhedral tools that were integrated into a production compiler. GRAPHITE performs a set of classical loop optimizations based on the polyhedral information, extracted from GIMPLE, GCC’s low-level intermediate representation. GRAPHITE has demonstrated the feasibility of the approach.
 
-LLVM-based compilers employ their own polyhedral framework: [Polly](https://polly.llvm.org/)[^5]. Polly is a high-level loop and data-locality optimizer and optimization infrastructure for LLVM. It uses an abstract mathematical representation based on integer polyhedral to analyze and optimize the memory access pattern of a program. Polly performs classical loop transformations, especially tiling and loop fusion, to improve data-locality. This framework has shown significant speedups on a number of well-known benchmarks [@Grosser2012PollyP]. Below we show an example of how Polly can give an almost 30 times speedup of a GEneral Matrix-Multiply (GEMM) kernel from [Polybench 2.0](https://web.cse.ohio-state.edu/~pouchet.2/software/polybench/)[^6] benchmark suite:
+Later LLVM compiler developed its own polyhedral framework called [Polly](https://polly.llvm.org/)[^5]. Polly is a high-level loop and data-locality optimization infrastructure for LLVM. It uses an abstract mathematical representation based on integer polyhedral to analyze and optimize the memory access patterns of a program. Polly performs classical loop transformations, especially tiling and loop fusion, to improve data-locality. This framework has shown significant speedups on a number of well-known benchmarks [@Grosser2012PollyP]. Below is an example of how Polly can give an almost 30 times speedup of a GEneral Matrix-Multiply (GEMM) kernel from [Polybench 2.0](https://web.cse.ohio-state.edu/~pouchet.2/software/polybench/)[^6] benchmark suite:
 
 ```bash
 $ clang -O3 gemm.c -o gemm.clang
