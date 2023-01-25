@@ -2,7 +2,7 @@
 typora-root-url: ..\..\img
 ---
 
-# Optimizing Memory Accesses
+# Optimizing Memory Accesses {#sec:MemBound}
 
 ## CPU Back-End Optimizations
 

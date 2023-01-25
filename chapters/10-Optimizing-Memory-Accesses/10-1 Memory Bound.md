@@ -2,7 +2,7 @@
 typora-root-url: ..\..\img
 ---
 
-## Memory Bound {#sec:MemBound}
+## Memory Bound
 
 When an application executes a large number of memory accesses and spends significant time waiting for them to finish, such an application is characterized as being bounded by memory. It means that to further improve its performance, we likely need to improve how we access memory, reduce the number of such accesses or upgrade the memory subsystem itself. 
 
