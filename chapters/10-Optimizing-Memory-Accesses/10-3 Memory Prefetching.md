@@ -43,24 +43,44 @@ for (int i = 0; i < N; ++i) {
 
 ![Hiding the cache miss latency by overlapping it with other execution.](../../img/memory-access-opts/SWmemprefetch2.png){#fig:SWmemprefetch2 width=90%}
 
-TODO: prefetch is a fake load.
-TODO: hint will be compiled down to machine instruction
-TODO: one can also use compiler intrinsic
-TODO: It is not always possible. example: pointer chaising
-TODO: add example of look ahead for 4,8,16 iterations.
+Another option to utilize explicit SW prefetching on x86 platforms is to use compiler intrinsics `_mm_prefetch` intrinsic. See Intel Intrinsics Guide for more details. In any case, compiler will compile it down to machine instruction: `PREFETCH` for x86 and `pld` for ARM. For some platforms compiler can skip inserting an instruction, so it is a good idea to check the generated machine code.
 
-I STOPPED HERE
+There are situations when SW memory prefetching is not possible. For example, when traversing a linked list, prefetching window is tiny and it is not possible to hide the latency of pointer chaising.
 
-For prefetch hints to take effect, be sure to insert it well ahead of time so that by the time the loaded value will be used in other calculations, it will be already in the cache. Also, do not insert it too early since it may pollute the cache with the data that is not used for some time. In order to estimate the prefetch window, use the method described in [@sec:timed_lbr]. [^5]
+In [@lst:MemPrefetch2] we saw an example of prefetching for the next iteration, but also you may frequently encounter a need to prefetch for 2, 4, 8, and sometimes even more iterations. The code in [@lst:MemPrefetch3] is one of those cases, when it could be beneficial. If the graph is very sparse and has a lot of verticies, it is very likely that accesses to `this->out_neighbors` and `this->in_neighbors` vectors will miss in caches a lot.
 
-The most common scenario where engineers use explicit memory prefetching is to get the data required for the next iteration of the loop. However, linear function prefetching can also be very helpful, e.g., when you know the address of the data ahead of time but request the data with some delay (prefetch window).
+This code is different from the previous example as there are no extensive computations on every iteration, so the penalty of cache misses likely dominates the latency of each iteration. But we can leverage the fact that we know all the elements that will be accessed in the future. The elements of vector `el` are accessed sequentially and thus are likely to be timely brought to the L1 cache by the HW prefetcher. Our goal here is to overlap the latency of a cache miss with executing enough iterations to completely hide it.
 
-Explicit memory prefetching is not portable, meaning that if it gives performance gains on one platform, it doesn't guarantee similar speedups on another platform. Even worse, when used badly, it can worsen the performance of caches. When using the wrong size of a memory block or requesting prefetches too often, it can force other useful data to be evicted from the caches.
+As a general rule, for prefetch hints to be effective, they must be inserted well ahead of time so that by the time the loaded value will be used in other calculations, it will be already in the cache. However, it also shouldn't be inserted too early since it may pollute the cache with the data that is not used for a long time. Notice, in [@lst:MemPrefetch3], `lookAhead` is a template parameter, which allows to try different values and see which gives the best performance. More advanced users can try to estimate the prefetching window using the method described in [@sec:timed_lbr], example of using such method can be found on easyperf blog. [^5]
 
-While software prefetching gives programmer control and flexibility, it's not always easy to get it right. Consider a situation when we want to insert a prefetch instruction into the piece of code that has average IPC=2, and every DRAM access takes 100 cycles. To have the best effect, we would need to insert prefetching instruction 200 instructions before the load. It is not always possible, especially if the load address is computed right before the load itself. The pointer chasing problem can be a good example when explicit prefetching is helpless. [@PrefetchSlides]
+Listing: Example of a SW prefetching for the next 8 iterations.
 
-Finally, an explicit prefetch instruction increases code size and adds pressure on the CPU Front-End. The prefetch instruction is just like any other instruction: it consumes CPU resources, and when using it wrong, it can pessimize the performance of a program.
+~~~~ {#lst:MemPrefetch3 .cpp}
+template <int lookAhead = 8>
+void Graph::update(const std::vector<Edge>& el) {
+  for(int i = 0; i + lookAhead < el.size(); i++) {
+    VertexID v = el[i].from;
+    VertexID u = el[i].to;
+    this->out_neighbors[u].push_back(v);
+    this->in_neighbors[v].push_back(u);
 
-[^3]: For this example, we define "big enough" to be more than this size of L3 cache inside a typical desktop CPU, which, at the time of writing, varies from 5 to 20 MB.
+    // prefetch elements for future iterations
+    VertexID v_next = el[i + lookAhead].from;
+    VertexID u_next = el[i + lookAhead].to;
+    __builtin_prefetch(this->out_neighbors.data() + v_next);
+    __builtin_prefetch(this->in_neighbors.data()  + u_next);
+  }
+  // process the remainder of the vector `el` ...
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+SW memory prefetching is most frequently used in the loops, but also one can insert those hints into the parent function, again, all depends on the available prefetching window.
+
+This technique is a powerful weapon, however, it should be used with extreme care as it is not easy to get it right. First of all, explicit memory prefetching is not portable, meaning that if it gives performance gains on one platform, it doesn't guarantee similar speedups on another platform. It is very implemetation-specific and platforms are not required to honor those hints. In such a case it will likely degrade performance. My recomendation would be to verify that the impact is positive with all available tools. Not only check the performance numbers, but also make sure that the number of cache misses (L3 in particular) went down. Once the change is committed into the code base, monitor performance on all the platforms that you run your application on, as it could be very sensitive to changes in the surrounding code. Consider dropping the idea if the benefits do not overweight the potential maintanance burden.
+
+For some complicated scenarios, make sure that the code actually prefetches the right memory locations. It can get tricky, when a current iteration of a loop depends on the previous iteration, e.g there is `continue` statement or changing the next element to process guarded by an `if` condition. In this case, my recommendation is to instrument the code to test the accuracy of your prefetching hints. Because when used badly, it can worsen the performance of caches by evicting other useful data.
+
+Finally, explicit prefetching increases code size and adds pressure on the CPU Front-End. A prefetch hint is just a fake load that goes into the memory subsystem, but does not have a destination register. And just like any other instruction it consumes CPU resources. Apply it with extreme care, because when used wrong, it can pessimize the performance of a program.
+
 [^4]: GCC builtins - [https://gcc.gnu.org/onlinedocs/gcc/Other-Builtins.html](https://gcc.gnu.org/onlinedocs/gcc/Other-Builtins.html).
-[^5]: Readers can also find an example of estimating the prefetch window in the article: [https://easyperf.net/blog/2019/04/03/Precise-timing-of-machine-code-with-Linux-perf#application-estimating-prefetch-window](https://easyperf.net/blog/2019/04/03/Precise-timing-of-machine-code-with-Linux-perf#application-estimating-prefetch-window).
+[^5]: "Precise timing of machine code with Linux perf" - [https://easyperf.net/blog/2019/04/03/Precise-timing-of-machine-code-with-Linux-perf#application-estimating-prefetch-window](https://easyperf.net/blog/2019/04/03/Precise-timing-of-machine-code-with-Linux-perf#application-estimating-prefetch-window).
