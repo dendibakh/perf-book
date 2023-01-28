@@ -37,7 +37,7 @@ Assembly instructions will be encoded and laid out in memory consequently:
 40051a  ...
 ```
 
-This is what is called *machine code layout*. Note that for the same program, it's possible to lay out the code in many different ways. For example, given two functions: `foo` and `bar`, we can place `bar` first in the binary and then `foo` or reverse the order. This affects offsets at which instructions will be placed in memory, which in turn affects the performance of the generated binary. For the rest of this chapter, we will take a look at some typical optimizations for the machine code layout.
+This is what is called *machine code layout*. Note that for the same program, it's possible to lay out the code in many different ways. For example, given two functions: `foo` and `bar`, we can place `bar` first in the binary and then `foo` or reverse the order. This affects offsets at which instructions will be placed in memory, which in turn may affect the performance of the generated binary. For the rest of this chapter, we will take a look at some typical optimizations for the machine code layout.
 
 [^1]: See exact formulas in TMA metrics table: [https://download.01.org/perfmon/TMA_Metrics.xlsx](https://download.01.org/perfmon/TMA_Metrics.xlsx).
 [^2]: See more information about this performance event here: [https://easyperf.net/blog/2018/12/29/Understanding-IDQ_UOPS_NOT_DELIVERED](https://easyperf.net/blog/2018/12/29/Understanding-IDQ_UOPS_NOT_DELIVERED)
