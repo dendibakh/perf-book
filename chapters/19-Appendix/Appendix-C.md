@@ -37,12 +37,10 @@ On Linux OS, there are two ways of using large pages in an application: Explicit
 
 ### Explicit hugepages
 
-**[TODO:] describe how to reserve at boot time.**
-
-Explicit huge pages can be reserved at boot time or at run time. 
+Explicit huge pages can be reserved at boot time or at run time. To make a permanent change to force the Linux kernel to allocate 128 huge pages at the boot time, run the following command:
 
 ```bash
-$ sudo sysctl -w vm.nr_hugepages=2048
+$ echo "vm.nr_hugepages = 128" >> /etc/sysctl.conf
 ```
 
 To explicitly allocate a fixed number of huge pages, one can use [libhugetlbfs](https://github.com/libhugetlbfs/libhugetlbfs). The following command preallocates 128 huge pages.
