@@ -31,6 +31,8 @@ The Instruction Decode Queue (IDQ) provides the interface between the in-order f
 [TODO]: describe TLB hierarchy. Add image. Describe numbers.
 Golden Cove's hierarchy is presented in figure @fig:GLC_TLB. L1 ITLB covers the memory space of 256 * 4KB equals 1MB, while L1 DTLB covers only 384 KB. L2 STLB is a larger storage and can accomdate 2048 most recent data and instruction page address translations, which covers a total of 8MB of memory space. Situation changes somewhat if huge pages are used.
 
+[TODO]: A "page fault" is an exception thrown by the hardware in the absence of a physical address mapping.
+
 ![TLB hierarchy of Golden Cove.](../../img/uarch/GLC_TLB_hierarchy.png){#fig:GLC_TLB width=70%}
 
 ### CPU Back-End {#sec:uarchBE}
