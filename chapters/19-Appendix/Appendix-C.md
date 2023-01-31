@@ -33,7 +33,7 @@ VirtualFree(ptr, 0, MEM_RELEASE);
 
 ## Linux
 
-On Linux OS, there are two ways of using large pages in an application: Explicit and Transparent Huge Pages.
+On Linux OS, there are two ways of using huge pages in an application: Explicit and Transparent Huge Pages.
 
 ### Explicit hugepages
 
