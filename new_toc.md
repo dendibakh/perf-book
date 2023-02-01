@@ -90,43 +90,43 @@ Preface
 
 **Part2. Source Code Tuning For CPU**
 
-**9 CPU Front-End Optimizations**
 	
-	9.1 Machine code layout
-    9.2 Basic Block
-    9.3 Basic block placement
-    9.4 Basic block alignment
-    9.5 Function splitting
-    9.6 Function grouping
-    9.7 Profile Guided Optimizations    [Expand on Bolt and Propeller]
-    9.8 Optimizing for ITLB             [Expand on huge pages code]
-	[add questions/exercises]
-    9.9 Chapter Summary
+**9 Optimizing Memory Accesses**
 
-	
-**10 Optimizing Memory Accesses**
-
-	10.1 Cache-Friendly Data Structures
-    10.2 Explicit Memory Prefetching
-    10.3 Optimizing For DTLB       [Expand on huge pages and page walks]
+	9.1 Cache-Friendly Data Structures
+    9.2 Explicit Memory Prefetching
+    9.3 Optimizing For DTLB       [Expand on huge pages and page walks]
 	[add questions/exercises]
 	
-**11 Optimizing Computations**
+**10 Optimizing Computations**
 
-	11.1 Inlining Functions
-    11.2 Loop Optimizations        [add unroll and jam]
-    11.3 Vectorization             [add Google Highway library]
-    11.4 Compiler Intrinsics       [expand with examples and typical use cases]
+	10.1 Inlining Functions
+    10.2 Loop Optimizations        [add unroll and jam]
+    10.3 Vectorization             [add Google Highway library]
+    10.4 Compiler Intrinsics       [expand with examples and typical use cases]
     [add questions/exercises]
-    11.5 Chapter Summary
+    10.5 Chapter Summary
 	
-**12 Optimizing Bad Speculation**
+**11 Optimizing Bad Speculation**
 	
-    12.1 Replace branches with lookup
-    12.2 Replace branches with predication
-    12.3 Chapter Summary
+    11.1 Replace branches with lookup
+    11.2 Replace branches with predication
+    11.3 Chapter Summary
 	[add questions/exercises]
+
+**12 CPU Front-End Optimizations**
 	
+	12.1 Machine code layout
+    12.2 Basic Block
+    12.3 Basic block placement
+    12.4 Basic block alignment
+    12.5 Function splitting
+    12.6 Function grouping
+    12.7 Profile Guided Optimizations    [Expand on Bolt and Propeller]
+    12.8 Optimizing for ITLB             [Expand on huge pages code]
+	[add questions/exercises]
+    12.9 Chapter Summary
+
 **[New chapter: 13 Architecture-specific optimizations]**
 
 	performance considerations on x86, ARM, and RISC-V (similarities and differences)
