@@ -4,6 +4,8 @@ typora-root-url: ..\..\img
 
 ## Modern CPU design
 
+[TODO]: update to GoldenCove uarch.
+
 ![Block diagram of a CPU Core in the Intel Skylake Microarchitecture. *© Image from [@IntelOptimizationManual].*](../../img/uarch/skylake_block_diagram_v2.png){#fig:Skylake_diag width=95%}
 
 The block diagram in figure @fig:Skylake_diag shows the details of Intel’s 6th generation core, Skylake, that was announced in 2015 and is widely spread all over the world. The Skylake core is split into an in-order front-end that fetches and decodes x86 instructions into u-ops and an 8-way superscalar, out-of-order backend. 
@@ -25,6 +27,13 @@ A major performance-boosting feature of the front-end is the Decoded Stream Buff
 Some very complicated instructions may require more UOPs than decoders can handle. UOPs for such instruction are served from Microcode Sequencer (MSROM). Examples of such instructions include HW operation support for string manipulation, encryption, synchronization, and others. Also, MSROM keeps the microcode operations to handle exceptional situations like branch misprediction (which requires pipeline flush), floating-point assist (e.g., when an instruction operates with denormal floating-point value), and others.
 
 The Instruction Decode Queue (IDQ) provides the interface between the in-order front-end and the out-of-order backend. IDQ queues up the UOPs in order. The IDQ has a total of 128 UOPs, 64 UOPs per hardware thread. 
+
+[TODO]: describe TLB hierarchy. Add image. Describe numbers.
+Golden Cove's hierarchy is presented in figure @fig:GLC_TLB. L1 ITLB covers the memory space of 256 * 4KB equals 1MB, while L1 DTLB covers only 384 KB. L2 STLB is a larger storage and can accomdate 2048 most recent data and instruction page address translations, which covers a total of 8MB of memory space. Situation changes somewhat if huge pages are used.
+
+[TODO]: A "page fault" is an exception thrown by the hardware in the absence of a physical address mapping.
+
+![TLB hierarchy of Golden Cove.](../../img/uarch/GLC_TLB_hierarchy.png){#fig:GLC_TLB width=70%}
 
 ### CPU Back-End {#sec:uarchBE}
 

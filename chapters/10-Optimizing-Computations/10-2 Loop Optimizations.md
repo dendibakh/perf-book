@@ -33,7 +33,7 @@ for (int i = 0; i < N; ++i)             for (int i = 0; i < N; ++i) {
 Listing: Loop Unrolling
 
 ~~~~ {#lst:Unrol .cpp}
-for (int i = 0; i < N; ++i)             for (int i = 0; i < N; i+=2) {
+for (int i = 0; i < N; ++i)             for (int i = 0; i+1 < N; i+=2) {
   a[i] = b[i] * c[i];          =>         a[i] = b[i] * c[i];
                                           a[i+1] = b[i+1] * c[i+1];
                                         }
@@ -113,9 +113,26 @@ for (int j = 0; j < N; j++)             }
   a[i].y = b[i].y;                      
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Loop Fusion helps to reduce the loop overhead (see discussion in Loop Unrolling) since both loops can use the same induction variable. Also, loop fusion can help to improve the temporal locality of memory accesses. In [@lst:fusion], if both `x` and `y` members of a structure happen to reside on the same cache line, it is better to fuse the two loops since we can avoid loading the same cache line twice. This will reduce the cache footprint and improve memory bandwidth utilization.
+Loop Fusion helps to reduce the loop overhead (similar to Loop Unrolling) since both loops can use the same induction variable. Also, loop fusion can help to improve the temporal locality of memory accesses. In [@lst:fusion], if both `x` and `y` members of a structure happen to reside on the same cache line, it is better to fuse the two loops since we can avoid loading the same cache line twice. This will reduce the cache footprint and improve memory bandwidth utilization.
 
-However, loop fusion does not always improve performance. Sometimes it is better to split a loop into multiple passes, pre-filter the data, sort and reorganize it, etc. By distributing the large loop into multiple smaller ones, we limit the amount of data required for each iteration of the loop, effectively increasing the temporal locality of memory accesses. This helps in situations with a high cache contention, which typically happens in large loops. Loop distribution also reduces register pressure since, again, fewer operations are being done within each iteration of the loop. Also, breaking a big loop into multiple smaller ones will likely be beneficial for the performance of the CPU Front-End because of better instruction cache utilization (see [@sec:secFEOpt]). Finally, when distributed, each small loop can be further optimized separately by the compiler.
+However, loop fusion does not always improve performance. Sometimes it is better to split a loop into multiple passes, pre-filter the data, sort and reorganize it, etc. By distributing the large loop into multiple smaller ones, we limit the amount of data required for each iteration of the loop, effectively increasing the temporal locality of memory accesses. This helps in situations with a high cache contention, which typically happens in large loops. Loop distribution also reduces register pressure since, again, fewer operations are being done within each iteration of the loop. Also, breaking a big loop into multiple smaller ones will likely be beneficial for the performance of the CPU Front-End because of better instruction cache utilization. Finally, when distributed, each small loop can be further optimized separately by the compiler.
+
+**Loop Unroll and Jam**. To perform this transformation, one needs to first unroll the outer loop, then jam (fuse) multiple inner loops together as shown in [@lst:unrolljam]. This transformation increases the ILP (Instruction-Level Parallelism) of the inner loop since more independent instructions are executed inside the inner loop. In the code example, inner loop is a reduction operation, which accumulates the deltas between elements of arrays `a` and `b`. When we unroll and jam the loop nest by a factor of 2, we effectively execute 2 iterations of the initial outer loop simultaneously. This is emphesized by having 2 independent accumulators, which breaks dependency chains over `diffs` in the initial variant.
+
+Loop Unroll and Jam can be performed as long as there are no cross-iteration dependencies on the outer loops, in other words, two iterations of the inner loop can be executed in parallel. Also, this transformation makes sense if inner loop has memory accesses that are strided on the outer loop index (`i` in this case), otherwise other transformations likely apply better. Unroll and Jam is especially useful when the trip count of the inner loop is low, e.g. less than 4. By doing the transformation, we pack more independent operations into the inner loop, which increases the ILP.
+
+Unroll and Jam transformation sometimes could be very useful for outer loop vectorization, which, at the time of writing, compilers cannot do automatically. In a situation when trip count of the inner loop is not visible to a compiler, it could still vectorize the original inner loop, hoping that it will execute enough iterations to hit the vectorized code (more on vectorization in the next section). But in case the trip count is low, the program will use a slow scalar version of the loop. Once we do Unroll and Jam, we allow compiler to vectorize the code differently: now "glueing" the independent instructions in the inner loop together (aka SLP vectorization).
+
+Listing: Loop Unroll and Jam
+
+~~~~ {#lst:unrolljam .cpp}
+for (int i = 0; i < N; i++)           for (int i = 0; i+1 < N; i+=2)
+  for (int j = 0; j < M; j++)           for (int j = 0; j < M; j++) {
+    diffs += a[i][j] - b[i][j];   =>      diffs1 += a[i][j]   - b[i][j];
+                                          diffs2 += a[i+1][j] - b[i+1][j];
+                                        }
+                                      diffs = diffs1 + diffs2;
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ### Discovering loop optimization opportunities.
 
@@ -140,11 +157,11 @@ Next, developers should identify the bottlenecks in the loop and assess performa
 
 \personal{Even though there are well-known optimization techniques for a particular set of computational problems, for a large part, loop optimizations are sort of "black art" that comes with experience. I recommend you to rely on a compiler and only complement it with making needed transformations yourself. Finally, keep the code as simple as possible and do not introduce unreasonable complicated changes if the performance benefits are negligible.}
 
-### Use Loop Optimization Frameworks
+### Loop Optimization Frameworks
 
 Over the years, researchers have developed techniques to determine the legality of loop transformations and automatically transform the loops. One such invention is the [polyhedral framework](https://en.wikipedia.org/wiki/Loop_optimization#The_polyhedral_or_constraint-based_framework)[^3]. [GRAPHITE](https://gcc.gnu.org/wiki/Graphite)[^4] was among the first set of polyhedral tools that were integrated into a production compiler. GRAPHITE performs a set of classical loop optimizations based on the polyhedral information, extracted from GIMPLE, GCC’s low-level intermediate representation. GRAPHITE has demonstrated the feasibility of the approach.
 
-LLVM-based compilers employ their own polyhedral framework: [Polly](https://polly.llvm.org/)[^5]. Polly is a high-level loop and data-locality optimizer and optimization infrastructure for LLVM. It uses an abstract mathematical representation based on integer polyhedral to analyze and optimize the memory access pattern of a program. Polly performs classical loop transformations, especially tiling and loop fusion, to improve data-locality. This framework has shown significant speedups on a number of well-known benchmarks [@Grosser2012PollyP]. Below we show an example of how Polly can give an almost 30 times speedup of a GEneral Matrix-Multiply (GEMM) kernel from [Polybench 2.0](https://web.cse.ohio-state.edu/~pouchet.2/software/polybench/)[^6] benchmark suite:
+Later LLVM compiler developed its own polyhedral framework called [Polly](https://polly.llvm.org/)[^5]. Polly is a high-level loop and data-locality optimization infrastructure for LLVM. It uses an abstract mathematical representation based on integer polyhedral to analyze and optimize the memory access patterns of a program. Polly performs classical loop transformations, especially tiling and loop fusion, to improve data-locality. This framework has shown significant speedups on a number of well-known benchmarks [@Grosser2012PollyP]. Below is an example of how Polly can give an almost 30 times speedup of a GEneral Matrix-Multiply (GEMM) kernel from [Polybench 2.0](https://web.cse.ohio-state.edu/~pouchet.2/software/polybench/)[^6] benchmark suite:
 
 ```bash
 $ clang -O3 gemm.c -o gemm.clang
