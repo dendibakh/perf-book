@@ -48,6 +48,31 @@ Due to the sampling nature of the tool, it will eventually miss events with a ve
 
 ### Examples {.unlisted .unnumbered}
 
+Below is a series of screenshots of VTune's most interesting features. For the purpose of this example, we took POV-Ray, a ray tracer that is used to create 3D graphics. Figure @fig:VtuneHotspots shows the hotpots analysis of povray 3.7 built-in benchmark, compiled with clang14 compiler with `-O3 -ffast-math -march=native -g` options, and run on Intel Alderlake system (Core i7-1260P, 4 P-cores + 8 E-cores) with 4 worker threads. 
+
+At the left part of the image, you can see a list of hot functions in the workload along with corresponding CPU time percentage and the number of retired instructions. On the right panel, you can see one of the most frequent call stacks that lead to calling the function `pov::Noise`. According to that screenshot, `44.4%` of the time function `pov::Noise`, was called from `pov::Evaluate_TPat`, which in turn was called from `pov::Compute_Pigment`. Notice that the call stack doesn't lead all the way to the `main` function. It happens because with HW-based collection, VTune uses LBR to sample call stacks, which has limited depth. Most likely we're dealing with recursive functions here, and to investigate that further users have to dig into the code.
+
+![VTune's hotspots view of povray built-in benchmark.](../../img/perf-tools/VtunePovray.png){#fig:VtuneHotspots width=100% }
+
+If you double-click on `pov::Noise` function, you will see an image that is shown on the figure @fig:VtuneSourceView. For the interest of space, only the most important columns are shown. Left panel shows the source code and CPU time that corresponds to each line of code. On the right, you can see a assembly instructions along with CPU time that was attributed to them. Highlighted machine instructions correspond to line 476 in the left panel. The sum of all CPU time percentages in both panels equals to the total CPU time attributed to the `pov::Noise`, which is `26.8%`.
+
+![VTune's source code view of povray built-in benchmark.](../../img/perf-tools/VtunePovray_SourceView.png){#fig:VtuneSourceView width=100% }
+
+I STOPPED HERE
+
+Intel VTune can collect many different CPU performance events. To illustrate this, we ran a different analysis type, Microarchitecture Exploration. We already showed 
+
+Another interesting
+If you tick the mark
+
+phases
+
+At the bottom we 
+
+One of the most powerful features of VTune is the ability to filter and regroup data. Users can select a region on the timeline and filter collected data only for that time interval. This will allow users to focus on that region and analyze what happened during 
+
+
+
 [TODO]: provide screenshots
  1) hotspots view (filtered and zoomed).
  2) source code view.
