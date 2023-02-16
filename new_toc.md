@@ -86,6 +86,7 @@ Preface
     Intel Vtune - AMD uprof - Apple Instruments - Linux perf
     Other: KUTrace, KDAB hotspots, Netflix FlameScope, [Tracy, Optick, Superluminal]
     [Windows ETW]
+    [Continuous Profilers]
     [add questions/exercises]
 
 **Part2. Source Code Tuning For CPU**
@@ -123,7 +124,7 @@ Preface
     12.5 Function splitting
     12.6 Function grouping
     12.7 Profile Guided Optimizations    [Expand on Bolt and Propeller]
-    12.8 Optimizing for ITLB             [Expand on huge pages code]
+    12.8 Optimizing for ITLB             [Expand on huge pages for code]
 	[add questions/exercises]
     12.9 Chapter Summary
 
@@ -138,8 +139,9 @@ Preface
 **14 Other Tuning Areas**
 
 	14.1 [Optimizing IO]
-    14.1 Compile-Time Computations
-    14.3 Cache Warming
+    [remove?] 14.1 Compile-Time Computations
+    14.2 [Faster standard library function implementations]
+    14.3 [Low Latency Techniques]
     14.4 Detecting Slow FP Arithmetic
     14.5 System Tuning
 	[add questions/exercises]
