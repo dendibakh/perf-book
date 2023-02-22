@@ -1,6 +1,6 @@
 ## Performance Metrics {#sec:PerfMetrics}
 
-In addition to the performance events that we discussed earlier in this chapter, performance engineers frequently use metrics, which are built on top of raw events. Table {@tbl:secondary_metrics} shows a list of metrics for Intel Alderlake platform along with descriptions and formulas. The list is not exhaustive, but it shows the most important metrics. Complete list of metrics for Intel CPUs and their formulas can be found in [TMA_metrics.xlsx](https://github.com/intel/perfmon/blob/main/TMA_Metrics.xlsx)[^1]. The last section in this chapter shows how performance metrics can be used in practice.
+In addition to the performance events that we discussed earlier in this chapter, performance engineers frequently use metrics, which are built on top of raw events. Table {@tbl:perf_metrics} shows a list of metrics for Intel's 12th-gen Goldencove architecture along with descriptions and formulas. The list is not exhaustive, but it shows the most important metrics. Complete list of metrics for Intel CPUs and their formulas can be found in [TMA_metrics.xlsx](https://github.com/intel/perfmon/blob/main/TMA_Metrics.xlsx)[^1]. The last section in this chapter shows how performance metrics can be used in practice.
 
 --------------------------------------------------------------------------
 Metric  Description                   Formula
@@ -100,9 +100,9 @@ SWPF    prefetch instruction       SW_PREFETCH_ACCESS.T0:u0xF
         (of any type)
 --------------------------------------------------------------------------
 
-Table: A list (not exhaustive) of secondary metrics along with descriptions and formulas for Intel Alderlake platforms. {#tbl:secondary_metrics}
+Table: A list (not exhaustive) of secondary metrics along with descriptions and formulas for Intel Goldencove architecture. {#tbl:perf_metrics}
 
-A few notes on those metrics. First, ILP and MLP metrics do not represent theoretical maximums for an application, rather they measure ILP and MLP on a particular machine. On an ideal machine with infinite resources numbers will be higher. Second, all metrics besides "DRAM BW Use" are fractions. We can apply fairly straightforward reasoning to each of them to tell whether a particular metric is high or low. But to make sense of "DRAM BW Use" metric, we would like to know if a program saturates the memory bandwidth or not. We will discuss how to find out peak DRAM BW in the next section.
+A few notes on those metrics. First, ILP and MLP metrics do not represent theoretical maximums for an application, rather they measure ILP and MLP on a given machine. On an ideal machine with infinite resources numbers will be higher. Second, all metrics besides "DRAM BW Use" and "Load Miss Real Latency" are fractions; we can apply fairly straightforward reasoning to each of them to tell whether a specific metric is high or low. But to make sense of "DRAM BW Use" and "Load Miss Real Latency" metrics, we need to put it in a context. For the former, we would like to know if a program saturates the memory bandwidth or not. The latter gives you an idea for the average cost of a cache miss, which is useless by itself unless you know the latencies of the cache hierarchy. We will discuss how to find out cache latencies and peak memory bandwidth in the next section.
 
 Formulas in the table give an intuition on how performance metrics are calculated, so that you can build similar metrics on another platform as long as underlying performance events are available there. Some tools can report performance metrics automatically. If not, you can always calculate those metrics manually since you know the formulas and corresponding performance events that must be collected.
 
