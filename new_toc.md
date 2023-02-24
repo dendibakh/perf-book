@@ -84,7 +84,9 @@ Preface
 **[New chapter: 8 Overview of Performance Analysis Tools]**
 
     Intel Vtune - AMD uprof - Apple Instruments - Linux perf
-    Other: KUTrace, KDAB hotspots, Netflix FlameScope, [Tracy, Optick, Superluminal]
+    Other: KUTrace, KDAB hotspots, Netflix FlameScope, 
+    [Tracy, Optick, Superluminal]
+    Flame Graphs 
     [Windows ETW]
     [Continuous Profilers]
     [add questions/exercises]
