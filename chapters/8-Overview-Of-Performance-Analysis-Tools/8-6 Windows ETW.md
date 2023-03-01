@@ -1,7 +1,7 @@
 # Overview Of Performance Analysis Tools {#sec:secOverviewPerfTools}
 
 
-# Windows
+## Event Tracing for Windows
 Microsoft has invested in a system wide tracing facility named Event Tracing for Windows (ETW).
  The main difference to the many Linux tracers is its ability to write structured events in user and kernel code with full stack trace support. Stack traces are essential to solve many challenging performance issues which otherwise would be impossible to solve. 
  ETW is available on all supported Windows platforms (x86, x64 and ARM) with the corresponding platform dependent installation packages.
