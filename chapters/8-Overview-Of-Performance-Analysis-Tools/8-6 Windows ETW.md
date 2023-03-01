@@ -3,7 +3,7 @@
 
 ## Event Tracing for Windows
 Microsoft has invested in a system wide tracing facility named Event Tracing for Windows (ETW).
- The main difference to the many Linux tracers is its ability to write structured events in user and kernel code with full stack trace support. Stack traces are essential to solve many challenging performance issues which otherwise would be impossible to solve. 
+ The main difference to the many Linux tracers is its ability to write structured events in user and kernel code with full stack trace support. Stack traces are essential to solve many challenging performance issues. They are the difference between knowing that someone did consume all CPU/Disk/Network/... vs. who did it in which source file.
  ETW is available on all supported Windows platforms (x86, x64 and ARM) with the corresponding platform dependent installation packages.
  
 
@@ -15,67 +15,22 @@ Microsoft has invested in a system wide tracing facility named Event Tracing for
 - Examine how fast your disk/s serves read/write requests and who initiates that work.
 - Check file access performance and patterns (includes cached read/writes which lead to no disk IO).
 - Trace the TCP/IP stack how packets flow between network interfaces and computers.
-- Process/Thread/Module lifetime along with creation/destruction stacks.
-- Get sampled (every 0.5s) memory utilization of all processes (working set, committed memory, shared memory, ...).
-- Profiling of OS allocations (VirtualAlloc) which are used by unmanaged (C/C++ Heap) and managed (.NET Garbage Collector) allocators.
-- Get a rough overview of CPU bottlenecks.
-- Trace Windows startup and shutdown including OS hard crashes with blue screens resulting in a kernel dump.
 - Add your own ETW Trace provider to correlate the system wide traces with your application behavior.
 
 ### What you cannot do with it: {.unlisted .unnumbered}
 
- - Why if/else branches are taken. For that you need a debugger. If the error is hard to catch you can use the Time Travel Debugger of Windbg Preview. It uses the Intel Processor Tracing CPU feature to trace every memory access and branch taken. The Time Travel Trace (TTT) file allows you to replay everything as often as you want.
  - Examine CPU bottlenecks in detail.
-     - Use VTune which offers much more details how the CPU accesses code and data.   
+   - Use VTune which offers much more details how the CPU accesses code and data.
  - How often a method was executed 
    - If you instrument your own methods with enter/leave ETW tracing it is possible.
  - Record high volume events for hours like thread wait (Context Switch) tracing. ETW records at system level all processes which is great, but generates a lot 
-   (ca. 1-2 GB/minute) of data. Even if you have the disk space most ETW tools will stop working with files > 8 GB. The Windows Performance Analyzer UI can work decently
-   with ETW files < 4 GB. It will crash at ca. 8 GB large files not, because it runs out of memory, but it hits a limitation of the .NET Runtime which does not (easily) support arrays > 2 GB.
-   - There are ways around this by e.g. stopping profiling every few minutes and start with a new file but that needs a lot of experience and hand tuning of the ETW recording settings.
+   (ca. 1-2 GB/minute) of data.
 
 ## Getting ETW Data
 To enable system wide profiling you must be administrator and have the privilege *SeSystemProfilePrivilege* enabled. 
 
 Recording ETW data is possible without any extra download since Windows 10 with Wpr.exe. The \underline{W}indows \underline{P}erformance \underline{R}ecorder tool supports 
 a set of built-in recording profiles which are ok for common performance issues. You can tailor your recording needs by authoring a custom performance recorder profile xml file (.wprp).
-
-Unfortunately wpr.exe is not working reliably on all Windows 10 versions and has not been patched during the lifetime of Windows 10 (including 22H2). The official answer from MS is that any tool which can be publicly downloaded (in this case from the ADK) no servicing via Windows Update is done. 
-If you find the following error while stopping ETW recording
-```
-C>wpr -start cpu -start dotnet  
-C>wpr -stop c:\temp\test.etl 
-        Cannot change thread mode after it is set.
-        Profile Id: RunningProfile
-        Error code: 0x80010106
-```
-
-you need to install the Windows Performance Toolkit (WPT) which is part of the Windows SDK and also of the Windows Assessment and Deployment Kit (Windows ADK). Below is a table of the known to be working WPR versions from the Windows SDKs:
-
---------------------------------------------------------------------------
-Windows Version        Description              Recommended WPT Version
-------                 ---------------------    ---------------------------------------
-Windows 11                                            
-10.0.22000.194         Latest                   Windows SDK for Windows 11 (10.0.22621.755) or later
-
-Windows 10 Consumer                                      
->=  10.0.17763         1809 - 22H2              "
-
-Windows Server 2022                                 
-10.0.20348.1194        Windows 10 based 21H2    "
-
-Windows Server 2019                                   
-10.0.17763             Windows 10 based 1809    "
-
-Windows 10 LTSC                                         
-10.0.17763             Windows 10 based 1809    "
-
-Windows Server 2016                                   
-10.0.14393.5427        Windows 10 based 1607    Windows 10 SDK version 2104 (10.0.20348.0)
-
---------------------------------------------------------------------------
-
-Table: Recommended Windows Performance Toolkit (WPT) for all major Windows versions. {#tbl:wpt_versions}
 
 You can download the Windows Performance Toolkit from the Windows SDK[^1] or ADK[^2] download page. 
 The installation is a two step process. First you download a small installer which will give you the options to download just the parts, in this case the Windows Performance Toolkit, you need.
@@ -150,8 +105,6 @@ You are allowed to redistribute WPT e.g. as part of your own application.
   It reads ETW data and generates aggregate summary Json files which can be queried, filtered and sorted
   at command line or exported to a CSV file.
    
-  ![Dump CPU top 10 stacktags.](../../img/perf-tools/DumpCPUTop10Stacktags.png){#fig:DumpStackTags width=100%}
-
 ## Case Study - Slow Program Start
 
 **Problem:** When double clicking on a downloaded executable in Windows Explorer it is started with a noticeable delay. Something seems to delay process start.
@@ -261,3 +214,43 @@ From the *"Disk Usage Utilization by Disk, Priority"* table in figure @fig:Proce
 [^9]: Stacktags [https://learn.microsoft.com/en-us/windows-hardware/test/wpt/stack-tags](https://learn.microsoft.com/en-us/windows-hardware/test/wpt/stack-tags)
 [^10]: ETWAnalyzer Stacktags [https://github.com/Siemens-Healthineers/ETWAnalyzer/blob/main/ETWAnalyzer/Configuration/default.stacktags](https://github.com/Siemens-Healthineers/ETWAnalyzer/blob/main/ETWAnalyzer/Configuration/default.stacktags)
 
+
+
+## Todo Move to -> Apendix 
+
+Unfortunately wpr.exe is not working reliably on all Windows 10 versions and has not been patched during the lifetime of Windows 10 (including 22H2). The official answer from MS is that any tool which can be publicly downloaded (in this case from the ADK) no servicing via Windows Update is done. 
+If you find the following error while stopping ETW recording
+```
+C>wpr -start cpu -start dotnet  
+C>wpr -stop c:\temp\test.etl 
+        Cannot change thread mode after it is set.
+        Profile Id: RunningProfile
+        Error code: 0x80010106
+```
+
+you need to install the Windows Performance Toolkit (WPT) which is part of the Windows SDK and also of the Windows Assessment and Deployment Kit (Windows ADK). Below is a table of the known to be working WPR versions from the Windows SDKs:
+
+--------------------------------------------------------------------------
+Windows Version        Description              Recommended WPT Version
+------                 ---------------------    ---------------------------------------
+Windows 11                                            
+10.0.22000.194         Latest                   Windows SDK for Windows 11 (10.0.22621.755) or later
+
+Windows 10 Consumer                                      
+>=  10.0.17763         1809 - 22H2              "
+
+Windows Server 2022                                 
+10.0.20348.1194        Windows 10 based 21H2    "
+
+Windows Server 2019                                   
+10.0.17763             Windows 10 based 1809    "
+
+Windows 10 LTSC                                         
+10.0.17763             Windows 10 based 1809    "
+
+Windows Server 2016                                   
+10.0.14393.5427        Windows 10 based 1607    Windows 10 SDK version 2104 (10.0.20348.0)
+
+--------------------------------------------------------------------------
+
+Table: Recommended Windows Performance Toolkit (WPT) for all major Windows versions. {#tbl:wpt_versions}
