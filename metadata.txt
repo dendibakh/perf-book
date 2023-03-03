@@ -5,7 +5,7 @@ rights: Creative Common Licesnse
 language: en-US
 cover-image: cover.jpg
 subparagraph: yes
-geometry: "left=3cm,right=3cm,top=2cm,bottom=2cm"
+geometry: "left=2cm,right=2cm,top=2cm,bottom=2cm"
 fontsize: 10pt
 output: pdf_document
 codeBlockCaptions: true
