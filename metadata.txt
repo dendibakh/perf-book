@@ -6,7 +6,7 @@ language: en-US
 cover-image: cover.jpg
 subparagraph: yes
 geometry: "left=3cm,right=3cm,top=2cm,bottom=2cm"
-fontsize: 11pt
+fontsize: 10pt
 output: pdf_document
 codeBlockCaptions: true
 lstPrefix: Listing
