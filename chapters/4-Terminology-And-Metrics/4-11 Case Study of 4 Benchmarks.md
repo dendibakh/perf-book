@@ -105,6 +105,8 @@ As you can see from this study, there is a lot one can learn about behavior of a
 
 Another caveat is that it only tells you about the average behavior of the program. For example, we might be looking at Stockfish's IPC of `1.8`, while in reality it may never run with such an IPC, instead it may have 2 phases of equal duration, one running with IPC of `1.6`, and the second with IPC of `1.8`. Common way to tackle this is to report statistical data for each metric along with the average value. Usually, having min, max, 95th percentile, and variation (stdev/avg) is enough to understand the distribution. Also, some tools allow plotting the data, so you can see how the value for a certain metric evolved during the program running time. As an example, figure @fig:CloverMetricCharts shows IPC, ... metrics 
 
+We can see that the workload is not stable, and its IPC and other metrics change over time.
+
 ![A set of metrics charts for the CloverLeaf benchmark.](../../img/terms-and-metrics/CloverMetricCharts.png){#fig:CloverMetricCharts width=100% }
 
 We discuss how to mitigate all the issues we suspect in the mentioned benchmarks later in the book.
