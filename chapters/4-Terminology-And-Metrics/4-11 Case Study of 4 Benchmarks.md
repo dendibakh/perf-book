@@ -99,16 +99,18 @@ IpSWPF           All         90.2        2,565       105,933    172,348
 
 Table: A case study. {#tbl:perf_metrics_case_study}
 
-I STOPPED HERE
+As you can see from this study, there is a lot one can learn about behavior of a program just by looking at the metrics. It answers the "what?" question, but doesn't tell you the "why?". For that you will need to collect performance profile, which we will introduce in later chapters. In the second part of the book we discuss how to mitigate performance issues that we suspect in the four benchmarks that we analyzed.
 
-As you can see from this study, there is a lot one can learn about behavior of a program just by looking at the metrics.
+Keep in mind that the summary of performance metrics in {@tbl:perf_metrics_case_study} only tells you about the *average* behavior of a program. For example, we might be looking at CloverLeaf's IPC of `0.2`, while in reality it may never run with such an IPC, instead it may have 2 phases of equal duration, one running with IPC of `0.1`, and the second with IPC of `0.3`. Performance tools tackle this by reporting statistical data for each metric along with the average value. Usually, having min, max, 95th percentile, and variation (stdev/avg) is enough to understand the distribution. Also, some tools allow plotting the data, so you can see how the value for a certain metric changed during the program running time. As an example, figure @fig:CloverMetricCharts shows the dynamics of IPC, L*MPKI, DRAM BW and average frequency for the CloverLeaf benchmark. The `pmu-tools` package can automatically build those charts once you add `--xlsx` and `--xchart` options.
 
-Another caveat is that it only tells you about the average behavior of the program. For example, we might be looking at Stockfish's IPC of `1.8`, while in reality it may never run with such an IPC, instead it may have 2 phases of equal duration, one running with IPC of `1.6`, and the second with IPC of `1.8`. Common way to tackle this is to report statistical data for each metric along with the average value. Usually, having min, max, 95th percentile, and variation (stdev/avg) is enough to understand the distribution. Also, some tools allow plotting the data, so you can see how the value for a certain metric evolved during the program running time. As an example, figure @fig:CloverMetricCharts shows IPC, ... metrics 
-
-We can see that the workload is not stable, and its IPC and other metrics change over time.
+```bash
+$ ~/workspace/pmu-tools/toplev.py -m --global --no-desc -v --xlsx workload.xlsx –xchart -- ./clover_leaf
+```
 
 ![A set of metrics charts for the CloverLeaf benchmark.](../../img/terms-and-metrics/CloverMetricCharts.png){#fig:CloverMetricCharts width=100% }
 
-We discuss how to mitigate all the issues we suspect in the mentioned benchmarks later in the book.
+Even though the deviation from the values reported in the summary is not very big, we can see that the workload is not always stable. After looking at the IPC chart we can hypothesize that there are no various phases in the workload and the variation is caused by multiplexing between performance events (discussed in [@sec:counting]). Yet, this is only a hypothesis that needs to be confirmed or disproved. Possible ways to proceed would be to collect more data points by running collection with higher granularity (in our case it's 10 sec) and study the source code. Be careful when drawing conclusions just from looking at the numbers, always obtain a second source of data that confirm your hypothesis.
+
+In summary, looking at performance metrics helps building the right mental model about what is and what is *not* happening in a program. Going further into analysis, this data will serve you well.
 
 [^1]: pmu-tools - [https://github.com/andikleen/pmu-tools](https://github.com/andikleen/pmu-tools).
