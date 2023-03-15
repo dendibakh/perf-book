@@ -1,13 +1,8 @@
-# Overview Of Performance Analysis Tools {#sec:secOverviewPerfTools}
-
-
 ## Event Tracing for Windows
-Microsoft has invested in a system wide tracing facility named Event Tracing for Windows (ETW).
- The main difference to the many Linux tracers is its ability to write structured events in user and kernel code with full stack trace support. Stack traces are essential to solve many challenging performance issues. They are the difference between knowing that someone did consume all CPU/Disk/Network/... vs. who did it in which source file.
- ETW is available on all supported Windows platforms (x86, x64 and ARM) with the corresponding platform dependent installation packages.
+Microsoft has invested in a system wide tracing facility named Event Tracing for Windows (ETW). The main difference to the many Linux tracers is its ability to write structured events in user and kernel code with full stack trace support. Stack traces are essential to solve many challenging performance issues. They are the difference between knowing that someone did consume all CPU/Disk/Network/... vs. who did it in which source file. ETW is available on all supported Windows platforms (x86, x64 and ARM) with the corresponding platform dependent installation packages.
  
-
 ### What can you do with it: {.unlisted .unnumbered}
+
 - Everything below is recorded system wide for all processes with configurable stack traces (kernel and user mode stacks combined).
 - Look at CPU hotspots with a configurable CPU sampling rate from 1/8 ms = 8 kHz up to 10 s = 1/10 Hz. Default is 1ms which costs ca. 5-10% execution performance.
 - Who blocks your threads and for how long (e.g. late event signals, unnecessary thread sleeps, ...) with Context Switch traces.
@@ -19,14 +14,12 @@ Microsoft has invested in a system wide tracing facility named Event Tracing for
 
 ### What you cannot do with it: {.unlisted .unnumbered}
 
- - Examine CPU bottlenecks in detail.
-   - Use VTune which offers much more details how the CPU accesses code and data.
- - How often a method was executed 
-   - If you instrument your own methods with enter/leave ETW tracing it is possible.
- - Record high volume events for hours like thread wait (Context Switch) tracing. ETW records at system level all processes which is great, but generates a lot 
-   (ca. 1-2 GB/minute) of data.
+- Examine CPU bottlenecks in detail. Use VTune which offers much more details how the CPU accesses code and data.
+- How often a method was executed. If you instrument your own methods with enter/leave ETW tracing it is possible.
+- Record high volume events for hours like thread wait (Context Switch) tracing. ETW records at system level all processes which is great, but generates a lot (ca. 1-2 GB/minute) of data.
 
-## Getting ETW Data
+### Getting ETW Data
+
 To enable system wide profiling you must be administrator and have the privilege *SeSystemProfilePrivilege* enabled. 
 
 Recording ETW data is possible without any extra download since Windows 10 with Wpr.exe. The \underline{W}indows \underline{P}erformance \underline{R}ecorder tool supports 
@@ -36,7 +29,7 @@ You can download the Windows Performance Toolkit from the Windows SDK[^1] or ADK
 The installation is a two step process. First you download a small installer which will give you the options to download just the parts, in this case the Windows Performance Toolkit, you need.
 You are allowed to redistribute WPT e.g. as part of your own application.
 
-## ETW Recording Tools
+### ETW Recording Tools {.unlisted .unnumbered}
 - wpr.exe 
 
   Part of Windows 10 and Windows Performance Toolkit.
@@ -74,7 +67,7 @@ You are allowed to redistribute WPT e.g. as part of your own application.
   Wrapper around xperf with special options to record data for Google Chrome issues. Can also record
   keyboard and mouse input.
 
-## ETW Viewing/Analysis Tools
+### ETW Viewing/Analysis Tools {.unlisted .unnumbered}
 - Windows Performance Analyzer (WPA)
   It is the most powerful UI in existence for viewing ETW data. There are not many system wide analysis tools out there. One comparable tool is TraceCompass from the Eclipse foundation.
 
@@ -105,11 +98,11 @@ You are allowed to redistribute WPT e.g. as part of your own application.
   It reads ETW data and generates aggregate summary Json files which can be queried, filtered and sorted
   at command line or exported to a CSV file.
    
-## Case Study - Slow Program Start
+### Case Study - Slow Program Start {.unlisted .unnumbered}
 
 **Problem:** When double clicking on a downloaded executable in Windows Explorer it is started with a noticeable delay. Something seems to delay process start.
 
-### Preparation
+#### Preparation {.unlisted .unnumbered}
 - Download a tool to record ETW data and screenshots like ETWController[^4].
 - Download the latest Windows 11 Performance Toolkit[^1] to be able to view the data with WPA. 
   - Ensure that the newer Win 11 wpr.exe comes first in your path by moving the install folder of the WPT before the C:\\Windows\\system32 in the System Environment dialog. This is how it should look like: 
@@ -119,7 +112,7 @@ You are allowed to redistribute WPT e.g. as part of your own application.
     C:\Windows\System32\wpr.exe
 ```
 
-### Measurement
+#### Measurement {.unlisted .unnumbered}
 
 ![ETWController UI screenshot.](../../img/perf-tools/ETWController.png){#fig:ETWControllerUI width=90%}
 
@@ -133,7 +126,7 @@ You are allowed to redistribute WPT e.g. as part of your own application.
 Stopping profiling the first time takes a bit longer because for all managed code synthetic pdbs are generated which is a one time operation. After profiling has reached the Stopped state you can press the *"Open in WPA"* button to load the ETL file into the Windows Performance Analyzer with an ETWController supplied profile. The CSwitch profile generates a large amount of data which is stored in a 4 GB ring buffer which allows you to record 1-2 minutes before the oldest events are overwritten. Sometimes it is a bit of an art to stop profiling at the right time point. If you have sporadic issues you can keep recording enabled for hours and stop it when an event like a log entry in a file shows up, which is checked by a polling script, to stop profiling when the issue has occurred.
 Windows supports Event Log and Performance Counter triggers which allow one to start a script when a performance counter reaches a threshold value or a specific event is written to an event log. If you need more sophisticated stop triggers you should take a look at PerfView which allows one to define a Performance Counter threshold which must be reached and stay there for x seconds before profiling is stopped. This way random spikes are no longer triggering false positives. 
 
-### WPA Tables
+#### WPA Tables {.unlisted .unnumbered}
 
 It is important to understand what data you are looking at in the tables. You certainly have noticed the yellow and blue vertical line in every WPA table. All columns right of the blue vertical line are used as input to graph data. Data left of the yellow line are groupings by the corresponding column values. Data between the yellow and blue line is the data of individual ETW events as table which you get when you unfold all groupings or you remove all grouped data columns.
 To create custom views from CPU Sampling data you can drag and drop the columns around to create new visualizations of the data. The following visualizations
@@ -161,7 +154,7 @@ Table: WPA Groupings  {#tbl:wpa_groupings}
 
 To switch between Process, Process Name with PID and Process PID you need to right click on the *"Process (Name)"* column. See figure @fig:WPA_Grouping.
 
-### Analysis in WPA
+#### Analysis in WPA {.unlisted .unnumbered}
 
 After stopping the recording we can examine the screenshots taken by ETWController to find where slowness was observed. An example is shown in figure @fig:ETWControllerScreenshot. When the profiling data is saved (the file named xx.etl) another folder named *xx.etl.Screenshots* is created. This contains all screenshots and a *Report.html* file which you can view in the browser. Every recorded keyboard/mouse interaction gets a screenshot of the form Screenshot_EventNumber e.g. Screenhot_63.jpg. This is the screenshot file of the double click event where the process start was delayed. The mouse pointer position is marked as a green square, except if a click event did occur, then it is red. This makes it easy to spot when and where a mouse click was performed.
 
@@ -200,9 +193,6 @@ The OverView profile allows you to quickly check if an issue correlates with
 
 From the *"Disk Usage Utilization by Disk, Priority"* table in figure @fig:ProcessStartDiskException we find that the disk was 29 ms active. If disk IO is near zero then it cannot be related with our > 1000 ms observed delay of a process start.
 
-
-## Footnotes
-
 [^1]: Windows SDK Downloads [https://developer.microsoft.com/en-us/windows/downloads/sdk-archive/](https://developer.microsoft.com/en-us/windows/downloads/sdk-archive/)
 [^2]: Windows ADK Downloads [https://learn.microsoft.com/en-us/windows-hardware/get-started/adk-install#other-adk-downloads](https://learn.microsoft.com/en-us/windows-hardware/get-started/adk-install#other-adk-downloads)
 [^3]: PerfView [https://github.com/microsoft/perfview](https://github.com/microsoft/perfview)
@@ -216,7 +206,7 @@ From the *"Disk Usage Utilization by Disk, Priority"* table in figure @fig:Proce
 
 
 
-## Todo Move to -> Apendix 
+[Todo]: Move to -> Apendix 
 
 Unfortunately wpr.exe is not working reliably on all Windows 10 versions and has not been patched during the lifetime of Windows 10 (including 22H2). The official answer from MS is that any tool which can be publicly downloaded (in this case from the ADK) no servicing via Windows Update is done. 
 If you find the following error while stopping ETW recording
