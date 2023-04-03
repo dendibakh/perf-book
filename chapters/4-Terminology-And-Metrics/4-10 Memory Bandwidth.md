@@ -23,33 +23,45 @@ The option `--idle_latency` measures read latency without loading the system. ML
 
 The chart on @fig:MemoryLatenciesCharts shows read latencies of L1, L2, and L3 caches. There are four different regions on the chart. The first region on the left from 1KB to 48KB buffer size corresponds to L1d cache, which is private to each physical core. We can observe 0.9ns latency for E-core and a slightly higher 1.1ns for P-core. Also, we can use this chart to confirm the cache sizes. Notice how E-core latency starts climbing after a buffer size goes above 32KB but E-core latency stays constant up to 48KB. That confirms that L1d cache size in E-core is 32KB, and in P-core it is 48KB.
 
-The second region shows the L2 cache latencies, which for E-core is almost twice higher than for P-core (5.9ns vs. 3.2ns). For P-core the latency increases after we cross 1.25MB buffer size, which is expected. But we expect E-core latency to stay the same until 2MB, which is not happening in our measurements.
-
-The third region from 2MB up to 14MB corresponds to L3 cache latency, which is roughly 12ns for both types of cores. The total size of L3 cache that is shared between all cores in the system is 18MB. Interestingly, we start seeing some unexpected dynamics starting from 15MB, not 18MB. Most likely it has to do with some accesses miss in L3 and require going to the main memory. The fourth region corresponds to memory latency, only the beginning of it is shown on the chart. After we cross the 18MB boundary, the latency climbes very steeply and starts to level off at 45ns for E-core and 90ns for P-core.
-
 ![L1/L2/L3 cache read latencies on Intel Core i7-1260P, measured with the mlc tool, large pages enabled.](../../img/terms-and-metrics/MemLatencies.png){#fig:MemoryLatenciesCharts width=100% }
 
-TODO:
+The second region shows the L2 cache latencies, which for E-core is almost twice higher than for P-core (5.9ns vs. 3.2ns). For P-core the latency increases after we cross 1.25MB buffer size, which is expected. But we expect E-core latency to stay the same until 2MB, which is not happening in our measurements.
 
-- Describe the difference between memory bandwidth and latency
-- Tell that latency may increase under load.
-- Give examples
-- Describe Intel mlc (works on Intel and AMD), give alternatives for ARM
-- Give output of mlc and comment it
-- Compare the output with maximums from Intel Advisor
+The third region from 2MB up to 14MB corresponds to L3 cache latency, which is roughly 12ns for both types of cores. The total size of L3 cache that is shared between all cores in the system is 18MB. Interestingly, we start seeing some unexpected dynamics starting from 15MB, not 18MB. Most likely it has to do with some accesses miss in L3 and require going to the main memory. The fourth region corresponds to memory latency, only the beginning of it is shown on the chart. After we cross the 18MB boundary, the latency climbes very steeply and starts to level off at 24MB for E-core and 64MB for P-core. With a much larger buffer size of 500MB, E-core access latency is 45ns and P-core is 90ns. This measures the memory latency since almost no loads hit in L3 cache.
 
 Using a similar technique we can measure bandwidth of various components of the memory hierarchy.
+For measuring bandwidth, MLC executes load requests which results are not used by any subsequent instructions. This 
+allows MLC to generate maximum possible bandwidth. 
+MLC spawns one software thread on each of the configured logical processors. The addresses that each thread accesses are independent and there is no sharing of data between threads. 
+
+The buffer size used by the threads determine whether MLC is measuring L1/L2/L3 cache b/w or memory b/w.
+
+```bash
+./mlc --max_bandwidth -k0-15 -Y -L -b10m
+Measuring Maximum Memory Bandwidths for the system
+Bandwidths are in MB/sec (1 MB/sec = 1,000,000 Bytes/sec)
+Using all the threads from each core if Hyper-threading is enabled
+Using traffic with the following read-write ratios
+ALL Reads        :      33691.53
+3:1 Reads-Writes :      30352.45
+2:1 Reads-Writes :      29722.28
+1:1 Reads-Writes :      28382.45
+Stream-triad like:      30503.68
+```
+
+The new options here are `-k`, which specifies a list of CPU numbers used for measurements. The `-Y` option tells MLC to use AVX2 loads, i.e. 32 bytes at a time. MLC measures bandwidth with different read-write ratios, but in the diagram below we only show all-read bandwidth as it gives us an intuition about peak memory bandwidth. But other ratios can also be important. Combined latency and bandwidth numbers for our system under test as measured with Intel MLC are shown in @fig:MemBandwidthAndLatenciesDiagram.
 
 ![Block diagram of the memory hierarchy of Intel Core i7-1260P and external DDR4 memory.](../../img/terms-and-metrics/MemBandwidthAndLatenciesDiagram.png){#fig:MemBandwidthAndLatenciesDiagram width=100% }
 
+Cores can draw much higher bandwidth from lower level caches like L1 and L2 than from shared L3 cache or main memory. Shared caches such as L3 and E-core L2, can scale reasonably well to accomodate requests from multiple cores at the same time. For example, single E-core L2 bandwidth is 100GB/s. With two E-cores from the same cluster, I measured 140 GB/s, three E-cores - 165 GB/s, all four E-cores can draw 175 GB/s from the shared L2. The same goes for L3 cache, which allows for 60 GB/s for a single P-core and only 25 GB/s for a single E-core. But when all the cores are used, L3 cache has 300 GB/s bandwidth.
 
-- Notice, that we measure bandwidth in GB/s, thus it also depends on the frequency at which cores are running. That's why in reality, those numbers may be significantly lower. For example, L1 bw for P-core is X, when running solely on the system at full Turbo frequency. But the L1 bw for P-core may drop to 0.75X, when the system is fully loaded.
-
+Notice, that we measure bandwidth in GB/s, thus it also depends on the frequency at which cores are running. That's why in reality, those numbers may be significantly lower. For example, L1 bw for P-core is X, when running solely on the system at full Turbo frequency. But the L1 bw for P-core may drop to 0.75X, when the system is fully loaded.
 
 If you constantly analyze performance on a single platform, it is a good idea to memorize latencies and bandwidth of various components of the memory hierarchy or have them handy. It helps to establish the mental model for a system under test which will aid your further performance analysis.
 
 [^1]: Intel MLC tool - [https://www.intel.com/content/www/us/en/download/736633/intel-memory-latency-checker-intel-mlc.html](https://www.intel.com/content/www/us/en/download/736633/intel-memory-latency-checker-intel-mlc.html)
 
+TODO: compare the output with maximums from Intel Advisor
 
 ```bash
 Measuring Peak Injection Memory Bandwidths for the system
