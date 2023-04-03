@@ -62,15 +62,3 @@ If you constantly analyze performance on a single platform, it is a good idea to
 [^1]: Intel MLC tool - [https://www.intel.com/content/www/us/en/download/736633/intel-memory-latency-checker-intel-mlc.html](https://www.intel.com/content/www/us/en/download/736633/intel-memory-latency-checker-intel-mlc.html)
 
 TODO: compare the output with maximums from Intel Advisor
-
-```bash
-Measuring Peak Injection Memory Bandwidths for the system
-Bandwidths are in MB/sec (1 MB/sec = 1,000,000 Bytes/sec)
-Using all the threads from each core if Hyper-threading is enabled
-Using traffic with the following read-write ratios
-ALL Reads        :      34557.4
-3:1 Reads-Writes :      30623.5
-2:1 Reads-Writes :      29705.9
-1:1 Reads-Writes :      29376.2
-Stream-triad like:      31875.7
-```
