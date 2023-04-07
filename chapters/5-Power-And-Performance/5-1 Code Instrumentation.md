@@ -118,12 +118,61 @@ the instrumentation will interfere too much with the runtime.
 % Using the APIs
 For CPU usage, outside of wall-clock time (`clock_gettime(2)`), your best option
 on Linux is the `perf_events` subsystem. It lets you read performance event
-counters directly. Use `perf_event_open(2)` to get a file descriptor
-representing the counters, then use `read(2)` to read the counters whenever you
-want. When reading it from inside the thread, the counters are for that thread
-alone. This can optionally include kernel code that ran and was attributed to
-the thread. The returned performance counter values are just `int64` event
-counts.
+counters directly.  The subsystem is rather low-level, so the `perfmon2-libfm4`
+package is useful here, as it adds both a discovery tool for identifying
+available events on your CPU's PMU, and a wrapper library around the raw `perf_event_open(2)`
+system call.  Here's an example that (poorly) benchmarks `sqrt(3)`:
+```c
+#include <assert.h>
+#include <math.h>
+#include <perfmon/pfmlib.h>
+#include <perfmon/pfmlib_perf_event.h>
+
+// The flags to perf_event_open() determine which fields are returned
+// from the resulting FD.
+struct read_format { uint64_t nr, time_enabled, time_running, values[2]; };
+void require_pfm(int value) { assert(value == PFM_SUCCESS); }
+void require_nonneg(int value) { assert(value >= 0); }
+
+int main(int argc, char **argv) {
+   double value = uintptr_t(argv) % 50000;  // Avoid compiler precomputation
+   int event_fd;
+   perf_event_attr  perf_attr{};
+   perf_attr.size = sizeof(perf_event_attr);
+   perf_attr.read_format = PERF_FORMAT_TOTAL_TIME_ENABLED | PERF_FORMAT_TOTAL_TIME_RUNNING | PERF_FORMAT_GROUP;
+
+   pfm_perf_encode_arg_t perf_setup{};
+   perf_setup.size = sizeof(pfm_perf_encode_arg_t);
+   perf_setup.attr = &perf_attr;
+
+   require_pfm(pfm_initialize());
+   // See the output of `showevtinfo`, which comes as an example program with perfmon2-libpfm4
+   require_pfm(pfm_get_os_event_encoding("INSTRUCTIONS_RETIRED", PFM_PLM3, PFM_OS_PERF_EVENT_EXT, &perf_setup));
+   require_nonneg((event_fd = perf_event_open(&perf_attr, 0, -1, -1, 0)));
+   require_pfm(pfm_get_os_event_encoding("LLC_MISSES", PFM_PLM3, PFM_OS_PERF_EVENT_EXT, &perf_setup));
+   require_nonneg((event_fd = perf_event_open(&perf_attr, 0, -1, event_fd, 0)));
+
+   read_format cur, prior;
+   require_nonneg(read(event_fd, &prior, sizeof(read_format)));
+
+   // code being benchmarked
+   value = sqrt(value);
+
+   require_nonneg(read(event_fd, &cur, sizeof(read_format)));
+
+   printf("Got value %lu for retired_instructions.  ", cur.values[0] - prior.values[0]);
+   printf("Got value %lu for llc_misses.  ", cur.values[1] - prior.values[1]);
+   printf("On-CPU time was %lu nanosecs\n", cur.time_running - prior.time_running);
+
+   return 0;
+}
+```
+
+Use `perf_event_open(2)` to get a file descriptor representing the counters,
+then use `read(2)` to read the counters whenever you want. When reading it from
+inside the thread, the counters are for that thread alone. This can optionally
+include kernel code that ran and was attributed to the thread. The returned
+performance counter values are just `int64` event counts.
 
 The difference in event counts over a region of code is the number of events
 that occurred during that region, in that thread. That difference divided by the
@@ -131,15 +180,24 @@ time taken is the event rate. You can ask for up to 3 counters simultaneously in
 one file descriptor. They will available atomically under the same `read(2)`
 system call. These atomic bundles are very useful. 
 
+Repeatedly running the example above (you will probably have to 0 to `/proc/sys/kernel/perf_event_paranoid` to 
+make it work), you will get something like:
+```
+Got value 39 for retired_instructions.  Got value 130 for llc_misses.  On-CPU time was 2209 nanosecs
+Got value 39 for retired_instructions.  Got value 57 for llc_misses.  On-CPU time was 1868 nanosecs
+Got value 39 for retired_instructions.  Got value 54 for llc_misses.  On-CPU time was 1732 nanosecs
+```
+
+
 You can compensate for the scheduler by requesting CPU cycles consumed (e.g.,
 `UNHALTED_CORE_CYCLES`) and comparing against wall-clock time to detect when the
 thread wasn't running. You can similarly see the effects of frequency stepping by
 comparing CPU cycles (`UNHALTED_CORE_CYCLES`) vs the fixed-frequency reference clock
 (`UNHALTED_REFERENCE_CYCLES`).
 
-You can also correlate the CPU-utilization of your code (IPC:
-`INSTRUCTIONS_RETIRED/UNHALTED_CORE_CYCLES`) to events you believe dominate it
-(e.g., `LLC_MISSES`).
+You can also correlate low IPC (`INSTRUCTIONS_RETIRED/UNHALTED_CORE_CYCLES`) to
+events you believe dominate it (e.g., `LLC_MISSES`).
+
 
 % Interval Estimation
 
@@ -179,10 +237,7 @@ adding the instrumentation.  For example, if you have a loop:
              conn_sock = accept(listen_sock,
                                 (struct sockaddr *) &addr, &addrlen);
              read(counter_fd, snapshot.post_accept, 48)   // post_accept
-             if (conn_sock == -1) {
-                 perror("accept");
-                 exit(EXIT_FAILURE);
-             }
+             asssert (conn_sock == -1);
              setnonblocking(conn_sock);
              ev.events = EPOLLIN | EPOLLET;
              ev.data.fd = conn_sock;
