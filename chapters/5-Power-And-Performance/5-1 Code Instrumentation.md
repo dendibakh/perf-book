@@ -123,6 +123,7 @@ package is useful here, as it adds both a discovery tool for identifying
 available events on your CPU's PMU, and a wrapper library around the raw `perf_event_open(2)`
 system call.  Here's an example that (poorly) benchmarks `sqrt(3)`:
 ```c
+// compile with -lpfm
 #include <assert.h>
 #include <math.h>
 #include <perfmon/pfmlib.h>
