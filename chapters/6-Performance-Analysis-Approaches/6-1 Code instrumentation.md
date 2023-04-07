@@ -4,16 +4,63 @@ typora-root-url: ..\..\img
 
 ## Code Instrumentation {#sec:secInstrumentation}
 
-Probably the first approach for doing performance analysis ever invented is Code Instrumentation. It is a technique that inserts extra code into a program to collect runtime information. [@lst:CodeInstrumentation] shows the simplest example of inserting `printf` statements at the beginning of the function to count the number of times this function was called. I think every programmer in the world did it at some point at least once. This method provides very detailed information when you need specific knowledge about the execution of the program. Code instrumentation allows us to track any information about every variable in the program.
+Probably the first approach for doing performance analysis ever invented is code *instrumentation*. It is a technique that inserts extra code into a program to collect specific runtime information. [@lst:CodeInstrumentation] shows the simplest example of inserting `printf` statements at the beginning of the function to count the number of times this function was called. After that you run the program and count the number of times you see "foo is called" in the output. I think every programmer in the world did it at some point of their carreer at least once.
 
 Listing: Code Instrumentation
 
 ~~~~ {#lst:CodeInstrumentation .cpp}
 int foo(int x) {
-  printf("foo is called");
++ printf("foo is called");
   // function body...
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A slightly more interesting example of code instrumentation is presented in [@lst:CodeInstrumentationHistogram]. The plus sign at the beginning of a line means that this line was added and is not present in the original code. In general, instrumentation code is not meant to be pushed into the codebase, it's rather for collecting the needed data and then can be thrown away. I usually just copy-paste a version of this code into whatever project I'm working on and then delete it. It is simple enough and can be adjusted to your specific needs quickly. 
+
+In this made-up code example, the function `findObject` searches the coordinates of an object with some properties `p` on a map. The function `findObj` returns the confidence level that we located the right object with the current coordinates `c`. If it is an exact match, we stop the search loop and return the coordinates. If the confidence is above the `threshold`, we choose to `zoomIn` to find more precise location of the object. Otherwise, we get the new coordinates within the `searchRadius` to try our search next time.
+
+
+
+Listing: Code Instrumentation
+
+~~~~ {#lst:CodeInstrumentationHistogram .cpp}
++ struct histogram {
++   std::map<uint32_t, std::map<uint32_t, uint64_t>> hist;
++   ~histogram() {
++     for (auto& tripCount : hist)
++       for (auto& updateCount : tripCount.second)
++         std::cout << "[" << tripCount.first << "][" 
++                   << updateCount.first << "] : " 
++                   << updateCount.second << "\n";
++   }
++ };
++ histogram h;
+
++ struct incrementor {
++   uint32_t loopTripCount = 0;
++   uint32_t updateCount = 0;
++   ~incrementor() {
++ 	   h.hist[loopTripCount][updateCount]++;
++   }
++ };
+
+Coords findObject(Coords c, ObjParams p, float searchRadius) {
++ incrementor inc;
+  while (true) {
++   inc.tripCount++;  
+    float match = findObj(c, p);
+    if (exactMatch(match))
+      return c;   
+    if (match > threshold) {
+      searchRadius = zoomIn(c, searchRadius);
++     inc.updateCount++;
+    }
+    c = getNewCoords(searchRadius);
+  }
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This method provides very detailed information when you need specific knowledge about the execution of the program. Code instrumentation allows us to track any information about every variable in the program.
 
 Instrumentation based profiling methods are mostly used on a macro level, not on the micro(low) level. Using such a method often yields the best insight when optimizing big pieces of code because you can use a top-down approach (instrumenting the main function then drilling down to its callees) of locating performance issues. While code instrumentation is not very helpful in the case of small programs, it gives the most value and insight by letting developers observe the architecture and flow of an application. This technique is especially helpful for someone working with an unfamiliar codebase.
 
