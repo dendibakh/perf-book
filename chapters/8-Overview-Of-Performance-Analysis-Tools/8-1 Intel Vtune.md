@@ -66,6 +66,6 @@ Region 3 shows performance events that were collected and their distribution ove
 
 Finally, the bottom panel (region 4) shows the CPU frequency chart for four hardware threads. Hovering over different time slices tells us that the frequency of those cores fluctuates in the 3.2GHz - 3.4GHz region. Memory Access analysis type also shows memory bandwidth in GB/s over time.
 
-![VTune's perf events timeline view of povray built-in benchmark.](../../img/perf-tools/VtunePovray_EventTimeline.png){#fig:VtuneTimelineView width=100% }
+![VTune's perf events timeline view of povray built-in benchmark.](../../img/perf-tools/VtunePovray_EventTimeline.jpg){#fig:VtuneTimelineView width=100% }
 
 [TODO]: Show usage of marker APIs with code and Timeline view.
