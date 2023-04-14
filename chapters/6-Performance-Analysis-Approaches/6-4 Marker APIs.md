@@ -88,7 +88,7 @@ void render(int xsz, int ysz, uint32_t *fb, int samples) {
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-We run it on the Intel Alderlake-based machine and here is the output we've got, numbers that you see on your machine might differ.
+In this code example, we first initialize `libpfm` library and configure performance events and the format that we will use to read them. Then, we choose the code region we want to analyze, in our case it is a loop with a `trace` function call inside. We surround this code region with two `read` system calls that will capture values of performance counters we set up earlier. Next, we save the deltas for later processing, in this case, we aggregated (code is not shown) it by calculating average, 90th percentile and maximum values. Running it on a Intel Alderlake-based machine we've got the output below:
 
 ```bash
 $ ./c-ray-f -s 1024x768 -r 2 -i sphfract -o output.ppm
