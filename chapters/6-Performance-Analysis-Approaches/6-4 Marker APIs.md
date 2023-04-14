@@ -15,10 +15,12 @@ Listing: Using libpfm4 marker API on the C-Ray benchmark
 ~~~~ {#lst:LibpfmMarkerAPI .cpp}
 +#include <perfmon/pfmlib.h>
 +#include <perfmon/pfmlib_perf_event.h>
-+  
-int main(int argc, char **argv) {
-   // ...
-   load_scene(infile);
+
+...
+
+/* render a frame of xsz/ysz dimensions into the provided framebuffer */
+void render(int xsz, int ysz, uint32_t *fb, int samples) {
+   ...
  
 +  pfm_initialize();
 +
@@ -29,6 +31,7 @@ int main(int argc, char **argv) {
 +                          PERF_FORMAT_TOTAL_TIME_RUNNING | PERF_FORMAT_GROUP;
 +   
 +  pfm_perf_encode_arg_t arg;
++  memset(&arg, 0, sizeof(pfm_perf_encode_arg_t));
 +  arg.size = sizeof(pfm_perf_encode_arg_t);
 +  arg.attr = &perf_attr;
 +   
@@ -41,42 +44,67 @@ int main(int argc, char **argv) {
 +  pfm_get_os_event_encoding("branch-misses", PFM_PLM3, PFM_OS_PERF_EVENT_EXT, &arg);
 +  event_fd = perf_event_open(&perf_attr, 0, -1, leader_fd, 0);
 +
--  start_time = get_msec();
 +  struct read_format { uint64_t nr, time_enabled, time_running, values[4]; };
-+  struct read_format cur, prior;
-+  read(event_fd, &prior, sizeof(struct read_format));
-   render(xres, yres, pixels, rays_per_pixel);
--  rend_time = get_msec() - start_time;
-+  read(event_fd, &cur, sizeof(struct read_format));
- 
-   /* output statistics to stderr */
--  fprintf(stderr, "Rendering took: %lu seconds (%lu milliseconds)\n", rend_time / 1000, rend_time);
-+  fprintf(stderr, "Rendering took: %lu nanosecs of CPU time\n", cur.time_running - prior.time_running);
-+  fprintf(stderr, "instructions: %lu\n", cur.values[0] - prior.values[0]);
-+  fprintf(stderr, "cycles: %lu\n", cur.values[1] - prior.values[1]);
-+  fprintf(stderr, "branches: %lu\n", cur.values[2] - prior.values[2]);
-+  fprintf(stderr, "branch-misses: %lu\n", cur.values[3] - prior.values[3]);
++  struct read_format before, after;
+
+  for(j=0; j<ysz; j++) {
+    for(i=0; i<xsz; i++) {
+      double r, g, b;
+      r = g = b = 0.0;
+
++     // capture counters before ray tracing
++     read(event_fd, &before, sizeof(struct read_format));
+
+      for(s=0; s<samples; s++) {
+        struct vec3 col = trace(get_primary_ray(i, j, s), 0);
+        r += col.x;
+        g += col.y;
+        b += col.z;
+      }
+
++     // capture counters after ray tracing
++     read(event_fd, &after, sizeof(struct read_format));
+
++     // save the deltas in separate arrays
++     nanosecs[j * xsz + i] = after.time_running - before.time_running;
++     instrs  [j * xsz + i] = after.values[0] - before.values[0];
++     cycles  [j * xsz + i] = after.values[1] - before.values[1];
++     branches[j * xsz + i] = after.values[2] - before.values[2];
++     br_misps[j * xsz + i] = after.values[3] - before.values[3];
+
+      r = r * rcp_samples;
+      g = g * rcp_samples;
+      b = b * rcp_samples;
+
+      *fb++ = ((uint32_t)(MIN(r, 1.0) * 255.0) & 0xff) << RSHIFT |
+          ((uint32_t)(MIN(g, 1.0) * 255.0) & 0xff) << GSHIFT |
+          ((uint32_t)(MIN(b, 1.0) * 255.0) & 0xff) << BSHIFT;
+    }
+  }
+
++ // aggregate statistics and print it
+
+  ...
+}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-We run it on the Intel Alderlake-based machine and here is the output we've got, numbers that you see might differ. 
+We run it on the Intel Alderlake-based machine and here is the output we've got, numbers that you see on your machine might differ.
 
 ```bash
 $ ./c-ray-f -s 1024x768 -r 2 -i sphfract -o output.ppm
-Rendering took: 3408273087 nanosecs of CPU time
-instructions: 56583325716
-cycles: 15967087210
-branches: 4154308095
-branch-misses: 14479489
-
-# counts are very similar to the output of:
-$ perf stat -e instructions,cycles,branches,branch-misses -- ./c-ray-f -s 1024x768 -r 2 -i sphfract -o output.ppm
+Per-pixel ray tracing stats:
+                      avg         p90         max
+-------------------------------------------------
+nanoseconds   |      4571 |      6139 |     25567
+instructions  |     71927 |     96172 |    165608
+cycles        |     20474 |     27837 |    118921
+branches      |      5283 |      7061 |     12149
+branch-misses |        18 |        35 |       146
 ```
 
-TODO: should we take a better representable example? The one that would show aggregating results from multiple runs of a function? We can also measure the overhead.
-
-The results are very close to the output of `perf stat` command, because, the most time is spent inside `render` function. 
-
 **Overhead**
+
+We measured 17% overhead.
 
 Managing the overhead of your instrumentation is critical. There are three parts: collecting the information, storing it, and reporting it. Overhead is usefully calculated as rates. Rates per unit of either time or element (RPC, loop iteration, etc.). Each collection should have a fixed cost (e.g., a syscall, but not a list traversal) and its overhead is that cost times the rate. For example, a system call is roughly 1.6 microseconds of CPU time, and if you collect 4 times per RPC, your overhead is 6.4 microseconds of CPU per RPC.
 
