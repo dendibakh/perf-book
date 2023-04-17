@@ -88,7 +88,7 @@ void render(int xsz, int ysz, uint32_t *fb, int samples) {
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In this code example, we first initialize `libpfm` library and configure performance events and the format that we will use to read them. Then, we choose the code region we want to analyze, in our case it is a loop with a `trace` function call inside. We surround this code region with two `read` system calls that will capture values of performance counters we set up earlier. Next, we save the deltas for later processing, in this case, we aggregated (code is not shown) it by calculating average, 90th percentile and maximum values. Running it on a Intel Alderlake-based machine we've got the output below:
+In this code example, we first initialize `libpfm` library and configure performance events and the format that we will use to read them. Then, we choose the code region we want to analyze, in our case it is a loop with a `trace` function call inside. We surround this code region with two `read` system calls that will capture values of performance counters before and after the loop. Next, we save the deltas for later processing, in this case, we aggregated (code is not shown) it by calculating average, 90th percentile and maximum values. Running it on an Intel Alderlake-based machine, we've got the output shown below. Root priviledges are not required, but `/proc/sys/kernel/perf_event_paranoid` should be set to less than 1. When reading counters from inside a thread, the values are for that thread alone. It can optionally include kernel code that ran and was attributed to the thread.
 
 ```bash
 $ ./c-ray-f -s 1024x768 -r 2 -i sphfract -o output.ppm
@@ -102,62 +102,48 @@ branches      |      5283 |      7061 |     12149
 branch-misses |        18 |        35 |       146
 ```
 
-**Overhead**
+Remember, that the instrumentation that we added measures the per-pixel ray tracing stats. Multiplying average numbers by the number of pixels (`1024x768`) should give us roughly the total stats for the program. A good sanity check in this case is to run `perf stat` and compare the overall C-Ray statistics for the performance events that we've collected.
 
-We measured 17% overhead.
+The C-ray benchmark primarily stresses the floating-point performance of a CPU core, which generally should not cause high variance in the measuments, in other words, we expect all the measurements to be very close to each other. However, we see that it's not the case, as p90 values are 1.33x average numbers and max is sometimes 5x slower than the average case. The most likely explanation here is that for some pixels the algorithm hits a corner case, executes more instructions and subsequently runs longer. But it's always good to confirm the hypothesis by studying the source code or extending the instrumentation to capture more data for the "slow" pixels.
 
-Managing the overhead of your instrumentation is critical. There are three parts: collecting the information, storing it, and reporting it. Overhead is usefully calculated as rates. Rates per unit of either time or element (RPC, loop iteration, etc.). Each collection should have a fixed cost (e.g., a syscall, but not a list traversal) and its overhead is that cost times the rate. For example, a system call is roughly 1.6 microseconds of CPU time, and if you collect 4 times per RPC, your overhead is 6.4 microseconds of CPU per RPC.
+Managing the overhead of your instrumentation is critical, especially if you choose to enable it in production environment. The instumentation code has three logical parts: collecting the information, storing it, and reporting it. Overhead is usefully calculated as rates per unit of time or work (RPC, loop iteration, etc.). Each collection should have a fixed cost (e.g., a syscall, but not a list traversal) and its overhead is that cost times the rate. For example, if a system call on our system is roughly 1.6 microseconds of CPU time, and we do it twice for each pixel (iteration of the outer loop), our overhead is 3.2 microseconds of CPU per pixel.
 
-Collection overhead depends on how many times the API is called during the work. Storage overhead is either linear or logarithmic to the collection rate times the retentia
+TODO: @Lally: do you want to elaborate on three parts of the instrumentation (collect, store, report)?
 
-To control overhead and relevancy you can choose when to enable or record the instrumentation. Random sampling gives you the overall character of your performance, but emitting data (e.g., log message) on particularly slow runs through some code can provide useful insight on tail latency.
+TODO: @Lally: do you want to elaborate on the fix cost of the instrumentation? Any guidelines how to achieve that?
 
-**Usage scenarios**
+The additional code showed in [@lst:LibpfmMarkerAPI] causes 17% overhead, which is OK for local experiments, but quite high to run in production. Most large distributed systems aim for less than 1% overhead, and for some up to 5% can be tolerable, but it's unlikely that users would be happy with 17% slowdown. To bring the overhead down, we could capture counters only once instead twice inside the loop, which will lower the overhead two times but make it a little less accurate. This inaccuracy can be compensated by a fixed cost of the code that goes after the instumentation inside the outer loop.
 
-TODO: you can also leave it enabled in production if the overhead is not too big.
+To control overhead and relevancy you can choose when to enable data collection. For a long-running application, random sampling provides the overall performance characteristics while incurring a very low overhead. If tail latency is of a primary concern, the emitting log messages on a particularly slow run can provide useful insights. In general, developers are free to implement any kind of adaptive instrumentation logic to keep the overhead low while still capturing useful data.
 
-Explicit instrumentation makes a lot of sense for two different scenarios: when you're developing your code and are already going to recompile it often and when you want the instrumentation around for monitoring during runtime. Some instrumentation fits in both categories. Others you may want behind an `#ifdef` or macro to leave off for production.
+TODO: @Lally: do you want to elaborate on the storage overhead? We can say about online algorithms for calculating mean and stddev, which require no additional memory consumption.
 
-Once you've collected your measurements in your process, you'll have to get that data back to you to analyze.  You have to be careful not to flood some I/O system with too much performance data.  The application performance will sink and the instrumentation will interfere too much with the runtime.
+Storage overhead is either linear or logarithmic to the collection rate times the retentia
 
-* Mark LOC for precise measurements
-* Attribute events (cache misses, cycles) to specific regions of code
-* Attribute the 'cost' of running the application to specific work.
+While capturing data you have to be careful not to flood the I/O system with too much performance data. In such a scenario, the application performance will sink and the instrumentation will interfere too much with the runtime.
 
-#### Example: using libfm4
+In the [@lst:LibpfmMarkerAPI], we collected 4 events simultaneously, though the CPU has 6 programmable counters...
 
+TODO: @Lally describe multiplexing in case we specify more events than physical counters. If I specify more events than physical PMCs, will libpfm start automatically multiplexing? How do you then scale the counters?
 
+Capturing multiple events simultaneously allows to calculate various metrics that we discussed in Chapter 4. For example, capturing `INSTRUCTIONS_RETIRED` and `UNHALTED_CLOCK_CYCLES` enables us to measure IPC. We can observe the effects of frequency scaling by comparing CPU cycles (`UNHALTED_CORE_CYCLES`) vs the fixed-frequency reference clock (`UNHALTED_REFERENCE_CYCLES`). It is possible to detect when the thread wasn't running by requesting CPU cycles consumed (`UNHALTED_CORE_CYCLES`, only counts when the thread is running) and comparing against wall-clock. Also, we can normalize the numbers to get the event rate per second/clock/instruction. For instance, measuring `MEM_LOAD_RETIRED.L3_MISS` and `INSTRUCTIONS_RETIRED` we can get the `L3MPKI` metric. As you can see, the setup is very flexible.
 
-TODO: describe multiplexing in case we specify more events than physical counters.
-TODO: Lally: Measuring blocks of counters together can calculate useful things! For example, `INSTRUCTIONS_RETIRED / UNHALTED_CLOCK_CYCLES = IPC`.
-Grouping those two events together with a third one, say L3 cache misses, will aid your factor analysis. In the event of low IPC, you will be able to observe which other factor may contribute to the poor code performance.
+The important property of grouping events is that the counters will be available atomically under the same `read` system call. These atomic bundles are very useful. First, it allows us to correlate events within each group. Say we measure IPC for a region of code, and found that it is very low. In this case, we can pair two events (instructions and cycles) with a third one, say L3 cache misses, to check if it contributes to a low IPC that we're dealing with. If it doesn't, we continue factor analysis using other events. Second, event grouping helps to mitigate bias in case a workload has different phases. Since all the events within a group are measured at the same time, they always capture the same phase.
 
-Use `perf_event_open(2)` to get a file descriptor representing the counters, then use `read(2)` to read the counters whenever you want. When reading it from inside the thread, the counters are for that thread alone. This can optionally include kernel code that ran and was attributed to the thread. The returned performance counter values are just `int64` event counts.
+In some scenarios, instrumentation may become a part of a functionality or a feature. For example, a developer can implement an instrumentation logic that detects decrease in IPC (e.g. when there is a busy sibling HW thread running) or decreasing CPU frequency (e.g. system throttling due to heavy load). When such event occurs, application automatically defers low-priority work to compensate for the hopefully temporarily increased load.
 
-The difference in event counts over a region of code is the number of events that occurred during that region, in that thread. That difference divided by the time taken is the event rate. You can ask for up to 3 counters simultaneously in one file descriptor. They will available atomically under the same `read(2)` system call. These atomic bundles are very useful. 
-
-TODO: root priviledges are not required.
-Repeatedly running the example above (you will probably have to 0 to `/proc/sys/kernel/perf_event_paranoid` to  make it work).
-
-**Interpreting the data**
-
-You can compensate for the scheduler by requesting CPU cycles consumed (e.g., `UNHALTED_CORE_CYCLES`) and comparing against wall-clock time to detect when the thread wasn't running. You can similarly see the effects of frequency stepping by comparing CPU cycles (`UNHALTED_CORE_CYCLES`) vs the fixed-frequency reference clock (`UNHALTED_REFERENCE_CYCLES`).
-
-TODO: describe possibility to implement adaptive mechanisms. For example, detect throttling and defer some low-priority work.
-
-In the example, we only printed the difference between the beginning and end. But it's more flexible to save the raw counter values instead of differences. In post-processing you can choose the intervals you care about, and not be sensitive to the ones you thought you needed when adding the instrumentation.
-
-% Interval Estimation
+**Interval Estimation**
 <deleted; summarized & moved up>
 
-% Grouped Counter techniques
+**Grouped Counter techniques**
 <moved up>
    
-% Getting the data out of process
+**Getting the data out of process**
 <deleted>
  
-% Aggregate Statistics Solutions
+**Aggregate Statistics Solutions**
 <deleted>
 
 [^1]: libpfm4 - [https://sourceforge.net/p/perfmon2/libpfm4/ci/master/tree/](https://sourceforge.net/p/perfmon2/libpfm4/ci/master/tree/)
+
 [^2]: C-Ray benchmark - [https://openbenchmarking.org/test/pts/c-ray](https://openbenchmarking.org/test/pts/c-ray)
