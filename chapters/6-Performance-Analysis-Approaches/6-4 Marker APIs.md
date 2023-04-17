@@ -15,15 +15,11 @@ Listing: Using libpfm4 marker API on the C-Ray benchmark
 ~~~~ {#lst:LibpfmMarkerAPI .cpp}
 +#include <perfmon/pfmlib.h>
 +#include <perfmon/pfmlib_perf_event.h>
-
 ...
-
 /* render a frame of xsz/ysz dimensions into the provided framebuffer */
 void render(int xsz, int ysz, uint32_t *fb, int samples) {
    ...
- 
 +  pfm_initialize();
-+
 +  struct perf_event_attr perf_attr;
 +  memset(&perf_attr, 0, sizeof(perf_attr));
 +  perf_attr.size = sizeof(struct perf_event_attr);
@@ -49,9 +45,7 @@ void render(int xsz, int ysz, uint32_t *fb, int samples) {
 
   for(j=0; j<ysz; j++) {
     for(i=0; i<xsz; i++) {
-      double r, g, b;
-      r = g = b = 0.0;
-
+      double r = 0.0, g = 0.0, b = 0.0;
 +     // capture counters before ray tracing
 +     read(event_fd, &before, sizeof(struct read_format));
 
@@ -61,29 +55,21 @@ void render(int xsz, int ysz, uint32_t *fb, int samples) {
         g += col.y;
         b += col.z;
       }
-
 +     // capture counters after ray tracing
 +     read(event_fd, &after, sizeof(struct read_format));
 
-+     // save the deltas in separate arrays
++     // save deltas in separate arrays
 +     nanosecs[j * xsz + i] = after.time_running - before.time_running;
 +     instrs  [j * xsz + i] = after.values[0] - before.values[0];
 +     cycles  [j * xsz + i] = after.values[1] - before.values[1];
 +     branches[j * xsz + i] = after.values[2] - before.values[2];
 +     br_misps[j * xsz + i] = after.values[3] - before.values[3];
 
-      r = r * rcp_samples;
-      g = g * rcp_samples;
-      b = b * rcp_samples;
-
-      *fb++ = ((uint32_t)(MIN(r, 1.0) * 255.0) & 0xff) << RSHIFT |
-          ((uint32_t)(MIN(g, 1.0) * 255.0) & 0xff) << GSHIFT |
-          ((uint32_t)(MIN(b, 1.0) * 255.0) & 0xff) << BSHIFT;
-    }
-  }
-
+      *fb++ = ((uint32_t)(MIN(r * rcp_samples, 1.0) * 255.0) & 0xff) << RSHIFT |
+              ((uint32_t)(MIN(g * rcp_samples, 1.0) * 255.0) & 0xff) << GSHIFT |
+              ((uint32_t)(MIN(b * rcp_samples, 1.0) * 255.0) & 0xff) << BSHIFT;
+  } }
 + // aggregate statistics and print it
-
   ...
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
