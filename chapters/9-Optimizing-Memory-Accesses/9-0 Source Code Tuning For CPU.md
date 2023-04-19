@@ -6,13 +6,13 @@ typora-root-url: ..\..\img
 
 \markright{Part2. Source Code Tuning For CPU}
 
-In part 2, we will take a look at how to use CPU monitoring features (see [@sec:sec4]) to find the places in the code which can be tuned for execution on a CPU. For performance-critical applications like large distributed cloud services, scientific HPC software, 'AAA' games, etc. it is very important to know how underlying HW works. It is a fail-from-the-start when the program is being developed without HW focus. 
+Welcome to the second part of this book where we will discuss various techniques for low-level source code optimization (aka *tuning*). In the first part, we learned how to find performance bottlenecks in the code, which is only half of the developer's job. Another half is to fix the problem. 
 
-Standard algorithms and data structures don't always work well for performance-critical workloads. For example, a linked list is pretty much deprecated in favor of 'flat' data structures. Traditionally every new node of the linked list is dynamically allocated. Besides invoking many costly[^7] memory allocations, this will likely result in a situation where all the elements of the list are scattered in memory. Traversing such a data structure requires random memory access for every element. Even though algorithmic complexity is still O(N), in practice, the timings will be much worse than of a plain array. Some data structures, like binary trees, have natural linked-list-like representation, so it might be tempting to implement them in a pointer chasing manner. However, more efficient "flat" versions of those data structures exist, see `boost::flat_map`, `boost::flat_set`.
+Performance engineering is an art. And like in any art, the set of possible scenarios is endless. The upcoming several chapters primarily address optimizations specific to modern CPU architectures without trying to cover all existing optimization opportunities one can imagine.
 
-Even though the algorithm you choose is best known for a particular problem, it might not work best for your particular case. For example, a binary search is optimal for finding an element in a sorted array. However, this algorithm usually suffers from branch mispredictions since every test of the element value has a 50% chance of being true. This is why on a small-sized (less than 20 elements) array of integers, linear search is usually better.
+There is a famous quote: "Premature optimization is the root of all evil". But the opposite is often true as well. Postponed performance engineering work may be too late and cause as much evil as premature optimization. For performance-critical applications like large distributed cloud services, scientific HPC software, 'AAA' games, etc. it is very important to know how underlying HW works. In such industries, it is a fail-from-the-start when a program is being developed without HW focus. There are examples of successful software products that were built around a small but very efficient kernel (loop or function), for example ClickHouse.
 
-Performance engineering is an art. And like in any art, the set of possible scenarios is endless. This chapter tries to address optimizations specific to CPU microarchitecture without trying to cover all existing optimization opportunities one can imagine. Still, I think it is important to at least name some high-level ones:
+ Still, I think it is important to at least name some high-level ones:
 
 * If a program is written using interpreted languages (python, javascript, etc.), rewrite its performance-critical portion in a language with less overhead.
 * Analyze the algorithms and data structures used in the program, see if you can find better ones.
@@ -20,6 +20,22 @@ Performance engineering is an art. And like in any art, the set of possible scen
 * If a problem is a highly parallelizable computation, make it threaded, or consider running it on a GPU.
 * Use async IO to avoid blocking while waiting for IO operations.
 * Leverage using more RAM to reduce the amount of CPU and IO you have to use (memoization, look-up tables, caching of data, compression, etc.)
+
+## Five Optimization Categories
+
+* Algorithmic optimizations. For example, use quicksort instead of bubblesort.
+* Parallelize computations. Doing multiple things at the same time. Concurency is used in all the layers of the HW and SW stacks. Examples: distribute the work across several threads, balance load between many servers in the data center, keep multiple concurent network connections to overlap the request latency, etc.
+* Eliminate redundant work. Don't do work that you don't need or have already done. Hoisting things outside of loops, excessive copies caused by passing by value.
+* Batching. Send large TCP packets instead of many small ones, allocate large block of memory rather than allocating space for hundreds of tiny objects, processing big matricies in smaller blocks (tiles).
+* Ordering. Changing the layout of the data to allow sequential memory accesses, grouping hot functions together and place them closer to each other in the binary, sort the array of C++ polymorphic objects based on their types to allow better prediction of virtual function calls.
+
+Some optimizations fall under multiple categories, for example, we can say that vectorization is a combination of parallel execution and batching; loop blocking is a manifestation of batching and eliminating redundant work.
+
+## Algorithmic optimizations {.unlisted .unnumbered}
+
+Standard algorithms and data structures don't always work well for performance-critical workloads. For example, a linked list is pretty much deprecated in favor of 'flat' data structures. Traditionally every new node of the linked list is dynamically allocated. Besides invoking many costly[^7] memory allocations, this will likely result in a situation where all the elements of the list are scattered in memory. Traversing such a data structure requires random memory access for every element. Even though algorithmic complexity is still O(N), in practice, the timings will be much worse than of a plain array. Some data structures, like binary trees, have natural linked-list-like representation, so it might be tempting to implement them in a pointer chasing manner. However, more efficient "flat" versions of those data structures exist, see `boost::flat_map`, `boost::flat_set`.
+
+Even though the algorithm you choose is best known for a particular problem, it might not work best for your particular case. For example, a binary search is optimal for finding an element in a sorted array. However, this algorithm usually suffers from branch mispredictions since every test of the element value has a 50% chance of being true. This is why on a small-sized (less than 20 elements) array of integers, linear search is usually better.
 
 ## Data-Driven Optimizations {.unlisted .unnumbered}
 

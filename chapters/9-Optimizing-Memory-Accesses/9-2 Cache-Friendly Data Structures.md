@@ -37,7 +37,7 @@ struct S {
   unsigned a;
   unsigned b;
   unsigned c;
-}; // S is sizeof(unsigned int) * 3
+}; // S is `sizeof(unsigned int) * 3` bytes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Listing: Packing Data: packed struct.
@@ -61,13 +61,13 @@ struct S1 {
   bool b;
   int i;
   short s;
-}; // S1 is sizeof(int) * 3
+}; // S1 is `sizeof(int) * 3` bytes
 
 struct S2 {
   int i;
   short s;  
   bool b;
-}; // S2 is sizeof(int) * 2
+}; // S2 is `sizeof(int) * 2` bytes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ### Aligning and padding. {#sec:secMemAlign}
