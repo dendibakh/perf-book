@@ -6,30 +6,29 @@ typora-root-url: ..\..\img
 
 \markright{Part2. Source Code Tuning For CPU}
 
-Welcome to the second part of this book where we will discuss various techniques for low-level source code optimization (aka *tuning*). In the first part, we learned how to find performance bottlenecks in the code, which is only half of the developer's job. Another half is to fix the problem. 
+Welcome to the second part of this book where we will discuss various techniques for low-level source code optimization, aka *tuning*. In the first part, we learned how to find performance bottlenecks in the code, which is only half of the developer's job. Another half is to fix the problem.
 
 Performance engineering is an art. And like in any art, the set of possible scenarios is endless. The upcoming several chapters primarily address optimizations specific to modern CPU architectures without trying to cover all existing optimization opportunities one can imagine.
 
-There is a famous quote: "Premature optimization is the root of all evil". But the opposite is often true as well. Postponed performance engineering work may be too late and cause as much evil as premature optimization. For performance-critical applications like large distributed cloud services, scientific HPC software, 'AAA' games, etc. it is very important to know how underlying HW works. In such industries, it is a fail-from-the-start when a program is being developed without HW focus. There are examples of successful software products that were built around a small but very efficient kernel (loop or function), for example ClickHouse.
+At a very high level, software optimizations can be divided into five categories.
 
- Still, I think it is important to at least name some high-level ones:
+* **Algorithmic optimizations**. Idea: analyze algorithms and data structures used in the program, and see if you can find better ones. Example: use quicksort instead of bubblesort.
+* **Parallelizing computations**. Idea: if an algorithm is highly parallelizable, make the program threaded, or consider running it on a GPU. The goal is to do multiple things at the same time. Concurency is already used in all the layers of the HW and SW stacks. Examples: distribute the work across several threads, balance load between many servers in the data center, keep multiple concurent network connections to overlap the request latency.
+* **Eliminating redundant work**. Idea: don't do work that you don't need or have already done. Examples: moving loop invariant computations outside of the loop, pass a C++ object by reference to get rid of excessive copies caused by passing by value.
+* **Batching**. Idea: aggregate multiple similar action items and do them in one go, thus reducing the overhead of repeating the action multiple times. Examples: send large TCP packets instead of many small ones, allocate large block of memory rather than allocating space for hundreds of tiny objects, processing big matricies in smaller blocks (tiles).
+* **Ordering**. Idea: reorder Changing the layout of the data to allow sequential memory accesses, grouping hot functions together and place them closer to each other in the binary, sort the array of C++ polymorphic objects based on their types to allow better prediction of virtual function calls.
 
+Many optimizations that we will consider later in the book, fall under multiple categories. For example, we can say that vectorization is a combination of parallelizing and batching; loop blocking is a manifestation of batching and eliminating redundant work.
+
+## Very high-level optimizations {.unlisted .unnumbered}
+
+To make the picture complete, let us also list other maybe obvious but still quite reasonable ways to speed up things:
+
+* Buy better hardware. Obviously, it's a business decision that comes with an associated cost, but sometimes it's the only way to improve performance when other
 * If a program is written using interpreted languages (python, javascript, etc.), rewrite its performance-critical portion in a language with less overhead.
-* Analyze the algorithms and data structures used in the program, see if you can find better ones.
 * Tune compiler options. Check that you use at least these three compiler flags: `-O3` (enables machine-independent optimizations), `-march` (enables optimizations for particular CPU generation), `-flto` (enables inter-procedural optimizations).
-* If a problem is a highly parallelizable computation, make it threaded, or consider running it on a GPU.
 * Use async IO to avoid blocking while waiting for IO operations.
 * Leverage using more RAM to reduce the amount of CPU and IO you have to use (memoization, look-up tables, caching of data, compression, etc.)
-
-## Five Optimization Categories
-
-* Algorithmic optimizations. For example, use quicksort instead of bubblesort.
-* Parallelize computations. Doing multiple things at the same time. Concurency is used in all the layers of the HW and SW stacks. Examples: distribute the work across several threads, balance load between many servers in the data center, keep multiple concurent network connections to overlap the request latency, etc.
-* Eliminate redundant work. Don't do work that you don't need or have already done. Hoisting things outside of loops, excessive copies caused by passing by value.
-* Batching. Send large TCP packets instead of many small ones, allocate large block of memory rather than allocating space for hundreds of tiny objects, processing big matricies in smaller blocks (tiles).
-* Ordering. Changing the layout of the data to allow sequential memory accesses, grouping hot functions together and place them closer to each other in the binary, sort the array of C++ polymorphic objects based on their types to allow better prediction of virtual function calls.
-
-Some optimizations fall under multiple categories, for example, we can say that vectorization is a combination of parallel execution and batching; loop blocking is a manifestation of batching and eliminating redundant work.
 
 ## Algorithmic optimizations {.unlisted .unnumbered}
 
