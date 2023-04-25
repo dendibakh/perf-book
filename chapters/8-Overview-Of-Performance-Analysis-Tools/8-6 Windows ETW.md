@@ -23,8 +23,10 @@ Microsoft has invested in a system wide tracing facility named Event Tracing for
 
 To enable system wide profiling you must be administrator and have the privilege *SeSystemProfilePrivilege* enabled. 
 
-Recording ETW data is possible without any extra download since Windows 10 with Wpr.exe. The \underline{W}indows \underline{P}erformance \underline{R}ecorder tool supports a set of built-in recording profiles which are ok for common performance issues. You can tailor your recording needs by authoring a custom performance recorder profile xml file (.wprp).
+Recording ETW data is possible without any extra download since Windows 10 with Wpr.exe. The \underline{W}indows \underline{P}erformance \underline{R}ecorder tool supports a set of built-in recording profiles which are ok for common performance issues. You can tailor your recording needs by authoring a custom performance recorder profile xml file with the `.wprp` extension.
 
+[TODO @Alois]: Why do we need Windows Performance Toolkit? What's inside it?
+[TODO @Alois]: What is the second step of the installation process?
 You can download the Windows Performance Toolkit from the Windows SDK[^1] or ADK[^2] download page. The installation is a two step process. First you download a small installer which will give you the options to download just the parts, in this case the Windows Performance Toolkit, you need. You are allowed to redistribute WPT e.g. as part of your own application.
 
 ### ETW Recording Tools {.unlisted .unnumbered}
@@ -79,6 +81,17 @@ Windows supports Event Log and Performance Counter triggers which allow one to s
 
 #### Analysis in WPA {.unlisted .unnumbered}
 
+[TODO:] Current section is already 6+ pages, above the initially planned budget.
+The case study with Windows defender blocking a start of a process seems good.
+I would rather just show a single image that shows the issue being analyzed since each screenshot takes almost an entire A4 page, or we can glue parts of two screenshots to make it more compact. What I would like to see on the screenshot:
+1. show explorer is blocked
+2. show MsMpEng.exe is active
+3. show screenshot event on the timeline
+4. explain the scheduler transitions
+Please explain as simple as possible, otherwise it will be a hard time for someone who is new to ETW. Good idea is to put markers on the image (like 1,2,3) and then refer to these markers from the text.
+Right now, there is a lot of data on the screenshots and it's hard to tell if everything is relevant or not.
+The goal of this chapter is to introduce the MAIN usage of ETW traces (e.g. observe SW dynamics), then briefly describe other things it can do.
+
 After stopping the recording, open the recorded trace in WPA. The screenshot of WPA trace for our case study is shown on figure @fig:DefenderOverhead.
 
 ![WPA overview of the trace showing a process start blocked by defender activity.](../../img/perf-tools/WPA_SlowProcessStart_DefenderOverhead.png){#fig:DefenderOverhead width=100% }
@@ -93,17 +106,34 @@ The methods in the *CPU Usage (Precise)* graph with highest CPU are most likely 
 
 We can examine the screenshots taken by ETWController to find where slowness was observed. An example is shown in figure @fig:ETWControllerScreenshot. When the profiling data is saved (the file named xx.etl) another folder named *xx.etl.Screenshots* is created. This contains all screenshots and a *Report.html* file which you can view in the browser. Every recorded keyboard/mouse interaction gets a screenshot of the form Screenshot_EventNumber e.g. Screenhot_63.jpg. This is the screenshot file of the double click event where the process start was delayed. The mouse pointer position is marked as a green square, except if a click event did occur, then it is red. This makes it easy to spot when and where a mouse click was performed.
 
+[TODO:] Cut the image fig:ETWControllerScreenshot.
+
 ![Screenshot captured with ETWController viewed in Browser.](../../img/perf-tools/ETWController_Screenshot.png){#fig:ETWControllerScreenshot width=80% }
 
 The slow click event number 63 we can locate in the profiling data in the WPA Overview view. Then you can zoom in to the interesting time region of a potentially longer recording. The event number is part of the *Generic Events HookTracer Events(Slow, Mouse, Keyboard)* WPA view which visualizes all keyboard, mouse and timer based screenshots. 
 
-[TODO:] text doesn't correlate with the image.
+[TODO @Alois]: the text below doesn't correlate with the image.
 
 See figure @fig:WpaSlowProcessStartOverview. When you double click in explorer to start an executable you would first check if a delay in explorer.exe is happening. Since we are dealing with delays it makes sense to look at the *CPU Usage (Precise) Waits* Graph. There you will find after the first column after process *New Thread Stack (Stack Tag)* which shows the summary of all threads and what they were doing. If we look deeper we find *Antivirus - Windows Defender* with a delay of 1.068s which can be visualized as bar chart to nicely display correlations across processes.
 
 ![WPA slow process start overview.](../../img/perf-tools/WPA_SlowProcessStartOverview.png){#fig:WpaSlowProcessStartOverview width=100% }
 
 You might be familiar with stack traces, but not necessarily stack tags. When you read a call stack you try to understand what an application was doing and mentally map the call stack to the applications intent. That is exactly what stack tags are for without the need to unfold the call stack to find deep inside the one key frame that is telling you what the application was doing. See[^9] for a more detailed explanation how you can define your own stacktag definitions. The stacktags from the ETWController profile originate from ETWAnalyzer[^10] which is the result of hundreds of performance issues investigated over a decade in Windows, .NET, .NET Core, GPU and Antivirus device drivers. 
+
+[TODO @Alois]: I think it's still unclear what a "stacktag" is. Is it just a Microsoft internal way of marking common call stacks? Do stacktags show a process call stack grouped by category (Waits, COM, etc.)? I think we either should explain it in a simple way or just avoid it altogether. :)
+
+[^1]: Windows SDK Downloads [https://developer.microsoft.com/en-us/windows/downloads/sdk-archive/](https://developer.microsoft.com/en-us/windows/downloads/sdk-archive/)
+[^2]: Windows ADK Downloads [https://learn.microsoft.com/en-us/windows-hardware/get-started/adk-install#other-adk-downloads](https://learn.microsoft.com/en-us/windows-hardware/get-started/adk-install#other-adk-downloads)
+[^3]: PerfView [https://github.com/microsoft/perfview](https://github.com/microsoft/perfview)
+[^4]: ETWController [https://github.com/alois-xx/etwcontroller](https://github.com/alois-xx/etwcontroller)
+[^5]: ETWAnalyzer [https://github.com/Siemens-Healthineers/ETWAnalyzer](https://github.com/Siemens-Healthineers/ETWAnalyzer)
+[^6]: UIforETW [https://github.com/google/UIforETW](https://github.com/google/UIforETW)
+[^7]: Performance HUD [https://www.microsoft.com/en-us/download/100813](https://www.microsoft.com/en-us/download/100813)
+[^8]: Microsoft Performance Tools Linux / Android [https://github.com/microsoft/Microsoft-Performance-Tools-Linux-Android](https://github.com/microsoft/Microsoft-Performance-Tools-Linux-Android)
+[^9]: Stacktags [https://learn.microsoft.com/en-us/windows-hardware/test/wpt/stack-tags](https://learn.microsoft.com/en-us/windows-hardware/test/wpt/stack-tags)
+[^10]: ETWAnalyzer Stacktags [https://github.com/Siemens-Healthineers/ETWAnalyzer/blob/main/ETWAnalyzer/Configuration/default.stacktags](https://github.com/Siemens-Healthineers/ETWAnalyzer/blob/main/ETWAnalyzer/Configuration/default.stacktags)
+
+## TO REMOVE {.unlisted .unnumbered}
 
 #### Debug symbols {.unlisted .unnumbered}
 
@@ -117,21 +147,7 @@ WPA is also useful without symbols by looking at correlations between CPU activi
 
 Figure @fig:WpaSlowProcessStartOverview shows that even without stack traces you can find interesting patterns by looking at CPU consumption of the explorer, Defender and when the double clicked executable is started. 
 
-[^1]: Windows SDK Downloads [https://developer.microsoft.com/en-us/windows/downloads/sdk-archive/](https://developer.microsoft.com/en-us/windows/downloads/sdk-archive/)
-[^2]: Windows ADK Downloads [https://learn.microsoft.com/en-us/windows-hardware/get-started/adk-install#other-adk-downloads](https://learn.microsoft.com/en-us/windows-hardware/get-started/adk-install#other-adk-downloads)
-[^3]: PerfView [https://github.com/microsoft/perfview](https://github.com/microsoft/perfview)
-[^4]: ETWController [https://github.com/alois-xx/etwcontroller](https://github.com/alois-xx/etwcontroller)
-[^5]: ETWAnalyzer [https://github.com/Siemens-Healthineers/ETWAnalyzer](https://github.com/Siemens-Healthineers/ETWAnalyzer)
-[^6]: UIforETW [https://github.com/google/UIforETW](https://github.com/google/UIforETW)
-[^7]: Performance HUD [https://www.microsoft.com/en-us/download/100813](https://www.microsoft.com/en-us/download/100813)
-[^8]: Microsoft Performance Tools Linux / Android [https://github.com/microsoft/Microsoft-Performance-Tools-Linux-Android](https://github.com/microsoft/Microsoft-Performance-Tools-Linux-Android)
-[^9]: Stacktags [https://learn.microsoft.com/en-us/windows-hardware/test/wpt/stack-tags](https://learn.microsoft.com/en-us/windows-hardware/test/wpt/stack-tags)
-[^10]: ETWAnalyzer Stacktags [https://github.com/Siemens-Healthineers/ETWAnalyzer/blob/main/ETWAnalyzer/Configuration/default.stacktags](https://github.com/Siemens-Healthineers/ETWAnalyzer/blob/main/ETWAnalyzer/Configuration/default.stacktags)
-
-
-## TO REMOVE {.unlisted .unnumbered}
-
-[Todo]: Move to -> Apendix 
+[Todo]: Move to -> Apendix ?
 
 Unfortunately wpr.exe is not working reliably on all Windows 10 versions and has not been patched during the lifetime of Windows 10 (including 22H2). The official answer from MS is that any tool which can be publicly downloaded (in this case from the ADK) no servicing via Windows Update is done. 
 If you find the following error while stopping ETW recording
