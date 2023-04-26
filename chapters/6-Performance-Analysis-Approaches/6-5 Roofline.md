@@ -41,6 +41,9 @@ $$
 $$
 
 The maximum memory bandwidth of Intel NUC Kit NUC8i5BEH, which I used for experiments, can be calculated as:
+
+TODO: revisit this calculation (why 8 bytes per memory access?)
+
 $$
 \begin{aligned}
 \textrm{Peak Memory Bandwidth} = &~\textrm{2400 (DDR4 memory transfer rate)}~\times~ \textrm{2 (memory channels)} ~ \times \\ &~ \textrm{8 (bytes per memory access)} ~ \times \textrm{1 (socket)}= \textrm{38.4 GiB/s}
