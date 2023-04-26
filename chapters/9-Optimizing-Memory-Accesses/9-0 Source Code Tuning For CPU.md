@@ -2,9 +2,9 @@
 typora-root-url: ..\..\img
 ---
 
-# Part2. Source Code Tuning For CPU {.unnumbered}
+# Part2. Source Code Tuning {.unnumbered}
 
-\markright{Part2. Source Code Tuning For CPU}
+\markright{Part2. Source Code Tuning}
 
 Welcome to the second part of this book where we will discuss various techniques for low-level source code optimization, aka *tuning*. In the first part, we learned how to find performance bottlenecks in the code, which is only half of the developer's job. Another half is to fix the problem.
 
@@ -68,10 +68,17 @@ Another wide-spread example of DDD is "Small Size optimization". Its idea is to 
 
 ### Low-Level Optimizations {.unlisted .unnumbered}
 
-Performance engineering is an art. And like in any art, the set of possible scenarios is endless. It's impossible to cover all various optimizations one can imagine. The upcoming several chapters primarily address optimizations specific to modern CPU architectures.
+Performance engineering is an art. And like in any art, the set of possible scenarios is endless. It's impossible to cover all various optimizations one can imagine. The upcoming several chapters primarily address optimizations specific to modern CPU architectures. 
 
-I STOPPED HERE
+Before we jump into particular source code tuning techinques, there are a few caution notes to make. First, avoid tuning bad code. If a piece of code has a high-level performance inefficiency, you shouldn't apply machine-specific optimizations to it. Always focus on fixing the major problem first. Only once you're sure that the algorithms and data structures are optimal for the problem you're trying to solve, try applying low-level improvements.
 
-Before we jump into particular techinques, remember that an optimization that you implement might not be beneficial for every platform. For example, Loop Blocking very much depends on the characteristics of the memory hierarchy in the system, especially L2 and L3 cache sizes. So, an algorithm tuned for CPU with particular sizes of L2 and L3 caches might not work well for CPUs with smaller caches. It is important to test the change on the platforms your application will be running on.
+Second, remember that an optimization that you implement might not be beneficial for every platform. For example, Loop Blocking depends on characteristics of the memory hierarchy in a system, especially L2 and L3 cache sizes. So, an algorithm tuned for a CPU with particular sizes of L2 and L3 caches might not work well for CPUs with smaller caches. It is important to test the change on the platforms your application will be running on.
 
-The next three chapters are organized in the most convenient way to be used with TMA (see [@sec:TMA]). The idea behind this classification is to offer some kind of checklist which engineers can use in order to effectively eliminate inefficiencies that TMA reveals. Again, this is not supposed to be a complete list of transformations one can come up with. However, this is an attempt to describe the typical ones.
+The next four chapters are organized according to the TMA classification (see [@sec:TMA]):
+
+* Chapter 9. Optimizing Memory Accesses - `TMA:MemoryBound` category
+* Chapter 10. Optimizing Computations - `TMA:CoreBound` category
+* Chapter 11. Optimizing Branch Prediction - `TMA:BadSpeculation` category
+* Chapter 12. Machine Code Layout Optimizations - `TMA:FrontEndBound` category
+
+ The idea behind this classification is to offer some kind of a checklist for developers when they are using TMA methodology in their performance engineering work. Whenever TMA attributes a performance bottleneck to one of the categories mentioned above, feel free to consult one of the corresponding chapters to learn about your options.
