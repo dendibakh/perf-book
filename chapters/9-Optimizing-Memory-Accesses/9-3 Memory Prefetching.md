@@ -49,7 +49,7 @@ There are situations when SW memory prefetching is not possible. For example, wh
 
 In [@lst:MemPrefetch2] we saw an example of prefetching for the next iteration, but also you may frequently encounter a need to prefetch for 2, 4, 8, and sometimes even more iterations. The code in [@lst:MemPrefetch3] is one of those cases, when it could be beneficial. If the graph is very sparse and has a lot of verticies, it is very likely that accesses to `this->out_neighbors` and `this->in_neighbors` vectors will miss in caches a lot.
 
-This code is different from the previous example as there are no extensive computations on every iteration, so the penalty of cache misses likely dominates the latency of each iteration. But we can leverage the fact that we know all the elements that will be accessed in the future. The elements of vector `el` are accessed sequentially and thus are likely to be timely brought to the L1 cache by the HW prefetcher. Our goal here is to overlap the latency of a cache miss with executing enough iterations to completely hide it.
+This code is different from the previous example as there are no extensive computations on every iteration, so the penalty of cache misses likely dominates the latency of each iteration. But we can leverage the fact that we know all the elements that will be accessed in the future. The elements of vector `edges` are accessed sequentially and thus are likely to be timely brought to the L1 cache by the HW prefetcher. Our goal here is to overlap the latency of a cache miss with executing enough iterations to completely hide it.
 
 As a general rule, for prefetch hints to be effective, they must be inserted well ahead of time so that by the time the loaded value will be used in other calculations, it will be already in the cache. However, it also shouldn't be inserted too early since it may pollute the cache with the data that is not used for a long time. Notice, in [@lst:MemPrefetch3], `lookAhead` is a template parameter, which allows to try different values and see which gives the best performance. More advanced users can try to estimate the prefetching window using the method described in [@sec:timed_lbr], example of using such method can be found on easyperf blog. [^5]
 
@@ -57,20 +57,20 @@ Listing: Example of a SW prefetching for the next 8 iterations.
 
 ~~~~ {#lst:MemPrefetch3 .cpp}
 template <int lookAhead = 8>
-void Graph::update(const std::vector<Edge>& el) {
-  for(int i = 0; i + lookAhead < el.size(); i++) {
-    VertexID v = el[i].from;
-    VertexID u = el[i].to;
+void Graph::update(const std::vector<Edge>& edges) {
+  for(int i = 0; i + lookAhead < edges.size(); i++) {
+    VertexID v = edges[i].from;
+    VertexID u = edges[i].to;
     this->out_neighbors[u].push_back(v);
     this->in_neighbors[v].push_back(u);
 
     // prefetch elements for future iterations
-    VertexID v_next = el[i + lookAhead].from;
-    VertexID u_next = el[i + lookAhead].to;
+    VertexID v_next = edges[i + lookAhead].from;
+    VertexID u_next = edges[i + lookAhead].to;
     __builtin_prefetch(this->out_neighbors.data() + v_next);
     __builtin_prefetch(this->in_neighbors.data()  + u_next);
   }
-  // process the remainder of the vector `el` ...
+  // process the remainder of the vector `edges` ...
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

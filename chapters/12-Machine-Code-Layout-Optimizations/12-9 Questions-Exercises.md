@@ -1,3 +1,6 @@
 ## Questions and Exercises {.unlisted .unnumbered}
 
-1. Experiment with using Huge Pages for code section. Take a large application (access to source code is a plus but not necessary), with a binary size of more than 100MB. Try to remap its code section onto huge pages using one of the methods described in [@sec:FeTLB]. Observe any changes in performance, huge page allocation in `/proc/meminfo`, CPU performance counters that measure ITLB loads and misses.
+1. Solve `perf-ninja::pgo` lab assignment.
+2. Practice applying PGO, llvm-bolt, Propeller to the application you're working on or some randomly chosen benchmark. Compare "before" and "after" profiles to understand where the speedups are coming from.
+3. Experiment with using Huge Pages for code section. Take a large application (access to source code is a plus but not necessary), with a binary size of more than 100MB. Try to remap its code section onto huge pages using one of the methods described in [@sec:FeTLB]. Observe any changes in performance, huge page allocation in `/proc/meminfo`, CPU performance counters that measure ITLB loads and misses.
+4. Suppose you have a code that has a C++ switch statement in a loop. You instrumented the code and figured out that one particular case in a switch statement is used 70% of the time. The other 40 cases are used <3% of the time each and other 20 cases never happen. What will you do to optimize performance of that switch/loop?

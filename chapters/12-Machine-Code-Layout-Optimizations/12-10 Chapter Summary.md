@@ -32,6 +32,6 @@ grouping   functions         utilization   hot functions
 
 Table: Summary of CPU Front-End optimizations. {#tbl:CPU_FE_OPT}
 
-\personal{I think code layout improvements are often underestimated and end up being omitted and forgotten. I agree that you might want to start with low hanging fruits like loop unrolling and vectorization opportunities. But knowing that you might get an extra 5-10\% just from better laying out the machine code is still useful. It is usually the best option to use PGO if you can come up with a set of typical use cases for your application.}
+\personal{I think code layout improvements are often underestimated and end up being omitted and forgotten. I agree that you might want to start with low hanging fruits like loop unrolling and vectorization opportunities. But knowing that you might get an extra 5-10\% just from better laying out the machine code is still useful. It is usually the best option to use PGO, Bolt, and other tools if you can come up with a set of typical use cases for your application.}
 
 \sectionbreak

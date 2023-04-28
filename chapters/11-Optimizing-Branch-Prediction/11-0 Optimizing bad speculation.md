@@ -2,6 +2,8 @@
 typora-root-url: ..\..\img
 ---
 
+[TODO]: fix the beginning
+
 # Optimizing Branch Prediction
 
 The speculation feature in modern CPUs is described in [@sec:SpeculativeExec]. Mispredicting a branch can add a significant speed penalty when it happens regularly. When such an event happens, a CPU is required to clear all the speculative work that was done ahead of time and later was proven to be wrong. It also needs to flush the whole pipeline and start filling it with instructions from the correct path. Typically, modern CPUs experience a 15-20 cycles penalty as a result of a branch misprediction.

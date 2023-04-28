@@ -2,6 +2,10 @@
 typora-root-url: ..\..\img
 ---
 
+[TODO]: Trim footnotes
+[TODO]: Elaborate more on "Tune the code for memory hierarchy"
+[TODO]: Discuss what to do when memory bandwidth is a limitation
+
 ## Cache-Friendly Data Structures {#sec:secCacheFriendly}
 
 Writing cache-friendly algorithms and data structures, is one of the key items in the recipe for a well-performing application. The key pillar of cache-friendly code is the principles of temporal and spatial locality that we described in [@sec:MemHierar]. The goal here is to allow required data to be fetched from caches efficiently. When designing cache-friendly code, it's helpful to think in terms of cache lines, not only individual variables and their location in memory.

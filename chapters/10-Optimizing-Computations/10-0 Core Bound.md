@@ -2,6 +2,8 @@
 typora-root-url: ..\..\img
 ---
 
+[TODO]: fix the beginning
+
 # Optimizing Computations {#sec:CoreBound}
 
 The second type of CPU Back-End bottleneck is `Core Bound`. Technically speaking, this metric represents all the stalls inside a CPU Out-Of-Order execution engine that were not caused by memory issues. There are two main categories that represent Core Bound metric:
