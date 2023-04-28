@@ -8,27 +8,14 @@ We are going to focus on Tracy, as this seems to be one the more popular project
 ```c++
 #include "tracy/Tracy.hpp"
 
-void Trace()
-{
-    ZoneScoped;
-
-    if (...)
-    {
-        Scatter();
-    }
-}
-
 void TraceRowJob()
 {
     ZoneScoped;
 
-    for(...)
-    {
-        Trace();
-    }
+    // ...
 }
 
-void DrawTest()
+void RenderFrame()
 {
     ZoneScoped;
 
@@ -36,27 +23,20 @@ void DrawTest()
     {
         TraceRowJob();
     }
-}
-
-void RenderFrame()
-{
-    ZoneScoped;
-
-    DrawTest();
 
     FrameMark;
 }
 ```
 
-A [full example](https://github.com/wolfpld/tracy/tree/master/examples/ToyPathTracer) that shows how to use the Tracy API is provided in the official repository.
+The [full example](https://github.com/wolfpld/tracy/tree/master/examples/ToyPathTracer) that shows how to use the Tracy API is provided in the official repository. The example implements a simple path tracer. To render the full frame, it distributes the processing of each row to a separate thread. The `FrameMark` macro can be inserted to identify individual frames in the profiler.
 
 The `ZoneScoped` macro creates an object on the stack that will record the runtime activity of the code within its scope. Tracy refers to this scope as "zone". At the zone entry, the current timestamp is captured. Once the function exits, the object will record a new timestamp and will store this timing data along with a few other details, including the function name. The implementation has very little overhead - it has been measured to be 2.25ns per zone - although care must be taken when profiling certain sections of the code like tight loops.
 
-Tracy has two operation modes: it can store all the timing data until the profiler is connected to the application, or it can simply discard the data and start recording only when a profiler is connected. The latter is usually the preferred option, as it means the tracing code can be compiled into the application and it will cause little to no overhead to the running program unless the profiler is attached.
+Tracy has two operation modes: it can store all the timing data until the profiler is connected to the application (the default mode), or it can simply discard the profiling data and start recording only when a profiler is connected. This option can be enabled by specifying the `TRACY_ON_DEMAND` pre-processor macro when compiling the application. The latter is usually the preferred option, as it means the tracing code can be compiled into the application and it will cause little to no overhead to the running program unless the profiler is attached.
 
 The profiler is a separate application that connects to a running application to record and display the live profiling data. The profiler can be run on a separate machine so that it doesn't interfere with the running application. Here is an example of the profiler output:
 
-![Tracy main view](../../img/tracy/profiler_main.png){#fig:Tracy_Main_View width=90%}
+![Tracy main view](../../img/tracy/profiler_main_crop.png){#fig:Tracy_Main_View width=100%}
 
 The profiler provides plenty of details. The main view shows the graph for all the zones that were active during a given frame. A histogram for displaying the times for all the recorded frames is displayed above the main view, which makes it easier to spot a long running frame (the red bar in the picture) that could cause stutter.
 
@@ -64,21 +44,17 @@ The profiler provides plenty of details. The main view shows the graph for all t
 
 Memory allocations can be manually tracked as well, and are displayed in a separate window. This can be useful to spot memory leaks or to determine which code in the application is responsible for a given memory allocation. Tracy allows to track separate memory pools as well, which can be useful if multiple allocators are being used.
 
-We can inspect the statistics for the data recorded so far, including the total time a given function function was active, how many times it was invoked, etc. It's also possible to select a time range in the main view an analyze the statistics only for that time interval.
+The next image highlights the profiler views that are most commonly used when inspecting a trace:
 
-![Tracy statistics view](../../img/tracy/profiler_statistics.png){#fig:Tracy_Statistics_View width=90%}
+![Tracy zone detail windows](../../img/tracy/windows.png){#fig:Tracy_Zone_Detail_Windows width=90%}
 
-The next image shows the details for a give zone:
+By default, Tracy tracks other details about the profiled system and application, including threads that have not been explicitly profiled. It also behaves like a traditional sampling profiler as it reports data for applications that are running concurrently to the profiled program. It also tracks which core a given thread is executing on and it displays context switches when hovering the mouse on a given section in the CPU data view. This is shown in area 1.
 
-![Tracy zone details](../../img/tracy/profiler_zone_info.png){#fig:Tracy_Zone_Details width=90%}
+Area 2 shows the details for a zone and how much of the execution time is due to the zone itself or its children.
 
-Finally, we show the time histogram for a given zone. This is particularly useful to determine how much variation there is when executing a function:
+Area 3 shows the the time histogram for a zone. This is particularly useful to determine how much variation there is when executing a function. This view also provides other data points, including the mean, median and standard deviation for the inspected zone.
 
-![Tracy zone timing](../../img/tracy/profiler_zone_time.png){#fig:Tracy_Zone_Timing width=90%}
-
-By default, Tracy tracks other details about the profiled system and application, including threads that have not been explicitly profiled. It also behaves like a traditional sampling profiler as it reports data for applications that are running concurrently to the profiled program. It also tracks which core a given thread is executing on and it displays context switches when hovering the mouse on a given section in the CPU data view:
-
-![Tracy system view](../../img/tracy/profiler_system2.png){#fig:Tracy_System_View width=90%}
+Finally, in area 4 we can analyze the statistics for the data recorded, including the total time a given function function was active, how many times it was invoked, etc. It's also possible to select a time range in the main view an analyze the statistics only for that time interval.
 
 If debug symbols are available, Tracy can also display hotspots in the source code and related assembly:
 
@@ -91,7 +67,7 @@ This will capture an application running on the local machine for 60 seconds, an
 Tracy provides many other features, too many to cover in this overview. They include:
 - naming threads
 - timing and tracking locks
-- session comparison: this is vital to ensure a change provides the expected benefits. It's possible to load two profiling sessions and compare the timings for a given zone.
+- session comparison: this is vital to ensure a change provides the expected benefits. It's possible to load two profiling sessions and compare zone data before and after the change was made.
 - graphics API profiling: Tracy supports OpenGL, Vulkan and DirectX. Much like with CPU code, it's possible to insert profiling markers in the GPU command stream. The GPU driver will report the time taken to execute in between markers and Tracy will display the information in the profiler.
 
 Tracy provides a detailed [user manual](https://github.com/wolfpld/tracy/releases/download/v0.9/tracy.pdf) which goes into each feature's detail. The author also provides an interactive demo if you'd like to get a feel for the capabilities of this tool: https://tracy.nereid.pl/.
