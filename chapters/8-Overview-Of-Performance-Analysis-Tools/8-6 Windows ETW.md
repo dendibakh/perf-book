@@ -25,9 +25,8 @@ To enable system wide profiling you must be administrator and have the privilege
 
 Recording ETW data is possible without any extra download since Windows 10 with Wpr.exe. The \underline{W}indows \underline{P}erformance \underline{R}ecorder tool supports a set of built-in recording profiles which are ok for common performance issues. You can tailor your recording needs by authoring a custom performance recorder profile xml file with the `.wprp` extension.
 
-[TODO @Alois]: Why do we need Windows Performance Toolkit? What's inside it?
-[TODO @Alois]: What is the second step of the installation process?
-You can download the Windows Performance Toolkit from the Windows SDK[^1] or ADK[^2] download page. The installation is a two step process. First you download a small installer which will give you the options to download just the parts, in this case the Windows Performance Toolkit, you need. You are allowed to redistribute WPT e.g. as part of your own application.
+If you are running Windows 10 or you want not only record but also view the recorded ETW data you need to install the Windows Performance Toolkit.
+You can download the Windows Performance Toolkit from the Windows SDK[^1] or ADK[^2] download page. The installation is a two step process. First you download a small installer which you start. There you can select in the SDK Installer UI just the parts of the huge Windows SDK you need. In our case we just enable the checkbox of the Windows Performance Toolkit and install it. You are allowed to redistribute WPT e.g. as part of your own application.
 
 ### ETW Recording Tools {.unlisted .unnumbered}
 
@@ -41,7 +40,7 @@ You can download the Windows Performance Toolkit from the Windows SDK[^1] or ADK
   
 ### ETW Viewing/Analysis Tools {.unlisted .unnumbered}
 
-- Windows Performance Analyzer (WPA): the most powerful UI for viewing ETW data. ~~There are not many system wide analysis tools out there. One comparable tool is TraceCompass from the Eclipse foundation.~~ WPA can visualize and overlay Disk, CPU, GPU, Network, Memory, Process and many more data sources to get a holistic understanding how your system behaves and what it was doing. Although the UI is very powerful it may also be quite complex for beginners. ~~You need to know how your application interacts with your language runtime (e.g. .NET Common Language Runtime, C-Runtime, JavaScript, ...), the operating system and other processes which constitute your system. Microsoft has invested also in Linux observability. As a result of this~~ WPA supports plugins to process any data, not just ETW traces. Today you can view Linux/Android[^8] profiling data with WPA generated from tools like Linux perf, LTTNG, Perfetto and the following log file formats: dmesg, Cloud-Init, WaLinuxAgent, AndoidLogcat.
+- Windows Performance Analyzer (WPA): the most powerful UI for viewing ETW data.  WPA can visualize and overlay Disk, CPU, GPU, Network, Memory, Process and many more data sources to get a holistic understanding how your system behaves and what it was doing. Although the UI is very powerful it may also be quite complex for beginners.  WPA supports plugins to process any data, not just ETW traces. Today you can view Linux/Android[^8] profiling data with WPA generated from tools like Linux perf, LTTNG, Perfetto and the following log file formats: dmesg, Cloud-Init, WaLinuxAgent, AndoidLogcat.
 
 - ETWAnalyzer[^5]: reads ETW data and generates aggregate summary Json files which can be queried, filtered and sorted at command line or exported to a CSV file.
 
@@ -67,60 +66,90 @@ Next, we will take a look at the example of using ETWController to capture ETW t
 
 #### Capture traces {.unlisted .unnumbered}
 
-![ETWController UI screenshot.](../../img/perf-tools/ETWController.png){#fig:ETWControllerUI width=80%}
-
 - Start ETWController
 - Select the CSwitch profile to track thread wait times along with the other default recording settings. Keep the check boxes *"Record mouse clicks"* and *"Take cyclic screenshots"* enabled to be later able to navigate to the slow spots with the help of the screen shots. See @fig:ETWControllerUI.
  - Press *"Start Recording"*
  - Download some executable from the internet, unpack it and double click the executable to start it. 
  - After that you can stop profiling by pressing the *"Stop Recording"* button. 
 
+![ETWController UI screenshot.](../../img/perf-tools/ETWController.png){#fig:ETWControllerUI width=80%}
+
 Stopping profiling the first time takes a bit longer because for all managed code synthetic pdbs are generated which is a one time operation. After profiling has reached the Stopped state you can press the *"Open in WPA"* button to load the ETL file into the Windows Performance Analyzer with an ETWController supplied profile. The CSwitch profile generates a large amount of data which is stored in a 4 GB ring buffer which allows you to record 1-2 minutes before the oldest events are overwritten. Sometimes it is a bit of an art to stop profiling at the right time point. If you have sporadic issues you can keep recording enabled for hours and stop it when an event like a log entry in a file shows up, which is checked by a polling script, to stop profiling when the issue has occurred.
+
+![Screenshot captured with ETWController viewed in Browser.](../../img/perf-tools/ETWController_Screenshot.png){#fig:ETWControllerScreenshot width=80% }
 
 Windows supports Event Log and Performance Counter triggers which allow one to start a script when a performance counter reaches a threshold value or a specific event is written to an event log. If you need more sophisticated stop triggers you should take a look at PerfView which allows one to define a Performance Counter threshold which must be reached and stay there for x seconds before profiling is stopped. This way random spikes are no longer triggering false positives. 
 
 #### Analysis in WPA {.unlisted .unnumbered}
 
-[TODO:] Current section is already 6+ pages, above the initially planned budget.
-The case study with Windows defender blocking a start of a process seems good.
-I would rather just show a single image that shows the issue being analyzed since each screenshot takes almost an entire A4 page, or we can glue parts of two screenshots to make it more compact. What I would like to see on the screenshot:
-1. show explorer is blocked
-2. show MsMpEng.exe is active
-3. show screenshot event on the timeline
-4. explain the scheduler transitions
-Please explain as simple as possible, otherwise it will be a hard time for someone who is new to ETW. Good idea is to put markers on the image (like 1,2,3) and then refer to these markers from the text.
-Right now, there is a lot of data on the screenshots and it's hard to tell if everything is relevant or not.
-The goal of this chapter is to introduce the MAIN usage of ETW traces (e.g. observe SW dynamics), then briefly describe other things it can do.
-
-After stopping the recording, open the recorded trace in WPA. The screenshot of WPA trace for our case study is shown on figure @fig:DefenderOverhead.
-
 ![WPA overview of the trace showing a process start blocked by defender activity.](../../img/perf-tools/WPA_SlowProcessStart_DefenderOverhead.png){#fig:DefenderOverhead width=100% }
 
 WPA supports custom profiles to configure the graph and table data for visualizing CPU, disk, files, etc. in the way you like best. Originally it was developed for device driver developers which is reflected by the built-in profiles which do not focus on application development. ETWController brings its own profile (*Overview.wpaprofile*) which you can set as default profile under *Profiles - Save Startup Profile* to always use the performance overview profile.
 
-On the screenshot, the view is divided into two parts: *CPU Usage (Sampled)* and *CPU Usage (Precise)*, let's understand the difference. The upper half shows sampled graph which is useful to see where CPU is spent, similar to hotspots view in other profiling tools. The lower half shows precise graph, which takes into account time intervals during a process was not running (wall time). Such data is generated by the Windows Thread Scheduler handling context switch events which provides data, e.g. how long and on which CPU a thread was running (CPU Usage), how long it was blocked in a kernel call (Wait), in which priority and how long the thread had been waiting for a CPU to become free (Ready Time), etc.
+On the screenshot @fig:DefenderOverhead, the view is divided into two parts: *CPU Usage (Sampled)* and *CPU Usage (Precise)*, let's understand the difference. The upper half shows sampled graph which is useful to see where CPU is spent, similar to hotspots view in other profiling tools. The lower half shows precise graph, which takes into account time intervals during a process was not running (wall time). Such data is generated by the Windows Thread Scheduler handling context switch events which provides data, e.g. how long and on which CPU a thread was running (CPU Usage), how long it was blocked in a kernel call (Wait), in which priority and how long the thread had been waiting for a CPU to become free (Ready Time), etc.
 
 The methods in the *CPU Usage (Precise)* graph with highest CPU are most likely not the actual CPU consumers. A Context switch event is (simplified!) generated when a thread hits a blocking OS call like `WaitForSingleObject` or `WaitForMultipleObjects`. If a thread is e.g. in a busy for loop spinning billions of iterations but later taking a lock all CPU will be attributed to the lock call which calls into a blocking OS call. Only the blocking operation generates a Context Switch event and not high CPU. Although the CPU consumption of a thread is measured exactly it will not help you to locate busy CPU consumers. To find CPU bottlenecks you need to look into CPU sampling data. If you want to know why your thread was not running then you need Context Switch traces. What most users expect would be a combined view which show wait times and CPU hotspots in one tool, but this is so far not supported in WPA. ETWAnalyzer merges the data, but it is a console only application with no UI.
 
-[TODO:] highlight EventNumber 63 on the screenshot.
-
 We can examine the screenshots taken by ETWController to find where slowness was observed. An example is shown in figure @fig:ETWControllerScreenshot. When the profiling data is saved (the file named xx.etl) another folder named *xx.etl.Screenshots* is created. This contains all screenshots and a *Report.html* file which you can view in the browser. Every recorded keyboard/mouse interaction gets a screenshot of the form Screenshot_EventNumber e.g. Screenhot_63.jpg. This is the screenshot file of the double click event where the process start was delayed. The mouse pointer position is marked as a green square, except if a click event did occur, then it is red. This makes it easy to spot when and where a mouse click was performed.
-
-[TODO:] Cut the image fig:ETWControllerScreenshot.
-
-![Screenshot captured with ETWController viewed in Browser.](../../img/perf-tools/ETWController_Screenshot.png){#fig:ETWControllerScreenshot width=80% }
 
 The slow click event number 63 we can locate in the profiling data in the WPA Overview view. Then you can zoom in to the interesting time region of a potentially longer recording. The event number is part of the *Generic Events HookTracer Events(Slow, Mouse, Keyboard)* WPA view which visualizes all keyboard, mouse and timer based screenshots. 
 
-[TODO @Alois]: the text below doesn't correlate with the image.
 
-See figure @fig:WpaSlowProcessStartOverview. When you double click in explorer to start an executable you would first check if a delay in explorer.exe is happening. Since we are dealing with delays it makes sense to look at the *CPU Usage (Precise) Waits* Graph. There you will find after the first column after process *New Thread Stack (Stack Tag)* which shows the summary of all threads and what they were doing. If we look deeper we find *Antivirus - Windows Defender* with a delay of 1.068s which can be visualized as bar chart to nicely display correlations across processes.
+See figure @fig:DefenderOverhead. When you double click in explorer to start an executable you would first check if a delay in explorer.exe is happening. Since we are dealing with delays it makes sense to look at the *CPU Usage (Precise) Waits* Graph. There you will find after the first column after process *New Thread Stack (Stack Tag)* which shows the summary of all threads and what they were doing. If we look deeper we find *Antivirus - Windows Defender* with a delay of 1.068s which can be visualized as bar chart to nicely display correlations across processes.
 
-![WPA slow process start overview.](../../img/perf-tools/WPA_SlowProcessStartOverview.png){#fig:WpaSlowProcessStartOverview width=100% }
+You might be familiar with stack traces, but not necessarily stack tags. When you read a call stack you try to understand what an application was doing and mentally map the call stack to the applications intent. Lets suppose a deep stack trace which consumes a lot of CPU 
 
-You might be familiar with stack traces, but not necessarily stack tags. When you read a call stack you try to understand what an application was doing and mentally map the call stack to the applications intent. That is exactly what stack tags are for without the need to unfold the call stack to find deep inside the one key frame that is telling you what the application was doing. See[^9] for a more detailed explanation how you can define your own stacktag definitions. The stacktags from the ETWController profile originate from ETWAnalyzer[^10] which is the result of hundreds of performance issues investigated over a decade in Windows, .NET, .NET Core, GPU and Antivirus device drivers. 
+----------------------------------------------------------------------------------------------------
+Stack Tag                   Stack                                           CPU ms             Wait ms
+---------                   ----------------------------------------        ---------------    ----------
+Windows Defender            YourApp.exe!main()                              5000               10000
 
-[TODO @Alois]: I think it's still unclear what a "stacktag" is. Is it just a Microsoft internal way of marking common call stacks? Do stacktags show a process call stack grouped by category (Waits, COM, etc.)? I think we either should explain it in a simple way or just avoid it altogether. :)
+                            YourApp.exe!logic1()                            3000               5000  
+
+                             YourApp.exe!logic2()                            2000               3000
+
+                             YourApp.exe!logic3()                            2000               3000
+
+                             YourApp.exe!logic4()                            2000               3000
+
+                              YourApp.exe!logic5()                            1000               2500
+
+                                YourApp.exe!logic6()                            500                2300
+
+                                YourApp.exe!readfile()                          500                2300
+
+                                  KernelBase.dll!CreateFileInternal               396              2200
+
+                                  apphelp.dll!InsHook_NtCreateFile                396              2200
+
+                                  ntdll.dll!NtCreateFile                          396              2200
+
+                                  ...                                             396              2200
+
+                                  FLTMGR.SYS!FltpCreate                           396              2200
+
+                                  FLTMGR.SYS!FltpPassThroughInternal              396              2200
+
+                                  FLTMGR.SYS!FltpPerformPreCallbacksWorker        396              2200
+
+                                  WdFilter.sys!<PDB not found>                    396              2200
+
+                                  ...                                             ...               ...
+
+----------------------------------------------------------------------------------------------------
+Table: Stacktag Example. {#tbl:stacktag_example}
+
+At a high level you know that logic1 is running which many layers below tries to read from a file where the file open operation (CreateFile) is delayed for 2500ms. If only user mode stacks are present you must assume that the file system was just slow. But with ETW see also what the kernel is doing. In this case CreateFile is intercepted by Windows Defender (WdFilter.sys = Windows Defender Filter Driver) for which Microsoft does not deliver symbol information. We know that our call was delayed by Antivirus. To check where else the Antivirus Scanner is interfering with your application you need to unfold all stacks where WdFilter.sys is poping up, which is a time consuming operation. One would like to group the stacks which are interecepted by Defender into an extra bucket. That is what stack tags are meant for: To give a key method of a stack trace a descriptive name. Stacktags are method and module pattern expressions in an external XML file (in WPA: Trace -Trace Properties-Stack Tags Definitions) which are defined like this:
+```
+  <Tag Name="Windows Defender" Priority="1">
+    <Entrypoint Module="WdFilter.sys" Method="*"/>
+    <Entrypoint Module="mssecflt.sys" Method="*"/>
+  </Tag>
+```
+Stack tag matching works from bottom to top where the first matching stack tag definition wins. That behavior has the nice property that you can sum up all stacktags to get the total CPU/Wait overhead for this stacktag. Since ETW stack traces combine user and kernel stacks it is easy to estimate AV overhead by defining a stacktag for all AV device drivers which are showing up in your application stack traces in CPU Sampling and Context Switch traces because the AV drivers are intercepting your user mode calls. 
+
+The Defender stacktag matches two Defender device drivers which intercept (mainly) CreateProcess and File related operations. If e.g. the CreateFile call is delayed by one of these drivers we can directly see how much Wait and CPU by this driver was introduced by looking at the aggregated stack tag metrics. If the tag is absent we know that no Defender was running at that point in time. 
+See[^9] for a more detailed explanation how you can define your own stacktag definitions. The stacktags from the ETWController profile originate from ETWAnalyzer[^10] which is the result of hundreds of performance issues investigated over a decade in Windows, .NET, .NET Core, GPU and Antivirus device drivers. 
 
 [^1]: Windows SDK Downloads [https://developer.microsoft.com/en-us/windows/downloads/sdk-archive/](https://developer.microsoft.com/en-us/windows/downloads/sdk-archive/)
 [^2]: Windows ADK Downloads [https://learn.microsoft.com/en-us/windows-hardware/get-started/adk-install#other-adk-downloads](https://learn.microsoft.com/en-us/windows-hardware/get-started/adk-install#other-adk-downloads)
@@ -132,101 +161,3 @@ You might be familiar with stack traces, but not necessarily stack tags. When yo
 [^8]: Microsoft Performance Tools Linux / Android [https://github.com/microsoft/Microsoft-Performance-Tools-Linux-Android](https://github.com/microsoft/Microsoft-Performance-Tools-Linux-Android)
 [^9]: Stacktags [https://learn.microsoft.com/en-us/windows-hardware/test/wpt/stack-tags](https://learn.microsoft.com/en-us/windows-hardware/test/wpt/stack-tags)
 [^10]: ETWAnalyzer Stacktags [https://github.com/Siemens-Healthineers/ETWAnalyzer/blob/main/ETWAnalyzer/Configuration/default.stacktags](https://github.com/Siemens-Healthineers/ETWAnalyzer/blob/main/ETWAnalyzer/Configuration/default.stacktags)
-
-## TO REMOVE {.unlisted .unnumbered}
-
-#### Debug symbols {.unlisted .unnumbered}
-
-All stacktag definitions which refer to a method need symbols, otherwise the stack trace to stack tag mapping will not work and you will only see stack tags which refer to modules but not specific methods. To load symbols you need to add the Microsoft symbol server and potentially your own symbol server in the *Trace - Configure Symbol Paths* dialog. See @fig:WpaSymbolLoadDialog. After that you can start loading symbols by checking the *Trace - Load Symbols* menu entry. WPA has a reputation of being slow because most users leave the remote symbol servers enabled after having downloaded the matching symbols once. 
-
-*Pro Tip: The next time you open a new or the same ETL file be sure to uncheck all remote symbol servers, before starting to load symbols. Symbol loading will then need < 1 minute without the large delay (up to 1h) to check all remote servers again for the same symbols even when no new symbols are downloaded.*
-
-![WPA Symbol configuration.](../../img/perf-tools/WPA_SymbolLoad.png){#fig:WpaSymbolLoadDialog width=70%}
-
-WPA is also useful without symbols by looking at correlations between CPU activity where in the beginning explorer was processing the double click event and suddenly Windows Defender needs 637 ms CPU followed by some idle time where no process was active and then suddenly our double clicked process (ETWAnalyer) was started ca. 1s after the double click event. Correlation is not causation, but with Context Switch Tracing you can prove that explorer was waiting on Windows Defender which is not possible by looking at CPU sampling data. 
-
-Figure @fig:WpaSlowProcessStartOverview shows that even without stack traces you can find interesting patterns by looking at CPU consumption of the explorer, Defender and when the double clicked executable is started. 
-
-[Todo]: Move to -> Apendix ?
-
-Unfortunately wpr.exe is not working reliably on all Windows 10 versions and has not been patched during the lifetime of Windows 10 (including 22H2). The official answer from MS is that any tool which can be publicly downloaded (in this case from the ADK) no servicing via Windows Update is done. 
-If you find the following error while stopping ETW recording
-```
-C>wpr -start cpu -start dotnet  
-C>wpr -stop c:\temp\test.etl 
-        Cannot change thread mode after it is set.
-        Profile Id: RunningProfile
-        Error code: 0x80010106
-```
-
-you need to install the Windows Performance Toolkit (WPT) which is part of the Windows SDK and also of the Windows Assessment and Deployment Kit (Windows ADK). Below is a table of the known to be working WPR versions from the Windows SDKs:
-
---------------------------------------------------------------------------
-Windows Version        Description              Recommended WPT Version
-------                 ---------------------    ---------------------------------------
-Windows 11                                            
-10.0.22000.194         Latest                   Windows SDK for Windows 11 (10.0.22621.755) or later
-
-Windows 10 Consumer                                      
->=  10.0.17763         1809 - 22H2              "
-
-Windows Server 2022                                 
-10.0.20348.1194        Windows 10 based 21H2    "
-
-Windows Server 2019                                   
-10.0.17763             Windows 10 based 1809    "
-
-Windows 10 LTSC                                         
-10.0.17763             Windows 10 based 1809    "
-
-Windows Server 2016                                   
-10.0.14393.5427        Windows 10 based 1607    Windows 10 SDK version 2104 (10.0.20348.0)
-
---------------------------------------------------------------------------
-
-Table: Recommended Windows Performance Toolkit (WPT) for all major Windows versions. {#tbl:wpt_versions}
-
-<Removed>
-
-### WPA overview {.unlisted .unnumbered}
-
-Figure @fig:WPAOverview shows e.g. how a test application (FileWriter.exe) that writes many small files is blocked by the parallel activity of Windows Defender (MsMpEng.exe). There are two CPU graphs which look similar, but show different data. The first graph shows *CPU Usage (Sampled)* which is useful to see where CPU is spent. The latter graph *CPU Usage (Precise)* is generated by visualizing data of the Windows Thread Scheduler (Context Switch Events) which contain a lot of data like how long on which CPU a thread was running (CPU Usage), how long it was blocked in a kernel call (Wait), in which priority and how long the thread had been waiting for a CPU to become free (Ready Time) just to name the most important ones. While the stack traces of both graphs look similar you need to understand what you are looking at. 
-
-![WPA Overview.](../../img/perf-tools/Wpa_Overview.png){#fig:WPAOverview width=100%}
-
-<Removed>
-
-#### WPA Tables {.unlisted .unnumbered}
-
-It is important to understand what data you are looking at in the tables. You certainly have noticed the yellow and blue vertical line in every WPA table. All columns right of the blue vertical line are used as input to graph data. Data left of the yellow line are groupings by the corresponding column values. Data between the yellow and blue line is the data of individual ETW events as table which you get when you unfold all groupings or you remove all grouped data columns.
-
-To create custom views from CPU Sampling data you can drag and drop the columns around to create new visualizations of the data. The following visualizations
-
-- CPU by executable name (no process id)
-- CPU per process instance (process with pid) process and thread
-- CPU by process instance (process with pid), thread, stack by thread.
-
-need these WPA groupings which you can configure via the View Editor (Ctrl+E or by pressing the wheel button):
-
------------------------------------------------------------------------------
-Column 1                 Column 2      Column 3         Column 4      Column 5    Column 6
---------                 ----------    -----------      ----------    ---------   -------- 
-Process                  Yellow Bar    Blue Bar         % Weight        -         -        
-
-Process (Name and pid)   Thread Id     Yellow Bar       Blue Bar      % Weight    -             
-
-Process (Name and pid)   Thread Id     Stack            Yellow Bar    Blue Bar    % Weight        
-
------------------------------------------------------------------------------
-
-Table: WPA Groupings  {#tbl:wpa_groupings}
-
-![WPA grouping to show CPU per process executable.](../../img/perf-tools/WPA_Grouping.png){#fig:WPA_Grouping width=100% }
-
-To switch between Process, Process Name with PID and Process PID you need to right click on the *"Process (Name)"* column. See figure @fig:WPA_Grouping.
-
-#### WPA disk and exception correlation {.unlisted .unnumbered}
-
-![WPA disk and exception correlation.](../../img/perf-tools/WPA_SlowProcessStart_Disk_Exception.png){#fig:ProcessStartDiskException width=100% }
-
-The OverView profile allows you to quickly check if an issue correlates with a CPU, disk, memory, .NET exception, or something else. From the *"Disk Usage Utilization by Disk, Priority"* table in figure @fig:ProcessStartDiskException we find that the disk was 29 ms active. If disk IO is near zero then it cannot be related to our > 1000 ms observed delay of a process start.
