@@ -2,7 +2,7 @@
 typora-root-url: ..\..\img
 ---
 
-## Detecting Coherence Issues {#sec:TrueFalseSharing}
+## Cache Coherence Issues {#sec:TrueFalseSharing}
 
 ### Cache Coherency Protocols
 

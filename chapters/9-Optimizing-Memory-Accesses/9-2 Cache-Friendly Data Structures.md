@@ -2,6 +2,7 @@
 typora-root-url: ..\..\img
 ---
 
+[TODO]: Memory profiling. How to measure memory footprint? Flamescope
 [TODO]: Trim footnotes
 [TODO]: Elaborate more on "Tune the code for memory hierarchy"
 [TODO]: Discuss what to do when memory bandwidth is a limitation
