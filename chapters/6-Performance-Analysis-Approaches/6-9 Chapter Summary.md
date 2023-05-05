@@ -22,9 +22,4 @@ typora-root-url: ..\..\img
 
 * Compiler Opt reports help to find missing compiler optimizations. It may also guide developers in composing new performance experiments.
 
-  
-
 \sectionbreak
-
-
-

@@ -16,4 +16,3 @@ Performance profilers leverage HW features presented in this chapter to enable m
 [^2]: ARM CoreSight: [https://developer.arm.com/ip-products/system-ip/coresight-debug-and-trace](https://developer.arm.com/ip-products/system-ip/coresight-debug-and-trace)
 
 \sectionbreak
-
