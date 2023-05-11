@@ -79,23 +79,29 @@ Software memory prefetching complements the one done by the HW. Developers can s
 
 ### Main Memory
 
-Main memory is the next level of the hierarchy, downstream from the caches. Main memory uses DRAM (dynamic RAM) technology that supports large capacities at reasonable cost points. The main memory is described by three main attributes - latency, bandwidth, and capacity. Latency is typically specified by two components. Memory access time is the time elapsed between the request to when the data word is available. Memory cycle time defines the minimum time required between two consecutive accesses to the memory. 
+Main memory is the next level of the hierarchy, downstream from the caches. Main memory uses DRAM (Dynamic Random Access Memory), technology that supports large capacities at reasonable cost points. Performance of main memory is described by latency and bandwidth. Memory latency is the time elapsed between the memory access request is issued and when the data is available to use by CPU. Memory bandwidth defines how many bytes can be fetch per some period of time, usually measured in gigabytes per second. ~~Memory cycle time defines the minimum time required between two consecutive accesses to the memory.~~
 
-DDR (double data rate) DRAM technology is the predominant DRAM technology supported by most CPUs. Historically, DRAM bandwidths have improved every generation while the DRAM latencies have stayed the same or even increased. The table @tbl:mem_rate shows the top data rate and the corresponding latency for the last three generations of DDR technologies. The data rate is measured as a million transfers per sec (MT/s). The latencies shown in this table correspond to the latency in the DRAM device itself. Typically, the latencies as seen from the CPU pipeline (cache miss on a load to use) are higher (in the 70ns-150ns range) due to additional latencies and queuing delays incurred in the cache controllers, memory controllers, and on-die interconnects. 
+DDR (double data rate) DRAM technology is the predominant DRAM technology supported by most CPUs. Historically, DRAM bandwidths have improved every generation while the DRAM latencies have stayed the same or even increased. The table @tbl:mem_rate shows the top data rate, peak bandwidth, and the corresponding reading latency for the last three generations of DDR technologies. The data rate is measured as a million transfers per sec (MT/s). The latencies shown in this table correspond to the latency in the DRAM device itself. Typically, the latencies as seen from the CPU pipeline (cache miss on a load to use) are higher (in the 50ns-150ns range) due to additional latencies and queuing delays incurred in the cache controllers, memory controllers, and on-die interconnects. See an example of measuring memory latency and bandiwdth in [@sec:MemLatBw].
 
-----------------------------------------
-   DDR      Highest Data   Typical Read 
-Generation   Rate (MT/s)   Latency (ns)
-----------  ------------   -------------
-  DDR3          2133          10.3
+----------------------------------------------------------------
+   DDR       Year   Highest Data   Peak Bandwidth  Typical Read
+Generation           Rate (MT/s)    (Gbytes/s)      Latency (ns)
+----------  ------  ------------   -------------   -------------
+  DDR3       2007      2133           12.8            10.3
 
-  DDR4          3200          12.5
+  DDR4       2014      3200           25.6            12.5
 
-  DDR5          6400          14
+  DDR5       2020      6400           51.2            14
 
-----------------------------------------
+----------------------------------------------------------------
 
-Table: The top data rate and the corresponding latency for the last three generations of DDR technologies. {#tbl:mem_rate}
+Table: Performance characteristics for the last three generations of DDR technologies. {#tbl:mem_rate}
+
+[TODO]: describe memory ranking
+
+[TODO]: describe memory channels
+
+[TODO]: describe HBM
 
 New DRAM technologies such as GDDR (Graphics DDR) and HBM (High Bandwidth Memory) are used by custom processors that require higher bandwidth, not supported by DDR interfaces.
 

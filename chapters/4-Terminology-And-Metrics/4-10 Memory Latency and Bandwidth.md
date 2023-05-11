@@ -1,4 +1,4 @@
-## Memory latency and bandwidth
+## Memory latency and bandwidth {#sec:MemLatBw}
 
 Inefficient memory accesses are often a dominant performance bottleneck in modern environments. Thus, how quickly a processor can fetch data from the memory subsystem is a critical factor in determining application performance. There are two aspects of memory performance: 1) how fast a CPU can fetch a single byte from memory (latency), and 2) how many bytes it can fetch per second (bandwidth). Both are important in various scenarios, we will look at a few examples later. In this section, we will focus on measuring peak performance of the memory subsystem components.
 
