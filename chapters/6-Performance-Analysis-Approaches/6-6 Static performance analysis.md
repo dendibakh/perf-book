@@ -4,6 +4,8 @@ typora-root-url: ..\..\img
 
 ## Static Performance Analysis
 
+[TODO] introduce UICA, show example of finding dependency chains using it
+
 Today we have extensive tooling for static code analysis. For C and C++ languages we have such well known tools like [Clang Static Analyzer](https://clang-analyzer.llvm.org/), [Klocwork](https://www.perforce.com/products/klocwork), [Cppcheck](http://cppcheck.sourceforge.net/) and others[^1]. They aim at checking the correctness and semantics of the code. Likewise, there are tools that try to address the performance aspect of the code. Static performance analyzers don't run the actual code. Instead, they simulate the code as if it is executed on a real HW. Statically predicting performance is almost impossible, so there are many limitations to this type of analysis.
 
 First, it is not possible to statically analyze C/C++ code for performance since we don't know the machine code to which it will be compiled. So, static performance analysis works on assembly code.

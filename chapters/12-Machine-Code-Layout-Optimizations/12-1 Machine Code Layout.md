@@ -2,6 +2,8 @@
 typora-root-url: ..\..\img
 ---
 
+[TODO]: Describe how to measure code footprint
+
 # Machine Code Layout Optimizations {#sec:secFEOpt}
 
 CPU Front-End (FE) component is discussed in [@sec:uarchFE]. Most of the time, inefficiencies in CPU FE can be described as a situation when Back-End is waiting for instructions to execute, but FE is not able to provide them. As a result, CPU cycles are wasted without doing any actual useful work. Because modern processors are 4-wide (i.e., they can provide four uops every cycle), there can be a situation when not all four available slots are filled. This can be a source of inefficient execution as well. In fact, [`IDQ_UOPS_NOT_DELIVERED`](https://easyperf.net/blog/2018/12/29/Understanding-IDQ_UOPS_NOT_DELIVERED)[^2] performance event is counting how many available slots were not utilized due to a front-end stall. TMA uses this performance counter value to calculate its "Front-End Bound" metric[^1].
