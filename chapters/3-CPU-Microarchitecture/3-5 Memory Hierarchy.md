@@ -79,9 +79,11 @@ Software memory prefetching complements the one done by the HW. Developers can s
 
 ### Main Memory
 
-Main memory is the next level of the hierarchy, downstream from the caches. Main memory uses DRAM (Dynamic Random Access Memory), technology that supports large capacities at reasonable cost points. Performance of main memory is described by latency and bandwidth. Memory latency is the time elapsed between the memory access request is issued and when the data is available to use by CPU. Memory bandwidth defines how many bytes can be fetch per some period of time, usually measured in gigabytes per second. ~~Memory cycle time defines the minimum time required between two consecutive accesses to the memory.~~
+Main memory is the next level of the hierarchy, downstream from the caches. Main memory uses DRAM (Dynamic Random Access Memory), technology that supports large capacities at reasonable cost points. When comparing DRAM modules, people usually look at memory density and memory speed, besides its price, of course. Memory density defines how much memory the module has, measured in GB. Obviously the more the better as it constitues the memory space available to the OS and applications.
 
-DDR (double data rate) DRAM technology is the predominant DRAM technology supported by most CPUs. Historically, DRAM bandwidths have improved every generation while the DRAM latencies have stayed the same or even increased. The table @tbl:mem_rate shows the top data rate, peak bandwidth, and the corresponding reading latency for the last three generations of DDR technologies. The data rate is measured as a million transfers per sec (MT/s). The latencies shown in this table correspond to the latency in the DRAM device itself. Typically, the latencies as seen from the CPU pipeline (cache miss on a load to use) are higher (in the 50ns-150ns range) due to additional latencies and queuing delays incurred in the cache controllers, memory controllers, and on-die interconnects. See an example of measuring memory latency and bandiwdth in [@sec:MemLatBw].
+Performance of main memory is described by latency and bandwidth. Memory latency is the time elapsed between the memory access request is issued and when the data is available to use by CPU. Memory bandwidth defines how many bytes can be fetch per some period of time, usually measured in gigabytes per second.
+
+DDR (double data rate) DRAM technology is the predominant DRAM technology supported by most CPUs. Historically, DRAM bandwidths have improved every generation while the DRAM latencies have stayed the same or even increased. The table @tbl:mem_rate shows the top data rate, peak bandwidth, and the corresponding reading latency for the last three generations of DDR technologies. The data rate is measured as a million transfers per sec (MT/s). The latencies shown in this table correspond to the latency in the DRAM device itself. Typically, the latencies as seen from the CPU pipeline (cache miss on a load to use) are higher (in the 50ns-150ns range) due to additional latencies and queuing delays incurred in the cache controllers, memory controllers, and on-die interconnects. See an example of measuring observed memory latency and bandiwdth in [@sec:MemLatBw].
 
 ----------------------------------------------------------------
    DDR       Year   Highest Data   Peak Bandwidth  Typical Read
@@ -97,7 +99,15 @@ Generation           Rate (MT/s)    (Gbytes/s)      Latency (ns)
 
 Table: Performance characteristics for the last three generations of DDR technologies. {#tbl:mem_rate}
 
-[TODO]: describe memory ranking
+It is worth to mention that DRAM chips require memory cells being periodically refreshed. Because the bit value is stored as the presence of an electric charge on a tiny capacitor, it can lose its charge as the time passes. To prevent this, there is a special circuitry that reads each cell and writes it back, effectively restoring the capacitor's charge. While a DRAM chip is in its refresh procedure, it is not serving memory access requests.
+
+DRAM module is organized as sets of DRAM chips. Memory *rank* is a term that describes how many sets of DRAM chips exist on a module. For example, a single-rank (1R) memory module contains one set of DRAM chips. A dual-rank (2R) memory module has two sets of DRAM chips, therefore doubling the capacity of a single-rank module. Likewise, there are quad-rank (4R) and octa-rank (8R) memory modules available for purchase.
+
+Each set of memory chips consists of multiple chips. Memory *width* defines the width of the bus of each chip in a set and consequently, the number of chips in a set. Memory width can be one of three values: `x4`, `x8` or `x16`. As an example, figure @fig:Dram_ranks shows the organization of 2Rx16 dual-rank DRAM DDR4 module, total 2GB capacity. There are four chips in each set, with a 16-bit wide bus. Combined, the four chips provide 64-bit output. The two ranks are selected one at a time through a chip set select signal.
+
+![Organization of 2Rx16 dual-rank DRAM DDR4 module, total 2GB capacity.](../../img/uarch/DRAM_ranks.png){#fig:Dram_ranks width=80%}
+
+There is no direct answer whether performance of single-rank or dual-rank is better as it depends on the type of application. Switching from one rank to another through chip select signal needs additional clock cycles, which may increase the access latency. On the other hand, if a rank is not accessed, it can go through its refresh cycles in parallel while other ranks are busy. As soon as the previous rank completes data transmission, the next rank can immediately start its transmission. Also, single-rank modules produce less heat and are less likely to fail.
 
 [TODO]: describe memory channels
 
