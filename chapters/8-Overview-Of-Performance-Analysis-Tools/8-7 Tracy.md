@@ -74,7 +74,7 @@ Tracy provides many other features, too many to cover in this overview. They inc
 - session comparison: this is vital to ensure a change provides the expected benefits. It's possible to load two profiling sessions and compare zone data before and after the change was made.
 - graphics API profiling: Tracy supports OpenGL, Vulkan and DirectX. Much like with CPU code, it's possible to insert profiling markers in the GPU command stream. The GPU driver will report the time taken to execute in between markers and Tracy will display the information in the profiler.
 
-Tracy provides a detailed [user manual](https://github.com/wolfpld/tracy/releases/latest/download/tracy.pdf) which goes into each feature's detail. The author also provides an interactive demo if you'd like to get a feel for the capabilities of this tool: https://tracy.nereid.pl/.
+Tracy provides a detailed [user manual](https://github.com/wolfpld/tracy/releases/latest/download/tracy.pdf) which goes into each feature in detail. The author also provides an interactive demo if you would like to get a feel for the capabilities of this tool: https://tracy.nereid.pl/.
 
 [TODO:] From the Doc about Tracy features: "For example, statistical information about zones, trace comparisons, or inclusion of inline function frames in call stacks"
 
