@@ -43,8 +43,6 @@ Right above the main panel, there is a histogram that displays the times for all
 
 ![Tracy frame time view](../../img/tracy/profiler_frame_time.png){#fig:Tracy_Frame_Time_View width=90%}
 
-~~Memory allocations can be manually tracked as well, and are displayed in a separate window. This can be useful to spot memory leaks or to determine which code in the application is responsible for a given memory allocation. Tracy allows to track separate memory pools as well, which can be useful if multiple allocators are being used.~~
-
 Figure @fig:Tracy_CPU_Data illustrates the CPU data section of the profiler. This area shows which core a given thread is executing on and it also displays context switches. This section will also display other programs that are running on the CPU. As seen in the image, the details for a given thread are displayed when hovering the mouse on a given section in the CPU data view. Details include the CPU the thread is running on, the parent program, the individual thread and timing information. In this example, we can see that the `TestCpu.exe` thread was active for 4.4 ms on CPU 1.
 
 *[TODO:] @Marco, I suggest that we focus on the slow frame and one of its zones in the screenshots that we show. That way it will be a consistent story for readers. - @Denis see comment above :)*
@@ -72,6 +70,7 @@ It's also possible to capture a trace without using the profiler UI. This can be
 Tracy provides many other features, too many to cover in this overview. They include:
 - naming threads
 - timing and tracking locks
+- tracking memory allocations. This can be useful to spot memory leaks or to determine which code in the application is responsible for a given memory allocation. Tracy allows to track separate memory pools as well, which can be useful if multiple allocators are being used.
 - session comparison: this is vital to ensure a change provides the expected benefits. It's possible to load two profiling sessions and compare zone data before and after the change was made.
 - graphics API profiling: Tracy supports OpenGL, Vulkan and DirectX. Much like with CPU code, it's possible to insert profiling markers in the GPU command stream. The GPU driver will report the time taken to execute in between markers and Tracy will display the information in the profiler.
 
