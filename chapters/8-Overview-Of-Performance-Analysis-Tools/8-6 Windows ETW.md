@@ -92,70 +92,13 @@ Now that we familiarized ourselves with the WPA interface, let's observe the cha
 
 ![Screenshot captured with ETWController.](../../img/perf-tools/DoubleClick_Screenshot.png){#fig:ETWController_Screenshot width=80% }
 
-The double click marks the beginning of a `1.2` second delay when our application was waiting for something. At timestamp `35.1`, `explorer.exe` is active as it attempts to launch the new application. But then it wasn't doing much work and the application didn't start. Instead, `MsMpEng.exe` takes over the execution up until the time `35.7`. So far it looks like an antivirus scan before the downloaded executable is allowed to start.
+The double click marks the beginning of a 1.2 seconds delay when our application was waiting for something. At timestamp `35.1`, `explorer.exe` is active as it attempts to launch the new application. But then it wasn't doing much work and the application didn't start. Instead, `MsMpEng.exe` takes over the execution up until the time `35.7`. So far it looks like an antivirus scan before the downloaded executable is allowed to start. But we are not 100% sure that `MsMpEng.exe` is blocking the start of a new application.
 
-Since we are dealing with delays, we are interested in wait times which are available on the *CPU Usage (Precise) Waits* Panel. There you see the columns *New Process* and *New Thread Stack (Stack Tag)*. These are grouping columns which sum up for a process and stack tag the cpu and wait times of all threads of a process. If we look deeper we find *Antivirus - Windows Defender* with a delay of 1.068s which can be visualized as bar chart to nicely display correlations across processes.
+Since we are dealing with delays, we are interested in wait times which are available on the *CPU Usage (Precise) Waits* Panel. There we find the list of processes that our `explorer.exe` was waiting for, visualized as a bar chart that aligns with the timeline on the upper panel. It's not hard to spot the long bar that corresponds to *Antivirus - Windows Defender* which accounts for a waitig time of 1.068s. So, we can conclude that the delay in starting our application is caused by Defender scanning activity. If you drill into the call stack (not shown), you'll see that `CreateProcess` system call is delayed in the kernel by `WDFilter.sys`, a Windows Defender Filter Driver. It blocks the process from starting until the potentially malicious file contents is scanned. Antivirus software can intercept everything, resulting in unpredictable performance issues that are difficult to diagnose without a comprehensive kernel view, such as with ETW. Mystery solved? Well, not just yet.
 
-Mystery solved! The 1.068 second delay in starting our process is caused by Defender scanning activity. If you drill into the call stack, you'll see that CreateProcess is delayed in the kernel by `WDFilter.sys`, a Windows Defender Filter Driver. It blocks the process from starting until the potentially malicious file contents are scanned. Antivirus software can intercept everything, resulting in unpredictable performance issues that are difficult to diagnose without a comprehensive kernel view, such as with ETW.
+Knowing that Defender was the issue is just the first step. If you look at the top panel again, you'll see that the delay is not entirely caused by busy antivirus scanning. The `MsMpEng.exe` process was active from the time `35.1` till `35.7`, but the application didn't start immediately after that. There is an additional delay of 0.5 sec from the time `35.7` till `36.2`, during which the CPU was mostly idle, not doing anything. To root cause it, one needs to follow the thread wakeup history across processes, which we will not present here. In the end you would find a blocking web service call to `MpClient.dll!MpClient::CMpSpyNetContext::UpdateSpynetMetrics` which did wait for some Microsoft Defender web service to respond. If you enable additionally TCP/IP or socket ETW traces you can also find out to which remote endpoint Microsoft Defender was talking to. So, the second part of the delay is caused by the `MsMpEng.exe` process waiting for the network, which also blocked our application from running.
 
-Knowing that Defender was the issue is just the first step. If you look at the CPU graph you see that the one second delay is not entirely caused by busy AV scanning. Nearly half of the time the CPU was zero everywhere. You can follow the thread wakeup history across processes. This is a more complex analysis but in the end you will find a blocking web service call to `MpClient.dll!MpClient::CMpSpyNetContext::UpdateSpynetMetrics` which did wait for some MS Defender service to respond which explains the long zero CPU gap where nothing did happen. If you enable additionally TCP/IP or socket ETW traces you can also find out to which remote endpoint Defender was talking to.
-
-WPA tables and graphs look self explaining but there is more behind it. The tables and graphs are generic. By default WPA shows in each panel a flat list of parsed events with their property value in each column. You can group events by their property values by dragging and dropping the columns by which you want to group left of the yellow bar. This way you can easily create data aggregation views like the one below which groups by Stack Tag and then by Stack which you can expand until you get to the table of all grouped events and their values right of the yellow bar. In a similar way data, which is put right of the blue bar, will be visualized in the chart of a WPA panel. The generic drag and drop grouping and graphing capabilities of WPA are extremely powerful features which can be expanded in the same way to e.g. custom ETW events created by you. Everything you see is generic and can be configured in the way you need it.
-
-You might be familiar with stack traces, but not necessarily stack tags. When you read a call stack you try to understand what an application was doing and mentally map the call stack to the applications intent. Lets suppose a deep stack trace which consumes a lot of CPU.
-
-----------------------------------------------------------------------------------------------------
-Stack Tag          Stack                                      Bar         CPU ms           Wait ms
----------          ----------------------------------------   ---------   ---------------  ----------
-Windows Defender   YourApp.exe!main()                                _    5000             10000
-
-                   YourApp.exe!logic1()                              _    3000              5000  
-
-                    YourApp.exe!logic2()                             _    2000              3000
-
-                    YourApp.exe!logic3()                             _    2000              3000
-
-                    YourApp.exe!logic4()                             _    2000              3000
-
-                     YourApp.exe!logic5()                            _    1000              2500
-
-                       YourApp.exe!logic6()                          _     500              2300
-
-                       YourApp.exe!readfile()                        _     500              2300
-
-                         KernelBase.dll!CreateFileInternal           _     396              2200
-
-                         apphelp.dll!InsHook_NtCreateFile            _     396              2200
-
-                         ntdll.dll!NtCreateFile                      _     396              2200
-
-                         ...                                         _     396              2200
-
-                         FLTMGR.SYS!FltpCreate                       _     396              2200
-
-                         FLTMGR.SYS!FltpPassThroughInternal          _     396              2200
-
-                         FLTMGR.SYS!FltpPerformPreCallback...        _     396              2200
-
-                         WdFilter.sys!<PDB not found>                _     396              2200
-
-                         ...                                         _     ...               ...
-----------------------------------------------------------------------------------------------------
-Table: Stacktag Example. {#tbl:stacktag_example}
-
-At a high level you know that logic1 is running which many layers below tries to read from a file where the file open operation (CreateFile) is delayed for 2500ms. If only user mode stacks are present you must assume that the file system was slow. But with ETW you can also see what the kernel was doing. In this case CreateFile is intercepted by Windows Defender (WdFilter.sys = Windows Defender Filter Driver) for which Microsoft does not deliver symbol information. We know that our call was delayed by Antivirus. To check where else the Antivirus Scanner is interfering with your application you need to unfold all stacks where WdFilter.sys is poping up, which is a time consuming operation. One would like to group the stacks which are intercepted by Defender into an extra bucket. That is what stack tags are meant for: To give a key method of a stack trace a descriptive name. Stacktags are method and module pattern expressions in an external XML file (in WPA: Trace -Trace Properties-Stack Tags Definitions) which are defined like this:
-```
-  <Tag Name="Windows Defender" Priority="1">
-    <Entrypoint Module="WdFilter.sys" Method="*"/>
-    <Entrypoint Module="mssecflt.sys" Method="*"/>
-  </Tag>
-```
-Stack tag matching works from bottom to top where the first matching stack tag definition wins. That behavior has the nice property that you can sum up all stacktags to get the total CPU/Wait overhead for this stacktag. Since ETW stack traces combine user and kernel stacks it is easy to estimate AV overhead by defining a stacktag for all AV device drivers which are showing up in your application stack traces in CPU Sampling and Context Switch traces because the AV drivers are intercepting your user mode calls. 
-
-The Defender stacktag matches two Defender drivers which intercept (mainly) CreateProcess and File related operations. If e.g. the CreateFile call is delayed by one of these drivers we can directly see how much Wait and CPU by this driver was introduced by looking at the aggregated stack tag metrics. If the tag is absent we know that no Defender was running at that point in time. 
-See[^9] for a more detailed explanation how you can define your own stacktag definitions. The stacktags from the ETWController profile originate from ETWAnalyzer[^10] which is the result of hundreds of performance issues investigated over a decade in Windows, .NET, .NET Core, GPU and Antivirus device drivers. 
-
-WPA supports custom profiles to configure the graph and table data for visualizing CPU, disk, files, etc. in the way you like best. Originally it was developed for device driver developers which is reflected by the built-in profiles which do not focus on application development. ETWController brings its own profile (*Overview.wpaprofile*) which you can set as default profile under *Profiles - Save Startup Profile* to always use the performance overview profile.
+This case study shows only one example of what type of issue you can effectively analyze with WPA, but there are others. WPA interface is very reach and is highly customizable. It supports custom profiles to configure the graphs and tables for visualizing CPU, disk, files, etc. in the way you like best. Originally WPA was developed for device driver developers and there are built-in profiles which do not focus on application development. ETWController brings its own profile (*Overview.wpaprofile*) which you can set as default profile under *Profiles -> Save Startup Profile* to always use the performance overview profile.
 
 [^1]: Windows SDK Downloads [https://developer.microsoft.com/en-us/windows/downloads/sdk-archive/](https://developer.microsoft.com/en-us/windows/downloads/sdk-archive/)
 [^2]: Windows ADK Downloads [https://learn.microsoft.com/en-us/windows-hardware/get-started/adk-install#other-adk-downloads](https://learn.microsoft.com/en-us/windows-hardware/get-started/adk-install#other-adk-downloads)
@@ -165,5 +108,3 @@ WPA supports custom profiles to configure the graph and table data for visualizi
 [^6]: UIforETW [https://github.com/google/UIforETW](https://github.com/google/UIforETW)
 [^7]: Performance HUD [https://www.microsoft.com/en-us/download/100813](https://www.microsoft.com/en-us/download/100813)
 [^8]: Microsoft Performance Tools Linux / Android [https://github.com/microsoft/Microsoft-Performance-Tools-Linux-Android](https://github.com/microsoft/Microsoft-Performance-Tools-Linux-Android)
-[^9]: Stacktags [https://learn.microsoft.com/en-us/windows-hardware/test/wpt/stack-tags](https://learn.microsoft.com/en-us/windows-hardware/test/wpt/stack-tags)
-[^10]: ETWAnalyzer Stacktags [https://github.com/Siemens-Healthineers/ETWAnalyzer/blob/main/ETWAnalyzer/Configuration/default.stacktags](https://github.com/Siemens-Healthineers/ETWAnalyzer/blob/main/ETWAnalyzer/Configuration/default.stacktags)
