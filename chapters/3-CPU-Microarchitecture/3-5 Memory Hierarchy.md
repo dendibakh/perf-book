@@ -85,7 +85,9 @@ Main memory uses DRAM (Dynamic Random Access Memory), technology that supports l
 
 Performance of main memory is described by latency and bandwidth. Memory latency is the time elapsed between the memory access request is issued and when the data is available to use by CPU. Memory bandwidth defines how many bytes can be fetch per some period of time, usually measured in gigabytes per second.
 
-DDR (double data rate) DRAM technology is the predominant DRAM technology supported by most CPUs. Historically, DRAM bandwidths have improved every generation while the DRAM latencies have stayed the same or even increased. The table @tbl:mem_rate shows the top data rate, peak bandwidth, and the corresponding reading latency for the last three generations of DDR technologies. The data rate is measured as a million transfers per sec (MT/s). The latencies shown in this table correspond to the latency in the DRAM device itself. Typically, the latencies as seen from the CPU pipeline (cache miss on a load to use) are higher (in the 50ns-150ns range) due to additional latencies and queuing delays incurred in the cache controllers, memory controllers, and on-die interconnects. See an example of measuring observed memory latency and bandiwdth in [@sec:MemLatBw].
+#### DDR
+
+DDR (Double Data Rate) DRAM technology is the predominant DRAM technology supported by most CPUs. Historically, DRAM bandwidths have improved every generation while the DRAM latencies have stayed the same or even increased. The table @tbl:mem_rate shows the top data rate, peak bandwidth, and the corresponding reading latency for the last three generations of DDR technologies. The data rate is measured as a million transfers per sec (MT/s). The latencies shown in this table correspond to the latency in the DRAM device itself. Typically, the latencies as seen from the CPU pipeline (cache miss on a load to use) are higher (in the 50ns-150ns range) due to additional latencies and queuing delays incurred in the cache controllers, memory controllers, and on-die interconnects. See an example of measuring observed memory latency and bandiwdth in [@sec:MemLatBw].
 
 -----------------------------------------------------------------
    DDR       Year   Highest Data   Peak Bandwidth  In-device Read
@@ -128,8 +130,17 @@ For example, for a single-channel DDR4 configuration, the data rate is `2400 MT/
 
 In order to enable multi-channel configuration, you need to have a CPU and a motherboard that supports such architecture and install an even number of identical memory modules in the correct memory slots on the motherboard. The quickest way to check the setup is by running a hardware identification utility like `CPU-Z` or `HwInfo`. But also, you can run the memory bandwidth benchmarks like Intel `mlc` or `Stream`.
 
-While increased memory bandwidth is generally good, it does not always translate into increased system performance and is highly dependent on the application.
+While increased memory bandwidth is generally good, it does not always translate into increased system performance and is highly dependent on the application. 
 
-[TODO]: describe HBM
+It's important to watch out for utilized memory bandwidth, because once it becomes the primary bottleneck, the application stops scaling, i.e. adding more cores doesn't make it run faster.
 
-New DRAM technologies such as GDDR (Graphics DDR) and HBM (High Bandwidth Memory) are used by custom processors that require higher bandwidth, not supported by DDR interfaces.
+#### GDDR and HBM
+
+Besides multi-channel DDR, there are other technologies that target workloads where higher memory bandwidth is required to achieve greater performance. Technologies such as GDDR (Graphics DDR) and HBM (High Bandwidth Memory) are the most notable ones. They find their use in high-end graphics, high-performance computing such as climate modeling, molecular dynamics, physics simulation, but also in autonomous driving, and of course, AI/ML. They are a natural fit there because such application require to move large amounts of data very quickly.
+
+GDDR was primary designed for graphics and nowadays it is used on virtually every high-performance graphics card. While GDDR shares some charasteristics with DDR, it is also quite different. While DRAM DDR is designed for lower latencies, GDDR is built for much higher bandwidth, because it is located in the same package as the processor chip itself. Similar to DDR, the GDDR interface transfers two 32 bit (64-bit total) wide data words per clock cycle. The latest GDDR6X standard can achieve up to 168 GB/s bandwidth, operating at relatively low 656 MHz frequency.
+
+HBM is a new type of CPU/GPU memory that vertically stacks memory chips, also called 3D stacking. Similar to GDDR, HBM drastically shortens the distance data needs to travel to reach a processor. The main difference from DDR and GDDR, is that HBM memory bus is very wide: 1024 bits per each HBM stacks. It allows HBM to achieve ultra-high bandwidth. The latest HBM3 standard supports 665 GB/s bandwidth per package. It also operates at a low frequency of 500 Mhz and has a
+memory density of up to 48 GB per package.
+
+A system with HBM onboard will be a good choice if you're looking to get as much memory bandwidth as you can get. However, at the time of writing, this technology is quite expensive. As GDDR is predominantly used in graphics cards, HBM may be a good option to accelerate certain workloads that run on CPU. Indeed, we start seeing first x86 general purpose server chips with integrated HBM.
