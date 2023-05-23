@@ -128,11 +128,15 @@ $$
 
 For example, for a single-channel DDR4 configuration, the data rate is `2400 MT/s` and 64 bits or 8 bytes can be transfered each memory cycle, thus the maximum bandiwdth equals to `2400 * 8 = 19.2 GB/s`. Dual-channel or dual memory controller setups double the bandwidth to `38.4 GB/s`. Remember though, that those numbers are theoretical maximums, that assume that a data transfer will occur at each memory clock cycle, which in fact never happens in practice. So, when measuring actual memory speed, you will always see a value lower than the maximum theoretical transfer bandwidth. 
 
-In order to enable multi-channel configuration, you need to have a CPU and a motherboard that supports such architecture and install an even number of identical memory modules in the correct memory slots on the motherboard. The quickest way to check the setup is by running a hardware identification utility like `CPU-Z` or `HwInfo`. But also, you can run the memory bandwidth benchmarks like Intel `mlc` or `Stream`.
+In order to enable multi-channel configuration, you need to have a CPU and a motherboard that supports such architecture and install an even number of identical memory modules in the correct memory slots on the motherboard. The quickest way to check the setup on Windows is by running a hardware identification utility like `CPU-Z` or `HwInfo`, on Linux one can use `dmidecode` command. But also, you can run memory bandwidth benchmarks like Intel `mlc` or `Stream`.
 
-While increased memory bandwidth is generally good, it does not always translate into increased system performance and is highly dependent on the application. 
+To make use of multiple memory channels in a system, there is a technique called interleaving. It spreads adjacent addresses within a page across multiple memory devices. Example of a 2-way interleaving for sequential memory accesses is shown in figure @fig:Dram_channel_interleaving. As before, we have dual-channel memory configuration (channels A and B) with two independent memory controllers. Modern processors interleave per four cache lines (256 bytes), i.e. first four adjacent cache lines go to the channel A, and then the next set of four cache lines go to the channel B.
 
-It's important to watch out for utilized memory bandwidth, because once it becomes the primary bottleneck, the application stops scaling, i.e. adding more cores doesn't make it run faster.
+![2-way interleaving for sequential memory access.](../../img/uarch/DRAM_channel_interleaving.png){#fig:Dram_channel_interleaving width=70%}
+
+Without interleaving, consecutive adjacent accesses would be sent to the same memory controller, not utilizing the second available controller. While using the technique increases hardware-level parallelism and allows to effectively utilize all available bandwidth from the memory devices in a setup. For most workloads, performance is maximized when all the channels are populated as it spreads a single memory region across as many DRAM modules as possible.
+
+While increased memory bandwidth is generally good, it does not always translate into better system performance and is highly dependent on the application. On the other hand, it's important to watch out for available and utilized memory bandwidth, because once it becomes the primary bottleneck, the application stops scaling, i.e. adding more cores doesn't make it run faster.
 
 #### GDDR and HBM
 
