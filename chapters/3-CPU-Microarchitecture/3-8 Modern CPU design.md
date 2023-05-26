@@ -5,6 +5,7 @@ typora-root-url: ..\..\img
 ## Modern CPU design
 
 [TODO]: update to GoldenCove uarch.
+[TODO]: describe branch target buffer (BTB)
 
 ![Block diagram of a CPU Core in the Intel GoldenCove Microarchitecture. *© Image from [@IntelOptimizationManual].*](../../img/uarch/goldencove_block_diagram.png){#fig:Skylake_diag width=95%}
 
