@@ -12,7 +12,7 @@ The page table can either be single-level or nested. Figure @fig:L2PageTables sh
 
 ![Exmaple of a 2-level page table.](../../img/uarch/L2PageTables.png){#fig:L2PageTables width=70%}
 
-Netsed page table is a radix tree that keeps physical page addresses along with some metadata. To find a translation for such a 2-level page table, we first use bits 32..47 as an index into the Level-1 page table also known as *page table directory*. Every descriptor in the directory points to one of the 2^16^ blocks of Level-2 tables. Once we find the appropriate L2 block, we use bits 12..31 to find the physical page address. Concatenating it with the page offset (bits 0..11) gives us the physical address, which can be used to retrieve the data from the DRAM.
+Nested page table is a radix tree that keeps physical page addresses along with some metadata. To find a translation for such a 2-level page table, we first use bits 32..47 as an index into the Level-1 page table also known as *page table directory*. Every descriptor in the directory points to one of the 2^16^ blocks of Level-2 tables. Once we find the appropriate L2 block, we use bits 12..31 to find the physical page address. Concatenating it with the page offset (bits 0..11) gives us the physical address, which can be used to retrieve the data from the DRAM.
 
 The exact format of the page table is strictly dictated by the CPU for the reasons we will discuss a few paragraphs later. Thus the variations of page table organization are limited by what a CPU supports. Nowadays it is common to see 4- and 5-level page tables. Modern CPUs support 4-level page table with 48 bit pointers (256 TB of total memory) and 5-level page tables with 57 bit pointers (128 PB of total memory).
 
