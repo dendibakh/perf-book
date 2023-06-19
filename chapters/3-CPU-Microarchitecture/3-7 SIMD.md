@@ -33,6 +33,8 @@ Over time, the set of operations supported in SIMD has steadily increased. In ad
 -   Columnar databases (bit packing, filtering, joins);
 -   Sorting built-in types (VQSort [^6]), QuickSelect.
 
+CPUs increasingly also accelerate the matrix multiplications often used in machine learning. Intel's AMX extension, supported in Sapphire Rapids, multiplies 8-bit matrices of shape 16x64 and 64x16, accumulating into a 32-bit 16x16 matrix. By contrast, the unrelated but identically named AMX extension in Apple CPUs, as well as Arm's SME extension, compute outer products of a row and column, respectively stored in special 512-bit registers, or scalable vectors.
+
 [^1]: UTF-8 validation: [https://github.com/rusticstuff/simdutf8](https://github.com/rusticstuff/simdutf8)
 [^2]: Parsing JSON: [https://github.com/simdjson/simdjson](https://github.com/simdjson/simdjson).
 [^3]: Parsing CSV: [https://github.com/geofflangdale/simdcsv](https://github.com/geofflangdale/simdcsv)
