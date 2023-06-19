@@ -22,4 +22,19 @@ for (int i = 0; i < N; ++i) {
 
 [TODO]: update on NEON and SVE.
 
-Most of the popular CPU architectures feature vector instructions, including x86, PowerPC, ARM, and RISC-V. In 1996 Intel released a new instruction set, MMX, which was a SIMD instruction set that was designed for multimedia applications. Following MMX, Intel introduced new instruction sets with added capabilities and increased vector size: SSE, AVX, AVX2, AVX512. As soon as the new instruction sets became available, work began to make them usable to software engineers. At first, the new SIMD instructions were programmed in assembly. Later, special compiler intrinsics were introduced. Today all of the major compilers support vectorization for the popular processors.
+Most of the popular CPU architectures feature vector instructions, including x86, PowerPC, ARM, and RISC-V. In 1996 Intel released a new instruction set, MMX, which was a SIMD instruction set that was designed for multimedia applications. Following MMX, Intel introduced new instruction sets with added capabilities and increased vector size: SSE, AVX, AVX2, AVX-512. As soon as the new instruction sets became available, work began to make them usable to software engineers. At first, the new SIMD instructions were programmed in assembly. Later, special compiler intrinsics were introduced. Today all of the major compilers support vectorization for the popular processors.
+
+Over time, the set of operations supported in SIMD has steadily increased. In addition to straightforward arithmetic as shown above, newer use cases of SIMD include:
+
+-   String processing: finding characters, validating UTF-8 [^1], parsing JSON [^2] and CSV [^3];
+-   Hashing [^4], random generation [^5], cryptography (AES);
+-   Columnar databases (bit packing, filtering, joins);
+-   Sorting built-in types (VQSort [^6]), QuickSelect.
+
+[^1]: UTF-8 validation: [https://github.com/rusticstuff/simdutf8](https://github.com/rusticstuff/simdutf8)
+[^2]: Parsing JSON: [https://github.com/simdjson/simdjson](https://github.com/simdjson/simdjson).
+[^3]: Parsing CSV: [https://github.com/geofflangdale/simdcsv](https://github.com/geofflangdale/simdcsv)
+[^4]: SIMD hashing: [https://github.com/google/highwayhash](https://github.com/google/highwayhash)
+[^5]: Random generation: [abseil library](https://github.com/abseil/abseil-cpp/blob/master/absl/random/internal/randen.h)
+[^6]: Sorting: [VQSort](https://github.com/google/highway/tree/master/hwy/contrib/sort)
+

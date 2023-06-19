@@ -4,19 +4,23 @@ typora-root-url: ..\..\img
 
 ## Vectorization {#sec:Vectorization}
 
-On modern processors, the use of SIMD instructions can result in a great speedup over regular un-vectorized (scalar) code. When doing performance analysis, one of the top priorities of the software engineer is to ensure that the hot parts of the code are vectorized by the compiler. This section is supposed to guide engineers towards discovering vectorization opportunities. To recap on general information about the SIMD capabilities of modern CPUs, readers can take a look at [@sec:SIMD].
+On modern processors, the use of SIMD instructions can result in a great speedup over regular un-vectorized (scalar) code. When doing performance analysis, one of the top priorities of the software engineer is to ensure that the hot parts of the code are vectorized. This section guides engineers towards discovering vectorization opportunities. For a recap on the SIMD capabilities of modern CPUs, readers can take a look at [@sec:SIMD].
 
-Most vectorization happens automatically without any intervention of the user (Autovectorization). That is when a compiler automatically recognizes the opportunity to produce SIMD machine code from the source code. It is a good strategy to rely on autovectorization since modern compilers generate fast vectorized code for a wide variety of source code inputs. Echoing advice given earlier, the author recommends to let the compiler do its job and only interfere when it is needed.
+Often vectorization happens automatically without any user intervention (autovectorization). That is when a compiler automatically recognizes the opportunity to produce SIMD machine code from the source code. Autovectorization could be a convenient solution because modern compilers generate fast vectorized code for a wide variety of source code inputs.
 
-In rather rare cases, software engineers need to adjust autovectorization, based on the feedback[^2] that they get from a compiler or profiling data. In such cases, programmers need to tell the compiler that some code region is vectorizable or that vectorization is profitable. Modern compilers have extensions that allow power users to control the vectorizer directly and make sure that certain parts of the code are vectorized efficiently. There will be several examples of using compiler hints in the subsequent sections.
+However, in some cases, software engineers need to intervene based on the feedback[^2] that they get from a compiler or profiling data. In such cases, programmers need to tell the compiler that some code region is vectorizable or that vectorization is profitable. Modern compilers have extensions that allow power users to control the vectorizer directly and make sure that certain parts of the code are vectorized efficiently. There will be several examples of using compiler hints in the subsequent sections.
 
-It is important to note that there is a range of problems where SIMD is invaluable and where autovectorization just does not work and is not likely to work in the near future (one can find an example in [@Mula_Lemire_2019]). If it is not possible to make a compiler generate desired assembly instructions, a code snippet can be rewritten with the help of compiler intrinsics. In most cases, compiler intrinsics provide a 1-to-1 mapping into assembly instruction (see [@sec:secIntrinsics]).
+It is important to note that there is a range of problems where SIMD is important and where autovectorization just does not work and is not likely to work in the near future. One can find an example in [@Mula_Lemire_2019]. Compilers are also less likely to vectorize floating-point code because the results will differ numerically (more details later in this section). Code involving permutations or shuffles across vector lanes is also less likely to autovectorize, and this is likely to remain difficult for compilers.
 
-\personalOpinion{Even though in some cases developers need to mess around with compiler intrinsics, I recommend to mostly rely on compiler auto-vectorization and only use intrinsics when necessary. A code that uses compiler intrinsics resembles inline assembly and quickly becomes unreadable. Compiler auto-vectorization can often be adjusted using pragmas and other hints.}
+In such cases, or when it is not possible to make a compiler generate desired assembly instructions, code snippets can be rewritten with the help of compiler intrinsics. In most cases, compiler intrinsics provide a 1-to-1 mapping to assembly instructions (see [@sec:secIntrinsics]). Intrinsics are somewhat easier to use than inline assembly because the compiler takes care of register allocation. However, they are still often verbose and difficult to read, and subject to behavioral differences or even bugs in various compilers.
 
-Generally, three kinds of vectorization are done in a compiler: inner loop vectorization, outer loop vectorization, and SLP (Superword-Level Parallelism) vectorization. In this section, we will mostly consider inner loop vectorization since this is the most common case. We provide general information about the outer loop and SLP vectorization in appendix B.
+\personalOpinion{One of the authors recommends mostly relying on compiler autovectorization and only using intrinsics when necessary. Another is sometimes pleasantly surprised by autovectorization, but more often disappointed in all but trivial cases, and so so recommends manual vectorization to be certain of what you get.}
 
-### Compiler Autovectorization.
+For a middle path between low-effort but unpredictable autovectorization, and verbose/unreadable but predictable intrinsics, one can use a wrapper library around intrinsics. These tend to be more readable, can centralize compiler fixes in a library as opposed to scattering workarounds in user code, and still allow developers control over the generated code. Many such libraries exist, differing in their coverage of recent or 'exotic' operations, and the number of platforms they support. To our knowledge, Highway is currently the only one that fully supports scalable vectors as seen in the SVE and RISC-V V instruction sets. Note that one of the authors is the tech lead for this library. It will be introduced in [@sec:secIntrinsics].
+
+In the remainder of this section, we will discuss several of these approaches, especially inner loop vectorization because it is the most common type of autovectorization. The other two types, outer loop vectorization, and SLP (Superword-Level Parallelism) vectorization, are mentioned in appendix B.
+
+### Compiler autovectorization.
 
 Multiple hurdles can prevent auto-vectorization, some of which are inherent to the semantics of programming languages. For example, the compiler must assume that unsigned loop-indices may overflow, and this can prevent certain loop transformations. Another example is the assumption that the C programming language makes: pointers in the program may point to overlapping memory regions, which can make the analysis of the program very difficult. Another major hurdle is the design of the processor itself. In some cases processors, don’t have efficient vector instructions for certain operations. For example, performing predicated (bitmask-controlled) load and store operations are not available on most processors. Another example is vector-wide format conversion between signed integers to doubles because the result operates on vector registers of different sizes. Despite all of the challenges, the software developer can work around many of the challenges and enable vectorization. Later in the section, we provide guidance on how to work with the compiler and ensure that the hot code is vectorized by the compiler.
 
@@ -79,6 +83,8 @@ a.cpp:4:3: remark: vectorized loop (vectorization width: 4, interleaved count: 2
 ...
 ```
 
+Unfortunately this flag involves subtle and potentially dangerous behavior changes, including for Not-a-Number, signed zero, infinity and subnormals. Because third-party code may not be ready for these effects, this flag should not be enabled across large sections of code without careful validation of the results, including for edge cases.
+
 Let's look at another typical situation when a compiler may need support from a developer to perform vectorization. When compilers cannot prove that a loop operates on arrays with non-overlapping memory regions, they usually choose to be on the safe side. Let's revisit the example from [@lst:optReport] provided in [@sec:compilerOptReports]. When the compiler tries to vectorize the code presented in [@lst:OverlappingMemRefions], it generally cannot do this because the memory regions of arrays `a`, `b`, and `c` can overlap.
 
 Listing: a.c
@@ -140,7 +146,7 @@ void stridedLoads(int *A, int *B, int n) {
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Developers should be aware of the hidden cost of using vectorized code. Using AVX and especially AVX512 vector instructions would lead to a big frequency downclocking. The vectorized portion of the code should be hot enough to justify using AVX512.[^38]
+Developers should be aware of the hidden cost of using vectorized code. Using AVX and especially AVX-512 vector instructions could lead to frequency downclocking or startup overhead, which on certain CPUs can also affect subsequent code over a period of several microseconds. The vectorized portion of the code should be hot enough to justify using AVX-512.[^38] For example, sorting 80 KiB was found to be sufficient to amortize this overhead and make vectorization worthwhile.[^39]
 
 ### Loop vectorized but scalar version used.
 
@@ -208,3 +214,4 @@ Since function `calcSum` must return a single value (a `uniform` variable) and o
 [^36]: See example on easyperf blog: [https://easyperf.net/blog/2017/11/03/Multiversioning_by_DD](https://easyperf.net/blog/2017/11/03/Multiversioning_by_DD).
 [^37]: It is GCC specific pragma. For other compilers, check the corresponding manuals.
 [^38]: For more details read this blog post: [https://travisdowns.github.io/blog/2020/01/17/avxfreq1.html](https://travisdowns.github.io/blog/2020/01/17/avxfreq1.html).
+[^39]: Study of AVX-512 downclocking: in [VQSort readme](https://github.com/google/highway/blob/master/hwy/contrib/sort/README.md#study-of-avx-512-downclocking)
