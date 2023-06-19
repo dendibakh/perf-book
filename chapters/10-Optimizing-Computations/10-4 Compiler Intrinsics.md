@@ -61,8 +61,28 @@ float calcSum(const float* HWY_RESTRICT array, size_t count) {
 
 Notice the explicit handling of remainders after the loop processes multiples of the vector sizes `Lanes(d)`. Although this is more verbose, it makes visible what is actually happening, and allows optimizations such as overlapping the last vector instead of relying on `MaskedLoad`, or even skipping the remainder entirely when `count` is known to be a multiple of the vector size.
 
-Highway supports over 200 operations. For the full list, see its documentation [^13] and [FAQ](https://github.com/google/highway/blob/master/g3doc/faq.md). You can also experiment with it in the online [Compiler Explorer](https://gcc.godbolt.org/z/zP7MYe9Yf).
+Highway supports over 200 operations, which can be grouped into the following categories:
 
+*   Initialization
+*   Getting/setting lanes
+*   Getting/setting blocks
+*   Printing
+*   Tuples
+*   Arithmetic
+*   Logical
+*   Masks
+*   Comparisons
+*   Memory
+*   Cache control
+*   Type conversion
+*   Combine
+*   Swizzle/permute
+*   Swizzling within 128-bit blocks
+*   Reductions
+*   Crypto
+
+For the full list of operations, see its documentation [^13] and [FAQ](https://github.com/google/highway/blob/master/g3doc/faq.md). You can also experiment with it in the online [Compiler Explorer](https://gcc.godbolt.org/z/zP7MYe9Yf).
+Other libraries include Eigen, nsimd, SIMDe, VCL, and xsimd. Note that a C++ standardization effort starting with the Vc library resulted in std::experimental::simd, but this provides a very limited set of operations and as of this writing is only supported on the GCC 11 compiler.
 
 [^11]: Intel Intrinsics Guide - [https://software.intel.com/sites/landingpage/IntrinsicsGuide/](https://software.intel.com/sites/landingpage/IntrinsicsGuide/).
 [^12]: Highway library: [https://github.com/google/highway](https://github.com/google/highway)

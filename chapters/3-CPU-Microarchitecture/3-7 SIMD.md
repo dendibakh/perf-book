@@ -20,9 +20,11 @@ for (int i = 0; i < N; ++i) {
 
 ![Example of scalar and SIMD operations.](../../img/uarch/SIMD.png){#fig:SIMD width=80%}
 
-[TODO]: update on NEON and SVE.
+Most of the popular CPU architectures feature vector instructions, including x86, PowerPC, Arm, and RISC-V. In 1996 Intel released a new instruction set, MMX, which was a SIMD instruction set that was designed for multimedia applications. Following MMX, Intel introduced new instruction sets with added capabilities and increased vector size: SSE, AVX, AVX2, AVX-512. Arm has optionally supported the 128-bit NEON instruction set in various versions of its architecture. In version 8 (aarch64), this support was made mandatory, and new instructions were added. To allow making use of wider vectors without having to port software to each vector length, Arm subsequently introduced the SVE instruction set. Its defining characteristic is the concept of "scalable" vectors: their length is unknown at compile time. SVE provides special instructions for length-dependent operations such as incrementing pointers.
 
-Most of the popular CPU architectures feature vector instructions, including x86, PowerPC, ARM, and RISC-V. In 1996 Intel released a new instruction set, MMX, which was a SIMD instruction set that was designed for multimedia applications. Following MMX, Intel introduced new instruction sets with added capabilities and increased vector size: SSE, AVX, AVX2, AVX-512. As soon as the new instruction sets became available, work began to make them usable to software engineers. At first, the new SIMD instructions were programmed in assembly. Later, special compiler intrinsics were introduced. Today all of the major compilers support vectorization for the popular processors.
+Another example of scalable vectors is the RISC-V V extension, which was ratified in late 2021. Some implementations support quite wide (2048 bit) vectors, and up to eight can be grouped together to yield 16,384 bit vectors, which greatly reduces the number of instructions executed.
+
+As the new instruction sets became available, work began to make them usable to software engineers. At first, SIMD instructions were programmed in assembly. Later, special compiler intrinsics were introduced. Today all of the major compilers support vectorization for the popular processors.
 
 Over time, the set of operations supported in SIMD has steadily increased. In addition to straightforward arithmetic as shown above, newer use cases of SIMD include:
 
@@ -37,4 +39,3 @@ Over time, the set of operations supported in SIMD has steadily increased. In ad
 [^4]: SIMD hashing: [https://github.com/google/highwayhash](https://github.com/google/highwayhash)
 [^5]: Random generation: [abseil library](https://github.com/abseil/abseil-cpp/blob/master/absl/random/internal/randen.h)
 [^6]: Sorting: [VQSort](https://github.com/google/highway/tree/master/hwy/contrib/sort)
-
