@@ -33,29 +33,25 @@ The [full example](https://github.com/wolfpld/tracy/tree/master/examples/ToyPath
 
 The `ZoneScoped` macro creates an object on the stack that will record the runtime activity of the code within the scope of the object. Tracy refers to this scope as a "zone". At the zone entry, the current timestamp is captured. Once the function exits, the object will record a new timestamp and will store this timing data, along with a few other details, including the function name. It's hard to estimate the Tracy overhead, as it depends on how many zones you have inserted. On a sampled program that does image compression, the author of Tracy measured an overhead of 18% and 34% with two different compression schemes.  A total of 200M zones were profiled, with an average overhead of 2.25 ns per zone. This test instrumented a very hot function. In other scenarios the overhead will be much lower. While it's possible to keep the overhead small, you need to be careful about which sections of code you want to instrument, especially if you decide to use it in production.
 
-Tracy has two operation modes: it can store all the timing data until the profiler is connected to the application (the default mode), or it can simply discard the profiling data and start recording only when a profiler is connected. This option can be enabled by specifying the `TRACY_ON_DEMAND` pre-processor macro when compiling the application. The latter is the preferred option if you want to distribute an application that can be profiled as needed. With this option, the tracing code can be compiled into the application and it will cause little to no overhead to the running program unless the profiler is attached. *[TODO:] should the default be different then?  :) - Clarified why you might want the on demand option when tracy is enabled in an application*
+Tracy has two operation modes: it can store all the timing data until the profiler is connected to the application (the default mode), or it can simply discard the profiling data and start recording only when a profiler is connected. This option can be enabled by specifying the `TRACY_ON_DEMAND` pre-processor macro when compiling the application. The latter is the preferred option if you want to distribute an application that can be profiled as needed. With this option, the tracing code can be compiled into the application and it will cause little to no overhead to the running program unless the profiler is attached.
 
 The profiler is a separate application that connects to a running application to capture and display the live profiling data, aka the "flight recorder" mode. The profiler can be run on a separate machine so that it doesn't interfere with the running application. Note, however, that this doesn't mean that the runtime overhead caused by the instrumentation code disappears - it is still there, but the overhead of visualizing the data is avoided in this case.
 
 Tracy graphical interface is quite rich, unfortunately too hard to fit on a single screenshot, so we break it down into pieces. Figure @fig:Tracy_Main_View shows a timeline view when profiling the code in [@lst:TracyInstrumentation]. It shows the graph for all the zones that were active during a given frame. In the image we can see the Main Thread and 5 worker threads (WorkerThread). All threads, including the main thread, are performing work to advance progress in rendering the final image. In this example, each thread processes a row of pixels inside the `TraceRowJob` zone. The `TraceRowJob` zone contains many smaller zones, whose name cannot be displayed in the profiler. When this happens, Tracy collapses the small zones and only shows the number of active zones - this is what `4,109` stands for under the first `TraceRowJob` in the Main Thread.
 
-![Tracy main timeline view](../../img/tracy/profiler_main_crop.png){#fig:Tracy_Main_View width=100%}
+![Tracy main timeline view](../../img/perf-tools/tracy/profiler_main_crop.png){#fig:Tracy_Main_View width=100%}
 
 Right above the main panel, there is a histogram that displays the times for all the recorded frames, see figure @fig:Tracy_Frame_Time_View. It makes it easier to spot a long running frame that could cause stutter. It makes it easier to spot those frames that took longer than average to complete. In this example, most frames take around 33 ms (the yellow bars). However there are some frames that take longer than this and are marked in red. As can be seen in the screenshot, a tooltip showing the details of a given frame is displayed when hovering the mouse on the bar in the histogram.
 
-*[TODO:] @Marco, Can we also show the slow frame on the timeline that is right below this histogram? @Denis the frame time view is taken from a different application. The path tracer example only runs for a few frames and would be hard to show this occurrence - UPDATE: done :)*
-
-![Tracy frame time view](../../img/tracy/profiler_frame_time.png){#fig:Tracy_Frame_Time_View width=90%}
+![Tracy frame time view](../../img/perf-tools/tracy/profiler_frame_time.png){#fig:Tracy_Frame_Time_View width=90%}
 
 Figure @fig:Tracy_CPU_Data illustrates the CPU data section of the profiler. This area shows which core a given thread is executing on and it also displays context switches. This section will also display other programs that are running on the CPU. As seen in the image, the details for a given thread are displayed when hovering the mouse on a given section in the CPU data view. Details include the CPU the thread is running on, the parent program, the individual thread and timing information. In this example, we can see that the `TestCpu.exe` thread was active for 4.4 ms on CPU 1.
 
-*[TODO:] @Marco, I suggest that we focus on the slow frame and one of its zones in the screenshots that we show. That way it will be a consistent story for readers. - @Denis see comment above :)*
-
-![Tracy CPU data view](../../img/tracy/profiler_main_crop_2.png){#fig:Tracy_CPU_Data width=100%}
+![Tracy CPU data view](../../img/perf-tools/tracy/profiler_main_crop_2.png){#fig:Tracy_CPU_Data width=100%}
 
 The next image shows the views that provide more details about where your program spends its time and that allow you to analyze individual zones in more depth:
 
-![Tracy zone detail windows](../../img/tracy/windows_2.png){#fig:Tracy_Zone_Details width=100%}
+![Tracy zone detail windows](../../img/perf-tools/tracy/windows_2.png){#fig:Tracy_Zone_Details width=100%}
 
 In the Statistics window (1) we can analyze the statistics for the data recorded, including the total time a given function function was active, how many times it was invoked, etc. It's also possible to select a time range in the main view an analyze the statistics only for that time interval.
 
@@ -69,7 +65,7 @@ Now we can examine other slow instances to find what is common between them, whi
 
 If debug symbols are available, Tracy can also display hotspots in the source code and related assembly:
 
-![Tracy source view](../../img/tracy/profiler_assembler.png){#fig:Tracy_Source View width=100%}
+![Tracy source view](../../img/perf-tools/tracy/profiler_assembler.png){#fig:Tracy_Source View width=100%}
 
 It's also possible to capture a trace without using the profiler UI. This can be done with the following command: `./capture -a 127.0.0.1 -o trace.tracy -s 60` This will capture an application running on the local machine for 60 seconds, and will store the profiling data in a file called `trace.tracy`. The profile data can be inspected using the profiler UI described above.
 
