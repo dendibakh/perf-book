@@ -13,6 +13,10 @@ Listing: Tracy Instrumentation
 
 void TraceRowJob() {
   ZoneScoped;
+
+  if (frameCount == randomlySelected)
+    DoExtraWork();
+
   // ...
 }
 
@@ -33,13 +37,13 @@ Tracy has two operation modes: it can store all the timing data until the profil
 
 The profiler is a separate application that connects to a running application to capture and display the live profiling data, aka the "flight recorder" mode. The profiler can be run on a separate machine so that it doesn't interfere with the running application. Note, however, that this doesn't mean that the runtime overhead caused by the instrumentation code disappears - it is still there, but the overhead of visualizing the data is avoided in this case.
 
-Tracy graphical interface is quite rich, unfortunately too hard to fit on a single screenshot, so we break it down into pieces. Figure @fig:Tracy_Main_View shows a timeline view when profiling the code in [@lst:TracyInstrumentation]. It shows the graph for all the zones that were active during a given frame. In the image we can see the Main Thread and 4 worker threads (WorkerThread). All threads, including the main thread, are performing work to advance progress in rendering the final image. In this example, each thread processes a row of pixels inside the `TraceRowJob` zone. The `TraceRowJob` zone contains many smaller zones, whose name cannot be displayed in the profiler. When this happens, Tracy collapses the small zones and only shows the number of active zones - this is what `20,481` stands for under the first `TraceRowJob` in the Main Thread.
+Tracy graphical interface is quite rich, unfortunately too hard to fit on a single screenshot, so we break it down into pieces. Figure @fig:Tracy_Main_View shows a timeline view when profiling the code in [@lst:TracyInstrumentation]. It shows the graph for all the zones that were active during a given frame. In the image we can see the Main Thread and 5 worker threads (WorkerThread). All threads, including the main thread, are performing work to advance progress in rendering the final image. In this example, each thread processes a row of pixels inside the `TraceRowJob` zone. The `TraceRowJob` zone contains many smaller zones, whose name cannot be displayed in the profiler. When this happens, Tracy collapses the small zones and only shows the number of active zones - this is what `4,109` stands for under the first `TraceRowJob` in the Main Thread.
 
-![Tracy main timeline view](../../img/tracy/profiler_main_crop_3.png){#fig:Tracy_Main_View width=100%}
+![Tracy main timeline view](../../img/tracy/profiler_main_crop.png){#fig:Tracy_Main_View width=100%}
 
-Right above the main panel, there is a histogram that displays the times for all the recorded frames, see figure @fig:Tracy_Frame_Time_View. It makes it easier to spot a long running frame that could cause stutter. It's not hard to spot a frame in the middle that takes twice as much time as an average frame.
+Right above the main panel, there is a histogram that displays the times for all the recorded frames, see figure @fig:Tracy_Frame_Time_View. It makes it easier to spot a long running frame that could cause stutter. It makes it easier to spot those frames that took longer than average to complete. In this example, most frames take around 33 ms (the yellow bars). However there are some frames that take longer than this and are marked in red. As can be seen in the screenshot, a tooltip showing the details of a given frame is displayed when hovering the mouse on the bar in the histogram.
 
-*[TODO:] @Marco, Can we also show the slow frame on the timeline that is right below this histogram? @Denis the frame time view is taken from a different application. The path tracer example only runs for a few frames and would be hard to show this occurence*
+*[TODO:] @Marco, Can we also show the slow frame on the timeline that is right below this histogram? @Denis the frame time view is taken from a different application. The path tracer example only runs for a few frames and would be hard to show this occurrence - UPDATE: done :)*
 
 ![Tracy frame time view](../../img/tracy/profiler_frame_time.png){#fig:Tracy_Frame_Time_View width=90%}
 
@@ -55,9 +59,11 @@ The next image shows the views that provide more details about where your progra
 
 In the Statistics window (1) we can analyze the statistics for the data recorded, including the total time a given function function was active, how many times it was invoked, etc. It's also possible to select a time range in the main view an analyze the statistics only for that time interval.
 
-The Zone Info window (2) shows the details for a zone and how much of the execution time is due to the zone itself or its children. In this example, execution of the `TraceRowJob` function itself (without it's callees) in the current zone takes only 654.99 us, which is 1.74% of the whole zone. The time for the zone including the child zones is 37.64 ms. This view also shows the source file and line of code where the zone starts. We can also see that in some instances there is a call to DoExtraWork that takes a long time to execute. In this view we can see that it took 29.35 ms for it to complete. We can click on the DoExtraWork row in the Child Zones section of this view. This will update the Zone Info view with the details of the slow zone so that we can inspect the data and try to understand what caused the performance issue.
+The Zone Info window (2) shows the details for a zone and how much of the execution time is due to the zone itself or its children. In this example, execution of the `TraceRowJob` function itself (without it's callees) in the current zone takes only 1.36 ms, which is 7.06% of the whole zone. The time for the zone including the child zones is 19.24 ms. This view also shows the source file and line of code where the zone starts. In this instance of the TraceRowJob zone, we can see a call to `DoExtraWork` that takes a long time to execute. In this view we can see that it took 16.99 ms for it to complete. We can click on the `DoExtraWork` row in the Child Zones section of this view. This will update the Zone Info view with the details of the slow zone so that we can inspect the data and try to understand what caused the performance issue.
 
-Clicking on the "Statistics" button will display the Find Zone window (3). Here we can see the time histogram for a zone. This is particularly useful to determine how much variation there is when executing a function. From this view you can select one of the slow zones. This will update the Zone Info window (2) with the details of that zone instance and by clicking the "Zoom To zone" button, the main window will focus on this slow zone. This information should should help you root cause the performance issue. The Find Zone window (3) also provides other data points, including the mean, median and standard deviation for the inspected zone.
+Clicking on the "Statistics" button will display the Find Zone window (3). Here we can see the time histogram for a zone. This is particularly useful to determine how much variation there is when executing a function. Looking at the histogram on the right, we see that the median duration for `TraceRowJob` is 3.59 ms, with most calls taking between 1 and 7 ms. However there are a few instances that take longer than 10 ms (note that the time axis is logarithmic), with a peak of 23 ms.
+
+Now we can examine other slow instances to find what is common between them, which will help us to root cause the issue. From this view you can select one of the slow zones. This will update the Zone Info window (2) with the details of that zone instance and by clicking the "Zoom To zone" button, the main window will focus on this slow zone. This information should should help you root cause the performance issue. The Find Zone window (3) also provides other data points, including the mean, median and standard deviation for the inspected zone.
 
 [TODO:] By default, Tracy monitors performance of the whole system, not just the application itself. It also behaves like a traditional sampling profiler as it reports data for applications that are running concurrently to the profiled program. The tool monitors thread migration and idle time by tracing kernel context switches (administrator privileges are required). Zone statistics (call counts, time, histogram) are exact because Tracy captures every zone entry/exit, but system-level data and source-code-level data are sampled.
 
