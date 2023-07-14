@@ -2,9 +2,23 @@
 
 Most of the tools explored so far fall under the category of sampling profilers. These are great when you want to identify hot-spots in your code, but in some cases they might not provide enough granularity for analysis. Depending on the profiler sampling frequency and the behavior of your program, most functions could be fast enough that they don't show up in a profiler. In some scenarios you might want to manually define which parts of your program need to be measured consistently. Video games, for instance, render frames (the final image shown on screen) on average at 60 frames per second (FPS); some monitors allow up to 144 FPS. At 60 FPS, each frame has as little as 16 milliseconds to complete the work before moving on to the next one. Developers pay particular attention to frames that go above this threshold, as this causes visible stutter in games and can ruin the player experience. This situation is hard to capture with a sampling profiler, as they usually only provide the total time taken for a given function.
 
-Developers have created profilers that provide features helpful in specific environments, usually with a marker API that you can use to manually instrument your code. This allows you to observe performance of a particular function or a block of code (later refered as a *zone*). Continuing with the game industry, there are a few tools in this space: some are integrated directly into game engines like Unreal, while others are provided as external libraries and tools that can be integrated into your project. Some of the most commonly used profilers are [Tracy](https://github.com/wolfpld/tracy), RAD Telemetry, [Remotery](https://github.com/Celtoys/Remotery), and [Optick](https://github.com/bombomby/optick) (Windows only).
+Developers have created profilers that provide features helpful in specific environments, usually with a marker API that you can use to manually instrument your code. This allows you to observe performance of a particular function or a block of code (later refered as a *zone*). Continuing with the game industry, there are a few tools in this space: some are integrated directly into game engines like Unreal, while others are provided as external libraries and tools that can be integrated into your project. Some of the most commonly used profilers are [Tracy](https://github.com/wolfpld/tracy), RAD Telemetry, [Remotery](https://github.com/Celtoys/Remotery), and [Optick](https://github.com/bombomby/optick) (Windows only). Next, we showcase Tracy, as this seems to be one the more popular projects, however these concepts apply to the other profilers as well. 
 
-Next, we showcase Tracy, as this seems to be one the more popular projects, however these concepts apply to the other profilers as well. In the example below, we use the [ToyPathTracer](https://github.com/wolfpld/tracy/tree/master/examples/ToyPathTracer)[^1] program, a simple path tracer, a technique similar to ray-tracing that shoots thousands of rays per pixel into the scene to render a realistic image. To process a frame, the implementation distributes the processing of each row of pixels to a separate thread.
+### What you can do with Tracy: {.unlisted .unnumbered}
+
+- Debug performance anomalies in a program, e.g. slow frames.
+- Correlate slow events with other events in a system.
+- Find common characteristics among slow events
+- Inspect source code and assembly.
+- Do "before-after" comparison.
+
+### What you cannot do with Tracy: {.unlisted .unnumbered}
+
+- Examine CPU microarchitectural issues, e.g. collect various performance counters.
+
+### Case Study: Analyzing Slow Frames with Tracy {.unlisted .unnumbered}
+
+In the example below, we use the [ToyPathTracer](https://github.com/wolfpld/tracy/tree/master/examples/ToyPathTracer)[^1] program, a simple path tracer, a technique similar to ray-tracing that shoots thousands of rays per pixel into the scene to render a realistic image. To process a frame, the implementation distributes the processing of each row of pixels to a separate thread.
 
 To emulate a typical scenario where Tracy can help to root cause the problem, we manually modified the code such that some frames would consume more time than others. [@lst:TracyInstrumentation] shows the sketch of the code along with added Tracy instrumentation. Notice, we randomly select frames to slow down. Also, we included Tracy's header and added `ZoneScoped` and `FrameMark` macros to the functions that we want to track. The `FrameMark` macro can be inserted to identify individual frames in the profiler. The duration of each frame will be visible on the timeline, which is very useful.
 
@@ -61,30 +75,18 @@ Remember, we saw on the figure @fig:Tracy_Frame_Time_View, that there are other 
 
 Now we can examine other slow instances to find what is common between them, which will help us to root cause the issue. From this view you can select one of the slow zones. This will update the Zone Info window (2) with the details of that zone instance and by clicking the "Zoom to zone" button, the main window will focus on this slow zone. From here we can check if the selected `TraceRowJob` instance has similar characteristics as the one that we just analyzed.
 
-[TODO:] By default, Tracy monitors performance of the whole system, not just the application itself. It also behaves like a traditional sampling profiler as it reports data for applications that are running concurrently to the profiled program. The tool monitors thread migration and idle time by tracing kernel context switches (administrator privileges are required). Zone statistics (call counts, time, histogram) are exact because Tracy captures every zone entry/exit, but system-level data and source-code-level data are sampled.
+### Other Features of Tracy {.unlisted .unnumbered}
 
-If debug symbols are available, Tracy can also display hotspots in the source code and related assembly:
+Tracy monitors performance of the whole system, not just the application itself. It also behaves like a traditional sampling profiler as it reports data for applications that are running concurrently to the profiled program. The tool monitors thread migration and idle time by tracing kernel context switches (administrator privileges are required). Zone statistics (call counts, time, histogram) are exact because Tracy captures every zone entry/exit, but system-level data and source-code-level data are sampled.
 
-![Tracy source view](../../img/perf-tools/tracy/tracy_source_view.png){#fig:Tracy_Source_View width=100%}
+In the example in this section, we used manual markup of interesting areas in the code. But it's not a strict requirement to start using Tracy. You may profile an unmodified application and add instrumentation later when you know where it’s needed. Tracy provides many other features, too many to cover in this overview. Here are some of the notable ones:
+- Tracking memory allocations and locks.
+- Session comparison. This is vital to ensure a change provides the expected benefits. It's possible to load two profiling sessions and compare zone data before and after the change was made.
+- Source code and assembly view. If debug symbols are available, Tracy can also display hotspots in the source code and related assembly just like Intel Vtune and other profilers.
 
-It's also possible to capture a trace without using the profiler UI. This can be done with the following command: `./capture -a 127.0.0.1 -o trace.tracy -s 60` This will capture an application running on the local machine for 60 seconds, and will store the profiling data in a file called `trace.tracy`. The profile data can be inspected using the profiler UI described above.
+In comparison with other tools like Intel Vtune and AMD uProf, with Tracy you cannot get the same level of CPU microarchitectural insights (e.g. various performance events). This is because Tracy does not leverage the HW features specific to a particular platform.
 
-Tracy provides many other features, too many to cover in this overview. They include:
-- naming threads
-- timing and tracking locks
-- tracking memory allocations. This can be useful to spot memory leaks or to determine which code in the application is responsible for a given memory allocation. Tracy allows to track separate memory pools as well, which can be useful if multiple allocators are being used.
-- session comparison: this is vital to ensure a change provides the expected benefits. It's possible to load two profiling sessions and compare zone data before and after the change was made.
-- graphics API profiling: Tracy supports OpenGL, Vulkan and DirectX. Much like with CPU code, it's possible to insert profiling markers in the GPU command stream. The GPU driver will report the time taken to execute in between markers and Tracy will display the information in the profiler.
-
-Tracy provides a detailed [user manual](https://github.com/wolfpld/tracy/releases/latest/download/tracy.pdf) which goes into each feature in detail. The author also provides an interactive demo if you would like to get a feel for the capabilities of this tool: https://tracy.nereid.pl/.
-
-[TODO:] From the Doc about Tracy features: "For example, statistical information about zones, trace comparisons, or inclusion of inline function frames in call stacks"
-
-[TODO:] From the Doc about Tracy features: "Tracy doesn’t require manual markup of interesting areas in your code to start profiling. Instead, you may rely on automated call stack sampling and add instrumentation later when you know where it’s needed"
-
-[TODO:] Tracy does not leverage all the HW features specific to a particular platform. For example, you cannot get the same level of CPU microarchitectural insights (e.g. various performance events) as you get on other tools like Intel Vtune and AMD uProf.
-
-It's hard to estimate the Tracy overhead, as it depends on how many zones you have inserted. On a sampled program that does image compression, the author of Tracy measured an overhead of 18% and 34% with two different compression schemes. A total of 200M zones were profiled, with an average overhead of 2.25 ns per zone. This test instrumented a very hot function. In other scenarios the overhead will be much lower. While it's possible to keep the overhead small, you need to be careful about which sections of code you want to instrument, especially if you decide to use it in production.
+The overhead of profiling with Tracy depends on how many zones you have activated. The author of Tracy provides some data points that he measured on a program that does image compression: an overhead of 18% and 34% with two different compression schemes. A total of 200M zones were profiled, with an average overhead of 2.25 ns per zone. This test instrumented a very hot function. In other scenarios the overhead will be much lower. While it's possible to keep the overhead small, you need to be careful about which sections of code you want to instrument, especially if you decide to use it in production.
 
 [^1]: Tracy - [https://github.com/wolfpld/tracy](https://github.com/wolfpld/tracy)
 [^2]: ToyPathTracer - [https://github.com/wolfpld/tracy/tree/master/examples/ToyPathTracer](https://github.com/wolfpld/tracy/tree/master/examples/ToyPathTracer)
