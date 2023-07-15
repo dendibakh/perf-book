@@ -17,12 +17,11 @@ To benchmark execution time, engineers usually use two different timers, which a
    // returns elapsed time in nanoseconds
    uint64_t timeWithChrono() {
      using namespace std::chrono;
-     uint64_t start = duration_cast<nanoseconds>
-         (steady_clock::now().time_since_epoch()).count();
+     auto start = steady_clock::now();
      // run something
-     uint64_t end = duration_cast<nanoseconds>
-         (steady_clock::now().time_since_epoch()).count();
-     uint64_t delta = end - start;
+     auto end = steady_clock::now();
+     uint64_t delta = duration_cast<nanoseconds>
+         (end - start).count();
      return delta;
    }
    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
