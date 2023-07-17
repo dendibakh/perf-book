@@ -6,33 +6,35 @@ typora-root-url: ..\..\img
 
 On modern processors, the use of SIMD instructions can result in a great speedup over regular un-vectorized (scalar) code. When doing performance analysis, one of the top priorities of the software engineer is to ensure that the hot parts of the code are vectorized. This section guides engineers towards discovering vectorization opportunities. For a recap on the SIMD capabilities of modern CPUs, readers can take a look at [@sec:SIMD].
 
-Often vectorization happens automatically without any user intervention (autovectorization). That is when a compiler automatically recognizes the opportunity to produce SIMD machine code from the source code. Autovectorization could be a convenient solution because modern compilers generate fast vectorized code for a wide variety of source code inputs.
+Often vectorization happens automatically without any user intervention, this is called autovectorization. In such situation, compiler automatically recognizes the opportunity to produce SIMD machine code from the source code. Autovectorization could be a convenient solution because modern compilers generate fast vectorized code for a wide variety of programs.
 
-However, in some cases, autovectorization does not succeed without intervention by the software engineer, perhaps based on the feedback[^2] that they get from a compiler or profiling data. In such cases, programmers need to tell the compiler that some code region is vectorizable or that vectorization is profitable. Modern compilers have extensions that allow power users to control the vectorizer directly and make sure that certain parts of the code are vectorized efficiently. There will be several examples of using compiler hints in the subsequent sections. However, programmers have only limited input into the autovectorization process.
+However, in some cases, autovectorization does not succeed without intervention by the software engineer, perhaps based on the feedback[^2] that they get from a compiler or profiling data. In such cases, programmers need to tell the compiler that some code region is vectorizable or that vectorization is profitable. Modern compilers have extensions that allow power users to control the autovectorization process and make sure that certain parts of the code are vectorized efficiently. However, this control is limited. There will be several examples of using compiler hints in the subsequent sections. 
 
-It is important to note that there is a range of problems where SIMD is important and where autovectorization just does not work and is not likely to work in the near future. One can find an example in [@Mula_Lemire_2019]. Compilers are also less likely to vectorize floating-point code because the results will differ numerically (more details later in this section). Code involving permutations or shuffles across vector lanes is also less likely to autovectorize, and this is likely to remain difficult for compilers. Finally, subsequent maintenance may change the structure of the code, such that autovectorization suddenly fails. Because this may occur long after the original software was written, it would be more expensive to fix or redo the implementation at this point.
+It is important to note that there is a range of problems where SIMD is important and where autovectorization just does not work and is not likely to work in the near future. One can find an example in [@Mula_Lemire_2019]. Outer loop autovectorization is not currently attempted by compilers. They are less likely to vectorize floating-point code because the results will differ numerically (more details later in this section). Code involving permutations or shuffles across vector lanes is also less likely to autovectorize, and this is likely to remain difficult for compilers. 
 
-In such cases, or when it is not possible to make a compiler generate desired assembly instructions, code can instead be written using compiler intrinsics. In most cases, compiler intrinsics provide a 1-to-1 mapping to assembly instructions (see [@sec:secIntrinsics]). Intrinsics are somewhat easier to use than inline assembly because the compiler takes care of register allocation, and they allow the programmer to retain considerable control over code generation. However, they are still often verbose and difficult to read, and subject to behavioral differences or even bugs in various compilers.
+There is a more subtle problem with autovectorization. As compilers evolve, optimizations that they make are changing. The successful autovectorization of the code that was done in the previous compiler version may stop working in the next version and vice versa. Also, during code maintenance or refactoring, the structure of the code may change, such that autovectorization suddenly starts failing. This may occur long after the original software was written, so it would be more expensive to fix or redo the implementation at this point.
+
+When it is absolutely necessary to generate specific assembly instructions, one should not rely on compiler autovectorization. In such cases, code can instead be written using compiler intrinsics. In most cases, compiler intrinsics provide a 1-to-1 mapping to assembly instructions (see [@sec:secIntrinsics]). Intrinsics are somewhat easier to use than inline assembly because the compiler takes care of register allocation, and they allow the programmer to retain considerable control over code generation. However, they are still often verbose and difficult to read, and subject to behavioral differences or even bugs in various compilers.
 
 For a middle path between low-effort but unpredictable autovectorization, and verbose/unreadable but predictable intrinsics, one can use a wrapper library around intrinsics. These tend to be more readable, can centralize compiler fixes in a library as opposed to scattering workarounds in user code, and still allow developers control over the generated code. Many such libraries exist, differing in their coverage of recent or 'exotic' operations, and the number of platforms they support. To our knowledge, Highway is currently the only one that fully supports scalable vectors as seen in the SVE and RISC-V V instruction sets. Note that one of the authors is the tech lead for this library. It will be introduced in [@sec:secIntrinsics].
 
 Note that when using intrinsics or a wrapper library, it is still advisable to write the initial implementation using C++. This allows rapid prototyping and verification of correctness, by comparing the results of the original code against the new vectorized implementation.
 
-### Compiler Autovectorization.
-
 In the remainder of this section, we will discuss several of these approaches, especially inner loop vectorization because it is the most common type of autovectorization. The other two types, outer loop vectorization, and SLP (Superword-Level Parallelism) vectorization, are mentioned in appendix B.
 
-Multiple hurdles can prevent auto-vectorization, some of which are inherent to the semantics of programming languages. For example, the compiler must assume that unsigned loop-indices may overflow, and this can prevent certain loop transformations. Another example is the assumption that the C programming language makes: pointers in the program may point to overlapping memory regions, which can make the analysis of the program very difficult. Another major hurdle is the design of the processor itself. In some cases processors, don’t have efficient vector instructions for certain operations. For example, performing predicated (bitmask-controlled) load and store operations are not available on most processors. Another example is vector-wide format conversion between signed integers to doubles because the result operates on vector registers of different sizes. Despite all of the challenges, the software developer can work around many of the challenges and enable vectorization. Later in the section, we provide guidance on how to work with the compiler and ensure that the hot code is vectorized by the compiler.
+### Compiler Autovectorization.
 
+Multiple hurdles can prevent auto-vectorization, some of which are inherent to the semantics of programming languages. For example, the compiler must assume that unsigned loop-indices may overflow, and this can prevent certain loop transformations. Another example is the assumption that the C programming language makes: pointers in the program may point to overlapping memory regions, which can make the analysis of the program very difficult. Another major hurdle is the design of the processor itself. In some cases processors, don’t have efficient vector instructions for certain operations. For example, performing predicated (bitmask-controlled) load and store operations are not available on most processors. Another example is vector-wide format conversion between signed integers to doubles because the result operates on vector registers of different sizes. Despite all of the challenges, the software developer can work around many of the challenges and enable vectorization. Later in the section, we provide guidance on how to work with the compiler and ensure that the hot code is vectorized by the compiler.
 
 The vectorizer is usually structured in three phases: legality-check, profitability-check, and transformation itself:
 
 * **Legality-check**. In this phase, the compiler checks if it is legal to transform the loop (or some other code region) into using vectors. The loop vectorizer checks that the iterations of the loop are consecutive, which means that the loop progresses linearly. The vectorizer also ensures that all of the memory and arithmetic operations in the loop can be widened into consecutive operations. That the control flow of the loop is uniform across all lanes and that the memory access patterns are uniform. The compiler has to check or ensure somehow that the generated code won’t touch memory that it is not supposed to and that the order of operations will be preserved. The compiler needs to analyze the possible range of pointers, and if it has some missing information, it has to assume that the transformation is illegal. The legality phase collects a list of requirements that need to happen for vectorization of the loop to be legal.
+
 * **Profitability-check**. Next, the vectorizer checks if a transformation is profitable. It compares different vectorization factors and figures out which vectorization factor would be the fastest to execute. The vectorizer uses a cost model to predict the cost of different operations, such as scalar add or vector load. It needs to take into account the added instructions that shuffle data into registers, predict register pressure, and estimate the cost of the loop guards that ensure that preconditions that allow vectorizations are met. The algorithm for checking profitability is simple: 1) add-up the cost of all of the operations in the code, 2) compare the costs of each version of the code, 3) divide the cost by the expected execution count. For example, if the scalar code costs 8 cycles, and the vectorized code costs 12 cycles, but performs 4 loop iterations at once, then the vectorized version of the loop is probably faster.
 
 * **Transformation**. Finally, after the vectorizer figures out that the transformation is legal and profitable, it transforms the code. This process also includes the insertion of guards that enable vectorization. For example, most loops use an unknown iteration count, so the compiler has to generate a scalar version of the loop, in addition to the vectorized version of the loop, to handle the last few iterations. The compiler also has to check if pointers don’t overlap, etc. All of these transformations are done using information that is collected during the legality check phase.
 
-### Discovering vectorization opportunities.
+#### Discovering vectorization opportunities.
 
 [Amdahl's law](https://en.wikipedia.org/wiki/Amdahl's_law)[^6] teaches us that we should spend time analyzing only those parts of code that are used the most during the execution of a program. Thus, the performance engineer should focus on hot parts of the code that were highlighted by a profiling tool (see [@sec:profiling]). As mentioned earlier, vectorization is most frequently applied to loops.
 
@@ -42,7 +44,7 @@ An alternative way to using compiler optimization reports is to check assembly o
 
 There are a few common cases that developers frequently run into when trying to accelerate vectorizable code. Below we present four typical scenarios and give general guidance on how to proceed in each case.
 
-### Vectorization is illegal.
+#### Vectorization is illegal.
 
 In some cases, the code that iterates over elements of an array is simply not vectorizable. Vectorization remarks are very effective at explaining what went wrong and why the compiler can’t vectorize the code. [@lst:VectDep] shows an example of dependence inside a loop that prevents vectorization[^31].
 
@@ -110,7 +112,7 @@ GCC has recognized potential overlap between memory regions of arrays `a`, `b`, 
 
 By their nature, compilers are static tools: they only reason based on the code they work with. For example, some of the dynamic tools, such as Intel Advisor, can detect if issues like cross-iteration dependence or access to arrays with overlapping memory regions actually occur in a given loop. But be aware that such tools only provide a suggestion. Carelessly inserting compiler hints can cause real problems.
 
-### Vectorization is not beneficial.
+#### Vectorization is not beneficial.
 
 In some cases, the compiler can vectorize the loop but figures that doing so is not profitable. In the code presented on [@lst:VectNotProfit], the compiler could vectorize the memory access to array `A` but would need to split the access to array `B` into multiple scalar loads. The scatter/gather pattern is relatively expensive, and compilers that can simulate the cost of operations often decide to avoid vectorizing code with such patterns. 
 
@@ -148,7 +150,7 @@ void stridedLoads(int *A, int *B, int n) {
 
 Developers should be aware of the hidden cost of using vectorized code. Using AVX and especially AVX-512 vector instructions could lead to frequency downclocking or startup overhead, which on certain CPUs can also affect subsequent code over a period of several microseconds. The vectorized portion of the code should be hot enough to justify using AVX-512.[^38] For example, sorting 80 KiB was found to be sufficient to amortize this overhead and make vectorization worthwhile.[^39]
 
-### Loop vectorized but scalar version used.
+#### Loop vectorized but scalar version used.
 
 In some cases, the compiler can successfully vectorize the code, but the vectorized code does not show in the profiler. When inspecting the corresponding assembly of a loop, it is usually easy to find the vectorized version of the loop body because it uses the vector registers, which are not commonly used in other parts of the program, and the code is unrolled and filled with checks and multiple versions for enabling different edge cases. 
 
@@ -156,7 +158,7 @@ If the generated code is not executed, one possible reason for this is that the 
 
 The solution to this problem is to force the vectorizer to use a lower vectorization factor or unroll count, to reduce the number of elements that loops process and enable more loops with lower trip counts to visit the fast vectorized loop body. Developers can achieve that with the help of `#pragma` hints. For Clang compiler one can use `#pragma clang loop vectorize_width(N)` as shown in the [article](https://easyperf.net/blog/2017/11/09/Multiversioning_by_trip_counts)[^30]on easyperf  blog.
 
-### Loop vectorized in a suboptimal way.
+#### Loop vectorized in a suboptimal way.
 
 When you see a loop being vectorized and is executed at runtime, likely this part of the program already performs well. However, there are exceptions. Sometimes human experts can come up with the code that outperforms the one generated by the compiler. 
 
@@ -164,7 +166,7 @@ The optimal vectorization factor can be unintuitive because of several factors. 
 
 Finally, there are situations when the scalar un-vectorized version of a loop performs better than the vectorized one. This could happen due to expensive vector operations like `gather/scatter` loads, masking, shuffles, etc. which compiler is required to use in order to make vectorization happen. Performance engineers could also try to disable vectorization in different ways. For the Clang compiler, it can be done via compiler options `-fno-vectorize` and `-fno-slp-vectorize`, or with a hint specific for a particular loop, e.g. `#pragma clang loop vectorize(enable)`.
 
-### Use languages with explicit vectorization. {#sec:ISPC}
+### Languages with explicit vectorization. {#sec:ISPC}
 
 Vectorization can also be achieved by rewriting parts of a program in a programming language that is dedicated to parallel computing. Those languages use special constructs and knowledge of the program's data to compile the code efficiently into parallel programs. Originally such languages were mainly used to offload work to specific processing units such as graphics processing units (GPU), digital signal processors (DSP), or field-programmable gate arrays (FPGAs). However, some of those programming models can also target your CPU (such as OpenCL and OpenMP).
 
