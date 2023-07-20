@@ -66,6 +66,14 @@ If two loads access the same cache line, they will hit the same FB. Such two loa
 
 In case the L2 miss is confirmed, the load continues to wait for the results of L3 cache, which incurs much higher latency. From that point, the request leaves the core and enters the "uncore", the term you may frequently see in profiling tools. The outstanding misses from the core are tracked in the Super Queue (SQ), which can track up to 48 uncore requests. In a scenario of L3 miss, the processor begins to set up a memory access. Further details are beyond the scope of this chapter.
 
+When a store happens, in a general case, to modify a memory location, the processor needs to load the full cache line, change it, and then write it back to memory. If the address to write is not in the cache, it goes through a very similar mechanism as with loads to bring that data in. The store cannot be complete until the data is not written to the cache hierarchy.
+
+Of course, there are a few optimizations done for store operations as well. First, if we're dealing with a store or multiple adjacent stores (aka *streaming stores*) that modify entire cache line, there is no need to read the data first as all of the bytes will be clobbered anyway. So, the processor will try to combine writes to fill entire cache lines. If this succeeds no memory read operation is needed at all.
+
+Second, write combining allows multiple stores to be assembled and written further out in the cache hierarchy as a unit. So, if multiple stores modify the same cache line, only one memory write will be issued to the memory subsystem. Modern processors have a data structure called *store buffer* that tries to combine stores. A store instruction copies the data that will be written from a register into the store buffer. From there it may be written to the L1 cache or it may be combined with other stores to the same cache line. The store buffer capacity is limited, so it can hold requests for partial writing to a cache line only for some time. However, while the data sits in the store buffer waiting to be written, other load instructions can read the data straight from the store buffers (store-to-load forwarding).
+
+Finally, if we happen to read the data before overwriting it, the cache line typically stays in the cache, displacing some other line. This behavior can be altered with the help of a *non-temporal* store, that will not keep the modified line in the cache. It is useful in situations when we know that we don't need the data once we have changed it. Non-temporal loads a stores help to utilize cache space more efficiently by not evicting other data that might be needed soon.
+
 ### TLB hierarchy
 
 Recall from the previous discussion, translations from virtual to physical addresses are cached in TLB. Golden Cove's TLB hierarchy is presented in figure @fig:GLC_TLB. Similar to a regular data cache, it has two levels, where level 1 has separate instances for instructions (ITLB) and data (DTLB). L1 ITLB has 256 entries for regular 4K pages and covers the memory space of 256 * 4KB equals 1MB, while L1 DTLB has 96 entries that covers 384 KB. 
@@ -85,4 +93,4 @@ Goldencove specification doesn't disclose how resources are shared between two S
 
 [^1]: Around 300 physical GPRs and a similar number of vector registers. The official number is not diclosed.
 [^2]: LDQ and STQ sizes are not disclosed, but people have measured 192 and 114 entries respectively.
-[^2]: AMD's equivalent is called Page Walk Caches.
+[^3]: AMD's equivalent is called Page Walk Caches.
