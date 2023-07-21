@@ -1,6 +1,3 @@
-
-
-
 ## SIMD Multiprocessors {#sec:SIMD}
 
 Another variant of multiprocessing that is widely used for many workloads is referred to as Single Instruction Multiple Data (SIMD). As the name indicates, in SIMD processors, a single instruction operates on many data elements in a single cycle using many independent functional units. Operations on vectors and matrices lend themselves well to SIMD architectures as every element of a vector or matrix can be processed using the same instruction. SIMD architecture allows more efficient processing of a large amount of data and works best for data-parallel applications that involve vector operations.
