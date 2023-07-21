@@ -3,8 +3,6 @@
 
 ## SIMD Multiprocessors {#sec:SIMD}
 
-[TODO]: put the chapter after ILP section.
-
 Another variant of multiprocessing that is widely used for many workloads is referred to as Single Instruction Multiple Data (SIMD). As the name indicates, in SIMD processors, a single instruction operates on many data elements in a single cycle using many independent functional units. Operations on vectors and matrices lend themselves well to SIMD architectures as every element of a vector or matrix can be processed using the same instruction. SIMD architecture allows more efficient processing of a large amount of data and works best for data-parallel applications that involve vector operations.
 
 Figure @fig:SIMD shows scalar and SIMD execution modes for the code listed in @lst:SIMD. In a traditional SISD (Single Instruction, Single Data) mode, addition operation is separately applied to each element of arrays `a` and `b`. However, in SIMD mode, addition is applied to multiple elements at the same time. If we target a CPU architecture which has execution units capable of performing operations on 256-bit vectors, we can process four double-precision elements with a single instruction. This leads to issuing 4x less instructions and can potentially gain a 4x speedup over four scalar computations. But in practice, performance benefits are not so straightforward for various reasons.
