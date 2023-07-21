@@ -8,6 +8,8 @@ This book is written to help developers better understand the performance of the
 
 Here is the outline of what this book contains:
 
+[TODO]: update below
+
 * Chapter 2 discusses how to conduct fair performance experiments and analyze their results. It introduces the best practices of performance testing and comparing results.
 * Chapters 3 and 4 provide basics of CPU microarchitecture and terminology in performance analysis; feel free to skip if you know this already. 
 * Chapter 5 explores several most popular approaches for doing performance analysis. It explains how profiling techniques work and what data can be collected.
