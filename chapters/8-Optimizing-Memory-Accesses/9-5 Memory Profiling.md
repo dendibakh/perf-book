@@ -36,14 +36,13 @@ Now let's switch to memory footprint. It defines how much memory a process touch
 
 The dashed line tracks the size of the unique data accessed since the start of the program. Here, we count the amount of memory that was accessed during 100 ms interval and has never been touched by the program before. For the first second of the program's lifetime, most of the accesses are unique, as we would expect. In the second phase, the algorithm starts using the allocated buffer. During the time interval from 1.3s to 1.8s, most of the buffer locations were touched (e.g. first iteration of the loop), that's why we don't see many unique accesses after that. That means that from the timestamp 2s up until 5s, the algorithm mostly utilizes already seen memory buffer and doesn't access any new data. However, behavior of the phase 4 is different. First, the algorithm in phase 4 is more memory intensive as the total memory footprint (solid line) is roughly 15 MB per 100 ms. Second, the algorithm accesses new data (dashed line) in relatively large bursts. Such bursts may be related to allocation of a new memory region, working on it, and then deallocating it.
 
-You may wonder how can this data might be help us. Well, it can help us to better understand the behavior of a workload and estimate the pressure on the memory subsystem. For instance, if the memory footprint is rather small, e.g. 1 MB/s, and the RSS fits into the L3 cache, we might suspect that the pressure on the memory subsystem is low; remember that available memory bandwidth in modern chips is in GB/s and is getting close to 1 TB/s. On the other hand, when the memory footprint is rather large, e.g. 10 GB/s, and the RSS is much bigger than the size of the L3 cache, then the workload might put significant pressure on the memory subsystem.
+You may wonder how we can use this data. Well, first, by looking at the chart, you can see observe phases and correlate it with the code that is running. Ask yourself if this goes according to your expectations, or the workload is doing something sneaky. Also, you may encounter unexpected spikes in memory footprint. Memory profiling techniques that we will discuss in this section do not necessary point you to the problematic places similar to regular hotspot profiling but they may help you better understand the behavior of a workload. In many occassions such data served as an additional data point to support the conclusions that we've made about a certain workload.
 
-Overall, memory profiling techniques that we will discuss in this section do not necessary point you to the problematic places similar to regular hotspot profiling but they may help you understand a certain 
+In some scenarios it can help us estimate the pressure on the memory subsystem. For instance, if the memory footprint is rather small, e.g. 1 MB/s, and the RSS fits into the L3 cache, we might suspect that the pressure on the memory subsystem is low; remember that available memory bandwidth in modern chips is in GB/s and is getting close to 1 TB/s. On the other hand, when the memory footprint is rather large, e.g. 10 GB/s, and the RSS is much bigger than the size of the L3 cache, then the workload might put significant pressure on the memory subsystem.
 
-[TODO]: Why do we need it? How it helps us?
-[TODO]: What do we want to optimize?
-[TODO]: Mention that this picture still doesn't address the problem of measuring the hot memory footprint per time interval.
-[TODO]: Mention that it's not possible to understand whether the code experiences temporal or spatial locality. We need a memory heatmap over time to estimate it.
+A few caveats before we proceed to the case studies. Memory usage and memory footprint doesn't tell us anything about temporal and spatial locality of memory accesses. Going back to the example in figure @fig:MemUsageFootprint, within each one second time interval, we only know how much memory was accessed, but we don't know whether those accesses were sequential, strided or completely random. We will address temporal and spatial locality analysis in a later case study.
+
+Also, keep in mind that it doesn't tell us how much from the accessed memory was actually hot. For example, if the algorithm touches 10 MB/s, we might be interested to know how much of that was hot, i.e. accessed more frequently than the other. But even if we would know that, say, only 1 MB out of 10 MB was hot, it doesn't tell us how cache-friendly the code is. There could be hundreds of cache lines that were accessed only once but those accesses were not prefeteched by the HW and thus missed in caches and were very expensive. Again, we need a better approach to analyze locality of memory accesses.
 
 ### Case Study: Memory Usage of Stockfish
 
@@ -51,7 +50,7 @@ Now, let's take a look at how to profile the real-world application. As an examp
 
 [TODO]: showcase `heaptrack`. Mention Mtuner: check that it can do similar things that heaptrack can.
 [TODO]: mention it can find opportunities for std::vector.reserve(N)
-[TODO]: Do I need a better example than Stockfish.
+[TODO]: Do I need a better example than Stockfish. I can also deoptimize 
 
 ![Stockfish memory profile with Heaptrack, summary view.](../../img/memory-access-opts/StockfishMemProf1.png){#fig:StockfishMemProf1 width=100%}
 
