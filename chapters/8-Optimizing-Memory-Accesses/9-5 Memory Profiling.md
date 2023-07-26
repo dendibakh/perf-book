@@ -9,7 +9,8 @@ So far in this chapter, we have discussed a few techniques to optimize memory ac
 * And others.
 
 When developers talk about memory consumption, they implicitly mean heap usage. Heap is, in fact, the biggest memory consumer in most applications as it accomodates all dynamically allocated objects. For completeness, let's mention other memory consumers:
-* Stack: Memory used by frame stacks in an application. Each application and each thread inside an application gets its own stack. Usually the stack size is only a few MB, and the application will crush if the limit is overflowed. The total memory consumption relates to how many threads are running in the system.
+
+* Stack: Memory used by frame stacks in an application. Each application and each thread inside an application gets its own stack. Usually the stack size is only a few MB, and the application will crush if the limit is overflowed. The total stack memory consumption is proportional to the number of threads running in the system.
 * Code: Memory that is used to store the code (instructions) of an application and its libraries. In most cases it doesn't contribute much to the memory consumption but there are exceptions. For example, Clang C++ compiler and chrome have large codebases, and tens of MB code sections in their binaries.
 
 Next, we will introduce terms *memory usage* and *memory footprint* and see how to profile both.
@@ -31,14 +32,17 @@ As we would expect, the RSS is always less or equal than the VSZ. Looking at the
 
 ![Example of the memory usage and footprint (hypothetical scenario).](../../img/memory-access-opts/MemoryUsageAndFootprint.png){#fig:MemUsageFootprint width=100%}
 
-Now let's switch to memory footprint. It defines how much memory a process touches during a period of time, e.g. in MB per second. This data might help us better understand the behavior of the workload. For instance, if the memory footprint is rather small, e.g. 1 MB/s, and the RSS fits into the L3 cache, we might suspect that the pressure on the memory subsystem is low; remember that available memory bandwidth in modern chips is in GB/s and is getting close to 1 TB/s. On the other hand, when the memory footprint is rather large, e.g. 10 GB/s, and the RSS is much bigger than the size of the L3 cache, then the workload might put significant pressure on the memory subsystem.
+Now let's switch to memory footprint. It defines how much memory a process touches during a period of time, e.g. in MB per second. In a hypothetical scenario, visualized on figure @fig:MemUsageFootprint, we plot memory usage per 100 milliseconds. The solid line tracks the total unique memory accessed per 100 ms. Here, we don't count how many times a certain memory location was accessed. That is, if a memory location was loaded twice during a 100ms interval, we count the touched memory only once. For the same reason, we cannot aggregate time intervals. In our example, we know that during the phase 2, the program was touching roughly 10MB every 100ms. But we cannot say that the memory footprint was 100 MB per second, because the same memory location could be loaded in adjacent 100ms time intervals. It would be true only if the program never repeated memory accesses within every one second interval.
 
-In a hypothetical scenario, visualized on figure @fig:MemUsageFootprint, we plot memory usage per 100 milliseconds. The solid line tracks the total unique memory accessed per 100 ms. Here, we don't count how many times a certain memory location was accessed. That is, if a memory location was loaded twice during a 100ms interval, we count the touched memory only once. For the same reason, we cannot aggregate time intervals. In our example, we know that during the phase 2, the program was touching roughly 10MB every 100ms. But we cannot say that the memory footprint was 100 MB per second, because the same memory location could be loaded in adjacent 100ms time intervals. It would be true only if the program never repeated memory accesses within every one second interval.
+The dashed line tracks the size of the unique data accessed since the start of the program. Here, we count the amount of memory that was accessed during 100 ms interval and has never been touched by the program before. For the first second of the program's lifetime, most of the accesses are unique, as we would expect. In the second phase, the algorithm starts using the allocated buffer. During the time interval from 1.3s to 1.8s, most of the buffer locations were touched (e.g. first iteration of the loop), that's why we don't see many unique accesses after that. That means that from the timestamp 2s up until 5s, the algorithm mostly utilizes already seen memory buffer and doesn't access any new data. However, behavior of the phase 4 is different. First, the algorithm in phase 4 is more memory intensive as the total memory footprint (solid line) is roughly 15 MB per 100 ms. Second, the algorithm accesses new data (dashed line) in relatively large bursts. Such bursts may be related to allocation of a new memory region, working on it, and then deallocating it.
 
-The dashed line tracks the size of the unique data accessed since the start of the program. Here, we count the amount of memory that was accessed during 100 ms interval and has never been touched by the program before. For the first second of the program's lifetime, most of the accesses are unique, as we would expect. In the second phase, the algorithm starts using the allocated buffer. During the time interval from 1.3s to 1.8s, most of the buffer locations were touched (e.g. first iteration of the loop), that's why we don't see many unique accesses after that. That means that from the timestamp 2s up until 5s, the algorithm mostly utilizes the existing memory buffer. However, behavior of the phase 4 is different. First, the algorithm in phase 4 is more memory intensive as the total memory footprint (solid line) is roughly 15 MB per 100 ms. Second, the algorithm accesses new data (dashed line) in relatively large bursts.
+You may wonder how can this data might be help us. Well, it can help us to better understand the behavior of a workload and estimate the pressure on the memory subsystem. For instance, if the memory footprint is rather small, e.g. 1 MB/s, and the RSS fits into the L3 cache, we might suspect that the pressure on the memory subsystem is low; remember that available memory bandwidth in modern chips is in GB/s and is getting close to 1 TB/s. On the other hand, when the memory footprint is rather large, e.g. 10 GB/s, and the RSS is much bigger than the size of the L3 cache, then the workload might put significant pressure on the memory subsystem.
+
+Overall, memory profiling techniques that we will discuss in this section do not necessary point you to the problematic places similar to regular hotspot profiling but they may help you understand a certain 
 
 [TODO]: Why do we need it? How it helps us?
 [TODO]: What do we want to optimize?
+[TODO]: Mention that this picture still doesn't address the problem of measuring the hot memory footprint per time interval.
 [TODO]: Mention that it's not possible to understand whether the code experiences temporal or spatial locality. We need a memory heatmap over time to estimate it.
 
 ### Case Study: Memory Usage of Stockfish
@@ -60,7 +64,6 @@ Heaptrack charts.
 </div>
 
 ### Case Study: Memory Footprint
-
 
 Listing: Applying loop interchange to naive matrix multiplication code.
 
@@ -103,27 +106,12 @@ PERIOD    LOAD  STORE  CODE  NEW   |   PERIOD    LOAD  STORE  CODE  NEW
 ...
 ```
 
-leftover (to remove)
-```
-3527304   4352    1     2      0       3527358   257    256    2    256
-3555986   4352    1     2      0       3556042   257    256    2    256
-3584668   4352    1     2      0       3584726   257    256    2    256
-3613350   4352    1     2      0       3613410   257    256    2    256
-3642032   4352    1     2      0       3642094   257    256    2    256
-3670714   4352    1     2      0       3670778   257    256    2    256
-3699396   4352    1     2      0       3699462   257    256    2    256
-3728078   4352    1     2      0       3728146   257    256    2    256
-3756760   4352    1     2      0       3756830   257    256    2    256
-3785442   4352    1     2      0       3785514   257    256    2    256
-3814124   4352    1     2      0       3814198   257    256    2    256
-3842806   4352    1     2      0       3842882   257    256    2    256
-3871488   4352    1     2      0       3871566   257    256    2    256
-3900170   4352    1     2   4097       3900250   257    256    2    257
-3928852   4352    1     2      0       3928934   257    256    2    256
-3957534   4352    1     2      0       3957618   257    256    2    256
-```
+[TODO]: Here, memory footprint does not equal to utilized memory bandwidth.
 
-showcase `sde -footprint`
-[TODO]: Do I need a better example for `sde -footprint`? Maybe the one with AOS-to-SOA inside?
+[TODO]: Run four different benchmarks, look at their memory footprints.
+
+### Case Study: Temporal And Spatial Locality Analysis 
+
+[TODO]: Describe tracking reuse distances
 
 [TODO]: Can we visualize memory access patterns? Aka memory heatmap over time.
