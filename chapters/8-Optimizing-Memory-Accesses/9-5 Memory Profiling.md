@@ -64,9 +64,14 @@ Heaptrack charts.
 
 ### Case Study: Memory Footprint
 
+Now let's take a look at how we can estimate the memory footprint. For a warmup, let's consider a simple naive matrix multiplication code presented in [@lst:MemFootprint]. The code multiplies two square 4Kx4K matrices `a` and `b` and writes result into square 4Kx4K matrix `c`. Recall that to calculate every element of result matrix `c`, we need to calculate dot product of row in `a` and column in `b`; this is what the innermost loop over `k` is doing.
+
 Listing: Applying loop interchange to naive matrix multiplication code.
 
 ~~~~ {#lst:MemFootprint .cpp}
+constexpr int N = 1024*4;                      // 4K
+std::array<std::array<float, N>, N> a, b, c;   // 4K x 4K matrices
+// init a, b, c
 for (int i = 0; i < N; i++) {               for (int i = 0; i < N; i++) { 
   for (int j = 0; j < N; j++) {        =>     for (int k = 0; k < N; k++) {
     for (int k = 0; k < N; k++)        =>       for (int j = 0; j < N; j++) {
@@ -76,9 +81,25 @@ for (int i = 0; i < N; i++) {               for (int i = 0; i < N; i++) {
 }                                           }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-![Memory access pattern and cache lines touched after first iterations.](../../img/memory-access-opts/MemoryFootprint.png){#fig:MemFootprint width=100%}
+To demonstrate the memory footprint reduction, we applied a simple loop interchange transformation that swaps the two lines marked with `=>`. Once we measure the memory footprint and compare it between the two version, it will be easy to see the difference. The visual result of the change in memory access pattern is shown in figure @fig:MemFootprint. We went from calculating each element of matrix `c` one-by-one to calculating partial results while maintaining row-major traversal in all three matrices. 
+
+In the original code (on the left), matrix `b` is accessed in a column-major way, which we know is not cache-friendly. Look at the picture and observe the cache lines that are touched after the first N iterations of the inner loop. We calculate dot product of row 0 in `a` and column 0 in `b`, and save it into the first element in matrix `c`. After next N iterations of the inner loop, we will access the same row 0 in `a` and column 1 in `b` to get the second result in matrix `c`.
+
+In the transformed code on the right, the inner loop accesses just a single element in matrix `a`. We multiply it by all the elements in corresponding row in `b` and accumulate products into the corresponding row in `c`. Thus, the first N iterations of the inner loop calculate products of element 0 in `a` and row 0 in `b` and accumulate results in row 0 in `c`. Next N iterations multiply element 0 in `a` and row 0 in `b` and accumulate results in row 0 in `c`.
+
+![Memory access pattern and cache lines touched after first iterations (not to scale).](../../img/memory-access-opts/MemoryFootprint.png){#fig:MemFootprint width=100%}
+
+Let's confirm the effect under Intel [SDE](https://www.intel.com/content/www/us/en/developer/articles/tool/software-development-emulator.html)[^1], Software Development Emulator tool for x86-based platforms. SDE is built upon the dynamic binary instrumentation mechanism, which allows to intercept every single instruction. It obviously comes with a huge cost. For the experiment we run here, slowdown of 100x is common. 
+
+To prevent compiler interference in our experiment, we disabled vectorization and unrolling optimizations, so that each version has only one hot loop with exactly 7 assembly instructions. We use this to uniformly compare memory footprint intervals. Instead of time intervals, we use intervals measured in machine instructions. Example of running SDE memory footprint tool is shown below. Notice we use `-fp_icount 28K` option which means measure memory footprint for each interval of 28K instructions. This value is specifically choosen, because it matches one iteration of the inner loop in "before" and "after" cases.
+
+SDE measures footprint in cache lines (64 KB) by default, but it can also measure in memory pages (4KB on x86). We combined the output and put it side by side. Also, a few not relevant columns were removed from the output. The first column `PERIOD` marks intervals of 28K instructions. The column `LOAD` tells how many cache lines were accessed by load instructions. Recall from the previous discussion, the same cache line accessed twice counts only once. Similarly, the column `STORE` tells how many cache lines were stored. The column `CODE` counts accessed cache lines that store instructions that were executed during that period. Finally, `NEW` counts cache lines touched during a period, and that were not seen before by the program.
+
+Important nore before we proceed, memory footprint reported by SDE does not equal to utilized memory bandwidth. It is because it doesn't account for which memory operations were served from memory.
 
 ```
+$ sde64 -footprint -fp_icount 28K -- ./matrix_multiply.exe
+
 ============================= CACHE LINES =============================
 PERIOD    LOAD  STORE  CODE  NEW   |   PERIOD    LOAD  STORE  CODE  NEW
 -----------------------------------------------------------------------
@@ -105,12 +126,20 @@ PERIOD    LOAD  STORE  CODE  NEW   |   PERIOD    LOAD  STORE  CODE  NEW
 ...
 ```
 
-[TODO]: Here, memory footprint does not equal to utilized memory bandwidth.
+I STOPPED HERE
+
+Let's discuss the number that we see for the original code (on the left). In the first period we access `(4096 * 4 bytes) / 64 bytes = 256` cache lines in matrix `a`; 4096 cache lines in `b`; 1 cache line is stored in `c`.
+
+For the transformed code. In the first period we access 1 cache line in matrix `a`; `(4096 * 4 bytes) / 64 bytes = 256` cache lines in `b`; `(4096 * 4 bytes) / 64 bytes = 256` cache line are stored into `c`.
 
 [TODO]: Run four different benchmarks, look at their memory footprints.
+
+Still confused about instructions as a measure of time? Let me address that. You can approximately convert the timeline from instructions to seconds if you know the overall IPC for a workload. For instance, at IPC=1 and processor frequency of 4GHz, 1B instructions run in 250 milliseconds, at IPC=2, 1B instructions run in 125 ms, and so on. You can port a memory footprint chart from MB per 1B instructions to MB/s if you measure the IPC of a workload on the target system and observe CPU frequency while it's running.
 
 ### Case Study: Temporal And Spatial Locality Analysis 
 
 [TODO]: Describe tracking reuse distances
 
 [TODO]: Can we visualize memory access patterns? Aka memory heatmap over time.
+
+[^1]: Intel SDE - [https://www.intel.com/content/www/us/en/developer/articles/tool/software-development-emulator.html](https://www.intel.com/content/www/us/en/developer/articles/tool/software-development-emulator.html).
