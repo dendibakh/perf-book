@@ -83,7 +83,7 @@ for (int i = 0; i < N; i++) {               for (int i = 0; i < N; i++) {
 
 To demonstrate the memory footprint reduction, we applied a simple loop interchange transformation that swaps the two lines marked with `=>`. Once we measure the memory footprint and compare it between the two version, it will be easy to see the difference. The visual result of the change in memory access pattern is shown in figure @fig:MemFootprint. We went from calculating each element of matrix `c` one-by-one to calculating partial results while maintaining row-major traversal in all three matrices. 
 
-In the original code (on the left), matrix `b` is accessed in a column-major way, which we know is not cache-friendly. Look at the picture and observe the cache lines that are touched after the first N iterations of the inner loop. We calculate dot product of row 0 in `a` and column 0 in `b`, and save it into the first element in matrix `c`. After next N iterations of the inner loop, we will access the same row 0 in `a` and column 1 in `b` to get the second result in matrix `c`.
+In the original code (on the left), matrix `b` is accessed in a column-major way, which we know is not cache-friendly. Look at the picture and observe the cache lines that are touched after the first N iterations of the inner loop. We calculate dot product of row 0 in `a` and *column* 0 in `b`, and save it into the first element in matrix `c`. During the next N iterations of the inner loop, we will access the same row 0 in `a` and column 1 in `b` to get the second result in matrix `c`.
 
 In the transformed code on the right, the inner loop accesses just a single element in matrix `a`. We multiply it by all the elements in corresponding row in `b` and accumulate products into the corresponding row in `c`. Thus, the first N iterations of the inner loop calculate products of element 0 in `a` and row 0 in `b` and accumulate results in row 0 in `c`. Next N iterations multiply element 0 in `a` and row 0 in `b` and accumulate results in row 0 in `c`.
 
@@ -95,7 +95,7 @@ To prevent compiler interference in our experiment, we disabled vectorization an
 
 SDE measures footprint in cache lines (64 KB) by default, but it can also measure in memory pages (4KB on x86). We combined the output and put it side by side. Also, a few not relevant columns were removed from the output. The first column `PERIOD` marks intervals of 28K instructions. The column `LOAD` tells how many cache lines were accessed by load instructions. Recall from the previous discussion, the same cache line accessed twice counts only once. Similarly, the column `STORE` tells how many cache lines were stored. The column `CODE` counts accessed cache lines that store instructions that were executed during that period. Finally, `NEW` counts cache lines touched during a period, and that were not seen before by the program.
 
-Important nore before we proceed, memory footprint reported by SDE does not equal to utilized memory bandwidth. It is because it doesn't account for which memory operations were served from memory.
+Important note before we proceed, memory footprint reported by SDE does not equal to utilized memory bandwidth. It is because it doesn't account for which memory operations were served from memory.
 
 ```
 $ sde64 -footprint -fp_icount 28K -- ./matrix_multiply.exe
@@ -126,11 +126,15 @@ PERIOD    LOAD  STORE  CODE  NEW   |   PERIOD    LOAD  STORE  CODE  NEW
 ...
 ```
 
+Let's discuss the number that we see. For the original code (on the left), in the first period, SDE reports that the algorithm loads 4351 cache lines. Let's do the math and see if we get the same number. The oririnal inner loop accesses row 0 in matrix `a`. Remember that the size of `float` is 4 bytes and the size of a cache line is 64 bytes. So, for matrix `a`, the algorithms loads `(4096 * 4 bytes) / 64 bytes = 256` cache lines. For matrix `b`, the algorithm accesses column 0. Every element resides on it's own cache line, so for matrix `b` it loads 4096 cache lines. We accumulate all products into a single element in `c`, so 1 cache line is *stored* in `c`. We calculated `4096 + 256 = 4352` cache lines loaded and 1 cache line stored. The difference in one cache line may be related to SDE starting counting 28K instruction interval not at exact start of loop iteration. The seven instructions of the inner loop reside in a single cache line, but the 28K interval also captures the middle loop, that's why we see two cache lines (`CODE`) with instructions being accessed. Lastly, since all the data that we access haven't been seen before, all the cache lines are `NEW`.
+
+Now let's switch to the second 28K instructions period. We have the same number of `LOAD`, `STORE`, and `CODE` cache lines, which is expected. However, there are no `NEW` cache lines touched. Let's understand why that happens. Look again at the figure @fig:MemFootprint. The second 4096 iterations of the inner loop will access row 0 in matrix `a` again. But the algorithm accesses column 1, which is new, but these elements reside on the same set of cache lines as column 0, so we have already accessed them in the previous 28K period. The pattern repeats through 14 more periods. Let's see why. In each cache line we have `64 bytes / 4 bytes (float) = 16` elements, which explains the pattern: we fetch new set of cache lines every 16 iterations. The last remaining question is why we have `4097 NEW` lines after the first 16 iterations of the inner loop? The answer is simple: the algorithm keeps on accessing row 0 in matrix `a`, so all those new cache lines come from matrix `b`.
+
+[TODO]: A side note. Keep in mind that it still doesn't tell anything about how cache friendly this code is. L1 cache in recent processors can only accomodate ~1000 cache lines, L2 ~32K lines. This code will evict cache lines that correspond to matrix `b`. But if the L1 cache can accomodate ~5000 cache lines, then we could potentially see comparable performance between two versions. 
+
 I STOPPED HERE
 
-Let's discuss the number that we see for the original code (on the left). In the first period we access `(4096 * 4 bytes) / 64 bytes = 256` cache lines in matrix `a`; 4096 cache lines in `b`; 1 cache line is stored in `c`.
-
-For the transformed code. In the first period we access 1 cache line in matrix `a`; `(4096 * 4 bytes) / 64 bytes = 256` cache lines in `b`; `(4096 * 4 bytes) / 64 bytes = 256` cache line are stored into `c`.
+For the transformed version, it looks much more consistent with all periods having very similar numbers, except the first. In the first period we access 1 cache line in matrix `a`; `(4096 * 4 bytes) / 64 bytes = 256` cache lines in `b`; `(4096 * 4 bytes) / 64 bytes = 256` cache line are stored into `c`.
 
 [TODO]: Run four different benchmarks, look at their memory footprints.
 
