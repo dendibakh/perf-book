@@ -46,21 +46,37 @@ Also, keep in mind that it doesn't tell us how much from the accessed memory was
 
 ### Case Study: Memory Usage of Stockfish
 
-Now, let's take a look at how to profile the real-world application. As an example, we will take Stockfish, that we already analyzed in Chapter 4. 
+Now, let's take a look at how to profile the memory usage of a real-world application. We will use [heaptrack](https://github.com/KDE/heaptrack)[^2], an open-sourced heap memory profiler for Linux developed by KDE. It is not straightforward to build it from sources, luckily most users can install it very easily with e.g. `apt install heaptrack-gui`. Heaptrack can find places where biggest or most frequent allocations happend among many other things. On Windows, you can use [Mtuner](https://github.com/milostosic/MTuner)[^3] which has very similar capabilities as Heaptrack.
 
-[TODO]: showcase `heaptrack`. Mention Mtuner: check that it can do similar things that heaptrack can.
-[TODO]: mention it can find opportunities for std::vector.reserve(N)
-[TODO]: Do I need a better example than Stockfish. I can also deoptimize 
+As an example, we will take Stockfish built-in benchmark, that we already analyzed in Chapter 4. Let's profile it with Heaptrack to see what we could find. Figure @fig:StockfishSummary shows us a summary view. Here are some interesting facts we can learn from it:
 
-![Stockfish memory profile with Heaptrack, summary view.](../../img/memory-access-opts/StockfishMemProf1.png){#fig:StockfishMemProf1 width=100%}
+- Total number of allocations is 10614.
+- Almost half of the allocations are temporary, i.e. allocations that are directly followed by their deallocation.
+- Peak heap memory consumption is 204 MB.
+- `Stockfish::std_aligned_alloc` is responsible for the largest portion of the allocated heap space (182 MB). But it is not among the most frequent allocation spots (middle table), so it is likely allocated once and stays alive until the end of the program.
+- Almost half of all the allocation calls comes from `operator new`, which are all temporary allocations. Can we get rid of temporary allocations?
+- Leaked memory is not interesting for this case study.
 
-<div id="fig:Memory Usage and Allocation">
-![Memory usage.](../../img/memory-access-opts/StockfishMemProf2.png){#fig:StockfishMemProf2 width=45%}
+![Stockfish memory profile with Heaptrack, summary view.](../../img/memory-access-opts/StockfishSummary.png){#fig:StockfishSummary width=90%}
 
-![Number of allocations.](../../img/memory-access-opts/StockfishMemProf3.png){#fig:StockfishMemProf3 width=45%}
+Figure @fig:StockfishMemUsage shows the memory usage of Stockfish built-in benchmark. The memory usage stays constant at 200 MB throughout the entire run of the program. Total consumed memory is broken into slices, e.g. regions 1 and 2 on the image. Each slice corresponds to a particular allocation. Interestingly, it was not a single big 182 MB allocation that was done through `Stockfish::std_aligned_alloc` as we hypothesized earlier. Instead, there are two: one 134.2 MB (region 1) and another 48.4 MB (region 2). Though both allocations stay alive until the very end of the benchmark. 
 
-Heaptrack charts.
-</div>
+![Stockfish memory profile with Heaptrack, memory usage over time stays constant.](../../img/memory-access-opts/Stockfish_consumed.png){#fig:StockfishMemUsage width=80%}
+
+Does it mean that there are no memory allocations after the startup phase? Let's find out. Figure @fig:StockfishAllocations shows the accumulated number of allocations over time. This is interesting. There are new allocations at a steady pace throughout the life of the program. How is that possible that consumed memory doesn't change? Well, it can be possible if we deallocate previously allocated buffers and allocate new ones of the same size (aka temporary allocations).
+
+Similar to the consumed memory chart, allocations are sliced according to the accumulated number of allocations attributed to each function. As we can see, new allocations keep coming from not just a single place, but many. The most frequent allocations are done through `operator new` that correspond to region 1 on the image.
+
+![Stockfish memory profile with Heaptrack, number of allocations is growing.](../../img/memory-access-opts/Stockfish_allocations.png){#fig:StockfishAllocations width=80%}
+
+Since the number of allocations is growing but the total consumed memory doesn't change, we are dealing with temporary allocations. Let's find out where in the code they are coming from. It is easy to do with the help of a flame graph showed in figure @fig:StockfishFlamegraph. There are 4800 temporary allocations in total with 91% of those coming from `operator new`. Thanks to the flame graph we know the entire call stack that leads to 4360 temporary allocations. Interestingly, those temporary allocations are initiated by `std::stable_sort` which allocates a temporary buffer to do the sorting. One way to get rid of those temporary allocations would be to use inplace stable sorting algorithm. However, by doing so we observed 8% drop in performance, so this change is bad.
+
+![Stockfish memory profile with Heaptrack, temporary allocations flamegraph.](../../img/memory-access-opts/Stockfish_flamegraph.png){#fig:StockfishFlamegraph width=80%}
+
+Besides temporary allocations, you can also find the paths that lead to the biggest allocations. In the dropdown menu at the top you would need to select the "Consumed" flame graph.
+
+[TODO]: Double-check that MTuner it can do similar things that heaptrack can.
+[TODO]: Do I need a better example than Stockfish? I can also show an example how to find unnecessary reallocations, e.g. opportunities for inserting std::vector.reserve(N) to avoid array migration.
 
 ### Case Study: Memory Footprint
 
@@ -145,7 +161,8 @@ Are you still confused about instructions as a measure of time? Let us address t
 ### Case Study: Temporal And Spatial Locality Analysis 
 
 [TODO]: Describe tracking reuse distances
-
-[TODO]: Can we visualize memory access patterns? Aka memory heatmap over time.
+[TODO]: Can we visualize memory access patterns? Aka memory heatmap over time. Probably no practical tool was ever developed.
 
 [^1]: Intel SDE - [https://www.intel.com/content/www/us/en/developer/articles/tool/software-development-emulator.html](https://www.intel.com/content/www/us/en/developer/articles/tool/software-development-emulator.html).
+[^2]: Heaptrack - [https://github.com/KDE/heaptrack](https://github.com/KDE/heaptrack).
+[^3]: MTuner - [https://github.com/milostosic/MTuner](https://github.com/milostosic/MTuner).
