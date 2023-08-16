@@ -130,5 +130,3 @@ When using Intel Vtune Profiler, one can collect call stacks data by checking th
 [^6]: This is an awkward way, though, and we don't recommend doing this. It's just to illustrate the concept.
 [^7]: x264 benchmark - [https://openbenchmarking.org/test/pts/x264](https://openbenchmarking.org/test/pts/x264).
 [^8]: Phoronix test suite - [https://www.phoronix-test-suite.com/](https://www.phoronix-test-suite.com/).
-[^9]: Flame Graphs by Brendan Gregg: [https://github.com/brendangregg/FlameGraph](https://github.com/brendangregg/FlameGraph). See more details about all the features on Brendan's dedicated web page: [http://www.brendangregg.com/flamegraphs.html](http://www.brendangregg.com/flamegraphs.html).
-[^11]: Hotspot profiler by KDAB - [https://github.com/KDAB/hotspot](https://github.com/KDAB/hotspot).
