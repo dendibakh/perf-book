@@ -1,4 +1,4 @@
-## Case Study {#sec:PerfMetricsCaseStudy}
+## Case Study: Analyzing Performance Metrics of Four Benchmarks {#sec:PerfMetricsCaseStudy}
 
 Putting together everything we discussed so far in this chapter, we run four benchmarks from different domains and calculated their performance metrics. First of all, let's introduce the benchmarks.
 
@@ -97,7 +97,7 @@ IpArith AVX256   All         30.3        0.0         0.0        39.6
 IpSWPF           All         90.2        2,565       105,933    172,348
 --------------------------------------------------------------------------
 
-Table: A case study. {#tbl:perf_metrics_case_study}
+Table: Performance Metrics of Four Benchmarks. {#tbl:perf_metrics_case_study}
 
 As you can see from this study, there is a lot one can learn about behavior of a program just by looking at the metrics. It answers the "what?" question, but doesn't tell you the "why?". For that you will need to collect performance profile, which we will introduce in later chapters. In the second part of the book we discuss how to mitigate performance issues that we suspect in the four benchmarks that we analyzed.
 

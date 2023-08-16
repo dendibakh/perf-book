@@ -2,7 +2,7 @@
 typora-root-url: ..\..\img
 ---
 
-## Cache miss
+## Cache Miss
 
 As discussed in [@sec:MemHierar], any memory request missing in a particular level of cache must be serviced by higher-level caches or DRAM. This implies a significant increase in the latency of such memory access. The typical latency of memory subsystem components is shown in table {@tbl:mem_latency}.[^1] Performance greatly suffers, especially when a memory request misses in Last Level Cache (LLC) and goes all the way down to the main memory (DRAM). Intel® [Memory Latency Checker](https://www.intel.com/software/mlc)[^2] (MLC) is a tool used to measure memory latencies and bandwidth and how they change with increasing load on the system. MLC is useful for establishing a baseline for the system under test and for performance analysis.
 

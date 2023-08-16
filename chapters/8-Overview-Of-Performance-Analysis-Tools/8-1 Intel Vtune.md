@@ -32,12 +32,13 @@ Windows does not require any additional configuration after you install Vtune. C
 ### What you can do with it: {.unlisted .unnumbered}
 
 - find hotspots: functions, loops, statements.
-- monitor various performance events, e.g. branch mispredictions and L3 cache misses.
+- monitor various CPU-specific performance events, e.g. branch mispredictions and L3 cache misses.
 - locate lines of code where these events happen.
-- filter data for a specific function, time period or processor.
+- characterize CPU performance bottlenecks with TMA methodology.
+- filter data for a specific function, process, time period or logical core.
 - observe the workload bahavior over time (incuding CPU frequency, memory bandwidth utilization, etc).
 
-VTune can provide a very rich information about a running process. It is the right tool for you if you're looking to improve the overall performance of an application. Vtune always provides an aggregated data over some time period, so it can be used for finding optimization opportunities for the "average case". 
+VTune can provide very rich information about a running process. It is the right tool for you if you're looking to improve the overall performance of an application. Vtune always provides an aggregated data over some time period, so it can be used for finding optimization opportunities for the "average case". 
 
 ### What you cannot do with it: {.unlisted .unnumbered}
 
@@ -67,5 +68,21 @@ Region 3 shows performance events that were collected and their distribution ove
 Finally, the bottom panel (region 4) shows the CPU frequency chart for four hardware threads. Hovering over different time slices tells us that the frequency of those cores fluctuates in the 3.2GHz - 3.4GHz region. Memory Access analysis type also shows memory bandwidth in GB/s over time.
 
 ![VTune's perf events timeline view of povray built-in benchmark.](../../img/perf-tools/VtunePovray_EventTimeline.jpg){#fig:VtuneTimelineView width=100% }
+
+### TMA in Intel® VTune™ Profiler {.unlisted .unnumbered}
+
+[TODO]: this section needs to be updated (moved from chapter 7).
+
+TMA is featured through the "[Microarchitecture Exploration](https://software.intel.com/en-us/vtune-help-general-exploration-analysis)"[^3] analysis in the latest Intel VTune Profiler. Figure @fig:Vtune_GE shows analysis summary for [7-zip benchmark](https://github.com/llvm-mirror/test-suite/tree/master/MultiSource/Benchmarks/7zip) [^4]. On the diagram, you can see that a significant amount of execution time was wasted due to CPU `Bad Speculation` and, in particular, due to mispredicted branches.
+
+![Intel VTune Profiler "Microarchitecture Exploration" analysis.](../../img/pmu-features/Vtune_GE.png){#fig:Vtune_GE width=90%}
+
+The beauty of the tool is that you can click on the metric you are interested in, and the tool will get you to the page that shows top functions that contribute to that particular metric. For example, if you click on the `Bad Speculation` metric, you will see something like what is shown in Figure @fig:Vtune_GE_func. [^19]
+
+!["Microarchitecture Exploration" Bottom-up view.](../../img/pmu-features/Vtune_GE_function_view.png){#fig:Vtune_GE_func width=90%}
+
+From there, if you double click on the `LzmaDec_DecodeReal2` function, Intel® VTune™ Profiler will get you to the source level view like the one that is shown in Figure @fig:Vtune_GE_code. The highlighted line contributes to the biggest number of branch mispredicts in the `LzmaDec_DecodeReal2` function.
+
+!["Microarchitecture Exploration" source code and assembly view.](../../img/pmu-features/Vtune_GE_code_view.png){#fig:Vtune_GE_code width=90%}
 
 [TODO]: Show usage of marker APIs with code and Timeline view.

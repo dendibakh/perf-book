@@ -20,21 +20,7 @@ The top two-levels of TMA metrics are expressed in the percentage of all pipelin
 
 After we identified the performance bottleneck in the program, we would be interested to know where exactly in the code it is happening. The second stage of TMA is locating the source of the problem down to the exact line of code and assembly instruction. Analysis methodology provides exact PMC that one should use for each category of the performance problem. Then the developer can use this PMC to find the area in the source code that contributes to the most critical performance bottleneck identified by the first stage. This correspondence can be found in [TMA metrics](https://github.com/intel/perfmon/blob/main/TMA_Metrics.xlsx)[^2] table in "Locate-with" column. For example, to locate the bottleneck associated with a high `DRAM_Bound` metric in an application running on the Intel Skylake processor, one should sample on `MEM_LOAD_RETIRED.L3_MISS_PS` performance event.
 
-### TMA in Intel® VTune™ Profiler
-
-TMA is featured through the "[Microarchitecture Exploration](https://software.intel.com/en-us/vtune-help-general-exploration-analysis)"[^3] analysis in the latest Intel VTune Profiler. Figure @fig:Vtune_GE shows analysis summary for [7-zip benchmark](https://github.com/llvm-mirror/test-suite/tree/master/MultiSource/Benchmarks/7zip) [^4]. On the diagram, you can see that a significant amount of execution time was wasted due to CPU `Bad Speculation` and, in particular, due to mispredicted branches.
-
-![Intel VTune Profiler "Microarchitecture Exploration" analysis.](../../img/pmu-features/Vtune_GE.png){#fig:Vtune_GE width=90%}
-
-The beauty of the tool is that you can click on the metric you are interested in, and the tool will get you to the page that shows top functions that contribute to that particular metric. For example, if you click on the `Bad Speculation` metric, you will see something like what is shown in Figure @fig:Vtune_GE_func. [^19]
-
-!["Microarchitecture Exploration" Bottom-up view.](../../img/pmu-features/Vtune_GE_function_view.png){#fig:Vtune_GE_func width=90%}
-
-From there, if you double click on the `LzmaDec_DecodeReal2` function, Intel® VTune™ Profiler will get you to the source level view like the one that is shown in Figure @fig:Vtune_GE_code. The highlighted line contributes to the biggest number of branch mispredicts in the `LzmaDec_DecodeReal2` function.
-
-!["Microarchitecture Exploration" source code and assembly view.](../../img/pmu-features/Vtune_GE_code_view.png){#fig:Vtune_GE_code width=90%}
-
-### TMA in Linux Perf {#sec:secTMA_perf}
+### Case Study: Reduce The Number Of Cache Misses With TMA Using Linux Perf {#sec:secTMA_perf}
 
 As of Linux kernel 4.8, `perf` has an option `--topdown` used in `perf stat` command[^5] that prints TMA level 1 metrics, i.e., only four high-level buckets:
 
@@ -54,7 +40,7 @@ To get access to Top-Down metrics level 2, 3, etc. one can use [toplev](https://
 
 \personal{Intel® VTune™ Profiler is an extremely powerful tool, no doubt about it. However, for quick experiments, I often use Linux perf that is available on every Linux distribution I’m working on. Thus, the motivation for the example in the next section being explored with Linux perf.}
 
-### Step1: Identify the bottleneck
+#### Step1: Identify the bottleneck {.unlisted .unnumbered}
 
 Suppose we have a tiny benchmark (`a.out`) that runs for 8.5 sec. The complete source code of the benchmark can be found on [github](https://github.com/dendibakh/dendibakh.github.io/tree/master/_posts/code/TMAM)[^8].
 
@@ -126,7 +112,7 @@ $ perf stat -e cycles,cycle_activity.stalls_l3_miss -- ./a.out
 
 According to the definition of `CYCLE_ACTIVITY.STALLS_L3_MISS`, it counts cycles when execution stalls, while the L3 cache miss demand load is outstanding. We can see that there are ~60% of such cycles, which is pretty bad.
 
-### Step2: Locate the place in the code {#sec:secTMA_locate}
+#### Step2: Locate the place in the code {#sec:secTMA_locate} {.unlisted .unnumbered}
 
 As the second step in the TMA process, we would locate the place in the code where the bottleneck occurs most frequently. In order to do so, one should sample the workload using a performance event that corresponds to the type of bottleneck that was identified during Step 1.
 
@@ -186,7 +172,7 @@ int main() {
 
 By looking at [@lst:TMA_asm], we can see that all L3-Cache misses in function `foo` are tagged to a single instruction. Now that we know which instruction caused so many L3 misses, let’s fix it. 
 
-### Step3: Fix the issue
+#### Step3: Fix the issue {.unlisted .unnumbered}
 
 Because there is a time window between the moment when we get the next address that will be accessed and actual load instruction, we can add a prefetch hint[^12] as shown on [@lst:TMA_prefetch]. More information about memory prefetching can be found in [@sec:memPrefetch].
 
@@ -211,7 +197,7 @@ $ perf stat -e cycles,cycle_activity.stalls_l3_miss -- ./a.out
 
 TMA is an iterative process, so we now need to repeat the process starting from the Step1. Likely it will move the bottleneck into some other bucket, in this case, Retiring. This was an easy example demonstrating the workflow of TMA methodology. Analyzing real-world application is unlikely to be that easy. The next entire chapter in this book is organized in a way to be conveniently used with the TMA process. E.g., its sections are broken down to reflect each high-level category of performance bottlenecks. The idea behind such a structure is to provide some kind of checklist which developers can use to drive code changes after a performance issue has been found. For instance, when developers see that the application they are working on is `Memory Bound`, they can look up [@sec:MemBound] for ideas.
 
-### Summary
+#### Summary {.unlisted .unnumbered}
 
 TMA is great for identifying CPU performance bottlenecks in the code. Ideally, when we run it on some application, we would like to see the Retiring metric at 100%.  This would mean that this application fully saturates the CPU. It is possible to achieve results close to this on a toy program. However, real-world applications are far from getting there. Figure @fig:TMA_metrics_SPEC2006 shows top-level TMA metrics for [SPEC CPU2006](http://spec.org/cpu2006/)[^13] benchmark for Skylake CPU generation. Keep in mind that the numbers are likely to change for other CPU generations as architects constantly try to improve the CPU design. The numbers are also likely to change for other instruction set architectures (ISA) and compiler versions.
 
@@ -223,10 +209,9 @@ Workload characterization provided by the TMA can increase the scope of potentia
 
 At the time of this writing, the first level of TMA metrics is also available on AMD processors.
 
-**Additional resources and links:**
+#### Additional resources and links {.unlisted .unnumbered}
 
-* Ahmad Yasin’s paper “A top-down method for performance analysis and counters architecture” [@TMA_ISPASS].
-
+- Ahmad Yasin’s paper “A top-down method for performance analysis and counters architecture” [@TMA_ISPASS].
 - Presentation "Software Optimizations Become Simple with Top-Down Analysis on Intel Skylake" by Ahmad Yasin at IDF'15, URL: [https://youtu.be/kjufVhyuV_A](https://youtu.be/kjufVhyuV_A).
 - Andi Kleen's blog - pmu-tools, part II: toplev, URL: [http://halobates.de/blog/p/262](http://halobates.de/blog/p/262).
 - Toplev manual, URL: [https://github.com/andikleen/pmu-tools/wiki/toplev-manual](https://github.com/andikleen/pmu-tools/wiki/toplev-manual).

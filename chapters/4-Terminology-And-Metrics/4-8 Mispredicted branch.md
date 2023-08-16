@@ -2,7 +2,7 @@
 typora-root-url: ..\..\img
 ---
 
-## Mispredicted branch {#sec:BbMisp}
+## Mispredicted Branch {#sec:BbMisp}
 
 Modern CPUs try to predict the outcome of a branch instruction (taken or not taken). For example, when the processor sees code like this:
 ```bash

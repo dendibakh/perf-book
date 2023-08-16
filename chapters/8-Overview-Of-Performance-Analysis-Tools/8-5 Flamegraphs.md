@@ -1,0 +1,5 @@
+## Flame Graphs
+
+A popular way of visualizing the profiling data and the most frequent code-paths in the program is by using flame graphs. It allows us to see which function calls take the biggest portion of execution time. Figure @fig:FlameGraph shows the example of a flame graph for  [x264](https://openbenchmarking.org/test/pts/x264) benchmark. From the mentioned flame graph we can see that the path that takes the most amount of execution time is `x264 -> threadpool_thread_internal -> slices_write -> slice_write -> x264_8_macroblock_analyse `. The original output is interactive and allows us to zoom into a particular code path. The flame graph was generated with [opensource scripts](https://github.com/brendangregg/FlameGraph)[^9] developed by Brendan Gregg. There are other tools capable of emitting flame graphs, perhaps KDAB [Hotspot](https://github.com/KDAB/hotspot)[^11] is the most popular alternative.
+
+![A Flame Graph for [x264](https://openbenchmarking.org/test/pts/x264) benchmark.](../../img/perf-analysis/Flamegraph.jpg){#fig:FlameGraph width=90%}
