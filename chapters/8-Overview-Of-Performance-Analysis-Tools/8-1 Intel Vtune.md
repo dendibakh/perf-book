@@ -86,3 +86,7 @@ From there, if you double click on the `LzmaDec_DecodeReal2` function, Intel® V
 !["Microarchitecture Exploration" source code and assembly view.](../../img/pmu-features/Vtune_GE_code_view.png){#fig:Vtune_GE_code width=90%}
 
 [TODO]: Show usage of marker APIs with code and Timeline view.
+
+[^3]: VTune microarchitecture analysis - [https://software.intel.com/en-us/vtune-help-general-exploration-analysis](https://software.intel.com/en-us/vtune-help-general-exploration-analysis). In pre-2019 versions of Intel® VTune Profiler, it was called as “General Exploration” analysis.
+[^4]: 7zip benchmark - [https://github.com/llvm-mirror/test-suite/tree/master/MultiSource/Benchmarks/7zip](https://github.com/llvm-mirror/test-suite/tree/master/MultiSource/Benchmarks/7zip).
+[^19]: Per-function view of TMA metrics is a feature unique to Intel® VTune profiler.
