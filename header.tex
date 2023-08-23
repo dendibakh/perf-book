@@ -122,6 +122,10 @@
 \usepackage{bookmark}
 \usepackage{etoolbox}
 
+\usepackage{tikz}
+\newcommand*\circled[1]{\tikz[baseline=(char.base)]{
+            \node[shape=circle,draw,inner sep=1.5pt] (char) {#1};}}
+
 \makeatletter
 \newcommand*{\AddChapterPrefixInBookmarks}{%
   \if@mainmatter
