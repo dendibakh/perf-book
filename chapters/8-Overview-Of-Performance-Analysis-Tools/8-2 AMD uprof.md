@@ -1,8 +1,8 @@
 ## AMD uProf
 
-### General Information {.unlisted .unnumbered}
+The [uProf](https://www.amd.com/en/developer/uprof.html) profiler is a tool developed by AMD for monitoring performance of applications running on AMD processors. While uProf can be used on Intel processors as well, you will be able to use only CPU-independent features. The profiler is available for free to download and can be used on Windows, Linux and FreeBSD. Also, uProf supports analyzing applications written in various languages, including C, C++, Java, .NET/CLR.
 
-[AMD uProf](https://www.amd.com/en/developer/uprof.html) profiler is suitable for monitoring performance of applications running on AMD processors. uProf can be used on Intel processors and supports most of the CPU independent features. It supports CPU performance profiling, OS event racing, OpenMP tracing, MPI tracing, CPU power profiling. uProf is available for free to download and supported on multiple platforms - Windows, Linux and FreeBSD. Applications of various languages can be profiled by uProf - C, C++, Java, .NET/CLR.
+It supports CPU performance profiling, OS event tracing, OpenMP tracing, MPI tracing, CPU power profiling.
 
 For CPU performance profiling it uses the sampling method to collect the performance data for analysis. uProf collects two types of MSRs supported by AMD processors to monitor the performance - Core PMC, and IBS (Instruction Based Sampling). IBS MSRs provide precise samples, whereas PMC MSRs suffer with skid issue.
 
@@ -12,12 +12,11 @@ It supports analysis of OpenMP applications to detect thread imbalance, analysis
 
 It supports profiling on multiple virtual machines (VMs), all features might not be available on all VMs - Microsoft Hyper-V, KVM, VMware ESXi, Citrix Xen.
 
-More details on various features of uProf can be found in the [User Guide](https://www.amd.com/en/developer/uprof.html#documentation). 
+More details on various features of uProf can be found in the [User Guide](https://www.amd.com/en/developer/uprof.html#documentation).
 
 ### How to configure it {.unlisted .unnumbered}
 
-On Linux, uProf Linux perf for data collection. On Windows, uProf uses own driver to collect the samples. The driver gets installed while installing uProf.
-uProf supports both command-line interface (CLI) and graphical interface (GUI). The CLI interface requires two separte steps - collect and report.
+On Linux, uProf uses Linux perf for data collection. On Windows, uProf uses its own driver that gets installed when you install uProf. No additional configuration is required. AMD uProf supports both command-line interface (CLI) and graphical interface (GUI). The CLI interface requires two separte steps - collect and report.
 
 ### What you can do with it: {.unlisted .unnumbered}
 
