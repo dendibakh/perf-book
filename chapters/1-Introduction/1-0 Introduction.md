@@ -8,9 +8,9 @@ They say, "performance is king". It was true a decade ago, and it certainly is n
 
 In the PC era[^2], developers usually were programming directly on top of the operating system, with possibly a few libraries in between. As the world moved to the cloud era, the SW stack got deeper and more complex. The top layer of the stack on which most developers are working has moved further away from the HW. Those additional layers abstract away the actual HW, which allows using new types of accelerators for emerging workloads. However, the negative side of such evolution is that developers of modern applications have less affinity to the actual HW on which their SW is running. 
 
-Software programmers have had an "easy ride" for decades, thanks to Moore’s law. It used to be the case that some SW vendors preferred to wait for a new generation of HW to speed up their application and did not spend human resources on making improvements in their code. By looking at Figure @fig:40YearsProcessorTrend, we can see that single-threaded performance[^3] growth is slowing down.
+Software programmers have had an "easy ride" for decades, thanks to Moore’s law. It used to be the case that some SW vendors preferred to wait for a new generation of HW to speed up their application and did not spend human resources on making improvements in their code. By looking at Figure @fig:50YearsProcessorTrend, we can see that single-threaded performance[^3] growth is slowing down.
 
-![48 Years of Microprocessor Trend Data. *© Image by K. Rupp via karlrupp.net*](../../img/intro/48-years-processor-trend.png){#fig:40YearsProcessorTrend width=90%}
+![50 Years of Microprocessor Trend Data. *© Image by K. Rupp via karlrupp.net*](../../img/intro/50-years-processor-trend.png){#fig:50YearsProcessorTrend width=90%}
 
 When it's no longer the case that each HW generation provides a significant performance boost [@Leisersoneaam9744], we must start paying more attention to how fast our code runs. When seeking ways to improve performance, developers should not rely on HW. Instead, they should start optimizing the code of their applications.
 
