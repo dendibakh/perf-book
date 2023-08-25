@@ -20,7 +20,7 @@ Besides that uProf can monitor various OS events on Linux - thread state, thread
 
 Due to the sampling nature of the tool, it will eventually miss events with a very short duration. The reported samples are statistically estimated numbers, which are most of the time sufficient to analyze the performance but not the exact count of the events.
 
-### Examples {.unlisted .unnumbered}
+### Example {.unlisted .unnumbered}
 
 To demonstrate the look-and-feel of AMD uProf tool, we ran the dense LU matrix factorization component from the [Scimark2](https://math.nist.gov/scimark2/index.html)[^2] benchmark on AMD Ryzen 9 7950X, Windows 11, 64 GB RAM.
 
