@@ -70,7 +70,7 @@ timestamp       srcline   instruction      srccode
 ...
 ```
 
-Above is shown just a small snippet from the long execution log. In this log, __we have traces of every instruction executed while our program was running__. We can literally observe every step that was made by the program. It is a very strong foundation for further analysis.
+Above is shown just a small snippet from the long execution log. In this log, we have traces of *every* instruction executed while our program was running. We can literally observe every step that was made by the program. It is a very strong foundation for further functional and performance analysis.
 
 ## Use Cases {.unnumbered .unlisted}
 
@@ -93,7 +93,6 @@ Decoding PT traces can take a long time. On an Intel Core i5-8259U machine, for 
 
 ## Intel PT References and links {.unnumbered .unlisted}
 
-* Intel publication "Processor Tracing", URL: [https://software.intel.com/en-us/blogs/2013/09/18/processor-tracing](https://software.intel.com/en-us/blogs/2013/09/18/processor-tracing).
 * Intel® 64 and IA-32 Architectures Software Developer Manuals [@IntelSDM, Volume 3C, Chapter 36].
 * Whitepaper "Hardware-assisted instruction profiling and latency detection" [@IntelPTPaper].
 * Andi Kleen article on LWN, URL: [https://lwn.net/Articles/648154](https://lwn.net/Articles/648154).
@@ -104,6 +103,6 @@ Decoding PT traces can take a long time. On an Intel Core i5-8259U machine, for 
   [https://github.com/torvalds/linux/blob/master/tools/perf/Documentation/intel-pt.txt](https://github.com/torvalds/linux/blob/master/tools/perf/Documentation/intel-pt.txt).
 * Cheatsheet for Intel Processor Trace, URL: [http://halobates.de/blog/p/410](http://halobates.de/blog/p/410).
 
-[^1]: See more information on overhead in [@IntelPTPaper].
+[^1]: See more information about Intel PT overhead in [@IntelPTPaper].
 [^2]: Analyze performance glitches with Intel PT - [https://easyperf.net/blog/2019/09/06/Intel-PT-part3](https://easyperf.net/blog/2019/09/06/Intel-PT-part3).
 [^3]: Postmortem debugging with Intel PT - [https://easyperf.net/blog/2019/08/30/Intel-PT-part2](https://easyperf.net/blog/2019/08/30/Intel-PT-part2).

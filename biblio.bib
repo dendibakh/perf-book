@@ -5,7 +5,6 @@
   title         = {Future Directions for Optimizing Compilers},
   year          = {2018},
   __markedentry = {[dbakhval:]},
-  abstract      = {As software becomes larger, programming languages become higher-level, and processors continue to fail to be clocked faster, we'll increasingly require compilers to reduce code bloat, eliminate abstraction penalties, and exploit interesting instruction sets. At the same time, compiler execution time must not increase too much and also compilers should never produce the wrong output. This paper examines the problem of making optimizing compilers faster, less buggy, and more capable of generating high-quality output.},
   date          = {2018-09-06},
   eprint        = {http://arxiv.org/abs/1809.02161v1},
   eprintclass   = {cs.PL},
@@ -91,7 +90,6 @@
   title         = {Robust benchmarking in noisy environments},
   year          = {2016},
   __markedentry = {[dbakhval:6]},
-  abstract      = {We propose a benchmarking strategy that is robust in the presence of timer error, OS jitter and other environmental fluctuations, and is insensitive to the highly nonideal statistics produced by timing measurements. We construct a model that explains how these strongly nonideal statistics can arise from environmental fluctuations, and also justifies our proposed strategy. We implement this strategy in the BenchmarkTools Julia package, where it is used in production continuous integration (CI) pipelines for developing the Julia language and its ecosystem.},
   date          = {2016-08-15},
   eprint        = {http://arxiv.org/abs/1608.04295v1},
   eprintclass   = {cs.PF},
@@ -298,13 +296,22 @@ pages	= {65-79}
   url = {https://software.intel.com/content/www/us/en/develop/documentation/vtune-help/top/analyze-performance/hardware-event-based-sampling-collection.html}
 }
 
-@inproceedings{CozPaper,
-author = {Curtsinger, Charlie and Berger, Emery},
-year = {2015},
-month = {10},
-pages = {184-197},
-title = {Coz: Finding Code that Counts with Causal Profiling},
-doi = {10.1145/2815400.2815409}
+@article{CozPaper,
+author = {Curtsinger, Charlie and Berger, Emery D.},
+title = {Coz: Finding Code That Counts with Causal Profiling},
+year = {2018},
+issue_date = {June 2018},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+volume = {61},
+number = {6},
+issn = {0001-0782},
+url = {https://doi.org/10.1145/3205911},
+doi = {10.1145/3205911},
+journal = {Commun. ACM},
+month = {may},
+pages = {91–99},
+numpages = {9}
 }
 
 @book{Akinshin2019,
@@ -355,17 +362,6 @@ numpages = {12},
 keywords = {performance, measurement, bias},
 location = {Washington, DC, USA},
 series = {ASPLOS XIV}
-}
-
-@inproceedings{STABILIZER,
-author = {Curtsinger, Charlie and Berger, Emery},
-year = {2013},
-month = {03},
-pages = {219-228},
-title = {STABILIZER: statistically sound performance evaluation},
-volume = {48},
-journal = {ACM SIGPLAN Notices},
-doi = {10.1145/2451116.2451141}
 }
 
 @misc{RobustBenchmarking,
@@ -492,14 +488,21 @@ url = {http://papers.nips.cc/paper/9337-a-zero-positive-learning-approach-for-di
     primaryClass={stat.AP}
 }
 
-@article{IntelPTPaper,  
-author={S. D. {Sharma} and M. {Dagenais}},  
-journal={The Journal of Engineering},   
-title={Hardware-assisted instruction profiling and latency detection},   
-year={2016},  
-volume={2016},  
-number={10},  
-pages={367-376},
+@article{IntelPTPaper,
+   author = {Suchakrapani Datt Sharma},
+   author = {Michel Dagenais},
+   keywords = {latency detection;syscall latency profiling;fine-tuning hardware tracing;hardware-assisted instruction profiling;hardware-based tracing;software tracing;sixth generation Intel processors;optimum utilisation;},
+   language = {English},
+   title = {Hardware-assisted instruction profiling and latency detection},
+   journal = {The Journal of Engineering},
+   issue = {10},   
+   volume = {2016},
+   year = {2016},
+   month = {October},
+   pages = {367-376(9)},
+   publisher ={Institution of Engineering and Technology},
+   copyright = {This is an open access article published by the IET under the Creative Commons Attribution License (http://creativecommons.org/licenses/by/3.0/)},
+   url = {https://digital-library.theiet.org/content/journals/10.1049/joe.2016.0127}
 }
 
 @inproceedings{PMC_virtual,
