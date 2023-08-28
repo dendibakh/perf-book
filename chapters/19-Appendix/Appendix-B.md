@@ -23,7 +23,6 @@ void bar(float* A, float* B, float K, int start, int end) {
 
 In the example below, if the pointers A and B point to consecutive addresses, then it is illegal to vectorize the code because some elements of A will be written before they are read from array B.
 
-
 Some programmers use the `restrict` keyword to notify the compiler that the pointers are disjointed, but in our example, the LLVM Loop Vectorizer has no way of knowing that the pointers A and B are unique. The Loop Vectorizer handles this loop by placing code that checks, at runtime, if the arrays A and B point to disjointed memory locations. If arrays A and B overlap, then the scalar version of the loop is executed.
 
 ```cpp
@@ -106,7 +105,6 @@ int foo(int * A, int * B, int n) {
 }
 ```
 
-
 In many situations, the cost model will decide that this transformation is not profitable. 
 
 ## Vectorization of Mixed Types {.unnumbered .unlisted}
@@ -136,7 +134,6 @@ fmuladd
 ## Partial unrolling during vectorization {.unnumbered .unlisted}
 
 Modern processors feature multiple execution units, and only programs that contain a high degree of parallelism can fully utilize the entire width of the machine. The LLVM Loop Vectorizer increases the instruction-level parallelism (ILP) by performing partial-unrolling of loops.
-
 
 In the example below, the entire array is accumulated into the variable `sum`. This is inefficient because only a single execution port can be used by the processor. By unrolling the code, the Loop Vectorizer allows two or more execution ports to be used simultaneously.
 

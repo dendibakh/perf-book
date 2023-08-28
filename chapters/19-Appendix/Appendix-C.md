@@ -8,8 +8,7 @@ typora-root-url: ..\..\img
 
 ## Windows
 
- To utilize huge pages on Windows, one needs to enable `SeLockMemoryPrivilege` [security policy](https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/lock-pages-in-memory).
- This can be done programatically via the Windows API, or alternatively via the security policy GUI.
+To utilize huge pages on Windows, one needs to enable `SeLockMemoryPrivilege` [security policy](https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/lock-pages-in-memory). This can be done programatically via the Windows API, or alternatively via the security policy GUI.
 
 1. Hit start -> search "secpol.msc", launch it.
 2. On the left select "Local Policies" -> "User Rights Assignment", then double-click on "Lock pages in memory".
@@ -35,7 +34,7 @@ VirtualFree(ptr, 0, MEM_RELEASE);
 
 On Linux OS, there are two ways of using huge pages in an application: Explicit and Transparent Huge Pages.
 
-### Explicit hugepages
+### Explicit hugepages {.unnumbered .unlisted}
 
 Explicit huge pages can be reserved at boot time or at run time. To make a permanent change to force the Linux kernel to allocate 128 huge pages at the boot time, run the following command:
 
@@ -89,7 +88,7 @@ Other alternatives include:
 * `mmap` using a file from a mounted `hugetlbfs` filesystem ([exampe code](https://github.com/torvalds/linux/blob/master/tools/testing/selftests/vm/hugepage-mmap.c)[^26]).
 * `shmget` using the `SHM_HUGETLB` flag ([exampe code](https://github.com/torvalds/linux/blob/master/tools/testing/selftests/vm/hugepage-shm.c)[^27]).
 
-### Transparent hugepages
+### Transparent hugepages {.unnumbered .unlisted}
 
 To allow application use Transparent Huge Pages (THP) on Linux one should make sure that `/sys/kernel/mm/transparent_hugepage/enabled` is `always` or `madvise`. The former enables system wide usage of THPs, while the latter gives control to the user code which memory regions should use THPs, thus avoids the risk of consuming more memory resources. Below is the example of using the `madvise` approach:
 

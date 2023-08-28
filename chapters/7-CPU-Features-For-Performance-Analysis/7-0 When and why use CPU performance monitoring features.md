@@ -19,4 +19,6 @@ Modern CPUs are constantly getting new features that enhance performance analysi
 * Processor Event-Based Sampling (PEBS) - a feature that enhances sampling. Among its primary advantages are: lowering the overhead of sampling and providing "Precise Events" capability, which allows pinpointing exact instruction that caused a particular performance event.
 * Intel Processor Traces (PT) - a facility to record and reconstruct the program execution with a timestamp on every instruction. Its main usages are postmortem analysis and root-causing performance glitches.
 
-The features mentioned above provide insights on the efficiency of a program from the CPU perspective and how to make it more CPU-friendly. Profiling tools leverage them to provide many different types of performance analysis.
+The Intel PT feature is covered in Appendix D. Intel PT was supposed to be an "end game" for performance analysis. With its low runtime overhead, it is a very powerful analysis feature. But it turns out to be not very popular among performance engineers. Partially because the support in the tools is not mature, partially because in many cases it is an overkill, and it's just easier to use a sampling profiler. Also, it produces a lot of data, which is not practical for long-running workloads.
+
+The features mentioned above provide insights on the efficiency of a program from the CPU perspective. In the next chapter we will discuss how profiling tools leverage them to provide many different types of performance analysis.
