@@ -8,6 +8,8 @@ There are many features in HW and SW that are intended to increase performance. 
 
 If we start two runs of the benchmark, one right after another on a "cold" processor[^1], the first run could possibly work for some time in "overclocked" mode and then decrease its frequency back to the base level. However, it's possible that the second run might not have this advantage and will operate at the base frequency without entering "turbo mode". Even though we run the exact same version of the program two times, the environment in which they run is not the same. Figure @fig:FreqScaling shows a situation where dynamic frequency scaling can cause variance in measurements. Such a scenario can frequently happen when benchmarking on laptops since usually they have limited heat dissipation.
 
+[TODO:] redraw the image
+
 ![Variance in measurements caused by frequency scaling.](../../img/measurements/FreqScaling.jpg){#fig:FreqScaling width=80%}
 
 Frequency Scaling is an HW feature, but variations in measurements might also come from SW features. Let's consider the example of a filesystem cache. If we benchmark an application that does lots of file manipulation, the filesystem can play a big role in performance. When the first iteration of the benchmark runs, the required entries in the filesystem cache could be missing. However, the filesystem cache will be warmed-up when running the same benchmark a second time, making it significantly faster than the first run.
@@ -24,7 +26,6 @@ It is not recommended to eliminate system non-deterministic behavior when estima
 
 Finally, it's important to keep in mind that even if a particular HW or SW feature has non-deterministic behavior, that doesn't mean it is considered harmful. It could give an inconsistent result, but it is designed to improve the overall performance of the system. Disabling such a feature might reduce the noise in microbenchmarks but make the whole suite run longer. This might be especially important for CI/CD performance testing when there are time limits for how long it should take to run the whole benchmark suite.
 
-[^1]: By cold processor, I mean the CPU that stayed in an idle mode for a while, allowing it to cool down. 
+[^1]: By cold processor, we mean the CPU that stayed in an idle mode for a while, allowing it to cool down its temperature. 
 [^11]: Dynamic Frequency Scaling - [https://en.wikipedia.org/wiki/Dynamic_frequency_scaling](https://en.wikipedia.org/wiki/Dynamic_frequency_scaling).
-[^12]: Standard deviation - [https://en.wikipedia.org/wiki/Standard_deviation](https://en.wikipedia.org/wiki/Standard_deviation).
 [^14]: Temci - [https://github.com/parttimenerd/temci](https://github.com/parttimenerd/temci).

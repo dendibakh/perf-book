@@ -6,7 +6,7 @@ typora-root-url: ..\..\img
 
 To benchmark execution time, engineers usually use two different timers, which all the modern platforms provide:
 
- - **System-wide high-resolution timer**. This is a system timer that is typically implemented as a simple count of the number of ticks that have transpired since some arbitrary starting date, called the [epoch](https://en.wikipedia.org/wiki/Epoch_(computing))[^1]. This clock is monotonic; i.e., it always goes up. System timer has a nano-seconds resolution[^9] and is consistent between all the CPUs. It is suitable for measuring events with a duration of more than a microsecond. System time can be retrieved from the OS with a system call[^2]. The system-wide timer is independent of CPU frequency. Accessing the system timer on Linux systems is possible via the `clock_gettime` system call[^10]. The `de facto` standard for accessing system timer in C++ is using `std::chrono` as shown in [@lst:Chrono].
+ - **System-wide high-resolution timer**. This is a system timer that is typically implemented as a simple count of the number of ticks that have transpired since some arbitrary starting date, called the [epoch](https://en.wikipedia.org/wiki/Epoch_(computing))[^1]. This clock is monotonic; i.e., it always goes up. System time can be retrieved from the OS with a system call[^2]. Accessing the system timer on Linux systems is possible via the `clock_gettime` system call. System timer has a nano-seconds resolution, is consistent between all the CPUs and is independent of CPU frequency. Even though the system timer can return timestamps with nano-seconds accuracy, it is not suitable for measuring short running events because it takes a long time to obtain the timestamp via the `clock_gettime` system call. But it is OK to measure events with a duration of more than a microsecond. The `de facto` standard for accessing system timer in C++ is using `std::chrono` as shown in [@lst:Chrono].
 
    Listing: Using C++ std::chrono to access system timer
    
@@ -47,5 +47,3 @@ Choosing which timer to use is very simple and depends on how long the thing is 
 [^1]: Unix epoch starts at 1 January 1970 00:00:00 UT: [https://en.wikipedia.org/wiki/Unix_epoch](https://en.wikipedia.org/wiki/Unix_epoch).
 [^2]: Retrieving system time - [https://en.wikipedia.org/wiki/System_time#Retrieving_system_time](https://en.wikipedia.org/wiki/System_time#Retrieving_system_time)
 [^3]: CppPerformanceBenchmarks wiki - [https://gitlab.com/chriscox/CppPerformanceBenchmarks/-/wikis/ClockTimeAnalysis](https://gitlab.com/chriscox/CppPerformanceBenchmarks/-/wikis/ClockTimeAnalysis)
-[^9]: Even though the system timer can return timestamps with nano-seconds accuracy, it is not suitable for measuring short running events because it takes a long time to obtain the timestamp via the `clock_gettime` system call.
-[^10]: On Linux, one can query CPU time for each thread using the `pthread_getcpuclockid` system call.
