@@ -57,5 +57,3 @@ Notice, that we measure latency in nanoseconds and bandwidth in GB/s, thus they 
 Knowledge of the primary characteristics of a machine is fundamental to assessing how well a program utilizes available resources. We will continue this discussion in [@sec:roofline] about Roofline performance model. If you constantly analyze performance on a single platform, it is a good idea to memorize latencies and bandwidth of various components of the memory hierarchy or have them handy. It helps to establish the mental model for a system under test which will aid your further performance analysis as you will see next.
 
 [^1]: Intel MLC tool - [https://www.intel.com/content/www/us/en/download/736633/intel-memory-latency-checker-intel-mlc.html](https://www.intel.com/content/www/us/en/download/736633/intel-memory-latency-checker-intel-mlc.html)
-
-TODO: compare the output with maximums from Intel Advisor
