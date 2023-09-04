@@ -109,6 +109,8 @@ $ ~/workspace/pmu-tools/toplev.py -m --global --no-desc -v --xlsx workload.xlsx 
 
 ![A set of metrics charts for the CloverLeaf benchmark.](../../img/terms-and-metrics/CloverMetricCharts2.png){#fig:CloverMetricCharts width=100% }
 
+[TODO]: describe the charts.
+
 Even though the deviation from the values reported in the summary is not very big, we can see that the workload is not always stable. After looking at the IPC chart we can hypothesize that there are no various phases in the workload and the variation is caused by multiplexing between performance events (discussed in [@sec:counting]). Yet, this is only a hypothesis that needs to be confirmed or disproved. Possible ways to proceed would be to collect more data points by running collection with higher granularity (in our case it's 10 sec) and study the source code. Be careful when drawing conclusions just from looking at the numbers, always obtain a second source of data that confirm your hypothesis.
 
 In summary, looking at performance metrics helps building the right mental model about what is and what is *not* happening in a program. Going further into analysis, this data will serve you well.
