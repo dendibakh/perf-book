@@ -38,7 +38,7 @@ It is so common that engineers want to count the number of executed instructions
 
 It's not unusual for PMU to have a large number of performance events. Figure @fig:PMU shows just a small part of all the performance events available for monitoring on a modern Intel CPU. It's not hard to notice that the number of available PMCs is much smaller than the number of performance events. It's not possible to count all the events at the same time, but analysis tools solve this problem by multiplexing between groups of performance events during the execution of a program (see [@sec:secMultiplex]). 
 
-The complete list of performance events for Intel CPUs can be found in [@IntelSDM, Volume 3B, Chapter 19]. For ARM chips, it is not that strictly defined. Vendors implement cores following an ARM architecture, but performance events vary widely, both in what they mean and what events are supported.
+The complete list of performance events for Intel CPUs can be found in [@IntelSDM, Volume 3B, Chapter 19] or at [perfmon-events.intel.com](https://perfmon-events.intel.com/). For ARM chips, it is not that strictly defined. Vendors implement cores following an ARM architecture, but performance events vary widely, both in what they mean and what events are supported.
 
 [^1]: The same information can be extracted from the kernel message buffer by using the `dmesg` command.
 [^2]: When the value of PMCs overflows, the execution of a program must be interrupted. SW then should save the fact of overflow.
