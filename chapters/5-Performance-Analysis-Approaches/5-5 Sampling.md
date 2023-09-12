@@ -22,7 +22,7 @@ User-mode sampling incurs more runtime overhead than EBS. The average overhead o
 
 In this section, we will discuss the scenario of using PMCs with EBS. Figure @fig:Sampling illustrates the counter overflow feature of the PMU, which is used to trigger performance monitoring interrupt (PMI). 
 
-![Using performance counter for sampling](../../img/perf-analysis/SamplingFlow.png){#fig:Sampling width=70%}
+![Using performance counter for sampling](../../img/perf-analysis/SamplingFlow.png){#fig:Sampling width=60%}
 
 In the beginning, we configure the event that we want to sample on. Identifying hotspots means knowing where the program spends most of the time. So sampling on cycles is very natural, and it is a default for many profiling tools. But it's not necessarily a strict rule; we can sample on any performance event we want. For example, if we would like to know the place where the program experiences the biggest number of L3-cache misses, we would sample on the corresponding event, i.e., `MEM_LOAD_RETIRED.L3_MISS`.
 
