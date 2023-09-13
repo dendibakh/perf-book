@@ -2,6 +2,8 @@
 typora-root-url: ..\..\img
 ---
 
+I STOPPED HERE
+
 ## Static Performance Analysis
 
 [TODO] introduce UICA, show example of finding dependency chains using it
