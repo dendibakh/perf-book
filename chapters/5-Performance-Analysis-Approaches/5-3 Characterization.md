@@ -4,8 +4,6 @@ typora-root-url: ..\..\img
 
 ## Workload Characterization {#sec:counting}
 
-[TODO]: cosmetic updates
-
 Workload characterization is a process of describing a workload by means of quantitative parameters and functions. In simple words, it means counting an absolute number of certain performance events. The goal of characterization is to define the behavior of the workload and extract its most important features. On a high level, an application can belong to one or many of the following types: interactive, database, real-time, network-based, massively parallel, etc. Different workloads can be characterized using different metrics and parameters to address a particular application domain.
 
 This is a book about low-level performance, remember? So, we will focus on extracting features related to the CPU and memory performance. The best example of a workload characterization from a CPU perspective is Top-Down Microarchitecture Analysis (TMA) methodology, which we will closely look at in [@sec:TMA]. TMA attempts to characterize an application by putting it into one of 4 buckets: CPU Front End, CPU Back End, Retiring, and Bad Speculation depending on what is causing the most performance issues. TMA uses Performance Monitoring Counters (PMCs) to collect the needed information and identify the inefficient use of CPU microarchitecture.

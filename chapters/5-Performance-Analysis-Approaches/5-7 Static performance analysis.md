@@ -24,6 +24,8 @@ A big collection of tools both for static and dynamic microarchitectural perform
 
 \personal{I use those tools whenever I need to explore some interesting CPU microarchitecture effect. Static and low-level dynamic analyzers (like likwid and uarch-bench) allow us to observe HW effects in practice while doing performance experiments. They are a great help for building up your mental model of how CPU works.}
 
+[TODO]: add uica.uops.info
+
 [^1]: Tools for static code analysis - [https://en.wikipedia.org/wiki/List_of_tools_for_static_code_analysis#C,_C++](https://en.wikipedia.org/wiki/List_of_tools_for_static_code_analysis#C,_C++).
 [^2]: IACA - [https://software.intel.com/en-us/articles/intel-architecture-code-analyzer](https://software.intel.com/en-us/articles/intel-architecture-code-analyzer). In April 2019, the tools has reached its End Of Life and is no longer supported.
 [^3]: LLVM MCA - [https://llvm.org/docs/CommandGuide/llvm-mca.html](https://llvm.org/docs/CommandGuide/llvm-mca.html)

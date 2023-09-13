@@ -2,6 +2,8 @@
 typora-root-url: ..\..\img
 ---
 
+I STOPPED HERE
+
 ## Roofline Performance Model {#sec:roofline}
 
 Roofline Performance Model was developed at the University of California, Berkeley, in 2009. It is a throughput-oriented performance model that is heavily used in the HPC world. The "roofline" in this model expresses the fact that the performance of an application cannot exceed the machine's capabilities. Every function and every loop in a program is limited by either compute or memory capacity of a machine. This concept is represented in figure @fig:RooflineIntro: the performance of an application will always be limited by a certain "roofline" function.
