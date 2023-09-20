@@ -1,4 +1,4 @@
-### Using Marker APIs
+### Using Marker APIs {#sec:MarkerAPI}
 
 In certain scenarios, we might be interested in analyzing performance of a specific code region, not an entire application. This can be a situation when you're developing a new piece of code and want to focus just on that code. Naturally, you would like to track optimization progress and capture additional performance data that will help you along the way. Most performance analysis tools provide specific *marker APIs* that let you do that. Here are a few examples:
 
