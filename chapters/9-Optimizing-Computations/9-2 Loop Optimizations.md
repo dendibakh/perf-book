@@ -76,6 +76,8 @@ There is another class of loop transformations that change the structure of loop
 
 **Loop Interchange**. It is a process of exchanging the loop order of nested loops. The induction variable used in the inner loop switches to the outer loop, and vice versa. [@lst:Interchange] shows an example of interchanging nested loops for `i` and `j`. The major purpose of loop interchange is to perform sequential memory accesses to the elements of a multi-dimensional array. By following the order in which elements are laid out in memory, we can improve the spatial locality of memory accesses and make our code more cache-friendly (see [@sec:secCacheFriendly]). This transformation helps to eliminate memory bandwidth and memory latency bottlenecks.
 
+[TODO]: Loop Interchange is harder if the loops are not perfectly nested.
+
 Listing: Loop Interchange
 
 ~~~~ {#lst:Interchange .cpp}
