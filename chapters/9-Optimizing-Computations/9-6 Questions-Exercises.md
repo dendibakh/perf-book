@@ -3,7 +3,7 @@
 1. Solve the following lab assignments using techniques we discussed in this chapter:
 - `perf-ninja::function_inlining_1` 
 - `perf-ninja::vectorization` 1 & 2
-- `perf-ninja::dep_chains_1`
+- `perf-ninja::dep_chains` 1 & 2
 - `perf-ninja::compiler_intrinsics` 1 & 2
 - `perf-ninja::loop_interchange` 1 & 2
 - `perf-ninja::loop_tiling_1`
