@@ -12,11 +12,11 @@ On Linux, Vtune can use two data collectors: Linux perf and Vtune's own driver c
 
 ```bash
 # go to the sepdk folder in vtune's installation
-$ cd ~/intel/oneapi/vtune/latest/sepdk/
+$ cd ~/intel/oneapi/vtune/latest/sepdk/src
 # build the drivers
 $ ./build-driver
 # add vtune group and add your user to that group
-# usually reboot is required after that
+# create a new shell, or reboot the system
 $ sudo groupadd vtune
 $ sudo usermod -a -G vtune `whoami`
 # install sep driver
