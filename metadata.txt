@@ -1,7 +1,7 @@
 ---
 title: Performance Analysis and Tuning on Modern CPUs
 author: Denis Bakhvalov
-rights: Creative Common Licesnse
+rights: Creative Commons License
 language: en-US
 cover-image: cover.jpg
 subparagraph: yes
