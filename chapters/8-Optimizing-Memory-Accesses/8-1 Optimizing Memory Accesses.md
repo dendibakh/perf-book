@@ -8,8 +8,6 @@ Modern computers are still being built based on the classecal Von Neumann archit
 
 The statement that the memory hierarchy performance is very important is backed by Figure @fig:CpuMemGap. It shows the growth of the gap in performance between memory and processors. The vertical axis is on a logarithmic scale and shows the growth of the CPU-DRAM performance gap. The memory baseline is the latency of memory access of 64 KB DRAM chips from 1980. Typical DRAM performance improvement is 7% per year, while CPUs enjoy 20-50% improvement per year.[@Hennessy]
 
-TODO: update the image
-
 ![The gap in performance between memory and processors. *© Image from [@Hennessy].*](../../img/memory-access-opts/ProcessorMemoryGap.png){#fig:CpuMemGap width=90%}
 
 Indeed, a variable can be fetched from the smallest L1 cache in just a few clock cycles, but it can take more than three hundred clock cycles to fetch the variable from RAM memory if it is not in the CPU cache. From a CPU perspective, a cache miss feels like a very long time, especially if the processor is not doing any useful work during that time. Execution threads may also be starved when the system is highly loaded with threads accessing memory at a very high rate and there is no available memory bandwidth to satisfy all loads and stores in a timely manner.
