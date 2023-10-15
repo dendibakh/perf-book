@@ -1,7 +1,5 @@
 ## Data Dependencies
 
-[TODO]: move to the beginning of the chapter?
-
 When a program statement refers to the data of a preceding statement, we say that there is a *data dependency* between the two statements. Sometimes people also use terms *dependency chain* or *data flow dependencies*. The example we are most familiar with is shown on figure @fig:LinkedListChasing. To access the node `N+1`, we should first dereference the pointer `N->next`. For the loop on the right, this is a *recurrent* data dependency, meaning it spans multiple iterations of the loop. Basically, traversing a linked list is one very long dependency chain.
 
 ![Data dependency while traversing a linked list.](../../img/computation-opts/LinkedListChasing.png){#fig:LinkedListChasing width=80%}
