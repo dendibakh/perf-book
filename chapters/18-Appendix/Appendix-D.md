@@ -24,7 +24,7 @@ With Intel PT, not only execution flow can be traced but also timing information
 
 ![Intel Processor Traces timings](../../img/appendix-D/PT_timings.jpg){#fig:PT_timings width=90%}
 
-In the example shown in figure @fig:PT_timings, instruction data (control flow) is perfectly accurate, but timing information is less accurate. Obviously, `CALL(edx)`, `TEST`, and `JB` instructions were not happening at the same time, yet we do not have more accurate timing information for them. Having timestamps allows us to align the time interval of our program with some other event in the system, and it's easy to compare to wall clock time. Trace timing in some implementations can further be improved by a cycle-accurate mode, in which the hardware keeps a record of cycle counts between normal packets (see more details in [@IntelSDM, Volume 3C, Chapter 36]).
+In the example shown in figure @fig:PT_timings, instruction data (control flow) is perfectly accurate, but timing information is less accurate. Obviously, `CALL(edx)`, `TEST`, and `JB` instructions were not happening at the same time, yet we do not have more accurate timing information for them. Having timestamps enables us to align the time interval of our program with another event in the system, and it's easy to compare to wall clock time. Trace timing in some implementations can further be improved by a cycle-accurate mode, in which the hardware keeps a record of cycle counts between normal packets (see more details in [@IntelSDM, Volume 3C, Chapter 36]).
 
 ## Collecting and Decoding Traces {.unnumbered .unlisted}
 
@@ -34,7 +34,7 @@ Intel PT traces can be easily collected with the Linux `perf` tool:
 $ perf record -e intel_pt/cyc=1/u ./a.out
 ```
 
-In the command line above, we asked the PT mechanism to update timing information every cycle. But likely, it will not increase our accuracy greatly since timing packets will only be sent when paired with some other control flow packet.
+In the command line above, we asked the PT mechanism to update timing information every cycle. But likely, it will not increase our accuracy greatly since timing packets will only be sent when paired with another control flow packet.
 
 After collecting, raw PT traces can be obtained by executing:
 
@@ -77,7 +77,7 @@ Above is shown just a small snippet from the long execution log. In this log, we
 1. **Analyze performance glitches**. Because PT captures the entire instruction stream, it is possible to analyze what was going on during the small-time period when the application was not responding. More detailed examples can be found in an [article](https://easyperf.net/blog/2019/09/06/Intel-PT-part3)[^2] on easyperf blog.
 2. **Postmortem debugging**. PT traces can be replayed by traditional debuggers like `gdb`. In addition to that, PT provides call stack information, which is *always* valid even if the stack is corrupted[^3]. PT traces could be collected on a remote machine once and then analyzed offline. This is especially useful when the issue is hard to reproduce or access to the system is limited. 
 3. **Introspect execution of the program**.
-   - We can immediately tell if some code path was never executed. 
+   - We can immediately tell if a code path was never executed. 
    - Thanks to timestamps, it's possible to calculate how much time was spent waiting while spinning on a lock attempt, etc.
    - Security mitigation by detecting specific instruction pattern.
 

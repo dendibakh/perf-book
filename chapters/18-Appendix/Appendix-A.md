@@ -140,7 +140,7 @@ Notice the number of context-switches gets to `0`, so the process received all t
 
 ## Filesystem Cache {.unnumbered .unlisted}
 
-Usually, some area of main memory is assigned to cache the file system contents, including various data. This reduces the need for an application to go all the way down to the disk. Here is an example of how file system cache can affect the running time of simple `git status` command:
+Usually, an area of main memory is assigned to cache the file system contents, including various data. This reduces the need for an application to go all the way down to the disk. Here is an example of how file system cache can affect the running time of simple `git status` command:
 
 ```bash
 # clean fs cache

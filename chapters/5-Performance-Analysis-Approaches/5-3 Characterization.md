@@ -82,11 +82,11 @@ If there are more events than counters, the analysis tool uses time multiplexing
 Multiplexing between 8 performance events with only 4 PMCs available.
 </div>
 
-With multiplexing, an event is not measured all the time, but rather only during some portion of it. At the end of the run, a profiling tool needs to scale the raw count based on total time enabled:
+With multiplexing, an event is not measured all the time, but rather only during a portion of time. At the end of the run, a profiling tool needs to scale the raw count based on total time enabled:
 $$
 final~count = raw~count \times ( time~running / time~enabled )
 $$
-Let's take figure @fig:Multiplexing2 as an example. Say, during profiling, we were able to measure some event from group 1 during three time intervals. Each measurement interval lasted 100ms (`time enabled`). The program running time was 500ms (`time running`). The total number of events for this counter was measured as 10'000 (`raw count`). So, the final count needs to be scaled as follows:
+Let's take figure @fig:Multiplexing2 as an example. Say, during profiling, we were able to measure an event from group 1 during three time intervals. Each measurement interval lasted 100ms (`time enabled`). The program running time was 500ms (`time running`). The total number of events for this counter was measured as 10'000 (`raw count`). So, the final count needs to be scaled as follows:
 $$
 final~count = 10'000 \times ( 500ms / ( 100ms \times 3) ) = 16'666
 $$

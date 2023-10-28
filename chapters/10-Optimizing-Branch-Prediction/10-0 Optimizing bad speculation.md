@@ -10,7 +10,7 @@ The speculation feature in modern CPUs is described in [@sec:SpeculativeExec]. M
 
 Nowadays, processors are very good at predicting branch outcomes. They not only can follow static prediction rules[^1] but also detect dynamic patterns. Usually, branch predictors save the history of previous outcomes for the branches and try to guess what will be the next result. However, when the pattern becomes hard for the CPU branch predictor to follow, it may hurt performance. One can find out how much a program suffers from branch mispredictions by looking at TMA `Bad Speculation` metric.
 
-\personal{The program will always experience some number of branch mispredictions. It is normal for general purpose applications to have a "Bad Speculation" rate in the range of 5-10\%. My recommendation is to pay attention to this metric if it goes higher than 10\%.}
+\personal{A program will always take a non-zero number of branch mispredictions. It is normal for general purpose applications to have a "Bad Speculation" rate in the range of 5-10\%. My recommendation is to pay attention to this metric if it goes higher than 10\%.}
 
 Since the branch predictors are good at finding patterns, old advice for optimizing branch prediction is no longer valid. One could provide a prediction hint to the processor in the form of a prefix to the branch instruction (`0x2E: Branch Not Taken`, `0x3E: Branch Taken`). While this technique can improve performance on older platforms, it won't produce gains on newer ones[^2].
 

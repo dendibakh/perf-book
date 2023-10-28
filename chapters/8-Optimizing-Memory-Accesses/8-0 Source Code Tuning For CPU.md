@@ -76,11 +76,11 @@ Second, remember that an optimization that you implement might not be beneficial
 
 The next four chapters are organized according to the TMA classification (see [@sec:TMA]):
 
-* Chapter 9. Optimizing Memory Accesses - `TMA:MemoryBound` category
-* Chapter 10. Optimizing Computations - `TMA:CoreBound` category
-* Chapter 11. Optimizing Branch Prediction - `TMA:BadSpeculation` category
-* Chapter 12. Machine Code Layout Optimizations - `TMA:FrontEndBound` category
+* Chapter 8. Optimizing Memory Accesses - `TMA:MemoryBound` category
+* Chapter 9. Optimizing Computations - `TMA:CoreBound` category
+* Chapter 10. Optimizing Branch Prediction - `TMA:BadSpeculation` category
+* Chapter 11. Machine Code Layout Optimizations - `TMA:FrontEndBound` category
 
-The idea behind this classification is to offer some kind of a checklist for developers when they are using TMA methodology in their performance engineering work. Whenever TMA attributes a performance bottleneck to one of the categories mentioned above, feel free to consult one of the corresponding chapters to learn about your options.
+The idea behind this classification is to offer a checklist for developers when they are using TMA methodology in their performance engineering work. Whenever TMA attributes a performance bottleneck to one of the categories mentioned above, feel free to consult one of the corresponding chapters to learn about your options.
 
 Chapter 14 covers other optimization areas that do not belong to any of the categories above. Chapter 15 addresses some common problems in optimizing multithreaded applications.

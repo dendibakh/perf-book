@@ -4,7 +4,7 @@ typora-root-url: ..\..\img
 
 ## Microbenchmarks
 
-Microbenchmarks are small self-contained programs that people write to quickly test some hypothesis. Usually, microbenchmarks are used to choose the best implementation of a certain relatively small alforithm or functionality. Nearly all modern languages have benchmarking frameworks. In C++, one can use the Google [benchmark](https://github.com/google/benchmark)[^3] library, C# has [BenchmarkDotNet](https://github.com/dotnet/BenchmarkDotNet)[^4] library, Julia has the [BenchmarkTools](https://github.com/JuliaCI/BenchmarkTools.jl)[^5] package, Java has [JMH](http://openjdk.java.net/projects/code-tools/jmh/etc)[^6] (Java Microbenchmark Harness), etc.
+Microbenchmarks are small self-contained programs that people write to quickly test a hypothesis. Usually, microbenchmarks are used to choose the best implementation of a certain relatively small algorithm or functionality. Nearly all modern languages have benchmarking frameworks. In C++, one can use the Google [benchmark](https://github.com/google/benchmark)[^3] library, C# has [BenchmarkDotNet](https://github.com/dotnet/BenchmarkDotNet)[^4] library, Julia has the [BenchmarkTools](https://github.com/JuliaCI/BenchmarkTools.jl)[^5] package, Java has [JMH](http://openjdk.java.net/projects/code-tools/jmh/etc)[^6] (Java Microbenchmark Harness), etc.
 
 When writing microbenchmarks, it's very important to ensure that the scenario you want to test is actually executed by your microbenchmark at runtime. Optimizing compilers can eliminate important code that could render the experiment useless, or even worse, drive you to the wrong conclusion. In the example below, modern compilers are likely to eliminate the whole loop:
 
