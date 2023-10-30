@@ -2,7 +2,7 @@
 typora-root-url: ..\..\img
 ---
 
-## Analysis With Intel VTune Profiler
+## Analysis with Intel VTune Profiler
 
 Intel VTune Profiler has a dedicated type of analysis for multithreaded applications called [Threading Analysis](https://software.intel.com/en-us/vtune-help-threading-analysis). Its summary window (see fig. @fig:MT_VtuneThreadSummary) displays statistics on the overall application execution, identifying all the metrics we described in [@sec:secMT_metrics]. From Effective CPU Utilization Histogram, we could learn several interesting facts about the captured application behavior. First, on average, only 5 HW threads (logical cores on the diagram) were utilized at the same time. Second, almost never all 8 HW threads were active at the same time.
 

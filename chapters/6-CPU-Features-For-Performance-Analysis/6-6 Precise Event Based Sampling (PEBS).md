@@ -21,7 +21,7 @@ Linux `perf` doesn't export the raw PEBS output as it does for LBR[^5]. Instead,
 
 There is a number of benefits that the PEBS mechanism brings to performance monitoring, which we will discuss in the next section.
 
-### Precise events
+### Precise Events
 
 One of the major problems in profiling is pinpointing the exact instruction that caused a particular performance event. As discussed in [@sec:profiling], interrupt-based sampling is based on counting specific performance events and waiting until it overflows. When an overflow interrupt happens, it takes a processor some amount of time to stop the execution and tag the instruction that caused the overflow. This is especially difficult for modern complex out-of-order CPU architectures.
 
@@ -58,7 +58,7 @@ TMA methodology (see [@sec:TMA]) heavily relies on precise events to locate the 
 $ perf record -e cpu/event=0xd1,umask=0x20,name=MEM_LOAD_RETIRED.L3_MISS/ppp -- ./a.exe
 ```
 
-### Lower sampling overhead
+### Lower Sampling Overhead
 
 Frequently generating interrupts and having an analysis tool itself capture program state inside the interrupt service routine is very costly since it involves OS interaction. This is why some hardware allows automatically sampling multiple times to a dedicated buffer without any interrupts. Only when the dedicated buffer is full, the processor raises an interrupt, and the buffer gets flushed to memory. This has a lower overhead than traditional interrupt-based sampling. 
 
@@ -66,7 +66,7 @@ When a performance counter is configured for PEBS, an overflow condition in the 
 
 Note that the PEBS buffer itself is located in the main memory, and its size is configurable. Again, it is the job of a performance analysis tool to allocate and configure the memory area for the CPU to be able to dump PEBS records in it. 
 
-### Analyzing memory accesses {#sec:sec_PEBS_DLA}
+### Analyzing Memory Accesses {#sec:sec_PEBS_DLA}
 
 Memory accesses are a critical factor for the performance of many applications. With PEBS, it is possible to gather detailed information about memory accesses in the program. The feature that allows this to happen is called Data Address Profiling. To provide additional information about sampled loads and stores, it leverages the following fields inside the PEBS facility (see Figure @fig:PEBS_record):
 

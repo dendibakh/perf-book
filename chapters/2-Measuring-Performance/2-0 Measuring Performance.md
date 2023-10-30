@@ -2,7 +2,7 @@
 typora-root-url: ..\..\img
 ---
 
-# Part1. Performance analysis on a modern CPU {.unnumbered}
+# Part1. Performance Analysis on a Modern CPU {.unnumbered}
 
 # Measuring Performance {#sec:secMeasPerf}
 

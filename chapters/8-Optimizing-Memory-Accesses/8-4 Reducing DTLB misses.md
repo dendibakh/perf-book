@@ -2,7 +2,7 @@
 typora-root-url: ..\..\img
 ---
 
-## Reducing DTLB misses {#sec:secDTLB}
+## Reducing DTLB Misses {#sec:secDTLB}
 
 As described earlier in the book, TLB is a fast but finite per-core cache for virtual-to-physical address translations of memory addresses. Without it, every memory access by an application would require a time-consuming page walk of the kernel page table to calculate the correct physical address for each referenced virtual address. In a system with a 5-level page table, it will require accessing at least 5 different memory locations to obtain an address translation. In section [@sec:FeTLB] we will discuss how huge pages can be used for code. Here we will see how they can be used for data.
 

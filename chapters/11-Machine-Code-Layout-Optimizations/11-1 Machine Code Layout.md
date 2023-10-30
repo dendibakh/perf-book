@@ -12,7 +12,7 @@ The reasons for why FE could not deliver instructions to the execution units can
 
 \personal{Most of the real-world applications will experience a non-zero "Front-End Bound" metric, meaning that some percentage of running time will be lost on suboptimal instruction fetching and decoding. Luckily it is usually below 10\%. If you see the "Front-End Bound" metric being around 20\%, it's definitely worth to spend time on it.}
 
-## Machine code layout
+## Machine Code Layout
 
 When a compiler translates your source code into machine code (binary encoding), it generates a serial byte sequence. For example, for the following C code:
 ```cpp

@@ -2,7 +2,7 @@
 typora-root-url: ..\..\img
 ---
 
-## Function grouping
+## Function Grouping
 
 Following the principles described in previous sections, hot functions can be grouped together to further improve the utilization of caches in the CPU Front-End. When hot functions are grouped together, they might share the same cache line, which reduces the number of cache lines the CPU needs to fetch.
 

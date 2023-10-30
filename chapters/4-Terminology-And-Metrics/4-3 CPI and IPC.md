@@ -2,7 +2,7 @@
 typora-root-url: ..\..\img
 ---
 
-## CPI & IPC {#sec:IPC}
+## CPI and IPC {#sec:IPC}
 
 Those are two fundamental metrics that stand for:
 

@@ -2,7 +2,7 @@
 typora-root-url: ..\..\img
 ---
 
-## What is discussed in this book?
+## What Is Discussed in this Book?
 
 This book is written to help developers better understand the performance of their application, learn to find inefficiencies, and eliminate them. *Why my hand-written compression algorithm performs two times slower than the conventional one? Why did my change in the function cause two times performance drop? Customers are complaining about the slowness of my application, where should I start? Have I optimized the program to its full potential? What performance analysis tools are available on my platform? What are the techniques to reduce the number of cache misses and branch mispredictions* Hopefully, by the end of this book, you will have the answers to those questions.
 

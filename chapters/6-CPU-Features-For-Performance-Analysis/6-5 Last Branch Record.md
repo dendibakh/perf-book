@@ -51,7 +51,7 @@ $ dmesg | grep -i lbr
 [    0.228149] Performance Events: PEBS fmt3+, 32-deep LBR, Skylake events, full-width counters, Intel PMU driver.
 ```
 
-### Collecting LBR stacks
+### Collecting LBR Stacks
 
 With Linux `perf`, one can collect LBR stacks using the command below:
 
@@ -88,7 +88,7 @@ On the block above, we present eight entries from the LBR stack, which typically
 
 There is a number of important use cases for LBR. In the next sections, we will address the most important ones.
 
-### Capture call graph
+### Capture Call Graph
 
 Discussions on collecting call graph and its importance were covered in [@sec:secCollectCallStacks]. LBR can be used for collecting call-graph information even if you compiled a program without frame pointers (controlled by compiler option `-fomit-frame-pointer`, ON by default) or debug information[^3]:
 
@@ -113,7 +113,7 @@ As you can see, we identified the hottest function in the program (which is `bar
 
 Using the LBR feature, we can determine a Hyper Block (sometimes called Super Block), which is a chain of basic blocks executed most frequently in the whole program. Basic blocks from that chain are not necessarily laid in the sequential physical order; they're executed sequentially.
 
-### Identify hot branches {#sec:lbr_hot_branch}
+### Identify Hot Branches {#sec:lbr_hot_branch}
 
 The LBR feature also allows us to know what were the most frequently taken branches: 
 
@@ -136,7 +136,7 @@ From this example, we can see that more than 50% of taken branches are inside th
 
 Most of the time, it’s possible to determine the location of the branch just from the line of code and target symbol. However, theoretically, one could write code with two `if` statements written on a single line. Also, when expanding the macro definition, all the expanded code gets the same source line, which is another situation when this might happen. This issue does not totally block the analysis but only makes it a little more difficult. In order to disambiguate two branches, you likely need to analyze raw LBR stacks yourself (see example on [easyperf](https://easyperf.net/blog/2019/05/06/Estimating-branch-probability)[^6] blog).
 
-### Analyze branch misprediction rate {#sec:secLBR_misp_rate}
+### Analyze Branch Misprediction Rate {#sec:secLBR_misp_rate}
 
 It’s also possible to know the misprediction rate for hot branches [^7]:
 
@@ -157,7 +157,7 @@ In this example[^8], lines that correspond to function `LzmaDec` are of particul
 
 Linux `perf` calculates the misprediction rate by analyzing each LBR entry and extracting misprediction bits from it. So that for every branch, we have a number of times it was predicted correctly and a number of mispredictions. Again, due to the nature of sampling, it is possible that some branches might have an `N` entry but no corresponding `Y` entry. It could mean that there are no LBR entries for that branch being mispredicted, but it doesn’t necessarily mean that the prediction rate equals to `100%`.
 
-### Precise timing of machine code {#sec:timed_lbr}
+### Precise Timing of Machine Code {#sec:timed_lbr}
 
 As it was discussed in [@sec:lbr], starting from Skylake architecture, LBR entries have `Cycle Count` information. This additional field gives us a number of cycles elapsed between two taken branches. If the target address in the previous LBR entry is the beginning of a basic block (BB) and the source address of the current LBR entry is the last instruction of the same basic block, then the cycle count is the latency of this basic block. For example:
 
@@ -233,13 +233,13 @@ Table: Probability density for basic block latency. {#tbl:bb_latency}
 
 Currently, timed LBR is the most precise cycle-accurate source of timing information in the system.
 
-### Estimating branch outcome probability
+### Estimating Branch Outcome Probability
 
 Later in [@sec:secFEOpt], we will discuss the importance of code layout for performance. Going forward a little bit, having a hot path in a fall through manner[^11] generally improves the performance of the program. Considering a single branch, knowing that `condition` 99% of the time is false or true is essential for a compiler to make better optimizing decisions.
 
 LBR feature allows us to get this data without instrumenting the code. As the outcome from the analysis, the user will get a ratio between true and false outcomes of the condition, i.e., how many times the branch was taken and how much not taken. This feature especially shines when analyzing indirect jumps (switch statement) and indirect calls (virtual calls). One can find examples of using it on a real-world application on [easyperf blog](https://easyperf.net/blog/2019/05/06/Estimating-branch-probability)[^6].
 
-### Other use cases
+### Other Use Cases
 
 * **Profile guided optimizations**. LBR feature can provide profiling feedback data for optimizing compilers. LBR can be a better choice as opposed to static code instrumentation when runtime overhead is considered.
 * **Capturing function arguments.** When LBR features is used together with PEBS (see [@sec:secPEBS]),  it is possible to capture function arguments, since according to [x86 calling conventions](https://en.wikipedia.org/wiki/X86_calling_conventions)[^12] first few arguments of a callee land in registers which are captured by PEBS record. [@IntelSDM, Appendix B, Chapter B.3.3.4]

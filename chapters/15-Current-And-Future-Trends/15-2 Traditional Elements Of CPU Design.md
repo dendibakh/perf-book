@@ -1,3 +1,3 @@
-## Traditional Elements Of CPU Design
+## Traditional Elements of CPU Design
 
 [TODO]

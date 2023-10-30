@@ -2,7 +2,7 @@
 typora-root-url: ..\..\img
 ---
 
-## Noise In Modern Systems {#sec:secFairExperiments}
+## Noise in Modern Systems {#sec:secFairExperiments}
 
 There are many features in HW and SW that are intended to increase performance. But not all of them have deterministic behavior. Let's consider [Dynamic Frequency Scaling](https://en.wikipedia.org/wiki/Dynamic_frequency_scaling)[^11] (DFS): this is a feature that allows a CPU to increase its frequency for a short time interval, making it run significantly faster. However, the CPU can't stay in "overclocked" mode for a long time, so later, it decreases its frequency back to the base value. DFS usually depends a lot on a core temperature, which makes it hard to predict the impact on our experiments.
 

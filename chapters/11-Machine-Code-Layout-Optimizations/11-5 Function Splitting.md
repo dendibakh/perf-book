@@ -2,7 +2,7 @@
 typora-root-url: ..\..\img
 ---
 
-## Function splitting 
+## Function Splitting 
 
 The idea behind function splitting[^13] is to separate hot code from the cold. This optimization is beneficial for relatively big functions with complex CFG and big pieces of cold code inside a hot path. An example of code when such transformation might be profitable is shown on [@lst:FunctionSplitting1]. To remove cold basic blocks from the hot path, we could cut and put them into its own new function and create a call to it (see [@lst:FunctionSplitting2]).
 

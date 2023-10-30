@@ -2,7 +2,7 @@
 typora-root-url: ..\..\img
 ---
 
-## Basic block placement {#sec:secLIKELY}
+## Basic Block Placement {#sec:secLIKELY}
 
 Suppose we have a hot path in the program that has some error handling code (`coldFunc`) in between:
 

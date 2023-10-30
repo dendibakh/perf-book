@@ -2,7 +2,7 @@
 typora-root-url: ..\..\img
 ---
 
-## Measuring Performance In Production
+## Measuring Performance in Production
 
 When an application runs on shared infrastructure (typical in a public cloud), there usually will be other workloads from other customers running on the same servers. With technologies like virtualization and containers becoming more popular, public cloud providers try to fully utilize the capacity of their servers. Unfortunately, it creates additional obstacles for measuring performance in such an environment. Sharing resources with neighbor processes can influence performance measurements in unpredictable ways.
 

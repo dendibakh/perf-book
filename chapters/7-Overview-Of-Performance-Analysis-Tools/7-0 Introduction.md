@@ -1,4 +1,4 @@
-# Overview Of Performance Analysis Tools {#sec:secOverviewPerfTools}
+# Overview of Performance Analysis Tools {#sec:secOverviewPerfTools}
 
 In the previous chapter, we explored the features implemented in modern processors to aid performance analysis. However, if you were to start directly using those features, it would become very nuanced very quickly as it requires a lot of low-level programming to make use of them. Luckily, performance analysis tools take care of all the complexity that is required to effectively use these HW performance monitoring features. It makes profiling goes smoothly, still it's critical to have an intuition of how the tool obtains and interprets the data. That is why we discuss analysis tools after we discussed CPU performance monitoring features.
 

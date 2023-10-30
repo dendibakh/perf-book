@@ -12,7 +12,7 @@ In this section, we will take a look at the most well-known loop optimizations t
 
 Compilers can automatically recognize an opportunity to perform certain loop transformations. However, sometimes developer's interference is required to reach the desired outcome. In the second part of this section, we will share some thoughts on how to discover loop optimization opportunities. Understanding what transformations were performed on a given loop and what optimizations compiler failed to do is one of the keys to successful performance tuning. In the end, we will consider an alternative way of optimizing loops with polyhedral frameworks.
 
-### Low-level optimizations.
+### Low-level Optimizations.
 
 First, we will consider simple loop optimizations that transform the code inside a single loop: Loop Invariant Code Motion, Loop Unrolling, Loop Strength Reduction, and Loop Unswitching. Such optimizations usually help improve the performance of a loop with high arithmetic intensity (see [@sec:roofline]), i.e., when a loop is bound by CPU compute capabilities. Generally, compilers are good at doing such transformations; however, there are still cases when a compiler might need a developer's support. We will talk about that in subsequent sections.
 
@@ -71,7 +71,7 @@ for (i = 0; i < N; i++) {               if (c)
                                           }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-### High-level optimizations.
+### High-level Optimizations.
 
 There is another class of loop transformations that change the structure of loops and often affect multiple nested loops. We will take a look at Loop Interchange, Loop Blocking (Tiling), and Loop Fusion and Distribution (Fission). This set of transformations aims at improving memory accesses and eliminating memory bandwidth and memory latency bottlenecks. From a compiler perspective, it is very difficult to prove legality of such transformations and justify their performance benefit. In that sense, developers are in a better position since they only have to care about the legality of the transformation in their particular piece of code, not about every possible scenario that may happen. Unfortunately, that also means that usually we have to do such transformations manually.
 
@@ -139,7 +139,7 @@ Loop Unroll and Jam can be performed as long as there are no cross-iteration dep
 
 Unroll and Jam transformation sometimes could be very useful for outer loop vectorization, which, at the time of writing, compilers cannot do automatically. In a situation when trip count of the inner loop is not visible to a compiler, it could still vectorize the original inner loop, hoping that it will execute enough iterations to hit the vectorized code (more on vectorization in the next section). But if the trip count is low, the program will use a slow scalar version of the loop. Once we do Unroll and Jam, we allow compiler to vectorize the code differently: now "glueing" the independent instructions in the inner loop together (aka SLP vectorization).
 
-### Discovering loop optimization opportunities.
+### Discovering Loop Optimization Opportunities.
 
 As we discussed at the beginning of this section, compilers will do the heavy-lifting part of optimizing your loops. You can count on them on making all the obvious improvements in the code of your loops, like eliminating unnecessary work, doing various peephole optimizations, etc. Sometimes a compiler is clever enough to generate the fast versions of the loops by default, and other times we have to do some rewriting ourselves to help the compiler. As we said earlier, from a compiler's perspective, doing loop transformations legally and automatically is very difficult. Often, compilers have to be conservative when they cannot prove the legality of a transformation. 
 

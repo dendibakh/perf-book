@@ -2,7 +2,7 @@
 typora-root-url: ..\..\img
 ---
 
-## What is not in this book?
+## What Is not Discussed in this Book?
 
 [TODO]: second edition talks much more about system performance, especially memory subsystem. Also, we talk about compilers.
 

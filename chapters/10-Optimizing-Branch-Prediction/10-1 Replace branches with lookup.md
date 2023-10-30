@@ -2,7 +2,7 @@
 typora-root-url: ..\..\img
 ---
 
-## Replace branches with lookup
+## Replace Branches with Lookup
 
 Frequently branches can be avoided by using lookup tables. An example of code when such transformation might be profitable is shown in [@lst:LookupBranches1]. Function `mapToBucket` maps values into corresponding buckets. For uniformly distributed values of `v`, we will have an equal probability for `v` to fall into any of the buckets. In the generated assembly for the baseline version, we will likely see many branches, which could have high misprediction rates. Hopefully, it's possible to rewrite the function `mapToBucket` using a single array lookup, as shown in [@lst:LookupBranches2].
 

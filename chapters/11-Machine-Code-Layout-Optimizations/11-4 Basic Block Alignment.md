@@ -2,7 +2,7 @@
 typora-root-url: ..\..\img
 ---
 
-## Basic block alignment
+## Basic Block Alignment
 
 Sometimes performance can significantly change depending on the offset at which instructions are laid out in memory. Consider a simple function presented in [@lst:LoopAlignment].
 

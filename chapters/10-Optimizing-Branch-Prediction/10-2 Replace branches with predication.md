@@ -2,7 +2,7 @@
 typora-root-url: ..\..\img
 ---
 
-## Replace branches with predication
+## Replace Branches with Predication
 
 Some branches could be effectively eliminated by executing both parts of the branch and then selecting the right result (predication). Example[^1] of code when such transformation might be profitable is shown on [@lst:PredicatingBranches1]. If TMA suggests that the `if (cond)` branch has a very high number of mispredictions, one can try to eliminate the branch by doing the transformation shown on [@lst:PredicatingBranches2].
 
