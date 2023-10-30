@@ -51,6 +51,6 @@ $ perf stat -e uops_issued.any,uops_executed.thread,uops_retired.slots -- ./a.ex
   2557884  uops_retired.slots
 ```
 
-The way instructions are split into micro operations may vary across CPU generations. Usually, the lower number of uops used for an instruction means that HW has a better support for it and is likely to have lower latency and higher throughput. For the latest Intel and AMD CPUs, the vast majority of instructions generate exactly one uop. Latency, throughput, port usage, and the number of uops for x86 instructions on recent microarchitectures can be found at [uops.info](https://uops.info/table.html)[^1] website.
+The way instructions are split into micro operations may vary across CPU generations. Usually, the lower number of uops used for an instruction means that HW has a better support for it and is likely to have lower latency and higher throughput. For the latest Intel and AMD CPUs, the vast majority of instructions generate exactly one uop. Latency, throughput, port usage, and the number of uops for x86 instructions on recent microarchitectures can be found at the [uops.info](https://uops.info/table.html)[^1] website.
 
 [^1]: Instruction latency and Throughput - [https://uops.info/table.html](https://uops.info/table.html)

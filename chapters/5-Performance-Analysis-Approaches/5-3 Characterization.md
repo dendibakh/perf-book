@@ -16,7 +16,7 @@ The idea behind counting is very simple: we want to count the absolute number of
 
 ![Counting performance events.](../../img/perf-analysis/CountingFlow.png){#fig:Counting width=60%}
 
-The steps outlined in figure @fig:Counting roughly represent what a typical analysis tool will do to count performance events. This process is implemented in the `perf stat` tool, which can be used to count various HW events, like the number of instructions, cycles, cache-misses, etc. Below is the example of output from `perf stat`:
+The steps outlined in figure @fig:Counting roughly represent what a typical analysis tool will do to count performance events. This process is implemented in the `perf stat` tool, which can be used to count various HW events, like the number of instructions, cycles, cache-misses, etc. Below is an example of the output from `perf stat`:
 
 ```bash
 $ perf stat -- ./a.exe

@@ -24,11 +24,11 @@ In this section, we will discuss the mechanics of using PMCs with EBS. Figure @f
 
 ![Using performance counter for sampling](../../img/perf-analysis/SamplingFlow.png){#fig:Sampling width=60%}
 
-After we initialized the register, we start counting and let the benchmark go. We configured PMC to count cycles, so it will be incremented every cycle. Eventually, it will overflow. At the time the register overflows, HW will raise the PMI. The profiling tool is configured to capture PMIs and has an Interrupt Service Routine (ISR) for handling them. We do multiple steps inside ISR: first of all, we disable counting; after that, we record the instruction which was executed by the CPU at the time the counter overflowed; then, we reset the counter to `N` and resume the benchmark.
+After we initialized the register, we start counting and let the benchmark go. We configured PMC to count cycles, so it will be incremented every cycle. Eventually, it will overflow. At the time the register overflows, HW will raise a PMI. The profiling tool is configured to capture PMIs and has an Interrupt Service Routine (ISR) for handling them. We do multiple steps inside ISR: first of all, we disable counting; after that, we record the instruction which was executed by the CPU at the time the counter overflowed; then, we reset the counter to `N` and resume the benchmark.
 
 Now, let us go back to the value `N`. Using this value, we can control how frequently we want to get a new interrupt. Say we want a finer granularity and have one sample every 1 million instructions. To achieve this, we can set the counter to `(unsigned) -1'000'000` so that it will overflow after every 1 million instructions. This value is also referred to as the "sample after" value.
 
-We repeat the process many times to build a sufficient collection of samples. If we later aggregate those samples, we could build a histogram of the hottest places in our program, like the one shown on the output from Linux `perf record/report` below. This gives us the breakdown of the overhead for functions of a program sorted in descending order (hotspots). Example of sampling [x264](https://openbenchmarking.org/test/pts/x264)[^7] benchmark from [Phoronix test suite](https://www.phoronix-test-suite.com/)[^8] is shown below:
+We repeat the process many times to build a sufficient collection of samples. If we later aggregate those samples, we could build a histogram of the hottest places in our program, like the one shown on the output from Linux `perf record/report` below. This gives us the breakdown of the overhead for functions of a program sorted in descending order (hotspots). An example of sampling the [x264](https://openbenchmarking.org/test/pts/x264)[^7] benchmark from the [Phoronix test suite](https://www.phoronix-test-suite.com/)[^8] is shown below:
 
 ```bash
 $ time -p perf record -F 1000 -- ./x264 -o /dev/null --slow --threads 1 ../Bosphorus_1920x1080_120fps_420_8bit_YUV.y4m
@@ -76,7 +76,7 @@ Percent | Source code & Disassembly of x264 for cycles:ppp
   ...
 ```
 
-Most profilers with Graphical User Interface (GUI), like Intel VTune Profiler, can show source code and associated assembly side-by-side. Also, there are tools that can visualize the output of Linux `perf` raw data with a rich graphical interface similar to Intel Vtune and other tools. You'll see all that in more details in chapter 7.
+Most profilers with a Graphical User Interface (GUI), like the Intel VTune Profiler, can show source code and associated assembly side-by-side. Also, there are tools that can visualize the output of Linux `perf` raw data with a rich graphical interface similar to Intel Vtune and other tools. You'll see all that in more details in chapter 7.
 
 ### Collecting Call Stacks {#sec:secCollectCallStacks}
 
@@ -88,7 +88,7 @@ Analyzing the source code of all the callers of `foo` might be very time-consumi
 
 Collecting call stacks in Linux `perf` is possible with three methods:
 
-1.  Frame pointers (`perf record --call-graph fp`). Requires binary being built with `--fnoomit-frame-pointer`. Historically, the frame pointer `RBP` register was used for debugging since it allows us to get the call stack without popping all the arguments from the stack (aka stack unwinding). The frame pointer can tell the return address immediately. However, it consumes one register just for this purpose, so it was expensive. It can also be used for profiling since it enables cheap stack unwinding.
+1.  Frame pointers (`perf record --call-graph fp`). Requires binary being built with `--fnoomit-frame-pointer`. Historically, the frame pointer (`RBP` register) was used for debugging since it enables us to get the call stack without popping all the arguments from the stack (aka stack unwinding). The frame pointer can tell the return address immediately. However, it consumes one register just for this purpose, so it was expensive. It can also be used for profiling since it enables cheap stack unwinding.
 2.  DWARF debug info (`perf record --call-graph dwarf`). Requires binary being built with DWARF debug information `-g` (`-gline-tables-only`). Obtains call stacks through stack unwinding procedure.
 3.  Intel Last Branch Record (LBR) Hardware feature `perf record --call-graph lbr`. Obtains call stacks by parsing the LBR stack (a set of HW registers). Not as deep call graph as the first two methods. See more information about LBR in [@sec:lbr].
 
@@ -121,7 +121,7 @@ $ perf report -n --stdio --no-children
                                   _start
 ```
 
-When using Intel Vtune Profiler, one can collect call stacks data by checking the corresponding "Collect stacks" box while configuring analysis. When using command-line interface specify `-knob enable-stack-collection=true` option.
+When using Intel Vtune Profiler, one can collect call stacks data by checking the corresponding "Collect stacks" box while configuring analysis. When using the command-line interface, specify the `-knob enable-stack-collection=true` option.
 
 The mechanism of collecting call stacks is very important to understand. Developers that are not familiar with the concept try to obtain this information by using a debugger. They do so by interrupting the execution of a program and analyze the call stack (e.g. `backtrace` command in `gdb` debugger). Don't do this, allow a profiling tool to do the job, which is much faster and gives much more accurate data.
 

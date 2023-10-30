@@ -212,7 +212,7 @@ Since function `calcSum` must return a single value (a `uniform` variable) and o
 [^6]: Amdahl's_law - [https://en.wikipedia.org/wiki/Amdahl's_law](https://en.wikipedia.org/wiki/Amdahl's_law).
 [^29]: The compiler flag `-Ofast` enables `-ffast-math` as well as the `-O3` compilation mode.
 [^30]: Using Clang's optimization pragmas - [https://easyperf.net/blog/2017/11/09/Multiversioning_by_trip_counts](https://easyperf.net/blog/2017/11/09/Multiversioning_by_trip_counts)
-[^31]: It is easy to spot read-after-write dependency once you unroll a couple of iterations of the loop. See example in [@sec:compilerOptReports].
+[^31]: It is easy to spot a read-after-write dependency once you unroll a couple of iterations of the loop. See the example in [@sec:compilerOptReports].
 [^33]: ISPC compiler: [https://ispc.github.io/](https://ispc.github.io/).
 [^34]: Some parts of the Unreal Engine which used SIMD intrinsics were rewritten using ISPC, which gave speedups: [https://software.intel.com/content/www/us/en/develop/articles/unreal-engines-new-chaos-physics-system-screams-with-in-depth-intel-cpu-optimizations.html](https://software.intel.com/content/www/us/en/develop/articles/unreal-engines-new-chaos-physics-system-screams-with-in-depth-intel-cpu-optimizations.html).
 [^35]: But the scalar version of the loop still may be unrolled.
