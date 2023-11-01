@@ -177,7 +177,7 @@ $ time ./gemm.polly
 real    0m0.227s
 ```
 
-Polly is a powerful framework for loop optimizations; however, it still misses out on some common and important situations[^7]. It is not enabled in the standard optimization pipeline in the LLVM infrastructure and requires that the user provide an explicit compiler option for using it (`-mllvm -polly`). Using polyhedral frameworks is a viable option when searching for a way to speed up your loops.
+Polly is a powerful framework for loop optimizations; however, it still misses out on some common and important situations.[^7] It is not enabled in the standard optimization pipeline in the LLVM infrastructure and requires that the user provide an explicit compiler option for using it (`-mllvm -polly`). Using polyhedral frameworks is a viable option when searching for a way to speed up your loops.
 
 [^1]: Codee: perfect loop nesting - [https://www.codee.com/catalog/glossary-perfect-loop-nesting/]](https://www.codee.com/catalog/glossary-perfect-loop-nesting/)
 [^2]: Cache-oblivious algorithm - [https://en.wikipedia.org/wiki/Cache-oblivious_algorithm](https://en.wikipedia.org/wiki/Cache-oblivious_algorithm)

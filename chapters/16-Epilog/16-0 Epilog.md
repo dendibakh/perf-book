@@ -4,7 +4,7 @@ Thanks for reading through the whole book. I hope you enjoyed it and found it us
 
 * HW performance is not growing as fast as it used to in the past years. Performance tuning is becoming more critical than it has been for the last 40 years. It will be one of the key drivers for performance gains in the near future. 
 * Software doesn't have an optimal performance by default. Certain limitations exist that prevent applications to reach their full performance potential. Both HW and SW components have such limitations.
-* "Premature optimization is the root of all evil"[^1]. But the opposite is often true as well. Postponed performance engineering work may be too late and cause as much evil as premature optimization. Do not neglect performance aspects when designing your future product.
+* There is a famous quote by Donald Knuth: "Premature optimization is the root of all evil". But the opposite is often true as well. Postponed performance engineering work may be too late and cause as much evil as premature optimization. Do not neglect performance aspects when designing your future product.
 * Performance of the modern system is not deterministic and depends on many factors. Meaningful performance analysis should account for noise and use statistical methods to analyze performance measurements.
 * Knowledge of the CPU microarchitecture might become handy in understanding the results of experiments you conduct. However, don't rely on this knowledge too much when you make a specific change in your code. Your mental model can never be as accurate as the actual design of the CPU internals. Predicting the performance of a particular piece of code is nearly impossible. *Always measure!*
 * Performance is hard because there are no predetermined steps you should follow, no algorithm. Engineers need to tackle problems from different angles. Know performance analysis methods and tools (both HW and SW) that are available to you. I strongly suggest embracing the Roofline model and TMA methodology if they are available on your platform. It will help you to steer your work in the right direction. Also, know when you can leverage other HW performance monitoring features like LBR, PEBS, and PT in your work.
@@ -21,5 +21,3 @@ If you enjoyed reading this book, make sure to pass it to your friends and colle
 I would love to hear your feedback on my email dendibakh@gmail.com. Let me know your thoughts, comments, and suggestions for the book. I will post all the updates and future information about the book on my blog [easyperf.net](https://easyperf.net/contact/).
 
 **Happy performance tuning!**
-
-[^1]: This is a famous quote by Donald Knuth.

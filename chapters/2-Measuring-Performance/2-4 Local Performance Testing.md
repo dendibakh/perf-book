@@ -14,7 +14,7 @@ Consider two distributions of performance measurements collected for two version
 
 ![Comparing 2 performance measurement distributions.](../../img/measurements/CompDist2.png){#fig:CompDist width=80%}
 
-An interesting advantage of using distribution plots is that it allows you to spot unwanted behavior of the benchmark[^3]. If the distribution is bimodal, the benchmark likely experiences two different types of behavior. A common cause of bimodally distributed measurements is code that has both a fast and a slow path, such as accessing a cache (cache hit vs. cache miss) and acquiring a lock (contended lock vs. uncontended lock). To "fix" this, different functional patterns should be isolated and benchmarked separately.
+An interesting advantage of using distribution plots is that it allows you to spot unwanted behavior of the benchmark.[^3] If the distribution is bimodal, the benchmark likely experiences two different types of behavior. A common cause of bimodally distributed measurements is code that has both a fast and a slow path, such as accessing a cache (cache hit vs. cache miss) and acquiring a lock (contended lock vs. uncontended lock). To "fix" this, different functional patterns should be isolated and benchmarked separately.
 
 Data scientists often present measurements by plotting the distributions and avoid calculating speedup ratios. This eliminates biased conclusions and allows readers to interpret the data themselves. One of the popular ways to plot distributions is by using box plots (see Figure @fig:BoxPlot), which allow comparisons of multiple distributions on the same chart.
 

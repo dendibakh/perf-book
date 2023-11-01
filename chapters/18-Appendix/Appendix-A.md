@@ -34,7 +34,7 @@ $ perf stat -e task-clock,cycles -- ./a.exe
 
 The average frequency is much higher when Turbo Boost is on.
 
-DFS can be permanently disabled in BIOS[^3]. To programmatically disable the DFS feature on Linux systems, you need root access. Here is how one can achieve this:
+DFS can be permanently disabled in BIOS.[^3] To programmatically disable the DFS feature on Linux systems, you need root access. Here is how one can achieve this:
 
 ```bash
 # Intel
@@ -46,7 +46,7 @@ echo 0 > /sys/devices/system/cpu/cpufreq/boost
 
 Modern CPU cores are often made in the simultaneous multithreading ([SMT](https://en.wikipedia.org/wiki/Simultaneous_multithreading)[^4]) manner. It means that in one physical core, you can have two threads of simultaneous execution. Typically, [architectural state](https://en.wikipedia.org/wiki/Architectural_state)[^5] is replicated, but the execution resources (ALUs, caches, etc.) are not. That means that if we have two separate processes running on the same core "simultaneously" (in different threads), they can steal resources from each other, for example, cache space.
 
-SMT can be permanently disabled in BIOS[^6]. To programmatically disable SMT on Linux systems, you need root access. Here is how one can turn down a sibling thread in each core:
+SMT can be permanently disabled in BIOS.[^6] To programmatically disable SMT on Linux systems, you need root access. Here is how one can turn down a sibling thread in each core:
 
 ```bash
 echo 0 > /sys/devices/system/cpu/cpuX/online

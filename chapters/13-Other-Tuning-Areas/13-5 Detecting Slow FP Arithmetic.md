@@ -4,7 +4,7 @@ typora-root-url: ..\..\img
 
 ## Slow Floating-Point Arithmetic {#sec:SlowFPArith}
 
-Some applications that do extensive computations with floating-point values, are prone to one very subtle issue that can cause performance slowdown. This issue arises when an application hit *subnormal* FP value, which we will discuss in this section. You can also find a term *denormal* FP value, which refers to the same thing. According to the IEEE Standard 754[^2], a subnormal is a non-zero number with exponent smaller than the smallest normal number[^1]. [@lst:Subnormals] shows a very simple instantiation of a subnormal value. 
+Some applications that do extensive computations with floating-point values, are prone to one very subtle issue that can cause performance slowdown. This issue arises when an application hit *subnormal* FP value, which we will discuss in this section. You can also find a term *denormal* FP value, which refers to the same thing. According to the IEEE Standard 754[^2], a subnormal is a non-zero number with exponent smaller than the smallest normal number.[^1] [@lst:Subnormals] shows a very simple instantiation of a subnormal value. 
 
 In real-world applications, a subnormal value usually represents a signal so small that it is indistinguishable from zero. In audio, it can mean a signal so quiet that it is out of the human hearing range. In image processing, it can mean any of the RGB color components of a pixel to be very close to zero and so on. Interestingly, subnormal values are present in many production software packages, including weather forecasting, ray tracing, physics simulations and modeling and others.
 
@@ -32,7 +32,7 @@ Once you confirmed subnormal values are there, you can enable the FTZ and DAZ mo
 * __DAZ__ (Denormals Are Zero). Any denormal inputs are replaced by zero before use.
 * __FTZ__ (Flush To Zero). Any outputs that would be denormal are replaced by zero.
 
-When they are enabled, there is no need for a costly handling of subnormal value in a CPU floating-point arithmetic. In x86-based platforms, there are two separate bit fields in the `MXCSR`, global control and status register. In ARM Aarch64, two modes are controled with `FZ` and `AH` bits of the `FPCR` control register. If you compile your application with `-ffast-math`, you have nothing to worry about, the compiler will automatically insert the required code to enable both flags at the start of the program. The `-ffast-math` compiler option is a little overloaded, so GCC developers created a separate `-mdaz-ftz` option that only controls the behavior of subnormal values. If you'd rather control it from the source code, [@lst:EnableFTZDAZ] shows example that you can use. If you choose this option, avoid frequent changes to the `MXCSR` register because the operation is relatively expensive[^3].
+When they are enabled, there is no need for a costly handling of subnormal value in a CPU floating-point arithmetic. In x86-based platforms, there are two separate bit fields in the `MXCSR`, global control and status register. In ARM Aarch64, two modes are controled with `FZ` and `AH` bits of the `FPCR` control register. If you compile your application with `-ffast-math`, you have nothing to worry about, the compiler will automatically insert the required code to enable both flags at the start of the program. The `-ffast-math` compiler option is a little overloaded, so GCC developers created a separate `-mdaz-ftz` option that only controls the behavior of subnormal values. If you'd rather control it from the source code, [@lst:EnableFTZDAZ] shows example that you can use. If you choose this option, avoid frequent changes to the `MXCSR` register because the operation is relatively expensive. A read of the MXCSR register has a fairly long latency, and a write to the register is a serializing instruction.
 
 Listing: Enabling FTZ and DAZ modes manually
 
@@ -47,4 +47,3 @@ Keep in mind, both `FTZ` and `DAZ` modes are incompatible with the IEEE Standard
 
 [^1]: Subnormal number - [https://en.wikipedia.org/wiki/Subnormal_number](https://en.wikipedia.org/wiki/Subnormal_number)
 [^2]: IEEE Standard 754 - [https://ieeexplore.ieee.org/document/8766229](https://ieeexplore.ieee.org/document/8766229)
-[^3]: A read of the MXCSR register has a fairly long latency, and a write to the register is a serializing instruction.

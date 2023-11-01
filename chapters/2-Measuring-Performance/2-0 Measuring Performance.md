@@ -6,7 +6,7 @@ typora-root-url: ..\..\img
 
 # Measuring Performance {#sec:secMeasPerf}
 
-The first step on the path to understanding an application's performance is knowing how to measure it. Some people attribute performance as one of the features of an application[^15]. But unlike other features, performance is not a boolean property: applications always have some level of performance. This is why it's impossible to answer "yes" or "no" to the question of whether an application has the performance. 
+The first step on the path to understand an application's performance is knowing how to measure it. People attribute performance as one of the features of an application.[^15] But unlike other features, performance is not a boolean property: an application can be very slow, blazingly fast or anywhere in between. This is why it's impossible to answer "yes" or "no" to the question of whether an application has the performance. 
 
 Performance problems are usually harder to track down and reproduce than most functional issues. Although, sometimes we have to deal with non-deterministic and hard to reproduce performance bugs as well. Often, every run of a program is functionally the same but somewhat different from performance standpoint. For example, when unpacking a zip-file, we get the same result over and over again, which means this operation is reproducible. However, it's impossible to reproduce exactly the same CPU cycle-by-cycle performance profile of this operation.
 

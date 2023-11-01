@@ -6,7 +6,7 @@ typora-root-url: ..\..\img
 
 Modern Intel and AMD CPUs have a feature called Last Branch Record (LBR), where the CPU continuously logs a number of previously executed branches. But before going into the details, one might ask: *Why are we so interested in branches?* Well, because this is how we are able to determine the control flow of our program. We largely ignore other instructions in a basic block (see [@sec:BasicBlock]) because branches are always the last instruction in a basic block. Since all instructions in the basic block are guaranteed to be executed once, we can only focus on branches that will “represent” the entire basic block. Thus, it’s possible to reconstruct the entire line-by-line execution path of the program if we track the outcome of every branch. In fact, this is what the Intel Processor Traces (PT) feature is capable of doing, which is discussed in Appendix D. The LBR feature predates PT and has different use cases and special features.
 
-Thanks to the LBR mechanism, the CPU can continuously log branches to a set of model-specific registers (MSRs) in parallel with executing the program, causing minimal slowdown[^15]. Hardware logs the “from” and “to” address of each branch along with some additional metadata (see Figure @fig:LbrAddr). The registers act like a ring buffer that is continuously overwritten and provides only 32 most recent branch outcomes[^1]. If we collect a long enough history of source-destination pairs, we will be able to unwind the control flow of our program, just like a call stack with limited depth.
+Thanks to the LBR mechanism, the CPU can continuously log branches to a set of model-specific registers (MSRs) in parallel with executing the program, causing minimal slowdown.[^15] Hardware logs the “from” and “to” address of each branch along with some additional metadata (see Figure @fig:LbrAddr). The registers act like a ring buffer that is continuously overwritten and provides only 32 most recent branch outcomes.[^1] If we collect a long enough history of source-destination pairs, we will be able to unwind the control flow of our program, just like a call stack with limited depth.
 
 ![64-bit Address Layout of LBR MSR. *© Image from [@IntelSDM].*](../../img/pmu-features/LBR_ADDR.png){#fig:LbrAddr width=90%}
 
@@ -183,7 +183,7 @@ Given that information, we know that there was one occurrence when the basic blo
 
 This information can be used for further fine-grained tuning of this basic block. This example might benefit from memory prefetching, which we will discuss in [@sec:memPrefetch]. Also, this cycle information can be used for timing loop iterations, where every loop iteration ends with a taken branch (back edge).
 
-An example of how one can build a probability density function for the latency of an arbitrary basic block can be found on [easyperf blog](https://easyperf.net/blog/2019/04/03/Precise-timing-of-machine-code-with-Linux-perf)[^9]. However, in newer versions of Linux perf, getting this information is much easier. For example[^7]:
+An example of how one can build a probability density function for the latency of an arbitrary basic block can be found on [easyperf blog](https://easyperf.net/blog/2019/04/03/Precise-timing-of-machine-code-with-Linux-perf)[^9]. However, in newer versions of Linux perf, getting this information is much easier. For example:[^7]
 
 ```bash
 $ perf record -e cycles -b -- ./a.exe

@@ -12,7 +12,7 @@ Nowadays, processors are very good at predicting branch outcomes. They not only 
 
 \personal{A program will always take a non-zero number of branch mispredictions. It is normal for general purpose applications to have a "Bad Speculation" rate in the range of 5-10\%. My recommendation is to pay attention to this metric if it goes higher than 10\%.}
 
-Since the branch predictors are good at finding patterns, old advice for optimizing branch prediction is no longer valid. One could provide a prediction hint to the processor in the form of a prefix to the branch instruction (`0x2E: Branch Not Taken`, `0x3E: Branch Taken`). While this technique can improve performance on older platforms, it won't produce gains on newer ones[^2].
+Since the branch predictors are good at finding patterns, old advice for optimizing branch prediction is no longer valid. One could provide a prediction hint to the processor in the form of a prefix to the branch instruction (`0x2E: Branch Not Taken`, `0x3E: Branch Taken`). While this technique can improve performance on older platforms, it won't produce gains on newer ones.[^2]
 
 Perhaps, the only direct way to get rid of branch mispredictions is to get rid of the branch itself. In the two subsequent sections, we will take a look at how branches can be replaced with lookup tables and predication.
 
