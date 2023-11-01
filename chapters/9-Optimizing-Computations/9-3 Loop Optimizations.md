@@ -16,7 +16,7 @@ Compilers can automatically recognize an opportunity to perform certain loop tra
 
 First, we will consider simple loop optimizations that transform the code inside a single loop: Loop Invariant Code Motion, Loop Unrolling, Loop Strength Reduction, and Loop Unswitching. Such optimizations usually help improve the performance of a loop with high arithmetic intensity (see [@sec:roofline]), i.e., when a loop is bound by CPU compute capabilities. Generally, compilers are good at doing such transformations; however, there are still cases when a compiler might need a developer's support. We will talk about that in subsequent sections.
 
-**Loop Invariant Code Motion (LICM)**. Expressions evaluated in a loop that never change are called loop invariants. Since their value doesn't change across loop iterations, we can move loop invariant expressions outside of the loop. We do so by storing the result in a temporary variable and use it inside the loop (see [@lst:LICM]). All decent compilers nowadays successfully perform LICM in majority of the cases.
+**Loop Invariant Code Motion (LICM)**: expressions evaluated in a loop that never change are called loop invariants. Since their value doesn't change across loop iterations, we can move loop invariant expressions outside of the loop. We do so by storing the result in a temporary variable and use it inside the loop (see [@lst:LICM]). All decent compilers nowadays successfully perform LICM in majority of the cases.
 
 Listing: Loop Invariant Code motion
 
@@ -28,7 +28,7 @@ for (int i = 0; i < N; ++i)             for (int i = 0; i < N; ++i) {
                                         }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-**Loop Unrolling.** An induction variable is a variable in a loop, whose value is a function of the loop iteration number. For example, `v = f(i)`, where `i` is an iteration number. Modifying the induction variable on each iteration can be unnecessary and expensive. Instead, we can unroll a loop and perform multiple iterations for each increment of the induction variable (see [@lst:Unrol]).
+**Loop Unrolling**: an induction variable is a variable in a loop, whose value is a function of the loop iteration number. For example, `v = f(i)`, where `i` is an iteration number. Modifying the induction variable on each iteration can be unnecessary and expensive. Instead, we can unroll a loop and perform multiple iterations for each increment of the induction variable (see [@lst:Unrol]).
 
 Listing: Loop Unrolling
 
@@ -43,7 +43,7 @@ The primary benefit of loop unrolling is to perform more computations per iterat
 
 Loop unrolling is a well-known optimization; still, many people are confused about it and try to unroll the loops manually. I suggest that no developer should unroll any loop by hand. First, compilers are very good at doing this and usually do loop unrolling quite optimally. The second reason is that processors have an "embedded unroller" thanks to their out-of-order speculative execution engine (see [@sec:uarch]). While the processor is waiting for the load from the first iteration to finish, it may speculatively start executing the load from the second iteration assuming there are no loop-carry dependencies. This spans to multiple iterations ahead, effectively unrolling the loop in the instruction Reorder Buffer (ROB).
 
-**Loop Strength Reduction (LSR)**. The idea of LSR is to replace expensive instructions with cheaper ones. Such transformation can be applied to all expressions that use an induction variable. Strength reduction is often applied to array indexing. Compilers perform LSR by analyzing how the value of a variable evolves across the loop iterations. In LLVM, it is known as Scalar Evolution (SCEV). In [@lst:LSR], it is relatively easy for a compiler to prove that the memory location `b[i*10]` is a linear function of the loop iteration number `i`, thus it can replace the expensive multiplication with a cheaper addition.
+**Loop Strength Reduction (LSR)**: replace expensive instructions with cheaper ones. Such transformation can be applied to all expressions that use an induction variable. Strength reduction is often applied to array indexing. Compilers perform LSR by analyzing how the value of a variable evolves across the loop iterations. In LLVM, it is known as Scalar Evolution (SCEV). In [@lst:LSR], it is relatively easy for a compiler to prove that the memory location `b[i*10]` is a linear function of the loop iteration number `i`, thus it can replace the expensive multiplication with a cheaper addition.
 
 Listing: Loop Strength Reduction
 
@@ -55,7 +55,7 @@ for (int i = 0; i < N; ++i)             int j = 0;
                                         }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-**Loop Unswitching**. If a loop has a conditional statement inside and it is invariant, we can move it outside of the loop. We do so by duplicating the body of the loop and placing a version of it inside each of the `if` and `else` clauses of the conditional statement (see [@lst:Unswitch]). While the loop unswitching may double the amount of code written, each of these new loops may now be separately optimized.
+**Loop Unswitching**: if a loop has a conditional statement inside and it is invariant, we can move it outside of the loop. We do so by duplicating the body of the loop and placing a version of it inside each of the `if` and `else` clauses of the conditional statement (see [@lst:Unswitch]). While the loop unswitching may double the amount of code written, each of these new loops may now be separately optimized.
 
 Listing: Loop Unswitching
 
@@ -75,7 +75,7 @@ for (i = 0; i < N; i++) {               if (c)
 
 There is another class of loop transformations that change the structure of loops and often affect multiple nested loops. We will take a look at Loop Interchange, Loop Blocking (Tiling), and Loop Fusion and Distribution (Fission). This set of transformations aims at improving memory accesses and eliminating memory bandwidth and memory latency bottlenecks. From a compiler perspective, it is very difficult to prove legality of such transformations and justify their performance benefit. In that sense, developers are in a better position since they only have to care about the legality of the transformation in their particular piece of code, not about every possible scenario that may happen. Unfortunately, that also means that usually we have to do such transformations manually.
 
-**Loop Interchange**. It is a process of exchanging the loop order of nested loops. The induction variable used in the inner loop switches to the outer loop, and vice versa. [@lst:Interchange] shows an example of interchanging nested loops for `i` and `j`. The main purpose of loop interchange is to perform sequential memory accesses to the elements of a multi-dimensional array. By following the order in which elements are laid out in memory, we can improve the spatial locality of memory accesses and make our code more cache-friendly. This transformation helps to eliminate memory bandwidth and memory latency bottlenecks.
+**Loop Interchange**: is a process of exchanging the loop order of nested loops. The induction variable used in the inner loop switches to the outer loop, and vice versa. [@lst:Interchange] shows an example of interchanging nested loops for `i` and `j`. The main purpose of loop interchange is to perform sequential memory accesses to the elements of a multi-dimensional array. By following the order in which elements are laid out in memory, we can improve the spatial locality of memory accesses and make our code more cache-friendly. This transformation helps to eliminate memory bandwidth and memory latency bottlenecks.
 
 Listing: Loop Interchange
 
@@ -87,7 +87,7 @@ for (i = 0; i < N; i++)                 for (j = 0; j < N; j++)
 
 Loop Interchange is only legal if loops are *perfectly nested*. A perfectly nested loop is one wherein all the statements are in the innermost loop. Interchanging imperfect loop nest is harder to do but still possible, check an example in the [Codee](https://www.codee.com/catalog/glossary-perfect-loop-nesting/)[^1] catalog.
 
-**Loop Blocking (Tiling)**. The idea of this transformation is to split the multi-dimensional execution range into smaller chunks (blocks or tiles) so that each block will fit in the CPU caches. If an algorithm works with large multi-dimensional arrays and performs strided accesses to their elements, there is a high chance of poor cache utilization. Every such access may push the data that will be requested by future accesses out of the cache (cache eviction). By partitioning an algorithm in smaller multi-dimensional blocks, we ensure the data used in a loop stays in the cache until it is reused.
+**Loop Blocking (Tiling)**: the idea of this transformation is to split the multi-dimensional execution range into smaller chunks (blocks or tiles) so that each block will fit in the CPU caches. If an algorithm works with large multi-dimensional arrays and performs strided accesses to their elements, there is a high chance of poor cache utilization. Every such access may push the data that will be requested by future accesses out of the cache (cache eviction). By partitioning an algorithm in smaller multi-dimensional blocks, we ensure the data used in a loop stays in the cache until it is reused.
 
 In the example shown in [@lst:blocking], an algorithm performs row-major traversal of elements of array `a` while doing column-major traversal of array `b`. The loop nest can be partitioned into smaller blocks in order to maximize the reuse of elements of the array `b`.
 
@@ -106,7 +106,7 @@ Loop Blocking is a widely known method of optimizing GEneral Matrix Multiplicati
 
 Typically, engineers optimize a tiled algorithm for the size of caches that are private to each CPU core (L1 or L2 for Intel and AMD, L1 for Apple). However, the sizes of private caches are changing from generation to generation, so hardcoding a block size presents its own set of challenges. As an alternative solution, one can use [cache-oblivious](https://en.wikipedia.org/wiki/Cache-oblivious_algorithm)[^2] algorithms whose goal is to work reasonably well for any size of the cache.
 
-**Loop Fusion and Distribution (Fission)**. Separate loops can be fused together when they iterate over the same range and do not reference each other's data. An example of a Loop Fusion is shown in [@lst:fusion]. The opposite procedure is called Loop Distribution (Fission) when the loop is split into separate loops.
+**Loop Fusion and Distribution (Fission)**: separate loops can be fused together when they iterate over the same range and do not reference each other's data. An example of a Loop Fusion is shown in [@lst:fusion]. The opposite procedure is called Loop Distribution (Fission) when the loop is split into separate loops.
 
 Listing: Loop Fusion and Distribution
 
@@ -122,7 +122,7 @@ Loop Fusion helps to reduce the loop overhead (similar to Loop Unrolling) since 
 
 However, loop fusion does not always improve performance. Sometimes it is better to split a loop into multiple passes, pre-filter the data, sort and reorganize it, etc. By distributing the large loop into multiple smaller ones, we limit the amount of data required for each iteration of the loop, effectively increasing the temporal locality of memory accesses. This helps in situations with a high cache contention, which typically happens in large loops. Loop distribution also reduces register pressure since, again, fewer operations are being done within each iteration of the loop. Also, breaking a big loop into multiple smaller ones will likely be beneficial for the performance of the CPU Front-End because of better instruction cache utilization. Finally, when distributed, each small loop can be further optimized separately by the compiler.
 
-**Loop Unroll and Jam**. To perform this transformation, one needs to first unroll the outer loop, then jam (fuse) multiple inner loops together as shown in [@lst:unrolljam]. This transformation increases the ILP (Instruction-Level Parallelism) of the inner loop since more independent instructions are executed inside the inner loop. In the code example, inner loop is a reduction operation, which accumulates the deltas between elements of arrays `a` and `b`. When we unroll and jam the loop nest by a factor of 2, we effectively execute 2 iterations of the initial outer loop simultaneously. This is emphesized by having 2 independent accumulators, which breaks dependency chains over `diffs` in the initial variant.
+**Loop Unroll and Jam**: to perform this transformation, one needs to unroll the outer loop first, then jam (fuse) multiple inner loops together as shown in [@lst:unrolljam]. This transformation increases the ILP (Instruction-Level Parallelism) of the inner loop since more independent instructions are executed inside the inner loop. In the code example, inner loop is a reduction operation, which accumulates the deltas between elements of arrays `a` and `b`. When we unroll and jam the loop nest by a factor of 2, we effectively execute 2 iterations of the initial outer loop simultaneously. This is emphesized by having 2 independent accumulators, which breaks dependency chains over `diffs` in the initial variant.
 
 Listing: Loop Unroll and Jam
 

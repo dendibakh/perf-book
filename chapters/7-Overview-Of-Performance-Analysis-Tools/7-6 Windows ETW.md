@@ -46,7 +46,7 @@ Here is the list of tools one can use to capture ETW traces:
 
 Next, we will take a look at the example of using ETWController to capture ETW traces and WPA to visualize them.
 
-**Problem statement:** When double clicking on a downloaded executable in Windows Explorer it is started with a noticeable delay. Something seems to delay process start. What could be the reason for this? Slow disk? 
+**Problem statement**: When double clicking on a downloaded executable in Windows Explorer it is started with a noticeable delay. Something seems to delay process start. What could be the reason for this? Slow disk? 
 
 #### Setup {.unlisted .unnumbered}
 

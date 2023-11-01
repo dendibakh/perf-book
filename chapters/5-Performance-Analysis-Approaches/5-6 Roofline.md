@@ -66,7 +66,7 @@ In summary, the Roofline Performance Model can help to:
 * Determine when we’re done optimizing.
 * Assess performance relative to machine capabilities.
 
-**Additional resources and links:** 
+**Additional resources and links**:
 
 * NERSC Documentation, URL: [https://docs.nersc.gov/development/performance-debugging-tools/roofline/](https://docs.nersc.gov/development/performance-debugging-tools/roofline/).
 * Lawrence Berkeley National Laboratory research, URL: [https://crd.lbl.gov/departments/computer-science/par/research/roofline/](https://crd.lbl.gov/departments/computer-science/par/research/roofline/)

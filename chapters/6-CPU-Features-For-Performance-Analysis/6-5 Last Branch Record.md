@@ -12,8 +12,8 @@ Thanks to the LBR mechanism, the CPU can continuously log branches to a set of m
 
 With LBRs, we can sample branches, but during each sample, look at the previous branches inside the LBR stack that were executed. This gives reasonable coverage of the control flow in the hot code paths but does not overwhelm us with too much information, as only a smaller number of the total branches are examined. It is important to keep in mind that this is still sampling, so not every executed branch can be examined. A CPU generally executes too fast for that to be feasible[@LBR2016].
 
-* **Last Branch Record (LBR) Stack** — since Skylake provides 32 pairs of MSRs that store the source and destination address of recently taken branches. 
-* **Last Branch Record Top-of-Stack (TOS) Pointer** — contains a pointer to the MSR in the LBR stack that contains the most recent branch, interrupt or exception recorded.
+* **Last Branch Record (LBR) Stack**: since Skylake provides 32 pairs of MSRs that store the source and destination address of recently taken branches. 
+* **Last Branch Record Top-of-Stack (TOS) Pointer**: contains a pointer to the MSR in the LBR stack that contains the most recent branch, interrupt or exception recorded.
 
 It is very important to keep in mind that only taken branches are being logged with the LBR mechanism. Below is an example that shows how branch results are tracked in the LBR stack.
 
@@ -241,9 +241,9 @@ LBR feature allows us to get this data without instrumenting the code. As the ou
 
 ### Other Use Cases
 
-* **Profile guided optimizations**. LBR feature can provide profiling feedback data for optimizing compilers. LBR can be a better choice as opposed to static code instrumentation when runtime overhead is considered.
-* **Capturing function arguments.** When LBR features is used together with PEBS (see [@sec:secPEBS]),  it is possible to capture function arguments, since according to [x86 calling conventions](https://en.wikipedia.org/wiki/X86_calling_conventions)[^12] first few arguments of a callee land in registers which are captured by PEBS record. [@IntelSDM, Appendix B, Chapter B.3.3.4]
-* **Basic Block Execution Counts.** Since all the basic blocks between a branch IP (source) and the previous target in the LBR stack are executed exactly once, it’s possible to evaluate the execution rate of basic blocks inside a program. This process involves building a map of starting addresses of each basic block and then traversing collected LBR stacks backward. [@IntelSDM, Appendix B, Chapter B.3.3.4]
+* **Profile guided optimizations**: the LBR feature can provide profiling feedback data for optimizing compilers. LBR can be a better choice as opposed to static code instrumentation when runtime overhead is considered.
+* **Capturing function arguments**: when the LBR feature is used together with PEBS (see [@sec:secPEBS]), it is possible to capture function arguments, since according to [x86 calling conventions](https://en.wikipedia.org/wiki/X86_calling_conventions)[^12] first few arguments of a callee land in registers which are captured by PEBS record. [@IntelSDM, Appendix B, Chapter B.3.3.4]
+* **Basic Block Execution Counts**: since all the basic blocks between a branch IP (source) and the previous target in the LBR stack are executed exactly once, it’s possible to evaluate the execution rate of basic blocks inside a program. This process involves building a map of starting addresses of each basic block and then traversing collected LBR stacks backward. [@IntelSDM, Appendix B, Chapter B.3.3.4]
 
 [^1]: Only since Skylake microarchitecture. In Haswell and Broadwell architectures LBR stack is 16 entries deep. Check the Intel manual for information about other architectures.
 [^2]: Linux `perf script` manual page - [http://man7.org/linux/man-pages/man1/perf-script.1.html](http://man7.org/linux/man-pages/man1/perf-script.1.html).

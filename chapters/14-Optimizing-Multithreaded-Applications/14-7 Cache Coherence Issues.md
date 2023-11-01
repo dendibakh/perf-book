@@ -10,10 +10,10 @@ Multiprocessor systems incorporate Cache Coherency Protocols to ensure data cons
 
 One of the most well-known cache coherency protocols is MESI (**M**odified **E**xclusive **S**hared **I**nvalid), which is used to support writeback caches like those used in modern CPUs. Its acronym denotes the four states with which a cache line can be marked (see fig. @fig:MESI):
 
-* **Modified** – cache line is present only in the current cache and has been modified from its value in RAM
-* **Exclusive** – cache line is present only in the current cache and matches its value in RAM
-* **Shared** – cache line is present here and in other cache lines and matches its value in RAM
-* **Invalid** – cache line is unused (i.e., does not contain any RAM location)
+* **Modified**: cache line is present only in the current cache and has been modified from its value in RAM
+* **Exclusive**: cache line is present only in the current cache and matches its value in RAM
+* **Shared**: cache line is present here and in other cache lines and matches its value in RAM
+* **Invalid**: cache line is unused (i.e., does not contain any RAM location)
 
 ![MESI States Diagram. *© Image by University of Washington via courses.cs.washington.edu.*](../../img/mt-perf/MESI_Cache_Diagram.jpg){#fig:MESI width=60%}
 

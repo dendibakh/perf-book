@@ -74,9 +74,9 @@ Above is shown just a small snippet from the long execution log. In this log, we
 
 ## Use Cases {.unnumbered .unlisted}
 
-1. **Analyze performance glitches**. Because PT captures the entire instruction stream, it is possible to analyze what was going on during the small-time period when the application was not responding. More detailed examples can be found in an [article](https://easyperf.net/blog/2019/09/06/Intel-PT-part3)[^2] on easyperf blog.
-2. **Postmortem debugging**. PT traces can be replayed by traditional debuggers like `gdb`. In addition to that, PT provides call stack information, which is *always* valid even if the stack is corrupted.[^3] PT traces could be collected on a remote machine once and then analyzed offline. This is especially useful when the issue is hard to reproduce or access to the system is limited. 
-3. **Introspect execution of the program**.
+1. **Analyze performance glitches**: because PT captures the entire instruction stream, it is possible to analyze what was going on during the small-time period when the application was not responding. More detailed examples can be found in an [article](https://easyperf.net/blog/2019/09/06/Intel-PT-part3)[^2] on easyperf blog.
+2. **Postmortem debugging**: PT traces can be replayed by traditional debuggers like `gdb`. In addition to that, PT provides call stack information, which is *always* valid even if the stack is corrupted.[^3] PT traces could be collected on a remote machine once and then analyzed offline. This is especially useful when the issue is hard to reproduce or access to the system is limited. 
+3. **Introspect execution of the program**:
    - We can immediately tell if a code path was never executed. 
    - Thanks to timestamps, it's possible to calculate how much time was spent waiting while spinning on a lock attempt, etc.
    - Security mitigation by detecting specific instruction pattern.

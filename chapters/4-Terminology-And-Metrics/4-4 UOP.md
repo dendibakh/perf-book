@@ -8,14 +8,14 @@ Microprocessors with the x86 architecture translate complex CISC-like instructio
 
 The main advantage of splitting instructions into micro operations is that uops can be executed:
 
-* **Out of order**. Consider `PUSH rbx` instruction, that decrements the stack pointer by 8 bytes and then stores the source operand on the top of the stack. Suppose that `PUSH rbx` is "cracked" into two dependent micro operations after decode:
+* **Out of order**: consider `PUSH rbx` instruction, that decrements the stack pointer by 8 bytes and then stores the source operand on the top of the stack. Suppose that `PUSH rbx` is "cracked" into two dependent micro operations after decode:
   ```
   SUB rsp, 8
   STORE [rsp], rbx
   ```
   Often, function prologue saves multiple registers using `PUSH` instructions. In our case, the next `PUSH` instruction can start executing after the `SUB` uop of the previous `PUSH` instruction finishes, and doesn't have to wait for the `STORE` uop, which can now go asynchronously.
 
-* **In parallel**. Consider `HADDPD xmm1, xmm2` instruction, that will sum up (reduce) two double precision floating point values in both `xmm1` and `xmm2` and store two results in `xmm1` as follows: 
+* **In parallel**: consider `HADDPD xmm1, xmm2` instruction, that will sum up (reduce) two double precision floating point values in both `xmm1` and `xmm2` and store two results in `xmm1` as follows: 
   ```
   xmm1[63:0] = xmm2[127:64] + xmm2[63:0]
   xmm1[127:64] = xmm1[127:64] + xmm1[63:0]
@@ -24,14 +24,14 @@ The main advantage of splitting instructions into micro operations is that uops 
 
 Even though we were just talking about how instructions are split into smaller pieces, sometimes, uops can also be fused together. There are two types of fusion in modern CPUs:
 
-* **Microfusion** - fuse uops from the same machine instruction. Microfusion can only be applied to two types of combinations: memory write operations and read-modify operations. For example:
+* **Microfusion**: fuse uops from the same machine instruction. Microfusion can only be applied to two types of combinations: memory write operations and read-modify operations. For example:
 
   ```bash
   add    eax, [mem]
   ```
   There are two uops in this instruction: 1) read the memory location `mem`, and 2) add it to `eax`. With microfusion, two uops are fused into one at the decoding step.
   
-* **Macrofusion** - fuse uops from different machine instructions. The decoders can fuse arithmetic or logic instruction with a subsequent conditional jump instruction into a single compute-and-branch µop in certain cases. For example:
+* **Macrofusion**: fuse uops from different machine instructions. The decoders can fuse arithmetic or logic instruction with a subsequent conditional jump instruction into a single compute-and-branch µop in certain cases. For example:
 
   ```bash
   .loop:
