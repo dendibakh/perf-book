@@ -90,7 +90,7 @@ There is a number of important use cases for LBR. In the next sections, we will 
 
 ### Capture Call Graph
 
-Discussions on collecting call graph and its importance were covered in [@sec:secCollectCallStacks]. LBR can be used for collecting call-graph information even if you compiled a program without frame pointers (controlled by compiler option `-fomit-frame-pointer`, ON by default) or debug information[^3]:
+Discussions on collecting call graph and its importance were covered in [@sec:secCollectCallStacks]. LBR can be used for collecting call-graph information even if you compiled a program without frame pointers (controlled by compiler option `-fomit-frame-pointer`, ON by default) or debug information:[^3]
 
 ```bash
 $ perf record --call-graph lbr -- ./a.exe
@@ -138,7 +138,7 @@ Most of the time, it’s possible to determine the location of the branch just f
 
 ### Analyze Branch Misprediction Rate {#sec:secLBR_misp_rate}
 
-It’s also possible to know the misprediction rate for hot branches [^7]:
+It’s also possible to know the misprediction rate for hot branches:[^7]
 
 ```bash
 $ perf record -e cycles -b -- ./a.exe
