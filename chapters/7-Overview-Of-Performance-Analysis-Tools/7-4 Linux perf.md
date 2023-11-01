@@ -28,8 +28,8 @@ Generally, Linux `perf` can do most of the same things that other profilers can 
 The output of the `perf record` command is a raw dump of samples. Many tools are built on top of Linux `perf` that parse the dump file and provide new analysis types. Here are the most notable ones:
 
 - Flame graphs, see next section.
-- [KDAB Hotspot](https://github.com/KDAB/hotspot)[^3], a tool that visualizes Linux `perf` data with an interface very similar to Intel Vtune. If you worked in Intel Vtune, KDAB Hotspot will be very familiar to you. Some people use it as a drop-in replacement for Intel Vtune.
-- Netflix [Flamescope](https://github.com/Netflix/flamescope)[^4], displays the heat map of sampled events over application runtime. You can observe different phases and patterns in the behavior of a workload. Netflix engineers found some very subtle performance bugs using this tool. Also, you can select a time range on the heat map and generate a flamegraph just for that time range.
+- [KDAB Hotspot](https://github.com/KDAB/hotspot),[^3] a tool that visualizes Linux `perf` data with an interface very similar to Intel Vtune. If you worked in Intel Vtune, KDAB Hotspot will be very familiar to you. Some people use it as a drop-in replacement for Intel Vtune.
+- Netflix [Flamescope](https://github.com/Netflix/flamescope),[^4] displays the heat map of sampled events over application runtime. You can observe different phases and patterns in the behavior of a workload. Netflix engineers found some very subtle performance bugs using this tool. Also, you can select a time range on the heat map and generate a flamegraph just for that time range.
 
 ### What you cannot do with it: {.unlisted .unnumbered}
 

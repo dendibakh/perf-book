@@ -27,15 +27,15 @@ Also, CPUs increasingly accelerate the matrix multiplications often used in mach
 
 Initially SIMD was driven by multimedia applications and scientific computations but later found its use in many other domains. Over time, the set of operations supported in SIMD instruction sets has steadily increased. In addition to straightforward arithmetic as shown above, newer use cases of SIMD include:
 
-- String processing: finding characters, validating UTF-8 [^1], parsing JSON [^2] and CSV [^3];
-- Hashing [^4], random generation [^5], cryptography (AES);
+- String processing: finding characters, validating UTF-8,[^1] parsing JSON[^2] and CSV[^3];
+- Hashing,[^4] random generation,[^5] cryptography(AES);
 - Columnar databases (bit packing, filtering, joins);
-- Sorting built-in types (VQSort [^6], QuickSelect);
+- Sorting built-in types (VQSort,[^6] QuickSelect);
 - Machine Learning and Artificial Inteligence (speeding up PyTorch, Tensorflow).
 
-[^1]: UTF-8 validation: [https://github.com/rusticstuff/simdutf8](https://github.com/rusticstuff/simdutf8)
-[^2]: Parsing JSON: [https://github.com/simdjson/simdjson](https://github.com/simdjson/simdjson).
-[^3]: Parsing CSV: [https://github.com/geofflangdale/simdcsv](https://github.com/geofflangdale/simdcsv)
-[^4]: SIMD hashing: [https://github.com/google/highwayhash](https://github.com/google/highwayhash)
-[^5]: Random generation: [abseil library](https://github.com/abseil/abseil-cpp/blob/master/absl/random/internal/randen.h)
-[^6]: Sorting: [VQSort](https://github.com/google/highway/tree/master/hwy/contrib/sort)
+[^1]: UTF-8 validation - [https://github.com/rusticstuff/simdutf8](https://github.com/rusticstuff/simdutf8)
+[^2]: Parsing JSON - [https://github.com/simdjson/simdjson](https://github.com/simdjson/simdjson).
+[^3]: Parsing CSV - [https://github.com/geofflangdale/simdcsv](https://github.com/geofflangdale/simdcsv)
+[^4]: SIMD hashing - [https://github.com/google/highwayhash](https://github.com/google/highwayhash)
+[^5]: Random generation - [abseil library](https://github.com/abseil/abseil-cpp/blob/master/absl/random/internal/randen.h)
+[^6]: Sorting - [VQSort](https://github.com/google/highway/tree/master/hwy/contrib/sort)

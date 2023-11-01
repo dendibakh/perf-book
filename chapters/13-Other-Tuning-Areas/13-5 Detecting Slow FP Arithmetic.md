@@ -4,7 +4,7 @@ typora-root-url: ..\..\img
 
 ## Slow Floating-Point Arithmetic {#sec:SlowFPArith}
 
-Some applications that do extensive computations with floating-point values, are prone to one very subtle issue that can cause performance slowdown. This issue arises when an application hit *subnormal* FP value, which we will discuss in this section. You can also find a term *denormal* FP value, which refers to the same thing. According to the IEEE Standard 754[^2], a subnormal is a non-zero number with exponent smaller than the smallest normal number.[^1] [@lst:Subnormals] shows a very simple instantiation of a subnormal value. 
+Some applications that do extensive computations with floating-point values, are prone to one very subtle issue that can cause performance slowdown. This issue arises when an application hit *subnormal* FP value, which we will discuss in this section. You can also find a term *denormal* FP value, which refers to the same thing. According to the IEEE Standard 754,[^2] a subnormal is a non-zero number with exponent smaller than the smallest normal number.[^1] [@lst:Subnormals] shows a very simple instantiation of a subnormal value. 
 
 In real-world applications, a subnormal value usually represents a signal so small that it is indistinguishable from zero. In audio, it can mean a signal so quiet that it is out of the human hearing range. In image processing, it can mean any of the RGB color components of a pixel to be very close to zero and so on. Interestingly, subnormal values are present in many production software packages, including weather forecasting, ray tracing, physics simulations and modeling and others.
 

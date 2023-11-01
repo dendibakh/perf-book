@@ -8,7 +8,7 @@ typora-root-url: ..\..\img
 
 When dealing with a single-threaded application, optimizing one portion of the program usually yields positive results on performance. However, it's not necessarily the case for multithreaded applications. There could be an application in which thread `A` executes a long-running operation, while thread `B` finishes its task early and just waits for thread `A` to finish. No matter how much we improve thread `B`,  application latency will not be reduced since it will be limited by a longer-running thread `A`. 
 
-This effect is widely known as [Amdahl's law](https://en.wikipedia.org/wiki/Amdahl's_law)[^6], which constitutes that the speedup of a parallel program is limited by its serial part. Figure @fig:MT_AmdahlsLaw illustrates the theoretical speedup limit as a function of the number of processors. For a program, 75% of which is parallel, the speedup factor converges to 4.
+This effect is widely known as [Amdahl's law](https://en.wikipedia.org/wiki/Amdahl's_law),[^6] which constitutes that the speedup of a parallel program is limited by its serial part. Figure @fig:MT_AmdahlsLaw illustrates the theoretical speedup limit as a function of the number of processors. For a program, 75% of which is parallel, the speedup factor converges to 4.
 
 ![The theoretical speedup of the latency of the execution of a program as a function of the number of processors executing it, according to Amdahl's law. *© Image by Daniels220 via Wikipedia.*](../../img/mt-perf/AmdahlsLaw.png){#fig:MT_AmdahlsLaw width=70%}
 

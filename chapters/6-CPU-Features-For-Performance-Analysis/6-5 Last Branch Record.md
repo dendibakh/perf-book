@@ -84,7 +84,7 @@ If we look inside the `dump.txt` (it might be big) we will see something like as
 ...
 ```
 
-On the block above, we present eight entries from the LBR stack, which typically consists of 32 LBR entries. Each entry has `FROM` and `TO` addresses (hexadecimal values), predicted flag (`M`/`P`)[^16], and a number of cycles (number in the last position of each entry). Components marked with "`-`" are related to transactional memory (TSX), which we won't discuss here. Curious readers can look up the format of a decoded LBR entry in the `perf script` [specification](http://man7.org/linux/man-pages/man1/perf-script.1.html)[^2].
+On the block above, we present eight entries from the LBR stack, which typically consists of 32 LBR entries. Each entry has `FROM` and `TO` addresses (hexadecimal values), predicted flag (`M`/`P`),[^16] and a number of cycles (number in the last position of each entry). Components marked with "`-`" are related to transactional memory (TSX), which we won't discuss here. Curious readers can look up the format of a decoded LBR entry in the `perf script` [specification](http://man7.org/linux/man-pages/man1/perf-script.1.html)[^2].
 
 There is a number of important use cases for LBR. In the next sections, we will address the most important ones.
 
@@ -153,7 +153,7 @@ $ perf report -n --sort symbol_from,symbol_to -F +mispredict,srcline_from,srclin
      6.33%    41665   Y   dec.c:36   dec.c:40  LzmaDec     LzmaDec 
 ```
 
-In this example[^8], lines that correspond to function `LzmaDec` are of particular interest to us. Using the reasoning from [@sec:lbr_hot_branch], we can conclude that the branch on source line `dec.c:36` is the most executed branch in the benchmark. In the output that Linux `perf` provides, we can spot two entries that correspond to the `LzmaDec` function: one with `Y` and one with `N` letters. Analyzing those two entries together gives us a misprediction rate of the branch. In this case, we know that the branch on line `dec.c:36` was predicted `303391` times (corresponds to `N`) and was mispredicted `41665` times (corresponds to `Y`), which gives us `88%` prediction rate.
+In this example,[^8] lines that correspond to function `LzmaDec` are of particular interest to us. Using the reasoning from [@sec:lbr_hot_branch], we can conclude that the branch on source line `dec.c:36` is the most executed branch in the benchmark. In the output that Linux `perf` provides, we can spot two entries that correspond to the `LzmaDec` function: one with `Y` and one with `N` letters. Analyzing those two entries together gives us a misprediction rate of the branch. In this case, we know that the branch on line `dec.c:36` was predicted `303391` times (corresponds to `N`) and was mispredicted `41665` times (corresponds to `Y`), which gives us `88%` prediction rate.
 
 Linux `perf` calculates the misprediction rate by analyzing each LBR entry and extracting misprediction bits from it. So that for every branch, we have a number of times it was predicted correctly and a number of mispredictions. Again, due to the nature of sampling, it is possible that some branches might have an `N` entry but no corresponding `Y` entry. It could mean that there are no LBR entries for that branch being mispredicted, but it doesn’t necessarily mean that the prediction rate equals to `100%`.
 
