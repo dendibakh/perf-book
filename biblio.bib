@@ -1,23 +1,19 @@
 % Encoding: UTF-8
 
-@Article{Lopes2018,
-  author        = {Nuno P. Lopes and John Regehr},
-  title         = {Future Directions for Optimizing Compilers},
-  year          = {2018},
-  __markedentry = {[dbakhval:]},
-  date          = {2018-09-06},
-  eprint        = {http://arxiv.org/abs/1809.02161v1},
-  eprintclass   = {cs.PL},
-  eprinttype    = {arXiv},
-  file          = {:http\://arxiv.org/pdf/1809.02161v1:PDF},
-  keywords      = {cs.PL},
-}
-
 @Manual{IntelOptimizationManual,
+  author       = {Intel},
   title        = {Intel® 64 and IA-32 Architectures Optimization Reference Manual},
   organization = {Intel® Corporation},
-  year         = {2020},
+  year         = {2023},
   url          = {https://software.intel.com/content/www/us/en/develop/download/intel-64-and-ia-32-architectures-optimization-reference-manual.html},
+}
+
+@Manual{IntelCpuMetrics,
+  author={Intel},
+  title={CPU Metrics Reference},
+  organization = {Intel® Corporation},
+  year={2023},
+  url = {https://software.intel.com/en-us/vtune-help-cpu-metrics-reference}
 }
 
 @Manual{IntelRDTSC,
@@ -42,6 +38,18 @@
   organization = {Statista, Inc},
   year   = {2018},
   url    = {https://www.statista.com/statistics/871513/worldwide-data-created/},
+}
+
+@Article{Lopes2018,
+  author        = {Nuno P. Lopes and John Regehr},
+  title         = {Future Directions for Optimizing Compilers},
+  year          = {2018},
+  date          = {2018-09-06},
+  eprint        = {http://arxiv.org/abs/1809.02161v1},
+  eprintclass   = {cs.PL},
+  eprinttype    = {arXiv},
+  file          = {:http\://arxiv.org/pdf/1809.02161v1:PDF},
+  keywords      = {cs.PL},
 }
 
 @Article{Mytkowicz09,
@@ -93,14 +101,6 @@
   keywords      = {cs.PF, 68N30, B.8.1; D.2.5},
 }
 
-@dataset{dataset,
-author = {Yasin, Ahmad},
-year = {2016},
-month = {10},
-pages = {},
-title = {TopDown-Yasin-ISPASS14-data}
-}
-
 @inproceedings{TMA_ISPASS,
 author = {Yasin, Ahmad},
 year = {2014},
@@ -133,9 +133,10 @@ doi = {10.1109/ISPASS.2014.6844459}
 }
 
 @inproceedings{Nowak2014TheOO,
-  title={The overhead of profiling using PMU hardware counters},
   author={Andrzej Nowak and Georgios Bitzes},
-  year={2014}
+  title={The overhead of profiling using PMU hardware counters},
+  year={2014},
+  url={https://zenodo.org/record/10800/files/TheOverheadOfProfilingUsingPMUhardwareCounters.pdf},
 }
 
 @inproceedings{HfSort,
@@ -148,7 +149,8 @@ booktitle = {Proceedings of the 2017 International Symposium on Code Generation 
 pages = {233–244},
 numpages = {12},
 location = {Austin, USA},
-series = {CGO ’17}
+series = {CGO ’17},
+url={https://ieeexplore.ieee.org/document/7863743},
 }
 
 @inproceedings{AutoFDO,
@@ -157,7 +159,8 @@ author	= {Dehao Chen and David Xinliang Li and Tipp Moseley},
 year	= {2016},
 booktitle	= {CGO 2016 Proceedings of the 2016 International Symposium on Code Generation and Optimization},
 pages	= {12-23},
-address	= {New York, NY, USA}
+address	= {New York, NY, USA},
+url={https://ieeexplore.ieee.org/document/7559528},
 }
 
 @article{BBReordering,
@@ -189,23 +192,6 @@ address	= {New York, NY, USA}
   timestamp = {Mon, 13 Aug 2018 16:46:24 +0200},
   biburl    = {https://dblp.org/rec/journals/corr/abs-1807-06735.bib},
   bibsource = {dblp computer science bibliography, https://dblp.org}
-}
-
-@inproceedings{Prefetching,
-author = {Iacobovici, Sorin and Kadambi, Sudarshan and Chou, Yuan and Abraham, Santosh},
-year = {2004},
-month = {01},
-pages = {1-11},
-title = {Effective stream-based and execution-based data prefetching},
-doi = {10.1145/1006209.1006211}
-}
-
-@online{PrefetchSlides,
-author = {{Nima Honarmand}},
-title = {Memory Prefetching},
-url = {https://compas.cs.stonybrook.edu/~nhonarmand/courses/sp15/cse502/slides/13-prefetch.pdf},
-organization = {Stony Brook University},
-date = {2015-03-01}
 }
 
 @book{Hennessy,
@@ -265,7 +251,8 @@ numpages = {12}
     year={2015},
     eprint={1509.05053},
     archivePrefix={arXiv},
-    primaryClass={cs.DS}
+    primaryClass={cs.DS},
+    url={https://arxiv.org/ftp/arxiv/papers/1509/1509.05053.pdf},
 }
 
 @article{GoogleWideProfiling,
@@ -275,20 +262,6 @@ year	= {2010},
 URL	= {http://www.computer.org/portal/web/csdl/doi/10.1109/MM.2010.68},
 journal	= {IEEE Micro},
 pages	= {65-79}
-}
-
-@Manual{IntelCpuMetrics,
-  title={CPU Metrics Reference},
-  organization = {Intel® Corporation},
-  year={2020},
-  url = {https://software.intel.com/en-us/vtune-help-cpu-metrics-reference}
-}
-
-@Manual{IntelVTuneGuide,
-  title={Intel® VTune™ Profiler User Guide},
-  organization = {Intel® Corporation},
-  year={2020},
-  url = {https://software.intel.com/content/www/us/en/develop/documentation/vtune-help/top/analyze-performance/hardware-event-based-sampling-collection.html}
 }
 
 @article{CozPaper,
@@ -357,15 +330,6 @@ numpages = {12},
 keywords = {performance, measurement, bias},
 location = {Washington, DC, USA},
 series = {ASPLOS XIV}
-}
-
-@misc{RobustBenchmarking,
-    title={Robust benchmarking in noisy environments},
-    author={Jiahao Chen and Jarrett Revels},
-    year={2016},
-    eprint={1608.04295},
-    archivePrefix={arXiv},
-    primaryClass={cs.PF}
 }
 
 @misc{IntelBlueprint,
@@ -480,7 +444,8 @@ url = {http://papers.nips.cc/paper/9337-a-zero-positive-learning-approach-for-di
     year={2019},
     eprint={1903.08762},
     archivePrefix={arXiv},
-    primaryClass={stat.AP}
+    primaryClass={stat.AP},
+    url={https://arxiv.org/abs/1903.08762},
 }
 
 @article{IntelPTPaper,
@@ -510,7 +475,8 @@ booktitle = {Proceedings of the 2nd USENIX Conference on Hot Topics in Cloud Com
 pages = {2},
 numpages = {1},
 location = {Boston, MA},
-series = {HotCloud'10}
+series = {HotCloud'10},
+url={https://www.usenix.org/legacy/event/hotcloud10/tech/full_papers/Du.pdf},
 }
 
 @article{Mula_Lemire_2019,
@@ -529,13 +495,13 @@ series = {HotCloud'10}
 }
 
 @inproceedings{ISPC_Paper,
-  author={M. {Pharr} and W. R. {Mark}},
+  author={Pharr, Matt and Mark, William R.},
   booktitle={2012 Innovative Parallel Computing (InPar)}, 
   title={ispc: A SPMD compiler for high-performance CPU programming}, 
   year={2012},
-  volume={},
-  number={},
-  pages={1-13}
+  pages={1-13},
+  doi={10.1109/InPar.2012.6339601},
+  url={https://ispc.github.io/papers/ispc_inpar_2012.pdf},
 }
 
 @article{CacheLocking,
@@ -584,7 +550,8 @@ doi = {10.1145/2858792}
   author={Andr{\'e} Seznec and Pierre Michaud},
   journal={J. Instr. Level Parallelism},
   year={2006},
-  volume={8}
+  volume={8},
+  url={https://inria.hal.science/hal-03408381/document},
 }
 
 @INPROCEEDINGS{Jimenez2001,
@@ -598,5 +565,15 @@ doi = {10.1145/2858792}
   doi={10.1109/HPCA.2001.903263}
 }
 
+@Comment{TODO: this one is not used}
+
+@misc{RobustBenchmarking,
+    title={Robust benchmarking in noisy environments},
+    author={Jiahao Chen and Jarrett Revels},
+    year={2016},
+    eprint={1608.04295},
+    archivePrefix={arXiv},
+    primaryClass={cs.PF}
+}
 
 @Comment{jabref-meta: databaseType:bibtex;}
