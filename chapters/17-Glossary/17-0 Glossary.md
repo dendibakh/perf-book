@@ -84,7 +84,5 @@
 
 \end{multicols}
 
-\setcitestyle{numbers}
-
 \bibliography{biblio}
 

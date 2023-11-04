@@ -14,6 +14,7 @@ args = parser.parse_args()
 chapterNum = args.ch
 verbose = args.v
 chapterStr = os.path.join('chapters', str(chapterNum) + '-')
+chapter17Str = os.path.join('chapters', '17-')
 print(chapterStr)
 
 def run_cmd(cmd):
@@ -24,7 +25,7 @@ def run_cmd(cmd):
 def get_list_of_files(path, extension):
     list_of_files = []
     for root, dirs, files in os.walk(path):
-        if (chapterNum != 99) and (chapterStr not in root):
+        if (chapterNum != 99) and (chapterStr not in root) and (chapter17Str not in root):
             continue        
         for file in files:
             if file.endswith("." + extension):
@@ -43,3 +44,28 @@ files_string += " footer.tex"
 if verbose:
     print (default_pandoc_cmd + files_string)
 run_cmd(default_pandoc_cmd + files_string)
+
+# post-processing
+
+texFile = 'book.tex'
+editTexFile = 'book_edit.tex'
+
+with open(texFile, 'r') as f:
+    lines = f.readlines()
+
+with open(editTexFile, 'w') as g:
+    for line in lines:
+        # workaround for citations and bibliography
+        if "\\usepackage[]{natbib}" in line:
+            g.write(line.replace("\\usepackage[]{natbib}", ''))
+        elif "\\bibliographystyle{plainnat}" in line:
+            g.write(line.replace("\\bibliographystyle{plainnat}", '\\bibliographystyle{apalike-ejor}'))
+        elif "\\citep" in line:
+            g.write(line.replace("\\citep", '\\cite'))            
+        else:
+            g.write(line)
+
+os.remove('book.tex')
+os.rename('book_edit.tex', 'book.tex')
+
+# now we don't have URLs. Compare with natbib to figure out the differences
