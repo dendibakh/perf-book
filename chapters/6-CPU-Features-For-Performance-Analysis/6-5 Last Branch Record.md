@@ -8,7 +8,7 @@ Modern Intel and AMD CPUs have a feature called Last Branch Record (LBR), where 
 
 Thanks to the LBR mechanism, the CPU can continuously log branches to a set of model-specific registers (MSRs) in parallel with executing the program, causing minimal slowdown.[^15] Hardware logs the “from” and “to” address of each branch along with some additional metadata (see Figure @fig:LbrAddr). The registers act like a ring buffer that is continuously overwritten and provides only 32 most recent branch outcomes.[^1] If we collect a long enough history of source-destination pairs, we will be able to unwind the control flow of our program, just like a call stack with limited depth.
 
-![64-bit Address Layout of LBR MSR. *© Image from [@IntelSDM].*](../../img/pmu-features/LBR_ADDR.png){#fig:LbrAddr width=90%}
+![64-bit Address Layout of LBR MSR. *© Image from [@IntelOptimizationManual].*](../../img/pmu-features/LBR_ADDR.png){#fig:LbrAddr width=90%}
 
 With LBRs, we can sample branches, but during each sample, look at the previous branches inside the LBR stack that were executed. This gives reasonable coverage of the control flow in the hot code paths but does not overwhelm us with too much information, as only a smaller number of the total branches are examined. It is important to keep in mind that this is still sampling, so not every executed branch can be examined. A CPU generally executes too fast for that to be feasible[@LBR2016].
 
@@ -42,7 +42,7 @@ Below is what we expect to see in the LBR stack at the moment we executed the `C
 
 \personal{Untaken branches not being logged might add an additional burden for analysis but usually doesn’t complicate it too much. We can still unwind the LBR stack since we know that the control flow was sequential from TO\_IP(N-1) to FROM\_IP(N).}
 
-Starting from Haswell, LBR entry received additional components to detect branch misprediction. There is a dedicated bit for it in the LBR entry (see [@IntelSDM, Volume 3B, Chapter 17]). Since Skylake additional `LBR_INFO` component was added to the LBR entry, which has `Cycle Count` field that counts elapsed core clocks since the last update to the LBR stack. There are important applications to those additions, which we will discuss later. The exact format of LBR entry for a specific processor can be found in [@IntelSDM, Volume 3B, Chapters 17,18].
+Starting from Haswell, LBR entry received additional components to detect branch misprediction. There is a dedicated bit for it in the LBR entry (see [@IntelOptimizationManual, Volume 3B, Chapter 17]). Since Skylake additional `LBR_INFO` component was added to the LBR entry, which has `Cycle Count` field that counts elapsed core clocks since the last update to the LBR stack. There are important applications to those additions, which we will discuss later. The exact format of LBR entry for a specific processor can be found in [@IntelOptimizationManual, Volume 3B, Chapters 17,18].
 
 Users can make sure LBRs are enabled on their system by doing the following command:
 
@@ -242,8 +242,8 @@ LBR feature allows us to get this data without instrumenting the code. As the ou
 ### Other Use Cases
 
 * **Profile guided optimizations**: the LBR feature can provide profiling feedback data for optimizing compilers. LBR can be a better choice as opposed to static code instrumentation when runtime overhead is considered.
-* **Capturing function arguments**: when the LBR feature is used together with PEBS (see [@sec:secPEBS]), it is possible to capture function arguments, since according to [x86 calling conventions](https://en.wikipedia.org/wiki/X86_calling_conventions)[^12] first few arguments of a callee land in registers which are captured by PEBS record. [@IntelSDM, Appendix B, Chapter B.3.3.4]
-* **Basic Block Execution Counts**: since all the basic blocks between a branch IP (source) and the previous target in the LBR stack are executed exactly once, it’s possible to evaluate the execution rate of basic blocks inside a program. This process involves building a map of starting addresses of each basic block and then traversing collected LBR stacks backward. [@IntelSDM, Appendix B, Chapter B.3.3.4]
+* **Capturing function arguments**: when the LBR feature is used together with PEBS (see [@sec:secPEBS]), it is possible to capture function arguments, since according to [x86 calling conventions](https://en.wikipedia.org/wiki/X86_calling_conventions)[^12] first few arguments of a callee land in registers which are captured by PEBS record. [@IntelOptimizationManual, Appendix B, Chapter B.3.3.4]
+* **Basic Block Execution Counts**: since all the basic blocks between a branch IP (source) and the previous target in the LBR stack are executed exactly once, it’s possible to evaluate the execution rate of basic blocks inside a program. This process involves building a map of starting addresses of each basic block and then traversing collected LBR stacks backward. [@IntelOptimizationManual, Appendix B, Chapter B.3.3.4]
 
 [^1]: Only since Skylake microarchitecture. In Haswell and Broadwell architectures LBR stack is 16 entries deep. Check the Intel manual for information about other architectures.
 [^2]: Linux `perf script` manual page - [http://man7.org/linux/man-pages/man1/perf-script.1.html](http://man7.org/linux/man-pages/man1/perf-script.1.html).

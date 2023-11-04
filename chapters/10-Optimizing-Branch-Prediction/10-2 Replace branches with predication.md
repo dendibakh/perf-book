@@ -25,7 +25,7 @@ int y = computeY();
 int a = cond ? x : y;
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-For the version of code in [@lst:PredicatingBranches2], the compiler can get rid of the branch and generate `CMOV` instruction[^2] instead. The `CMOVcc` instructions check the state of one or more of the status flags in the `EFLAGS` register (`CF, OF, PF, SF` and `ZF`) and perform a move operation if the flags are in a specified state (or condition). [@IntelSDM, Volume 2] Below are the two assembly listings for the baseline and improved version, respectively:
+For the version of code in [@lst:PredicatingBranches2], the compiler can get rid of the branch and generate `CMOV` instruction[^2] instead. The `CMOVcc` instructions check the state of one or more of the status flags in the `EFLAGS` register (`CF, OF, PF, SF` and `ZF`) and perform a move operation if the flags are in a specified state (or condition). [@IntelOptimizationManual, Volume 2] Below are the two assembly listings for the baseline and improved version, respectively:
 
 ```bash
 # baseline version

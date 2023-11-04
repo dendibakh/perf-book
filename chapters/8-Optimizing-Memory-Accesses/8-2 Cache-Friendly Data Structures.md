@@ -143,7 +143,7 @@ Intel CPUs have Data Linear Address HW feature (see [@sec:sec_PEBS_DLA]) that su
 [^8]: Blog article "Vector of Objects vs Vector of Pointers" by B. Filipek - [https://www.bfilipek.com/2014/05/vector-of-objects-vs-vector-of-pointers.html](https://www.bfilipek.com/2014/05/vector-of-objects-vs-vector-of-pointers.html).
 [^9]: Usually, people tune for the size of the L2 cache since it is not shared between the cores.
 [^10]: Blog article "Detecting false sharing" - [https://easyperf.net/blog/2019/12/17/Detecting-false-sharing-using-perf#2-tune-the-code-for-better-utilization-of-cache-hierarchy](https://easyperf.net/blog/2019/12/17/Detecting-false-sharing-using-perf#2-tune-the-code-for-better-utilization-of-cache-hierarchy).
-[^11]: In Intel processors `CPUID` instruction is described in [@IntelSDM, Volume 2]
+[^11]: In Intel processors `CPUID` instruction is described in [@IntelOptimizationManual, Volume 2]
 [^13]: Linux manual page for `memalign` - [https://linux.die.net/man/3/memalign](https://linux.die.net/man/3/memalign).
 [^14]: Generating aligned memory - [https://embeddedartistry.com/blog/2017/02/22/generating-aligned-memory/](https://embeddedartistry.com/blog/2017/02/22/generating-aligned-memory/).
 [^15]: Typical `malloc` implementation involves synchronization in case multiple threads would try to dynamically allocate the memory
