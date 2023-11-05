@@ -10,7 +10,7 @@ System performance depends on different components: CPU, OS, memory, I/O  device
 
 The scope of the book does not go beyond a single CPU socket, so we will not discuss optimization techniques for distributed, NUMA, and heterogeneous systems. Offloading computations to accelerators (GPU, FPGA, etc.) using solutions like OpenCL and openMP is not discussed in this book. 
 
-This book centers around Intel x86 CPU architecture and does not provide specific tuning recipes for AMD, ARM, or RISC-V chips. Nonetheless, many of the principles discussed in further chapters apply well to those processors. Also, Linux is the OS of choice for this book, but again, for most of the examples in this book, it doesn't matter since the same techniques benefit applications that run on Windows and macOS operating systems.
+This book centers around the Intel x86-64 CPU architecture and does not provide specific tuning recipes for AMD, ARM, or RISC-V chips. Nonetheless, many of the principles discussed in this book apply well to those processors. Also, Linux is the OS of choice for this book, but again, for most of the examples we provide, it doesn't matter since the same techniques benefit applications that run on Windows and macOS operating systems.
 
 All the code snippets in this book are written in C, C++, or x86 assembly languages, but to a large degree, ideas from this book can be applied to other languages that are compiled to native code like Rust, Go, and even Fortran. Since this book targets user-mode applications that run close to the hardware, we will not discuss managed environments, e.g., Java. 
 
