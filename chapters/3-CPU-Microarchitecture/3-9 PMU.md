@@ -28,11 +28,11 @@ Architecture Performance Monitoring Features (0xa/edx):
 
 ### Performance Monitoring Counters {#sec:PMC}
 
-If we imagine a simplified view of the processor, it may look something like what is shown in Figure @fig:PMC. As we discussed earlier in this chapter, a modern CPU has caches, branch predictor, execution pipeline, and other units. When connected to multiple units, a PMC can collect interesting statistics from them. For example, it can count how many clock cycles have passed, how many instructions executed, how many cache misses or branch mispredictions happened during that time, and other performance events.
+If we imagine a simplified view of the processor, it may look something like what is shown in Figure @fig:PMC. As we discussed earlier in this chapter, a modern CPU has caches, a branch predictor, an execution pipeline, and other units. When connected to multiple units, a PMC can collect interesting statistics from them. For example, it can count how many clock cycles have passed, how many instructions executed, how many cache misses or branch mispredictions happened during that time, and other performance events.
 
 ![Simplified view of a CPU with a performance monitoring counter.](../../img/uarch/PMC.png){#fig:PMC width=60%}
 
-Typically, PMCs are 48 bit wide, which allows analysis tools to run longer without interrupting the program's execution.[^2] Performance counters are HW registers implemented as Model Specific Registers (MSR). That means that the number of counters and their width can vary from model to model, and you can not rely on the same number of counters in your CPU. You should always query that first, using tools like `cpuid`, for example. PMCs are accessible via the `RDMSR` and `WRMSR` instructions, which can only be executed from kernel space.
+Typically, PMCs are 48-bit wide, which enables analysis tools to run for a long time without interrupting a program's execution.[^2] Performance counters are HW registers implemented as Model Specific Registers (MSR). That means that the number of counters and their width can vary from model to model, and you can not rely on the same number of counters in your CPU. You should always query that first, using tools like `cpuid`, for example. PMCs are accessible via the `RDMSR` and `WRMSR` instructions, which can only be executed from kernel space.
 
 It is so common that engineers want to count the number of executed instructions and elapsed cycles that the Intel PMU has dedicated PMCs for collecting such events. The Intel PMU has fixed and programmable PMCs. Fixed counters always measure the same thing inside the CPU core. With programmable counters, it's up to the user to choose what they want to measure. Often there are four fully programmable counters and three fixed-function counters per logical core. Fixed counters usually are set to count core clocks, reference clocks, and instructions retired (see [@sec:secMetrics] for more details on these metrics).
 
@@ -41,4 +41,4 @@ It's not unusual for PMU to have a large number of performance events. Figure @f
 The complete list of performance events for Intel CPUs can be found in [@IntelOptimizationManual, Volume 3B, Chapter 19] or at [perfmon-events.intel.com](https://perfmon-events.intel.com/). For ARM chips, it is not that strictly defined. Vendors implement cores following an ARM architecture, but performance events vary widely, both in what they mean and what events are supported.
 
 [^1]: The same information can be extracted from the kernel message buffer by using the `dmesg` command.
-[^2]: When the value of PMCs overflows, the execution of a program must be interrupted. SW then should save the fact of overflow.
+[^2]: When the value of PMCs overflows, the execution of a program must be interrupted. SW then should save the fact of an overflow. We will discuss it in more details later.
