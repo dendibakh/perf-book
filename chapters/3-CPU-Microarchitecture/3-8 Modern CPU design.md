@@ -4,7 +4,7 @@ typora-root-url: ..\..\img
 
 ## Modern CPU Design
 
-To see how all the concepts we talked about in this chapter are used in practice, let's take a look at the implementation of Intel’s 12th generation core, Goldencove, which became available in 2021. This core is used as P-core inside Alderlake and Sapphire Rapids platforms. The figure @fig:Goldencove_diag shows the block diagram of the Goldencove core. Notice, that this section only describes a single core, not the entire processor. So, we will skip discussion about frequencies, core counts, L3 caches, core interconnects, memory latency and bandwidth, and other things.
+To see how all the concepts we talked about in this chapter are used in practice, let's take a look at the implementation of Intel’s 12th generation core, Goldencove, which became available in 2021. This core is used as P-core inside Alderlake and Sapphire Rapids platforms. Figure @fig:Goldencove_diag shows the block diagram of the Goldencove core. Notice, that this section only describes a single core, not the entire processor. So, we will skip discussion about frequencies, core counts, L3 caches, core interconnects, memory latency and bandwidth, and other things.
 
 ![Block diagram of a CPU Core in the Intel GoldenCove Microarchitecture. *© Image from [@IntelOptimizationManual].*](../../img/uarch/goldencove_block_diagram.png){#fig:Goldencove_diag width=100%}
 
@@ -45,7 +45,7 @@ There are certain operations which processors handle in a specific manner, often
 
 The "Scheduler / Reservation Station" (RS) is the structure that tracks the availability of all resources for a given UOP and dispatches the UOP to the assigned port once it is ready. When an instruction enters the RS, scheduler starts tracking its data dependencies. Once all the source operands become available, the RS tries to dispatch it to a free execution port. The RS has fewer entries than the ROB. It can dispatch up to 6 UOPs per cycle.
 
-As shown in figure @fig:Goldencove_diag, there are 12 execution ports:
+As shown in Figure @fig:Goldencove_diag, there are 12 execution ports:
 
 * Ports 0, 1, 5, 6, and 10 provide all the integer, FP, and vector ALU. UOPs dispatched to those ports do not require memory operations.
 * Ports 2, 3, and 11 are used for address generation (AGU) and for load operations. 
@@ -76,7 +76,7 @@ Finally, if we happen to read the data before overwriting it, the cache line typ
 
 ### TLB Hierarchy
 
-Recall from the previous discussion, translations from virtual to physical addresses are cached in TLB. Golden Cove's TLB hierarchy is presented in figure @fig:GLC_TLB. Similar to a regular data cache, it has two levels, where level 1 has separate instances for instructions (ITLB) and data (DTLB). L1 ITLB has 256 entries for regular 4K pages and covers the memory space of 256 * 4KB equals 1MB, while L1 DTLB has 96 entries that covers 384 KB. 
+Recall from the previous discussion, translations from virtual to physical addresses are cached in TLB. Golden Cove's TLB hierarchy is presented in Figure @fig:GLC_TLB. Similar to a regular data cache, it has two levels, where level 1 has separate instances for instructions (ITLB) and data (DTLB). L1 ITLB has 256 entries for regular 4K pages and covers the memory space of 256 * 4KB equals 1MB, while L1 DTLB has 96 entries that covers 384 KB. 
 
 ![TLB hierarchy of Golden Cove.](../../img/uarch/GLC_TLB_hierarchy.png){#fig:GLC_TLB width=50%}
 

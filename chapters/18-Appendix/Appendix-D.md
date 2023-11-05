@@ -24,7 +24,7 @@ With Intel PT, not only execution flow can be traced but also timing information
 
 ![Intel Processor Traces timings](../../img/appendix-D/PT_timings.jpg){#fig:PT_timings width=90%}
 
-In the example shown in figure @fig:PT_timings, instruction data (control flow) is perfectly accurate, but timing information is less accurate. Obviously, `CALL(edx)`, `TEST`, and `JB` instructions were not happening at the same time, yet we do not have more accurate timing information for them. Having timestamps enables us to align the time interval of our program with another event in the system, and it's easy to compare to wall clock time. Trace timing in some implementations can further be improved by a cycle-accurate mode, in which the hardware keeps a record of cycle counts between normal packets (see more details in [@IntelOptimizationManual, Volume 3C, Chapter 36]).
+In the example shown in Figure @fig:PT_timings, instruction data (control flow) is perfectly accurate, but timing information is less accurate. Obviously, `CALL(edx)`, `TEST`, and `JB` instructions were not happening at the same time, yet we do not have more accurate timing information for them. Having timestamps enables us to align the time interval of our program with another event in the system, and it's easy to compare to wall clock time. Trace timing in some implementations can further be improved by a cycle-accurate mode, in which the hardware keeps a record of cycle counts between normal packets (see more details in [@IntelOptimizationManual, Volume 3C, Chapter 36]).
 
 ## Collecting and Decoding Traces {.unnumbered .unlisted}
 

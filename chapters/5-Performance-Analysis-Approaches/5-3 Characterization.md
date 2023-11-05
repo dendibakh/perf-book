@@ -16,7 +16,7 @@ The idea behind counting is very simple: we want to count the absolute number of
 
 ![Counting performance events.](../../img/perf-analysis/CountingFlow.png){#fig:Counting width=60%}
 
-The steps outlined in figure @fig:Counting roughly represent what a typical analysis tool will do to count performance events. This process is implemented in the `perf stat` tool, which can be used to count various HW events, like the number of instructions, cycles, cache-misses, etc. Below is an example of the output from `perf stat`:
+The steps outlined in Figure @fig:Counting roughly represent what a typical analysis tool will do to count performance events. This process is implemented in the `perf stat` tool, which can be used to count various HW events, like the number of instructions, cycles, cache-misses, etc. Below is an example of the output from `perf stat`:
 
 ```bash
 $ perf stat -- ./a.exe
@@ -86,7 +86,7 @@ With multiplexing, an event is not measured all the time, but rather only during
 $$
 final~count = raw~count \times ( time~running / time~enabled )
 $$
-Let's take figure @fig:Multiplexing2 as an example. Say, during profiling, we were able to measure an event from group 1 during three time intervals. Each measurement interval lasted 100ms (`time enabled`). The program running time was 500ms (`time running`). The total number of events for this counter was measured as 10'000 (`raw count`). So, the final count needs to be scaled as follows:
+Let's take Figure @fig:Multiplexing2 as an example. Say, during profiling, we were able to measure an event from group 1 during three time intervals. Each measurement interval lasted 100ms (`time enabled`). The program running time was 500ms (`time running`). The total number of events for this counter was measured as 10'000 (`raw count`). So, the final count needs to be scaled as follows:
 $$
 final~count = 10'000 \times ( 500ms / ( 100ms \times 3) ) = 16'666
 $$

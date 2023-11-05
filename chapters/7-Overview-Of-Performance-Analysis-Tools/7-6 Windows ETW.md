@@ -62,7 +62,7 @@ C:\Windows\System32\wpr.exe
 #### Capture traces {.unlisted .unnumbered}
 
 - Start ETWController.
-- Select the CSwitch profile to track thread wait times along with the other default recording settings. Keep the check boxes *"Record mouse clicks"* and *"Take cyclic screenshots"* enabled to be later able to navigate to the slow spots with the help of the screen shots. See figure @fig:ETWController_Dialog.
+- Select the CSwitch profile to track thread wait times along with the other default recording settings. Keep the check boxes *"Record mouse clicks"* and *"Take cyclic screenshots"* enabled to be later able to navigate to the slow spots with the help of the screen shots. See Figure @fig:ETWController_Dialog.
  - Press *"Start Recording"*.
  - Download some executable from the internet, unpack it and double click the executable to start it. 
  - After that you can stop profiling by pressing the *"Stop Recording"* button. 

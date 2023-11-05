@@ -10,5 +10,5 @@ fontsize: 10pt
 output: pdf_document
 codeBlockCaptions: true
 lstPrefix: Listing
-secPrefix: section
+secPrefix: Section
 ---

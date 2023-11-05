@@ -4,7 +4,7 @@ Virtual memory is the mechanism to share the physical memory attached to a CPU w
 
 In a CPU that supports virtual memory, programs use virtual addresses for their accesses. But while user code operates on virtual addresses, retrieving the data from memory requires physical address. Also, to effectively manage the scarce physical memory, it is divided into pages. Thus applications operate on a set of pages that an operating system has provided.
 
-Address translation is required for accessing data as well as the code (instructions). The mechanism for a system with a page size of 4KB is shown on figure @fig:VirtualMem. The virtual address is split into two parts. The virtual page number (52 most signicant bits) is used to index into the page table to produce a mapping between the virtual page number and the corresponding physical page. To offset within a 4KB page we need 12 bits, the rest 52 bits of a 64-bit pointer can be used for the address of page itself. Notice that the offset whitin a page (12 least signicant bits) does not require translation, and it is used "as-is" to access the physical memory location.
+Address translation is required for accessing data as well as the code (instructions). The mechanism for a system with a page size of 4KB is shown on Figure @fig:VirtualMem. The virtual address is split into two parts. The virtual page number (52 most signicant bits) is used to index into the page table to produce a mapping between the virtual page number and the corresponding physical page. To offset within a 4KB page we need 12 bits, the rest 52 bits of a 64-bit pointer can be used for the address of page itself. Notice that the offset whitin a page (12 least signicant bits) does not require translation, and it is used "as-is" to access the physical memory location.
 
 ![Virtual-to-physical address translation for 4KB pages.](../../img/uarch/VirtualMem2.png){#fig:VirtualMem width=70%}
 
@@ -30,7 +30,7 @@ TLB hierarchy keep translations for a relatively large memory space. Still, miss
 
 Having a small page size allows to manage the available memory more efficiently and reduce fragmentation. The drawback though is that it requires to have more page table entries to cover the same memory region. Consider two page sizes: 4KB, which is a default on x86, and 2MB *huge page* size. For an application that operates on 10MB data, we need 2560 entries in first case, and just 5 entries if we would map the address space onto huge pages. Those are named *Huge Pages* on Linux, *Super Pages* on FreeBSD, and *Large Pages* on Windows, but they all mean the same thing. Through the rest of the book we will refer to it as Huge Pages.
 
-Example of an address that points to the data within a huge page is shown in figure @fig:HugePageVirtualAddress. Just like with a default page size, the exact address format when using huge pages is dictated by the HW, but luckily we as programmers usually don't have to worry about it.
+Example of an address that points to the data within a huge page is shown in Figure @fig:HugePageVirtualAddress. Just like with a default page size, the exact address format when using huge pages is dictated by the HW, but luckily we as programmers usually don't have to worry about it.
 
 ![Virtual address that points within a 2MB page.](../../img/uarch/HugePageVirtualAddress.png){#fig:HugePageVirtualAddress width=80%}
 

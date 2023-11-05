@@ -25,7 +25,7 @@ As we advertised, in this example we will show how to collect HW performance cou
 $ clang++ -O3 -DNDEBUG -arch arm64 <other options ...> -c llvm/lib/Transforms/Vectorize/LoopVectorize.cpp
 ```
 
-To begin, open Instruments and choose "CPU Counters" analysis type. (Here we need to jump ahead a little bit). It will open the main timeline view shown in the figure @fig:InstrumentsView, ready to start profiling. But before we start, let's configure the collection. Click and hold the red target icon \circled{1}, then select "Recording Options..." menu. It will display the dialog window shown in the figure @fig:InstrumentsDialog. This is where you can add HW performance monitoring events for collection.
+To begin, open Instruments and choose "CPU Counters" analysis type. (Here we need to jump ahead a little bit). It will open the main timeline view shown in Figure @fig:InstrumentsView, ready to start profiling. But before we start, let's configure the collection. Click and hold the red target icon \circled{1}, then select "Recording Options..." menu. It will display the dialog window shown in Figure @fig:InstrumentsDialog. This is where you can add HW performance monitoring events for collection.
 
 ![Xcode Instruments: CPU Counters options.](../../img/perf-tools/XcodeInstrumentsDialog.png){#fig:InstrumentsDialog width=50% }
 
@@ -37,13 +37,13 @@ $ plutil -convert json /usr/share/kpep/a14.plist -o a14.json
 
 and then open `a14.json` using a simple text editor.
 
-The second step is to set the profiling target. To do that, click and hold the name of an application (marked \circled{2} on the figure @fig:InstrumentsView) and choose the one you're interested in, set the arguments and environment variables if needed. Now, you're ready to start the collection, press the red target icon \circled{1}.
+The second step is to set the profiling target. To do that, click and hold the name of an application (marked \circled{2} on Figure @fig:InstrumentsView) and choose the one you're interested in, set the arguments and environment variables if needed. Now, you're ready to start the collection, press the red target icon \circled{1}.
 
 ![Xcode Instruments: timeline and statistics panels.](../../img/perf-tools/XcodeInstrumentsView.jpg){#fig:InstrumentsView width=100% }
 
-Instruments shows a timeline and constantly updates statistics about the running application. Once the program finishes, Instruments will display the image similar to the figure @fig:InstrumentsView. The compilation took 7.3 seconds and we can see how the volume of events changed over time. For example, branch mispredictions become more pronounced towards the end of the runtime. You can zoom in to that interval on the timeline to examine the functions involved.
+Instruments shows a timeline and constantly updates statistics about the running application. Once the program finishes, Instruments will display the image similar to Figure @fig:InstrumentsView. The compilation took 7.3 seconds and we can see how the volume of events changed over time. For example, branch mispredictions become more pronounced towards the end of the runtime. You can zoom in to that interval on the timeline to examine the functions involved.
 
-The bottom panel shows numerical statistics. To inspect the hotspots similar to Intel Vtune's bottom-up view, select "Profile" in the menu \circled{3}, then click the "Call Tree" menu \circled{4} and check the "Invert Call Tree" box. This is exactly what we did on the figure @fig:InstrumentsView.
+The bottom panel shows numerical statistics. To inspect the hotspots similar to Intel Vtune's bottom-up view, select "Profile" in the menu \circled{3}, then click the "Call Tree" menu \circled{4} and check the "Invert Call Tree" box. This is exactly what we did on Figure @fig:InstrumentsView.
 
 Instruments show raw counts along with the percentages of the total, which is useful if you want to calculate secondary metrics like IPC, MPKI, etc. On the right side, we have the hottest call stack for the function `llvm::FoldingSetBase::FindNodeOrInsertPos`. If you double-click on a function, you can inspect ARM assembly instructions generated for the source code.
 

@@ -6,7 +6,7 @@ typora-root-url: ..\..\img
 
 Modern computers are still being built based on the classical Von Neumann architecture with decouples CPU, memory and input/output units. Operations with memory (loads and stores) account for the largest portion of performance bottlenecks and power consumption. It is no surprise that we start with this category first.
 
-The statement that the memory hierarchy performance is very important is backed by figure @fig:CpuMemGap. It shows the growth of the gap in performance between memory and processors. The vertical axis is on a logarithmic scale and shows the growth of the CPU-DRAM performance gap. The memory baseline is the latency of memory access of 64 KB DRAM chips from 1980. Typical DRAM performance improvement is 7% per year, while CPUs enjoy 20-50% improvement per year.[@Hennessy]
+The statement that the memory hierarchy performance is very important is backed by Figure @fig:CpuMemGap. It shows the growth of the gap in performance between memory and processors. The vertical axis is on a logarithmic scale and shows the growth of the CPU-DRAM performance gap. The memory baseline is the latency of memory access of 64 KB DRAM chips from 1980. Typical DRAM performance improvement is 7% per year, while CPUs enjoy 20-50% improvement per year.[@Hennessy]
 
 ![The gap in performance between memory and processors. *© Image from [@Hennessy].*](../../img/memory-access-opts/ProcessorMemoryGap.png){#fig:CpuMemGap width=90%}
 

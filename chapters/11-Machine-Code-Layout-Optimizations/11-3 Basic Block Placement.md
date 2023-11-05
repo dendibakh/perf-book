@@ -12,7 +12,7 @@ if (cond)
   coldFunc();
 // hot path again
 ```
-Figure @fig:BBLayout shows two possible physical layouts for this snippet of code. Figure @fig:BB_default is the layout most compiler will emit by default, given no hints provided. The layout that is shown in figure @fig:BB_better can be achieved if we invert the condition `cond` and place hot code as a fall-through.
+Figure @fig:BBLayout shows two possible physical layouts for this snippet of code. Figure @fig:BB_default is the layout most compiler will emit by default, given no hints provided. The layout that is shown in Figure @fig:BB_better can be achieved if we invert the condition `cond` and place hot code as a fall-through.
 
 <div id="fig:BBLayout">
 ![default layout](../../img/cpu_fe_opts/BBLayout_Default.jpg){#fig:BB_default width=30%}
