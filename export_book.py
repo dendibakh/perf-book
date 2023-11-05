@@ -5,6 +5,7 @@ import shlex
 from shlex import quote
 from shlex import split
 import natsort 
+import re
 
 parser = argparse.ArgumentParser(description='Compare multiple EMON outputs and generate an Excel file')
 parser.add_argument("-ch", type=int, help="chapter to export", default="99")
@@ -54,15 +55,30 @@ with open(texFile, 'r') as f:
     lines = f.readlines()
 
 with open(editTexFile, 'w') as g:
+    chapterRefs = []
+    prev = ""
+    for line in lines:
+        if "\\section{" in line:
+            chapterLabelPattern = r"\\hypertarget\{(.*?)\}"
+            match = re.search(chapterLabelPattern, prev)
+            if match:
+                chapterRefs.append("{" + match.group(1) + "}")
+        prev = line
+
     for line in lines:
         # workaround for citations and bibliography
         if "\\usepackage[]{natbib}" in line:
             g.write(line.replace("\\usepackage[]{natbib}", ''))
         elif "\\bibliographystyle{plainnat}" in line:
             g.write(line.replace("\\bibliographystyle{plainnat}", '\\bibliographystyle{apalike-ejor}'))
-        elif "\\citep" in line:
-            g.write(line.replace("\\citep", '\\cite'))            
         else:
+            if "\\citep" in line:
+                line = line.replace("\\citep", '\\cite')
+            # replace Section -> Chapter for top-level sections
+            if "Section~\\ref{" in line:
+                for chref in chapterRefs:
+                    if chref in line:
+                        line = line.replace("Section~\\ref" + chref, "Chapter~\\ref" + chref)
             g.write(line)
 
 os.remove('book.tex')
