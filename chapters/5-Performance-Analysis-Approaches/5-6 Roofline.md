@@ -4,13 +4,13 @@ typora-root-url: ..\..\img
 
 ## Roofline Performance Model {#sec:roofline}
 
-Roofline Performance Model is a throughput-oriented performance model that is heavily used in the HPC world. It was developed at the University of California, Berkeley, in 2009. The "roofline" in this model expresses the fact that the performance of an application cannot exceed the machine's capabilities. Every function and every loop in a program is limited by either compute or memory capacity of a machine. This concept is represented in Figure @fig:RooflineIntro. The performance of an application will always be limited by a certain "roofline" function.
+The Roofline performance model is a throughput-oriented performance model that is heavily used in the HPC world. It was developed at the University of California, Berkeley, in 2009. The "roofline" in this model expresses the fact that the performance of an application cannot exceed the machine's capabilities. Every function and every loop in a program is limited by either compute or memory capacity of a machine. This concept is represented in Figure @fig:RooflineIntro. The performance of an application will always be limited by a certain "roofline" function.
 
 ![Roofline model. *© Image taken from [NERSC Documentation](https://docs.nersc.gov/development/performance-debugging-tools/roofline/#arithmetic-intensity-ai-and-achieved-performance-flops-for-application-characterization).*](../../img/perf-analysis/Roofline-intro.png){#fig:RooflineIntro width=80%}
 
-Hardware has two main limitations: how fast it can make calculations (peak compute performance, FLOPS) and how fast it can move the data (peak memory bandwidth, GB/s). The maximum performance of an application is limited by the minimum between peak FLOPS (horizontal line) and the platform bandwidth multiplied by arithmetic intensity (diagonal line). A roofline chart that is shown in Figure @fig:RooflineIntro plots the performance of two applications `A` and `B` against hardware limitations. Application `A` has lower arithmetic intensity and its performance is bound by the memory bandwidth, while application `B` is more compute intensive and doesn't suffer as much from memory bottlenecks.Similar to this, `A` and `B` could represent two different functions within a program and have different performance characteristics. Roofline model accounts for that and allows to display multiple functions and loops of an application on the same chart.
+Hardware has two main limitations: how fast it can make calculations (peak compute performance, FLOPS) and how fast it can move the data (peak memory bandwidth, GB/s). The maximum performance of an application is limited by the minimum between peak FLOPS (horizontal line) and the platform bandwidth multiplied by arithmetic intensity (diagonal line). The roofline chart in Figure @fig:RooflineIntro plots the performance of two applications `A` and `B` against hardware limitations. Application `A` has lower arithmetic intensity and its performance is bound by the memory bandwidth, while application `B` is more compute intensive and doesn't suffer as much from memory bottlenecks.Similar to this, `A` and `B` could represent two different functions within a program and have different performance characteristics. The Roofline performance model accounts for that and can display multiple functions and loops of an application on the same chart.
 
-Arithmetic Intensity (AI) is a ratio between FLOPS and bytes and can be extracted for every loop in a program. Let's calculate the arithmetic intensity of code in [@lst:BasicMatMul]. In the innermost loop body, we have an addition and a multiplication; thus, we have 2 FLOPS. Also, we have three read operations and one write operation; thus, we transfer `4 ops * 4 bytes = 16` bytes. Arithmetic intensity of that code is `2 / 16 = 0.125`. AI serves as the value on the X-axis of a given performance point.
+Arithmetic Intensity (AI) is a ratio between FLOPS and bytes and can be extracted for every loop in a program. Let's calculate the arithmetic intensity of code in [@lst:BasicMatMul]. In the innermost loop body, we have an addition and a multiplication; thus, we have 2 FLOP. Also, we have three read operations and one write operation; thus, we transfer `4 ops * 4 bytes = 16` bytes. Arithmetic intensity of that code is `2 / 16 = 0.125`. AI serves as the value on the X-axis of a given performance point.
 
 Listing: Naive parallel matrix multiplication.
 
@@ -52,14 +52,14 @@ Automated tools like [Empirical Roofline Tool](https://bitbucket.org/berkeleylab
 
 After hardware limitations are determined, we can start assessing the performance of an application against the roofline. The two most frequently used methods for automated collection of Roofline data are sampling (used by [likwid](https://github.com/RRZE-HPC/likwid)[^4]tool) and binary instrumentation (used by Intel Software Development Emulator ([SDE](https://software.intel.com/content/www/us/en/develop/articles/intel-software-development-emulator.html)[^5])). Sampling incurs the lower overhead of collecting data, while binary instrumentation gives more accurate results.[^6] Intel Advisor automatically builds a Roofline chart and provides hints for performance optimization of a given loop. An example of a Roofline chart generated by Intel Advisor is presented in Figure @fig:RooflineMatrix. Notice, Roofline charts have logarithmic scales.
 
-Roofline methodology allows for tracking optimization progress by printing "before" and "after" points on the same chart. So, it is an iterative process that guides developers to help their applications to fully utilize HW capabilities. Figure @fig:RooflineMatrix reflects performance gains as a result of making two code transformations in code from [@lst:BasicMatMul]:
+Roofline methodology enables tracking optimization progress by printing "before" and "after" points on the same chart. So, it is an iterative process that guides developers to help their applications to fully utilize HW capabilities. Figure @fig:RooflineMatrix shows performance gains from making the following two changes to the code shown earlier in [@lst:BasicMatMul]:
 
-* Interchange two innermost loops (swap lines 4 and 5). This allows cache-friendly memory accesses (see [@sec:MemBound]).
+* Interchange the two innermost loops (swap lines 4 and 5). This enables cache-friendly memory accesses (see [@sec:MemBound]).
 * Enable autovectorization of the innermost loop using AVX2 instructions.
 
 ![Roofline analysis for matrix multiplication on Intel NUC Kit NUC8i5BEH with 8GB RAM using clang 10 compiler.](../../img/perf-analysis/roofline_matrix.png){#fig:RooflineMatrix width=90%}
 
-In summary, the Roofline Performance Model can help to:
+In summary, the Roofline performance model can help to:
 
 * Identify performance bottlenecks.
 * Guide software optimizations.
@@ -71,7 +71,7 @@ In summary, the Roofline Performance Model can help to:
 * NERSC Documentation, URL: [https://docs.nersc.gov/development/performance-debugging-tools/roofline/](https://docs.nersc.gov/development/performance-debugging-tools/roofline/).
 * Lawrence Berkeley National Laboratory research, URL: [https://crd.lbl.gov/departments/computer-science/par/research/roofline/](https://crd.lbl.gov/departments/computer-science/par/research/roofline/)
 * Collection of video presentations about Roofline model and Intel Advisor, URL: [https://techdecoded.intel.io/](https://techdecoded.intel.io/) (search "Roofline").
-* `Perfplot` is a collection of scripts and tools that allow a user to instrument performance counters on a recent Intel platform, measure them, and use the results to generate roofline and performance plots. URL: [https://github.com/GeorgOfenbeck/perfplot](https://github.com/GeorgOfenbeck/perfplot)
+* `Perfplot` is a collection of scripts and tools that enable a user to instrument performance counters on a recent Intel platform, measure them, and use the results to generate roofline and performance plots. URL: [https://github.com/GeorgOfenbeck/perfplot](https://github.com/GeorgOfenbeck/perfplot)
 
 [^2]: Empirical Roofline Tool - [https://bitbucket.org/berkeleylab/cs-roofline-toolkit/src/master/](https://bitbucket.org/berkeleylab/cs-roofline-toolkit/src/master/).
 [^3]: Intel Advisor - [https://software.intel.com/content/www/us/en/develop/tools/advisor.html](https://software.intel.com/content/www/us/en/develop/tools/advisor.html).

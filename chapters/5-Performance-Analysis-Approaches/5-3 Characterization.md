@@ -26,13 +26,13 @@ $ perf stat -- ./a.exe
    239298395  branch-misses  #    7,96% of all branches 
 ```
 
-It is very informative to know this data. First of all, it allows us to quickly spot some anomalies like a high branch misprediction rate or low IPC. But also, it might come in handy when you've just made code improvement and you want to validate performance gain. Looking at absolute numbers might help you justify or reject the code change. The main author uses `perf stat` as a simple benchmark wrapper. Since the overhead of counting events is minimal, almost all benchmarks can be automatically ran under `perf stat`. It serves as a first step in performance investigation. Sometimes anomalies can be spotted right away, which can save you some analysis time.
+It is very informative to know this data. First of all, it enables us to quickly spot some anomalies like a high branch misprediction rate or low IPC. In addition, it might come in handy when you've made a code change and you want to verify that the change has improved performance. Looking at absolute numbers might help you justify or reject the code change. The main author uses `perf stat` as a simple benchmark wrapper. Since the overhead of counting events is minimal, almost all benchmarks can be automatically ran under `perf stat`. It serves as a first step in performance investigation. Sometimes anomalies can be spotted right away, which can save you some analysis time.
 
 ### Manual Performance Counters Collection
 
 Modern CPUs have hundreds of countable performance events. It's very hard to remember all of them and their meanings. Understanding when to use a particular PMC is even harder. That is why generally, we don't recommend manually collecting specific PMCs unless you really know what you are doing. Instead, we recommend using tools like Intel Vtune Profiler that automate this process. Nevertheless, there are situations when you are interested in collecting specific PMCs.
 
-A complete list of performance events for all Intel CPU generations can be found in [@IntelOptimizationManual, Volume 3B, Chapter 19]. PMCs description is also available at [perfmon-events.intel.com](https://perfmon-events.intel.com/). Every event is encoded with `Event` and `Umask` hexadecimal values. Sometimes performance events can also be encoded with additional parameters, like `Cmask` and `Inv` and others. An example of encoding two performance events for the Intel Skylake microarchitecture is shown in the table {@tbl:perf_count}.
+A complete list of performance events for all Intel CPU generations can be found in [@IntelOptimizationManual, Volume 3B, Chapter 19]. PMCs description is also available at [perfmon-events.intel.com](https://perfmon-events.intel.com/). Every event is encoded with `Event` and `Umask` hexadecimal values. Sometimes performance events can also be encoded with additional parameters, like `Cmask`, `Inv` and others. An example of encoding two performance events for the Intel Skylake microarchitecture is shown in the table {@tbl:perf_count}.
 
 --------------------------------------------------------------------------
 Event  Umask Event Mask            Description
@@ -70,7 +70,7 @@ Performance counters are not available in every environment since accessing PMCs
 
 ### Multiplexing and Scaling Events {#sec:secMultiplex}
 
-There are situations when we want to count many different events at the same time. But with only one counter, it's possible to count only one thing at a time. That's why PMUs have multiple counters in it (in recent Intel's Goldencove microarchitecture there are 12 programmable PMCs, 6 per HW thread). Even then, the number of fixed and programmable counter is not always sufficient. Top-Down Analysis Methodology (TMA) requires collecting up to 100 different performance events in a single execution of a program. Modern CPUs don't have that many counters, and here is when multiplexing comes into play.
+There are situations when we want to count many different events at the same time. But with only one counter, it's possible to count only one thing at a time. That's why PMUs have multiple counters in it (in recent Intel's Goldencove microarchitecture there are 12 programmable PMCs, 6 per HW thread). Even then, the number of fixed and programmable counter is not always sufficient. Top-down Analysis Methodology (TMA) requires collecting up to 100 different performance events in a single execution of a program. Modern CPUs don't have that many counters, and here is when multiplexing comes into play.
 
 If there are more events than counters, the analysis tool uses time multiplexing to give each event a chance to access the monitoring hardware. Figure @fig:Multiplexing1 shows an example of multiplexing between 8 performance events with only 4 PMCs available.
 

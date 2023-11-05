@@ -80,7 +80,7 @@ Most profilers with a Graphical User Interface (GUI), like the Intel VTune Profi
 
 ### Collecting Call Stacks {#sec:secCollectCallStacks}
 
-Often when sampling, we might encounter a situation when the hottest function in a program gets called from multiple functions. An example of such a scenario is shown on Figure @fig:CallStacks. The output from the profiling tool might reveal that `foo` is one of the hottest functions in the program, but if it has multiple callers, we would like to know which one of them call `foo` the most number of times. It is a typical situation for applications that have library functions like `memcpy` or `sqrt` appear in the hotspots. To understand why a particular function appeared as a hotspot, we need to know which path in the Control Flow Graph (CFG) of the program caused it.
+Often when sampling, we might encounter a situation when the hottest function in a program gets called from multiple functions. An example of such a scenario is shown in Figure @fig:CallStacks. The output from the profiling tool might reveal that `foo` is one of the hottest functions in the program, but if it has multiple callers, we would like to know which one of them calls `foo` the most number of times. It is a typical situation for applications that have library functions like `memcpy` or `sqrt` appear in the hotspots. To understand why a particular function appeared as a hotspot, we need to know which path in the Control Flow Graph (CFG) of the program caused it.
 
 ![Control Flow Graph: hot function "foo" has multiple callers.](../../img/perf-analysis/CallStacksCFG.png){#fig:CallStacks width=50%}
 
@@ -123,7 +123,7 @@ $ perf report -n --stdio --no-children
 
 When using Intel Vtune Profiler, one can collect call stacks data by checking the corresponding "Collect stacks" box while configuring analysis. When using the command-line interface, specify the `-knob enable-stack-collection=true` option.
 
-The mechanism of collecting call stacks is very important to understand. Developers that are not familiar with the concept try to obtain this information by using a debugger. They do so by interrupting the execution of a program and analyze the call stack (e.g. `backtrace` command in `gdb` debugger). Don't do this, allow a profiling tool to do the job, which is much faster and gives much more accurate data.
+It is very important to know an effective way to collect call stacks. Developers that are not familiar with the concept try to obtain this information by using a debugger. They do so by interrupting the execution of a program and analyze the call stack (e.g. `backtrace` command in `gdb` debugger). Don't do this, let a profiling tool to do the job, which is much faster and gives much more accurate data.
 
 [^1]: Profiling(wikipedia) - [https://en.wikipedia.org/wiki/Profiling_(computer_programming)](https://en.wikipedia.org/wiki/Profiling_(computer_programming)).
 [^4]: In the past there were LLVM compiler bugs when compiling with debug info (`-g`). Code transformation passes incorrectly treated the presence of debugging intrinsics which caused different optimizations decisions. It did not affect functionality, only performance. Some of them were fixed, but it's hard to say if any of them are still there.
