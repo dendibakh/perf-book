@@ -8,7 +8,7 @@ Most CPUs employ a clock signal to pace their sequential operations. The clock s
 $$
 Frequency = \frac{Clockticks}{Time}
 $$
-The majority of modern CPUs, including Intel and AMD CPUs, don't have a fixed frequency at which they operate. Instead, they implement dynamic frequency scaling, which is called *Turbo Boost* in Intel's CPUs, and *Turbo Core* in AMD processors. It allows the CPU to increase and decrease its frequency dynamically -- scaling the frequency down reduces power-consumption at the expense of performance, and scaling the frequency up improves performance but sacrifices power savings.
+The majority of modern CPUs, including Intel and AMD CPUs, don't have a fixed frequency at which they operate. Instead, they implement dynamic frequency scaling, which is called *Turbo Boost* in Intel's CPUs, and *Turbo Core* in AMD processors. It enables the CPU to increase and decrease its frequency dynamically. Decreasing the frequency reduces power consumption at the expense of performance, and increasing the frequency improves performance but sacrifices power savings.
 
 The core clock cycles counter is counting clock cycles at the actual frequency that the CPU core is running at, rather than the external clock (reference cycles). Let's take a look at an experiment on Skylake i7-6000 processor running a single-threaded application, which has a base frequency of 3.4 GHz:
 
