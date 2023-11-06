@@ -4,7 +4,7 @@ typora-root-url: ..\..\img
 
 ## Last Branch Record {#sec:lbr}
 
-Modern Intel and AMD CPUs have a feature called Last Branch Record (LBR), where the CPU continuously logs a number of previously executed branches. But before going into the details, one might ask: *Why are we so interested in branches?* Well, because this is how we are able to determine the control flow of our program. We largely ignore other instructions in a basic block (see [@sec:BasicBlock]) because branches are always the last instruction in a basic block. Since all instructions in the basic block are guaranteed to be executed once, we can only focus on branches that will “represent” the entire basic block. Thus, it’s possible to reconstruct the entire line-by-line execution path of the program if we track the outcome of every branch. In fact, this is what the Intel Processor Traces (PT) feature is capable of doing, which is discussed in Appendix D. The LBR feature predates PT and has different use cases and special features.
+Modern Intel and AMD CPUs have a feature called Last Branch Record (LBR), where the CPU continuously logs a number of previously executed branches. But before going into the details, one might ask: *Why are we so interested in branches?* Well, because this is how we are able to determine the control flow of our program. We largely ignore other instructions in a basic block (see [@sec:BasicBlock]) because branches are always the last instruction in a basic block. Since all instructions in the basic block are guaranteed to be executed once, we can only focus on branches that will “represent” the entire basic block. Thus, it’s possible to reconstruct the entire line-by-line execution path of the program if we track the outcome of every branch. In fact, this is what the Intel Processor Traces (PT) feature is capable of doing, which is discussed in Appendix D. LBR, which predates PT, has different use cases and capabilities.
 
 Thanks to the LBR mechanism, the CPU can continuously log branches to a set of model-specific registers (MSRs) in parallel with executing the program, causing minimal slowdown.[^15] Hardware logs the “from” and “to” address of each branch along with some additional metadata (see Figure @fig:LbrAddr). The registers act like a ring buffer that is continuously overwritten and provides only 32 most recent branch outcomes.[^1] If we collect a long enough history of source-destination pairs, we will be able to unwind the control flow of our program, just like a call stack with limited depth.
 
@@ -42,7 +42,7 @@ Below is what we expect to see in the LBR stack at the moment we executed the `C
 
 \personal{Untaken branches not being logged might add an additional burden for analysis but usually doesn’t complicate it too much. We can still unwind the LBR stack since we know that the control flow was sequential from TO\_IP(N-1) to FROM\_IP(N).}
 
-Starting from Haswell, LBR entry received additional components to detect branch misprediction. There is a dedicated bit for it in the LBR entry (see [@IntelOptimizationManual, Volume 3B, Chapter 17]). Since Skylake additional `LBR_INFO` component was added to the LBR entry, which has `Cycle Count` field that counts elapsed core clocks since the last update to the LBR stack. There are important applications to those additions, which we will discuss later. The exact format of LBR entry for a specific processor can be found in [@IntelOptimizationManual, Volume 3B, Chapters 17,18].
+Starting from Haswell, the LBR entry received additional components to detect branch misprediction. There is a dedicated bit for branch misprediction in the LBR entry (see [@IntelOptimizationManual, Volume 3B, Chapter 17]). Since Skylake, an additional `LBR_INFO` component was added to the LBR entry, which now contains a `Cycle Count` field for counting elapsed core clocks since the last update to the LBR stack. There are important applications to those additions, which we will discuss later. The exact format of LBR entry for a specific processor can be found in [@IntelOptimizationManual, Volume 3B, Chapters 17,18].
 
 Users can make sure LBRs are enabled on their system by doing the following command:
 
@@ -69,7 +69,7 @@ Because each collected sample captures the entire LBR stack (32 last branch reco
 $ perf script -F brstack &> dump.txt
 ```
 
-If we look inside the `dump.txt` (it might be big) we will see something like as shown below:
+The `dump.txt` file, which can be quite large, contains lines like those shown below:
 
 ```
 ...
@@ -111,11 +111,11 @@ $ perf report -n --stdio
 
 As you can see, we identified the hottest function in the program (which is `bar`). Also, we found out callers that contribute to the most time spent in function `bar` (it is `foo`). In this case, we can see that 91% of samples in `bar` have `foo` as its caller function.[^4]
 
-Using the LBR feature, we can determine a Hyper Block (sometimes called Super Block), which is a chain of basic blocks executed most frequently in the whole program. Basic blocks from that chain are not necessarily laid in the sequential physical order; they're executed sequentially.
+Using LBR, we can determine a Hyper Block (sometimes called Super Block), which is a chain of basic blocks executed most frequently in the whole program. Basic blocks from that chain are not necessarily laid in the sequential physical order; they're executed sequentially.
 
 ### Identify Hot Branches {#sec:lbr_hot_branch}
 
-The LBR feature also allows us to know what were the most frequently taken branches: 
+LBR also enables us to know what were the most frequently taken branches: 
 
 ```bash
 $ perf record -e cycles -b -- ./a.exe
@@ -155,11 +155,11 @@ $ perf report -n --sort symbol_from,symbol_to -F +mispredict,srcline_from,srclin
 
 In this example,[^8] lines that correspond to function `LzmaDec` are of particular interest to us. Using the reasoning from [@sec:lbr_hot_branch], we can conclude that the branch on source line `dec.c:36` is the most executed branch in the benchmark. In the output that Linux `perf` provides, we can spot two entries that correspond to the `LzmaDec` function: one with `Y` and one with `N` letters. Analyzing those two entries together gives us a misprediction rate of the branch. In this case, we know that the branch on line `dec.c:36` was predicted `303391` times (corresponds to `N`) and was mispredicted `41665` times (corresponds to `Y`), which gives us `88%` prediction rate.
 
-Linux `perf` calculates the misprediction rate by analyzing each LBR entry and extracting misprediction bits from it. So that for every branch, we have a number of times it was predicted correctly and a number of mispredictions. Again, due to the nature of sampling, it is possible that some branches might have an `N` entry but no corresponding `Y` entry. It could mean that there are no LBR entries for that branch being mispredicted, but it doesn’t necessarily mean that the prediction rate equals to `100%`.
+Linux `perf` calculates the misprediction rate by analyzing each LBR entry and extracting misprediction bits from it. So that for every branch, we have a number of times it was predicted correctly and a number of mispredictions. Again, due to the nature of sampling, it is possible that some branches might have an `N` entry but no corresponding `Y` entry. It could mean there are no LBR entries for the branch being mispredicted, but that doesn’t necessarily mean the prediction rate is `100%`.
 
 ### Precise Timing of Machine Code {#sec:timed_lbr}
 
-As it was discussed in [@sec:lbr], starting from Skylake architecture, LBR entries have `Cycle Count` information. This additional field gives us a number of cycles elapsed between two taken branches. If the target address in the previous LBR entry is the beginning of a basic block (BB) and the source address of the current LBR entry is the last instruction of the same basic block, then the cycle count is the latency of this basic block. For example:
+As was discussed in [@sec:lbr], starting from Skylake, LBR entries provide `Cycle Count` information. This additional field specifies the number of elapsed cycles between two taken branches. If the target address in the previous LBR entry is the beginning of a basic block (BB) and the source address of the current LBR entry is the last instruction of the same basic block, then the cycle count is the latency of this basic block. For example:
 
 ```
 400618:   movb  $0x0, (%rbp,%rdx,1)    <= start of a BB
@@ -183,7 +183,7 @@ Given that information, we know that there was one occurrence when the basic blo
 
 This information can be used for further fine-grained tuning of this basic block. This example might benefit from memory prefetching, which we will discuss in [@sec:memPrefetch]. Also, this cycle information can be used for timing loop iterations, where every loop iteration ends with a taken branch (back edge).
 
-An example of how one can build a probability density function for the latency of an arbitrary basic block can be found on [easyperf blog](https://easyperf.net/blog/2019/04/03/Precise-timing-of-machine-code-with-Linux-perf)[^9]. However, in newer versions of Linux perf, getting this information is much easier. For example:[^7]
+An example of how to build a probability density function for the latency of a basic block can be found on the [easyperf blog](https://easyperf.net/blog/2019/04/03/Precise-timing-of-machine-code-with-Linux-perf)[^9]. However, in newer versions of Linux perf, getting this information is much easier. For example:[^7]
 
 ```bash
 $ perf record -e cycles -b -- ./a.exe
@@ -209,7 +209,7 @@ $ perf report -n --sort symbol_from,symbol_to -F +cycles,srcline_from,srcline_to
      0.58%   3804      24      dec.c:174    dec.c:174   
 ```
 
-Several not significant lines were removed from the output of `perf record` in order to make it fit on the page. If we now focus on the branch in which source and destination is `dec.c:174`[^10], we can find multiple lines associated with it. Linux `perf` sorts entries by overhead first, which requires us to manually filter entries for the branch which we are interested in. In fact, if we filter them, we will get the latency distribution for the basic block that ends with this branch, as shown in the table {@tbl:bb_latency}. Later we can plot this data and get a chart similar to Figure @fig:LBR_timing_BB.
+Several insignificant lines were removed from the output of `perf record` to make it fit on the page. If we now focus on the branch in which source and destination is `dec.c:174`[^10], we can find multiple lines associated with it. Linux `perf` sorts entries by overhead first, which requires us to manually filter entries for the branch which we are interested in. In fact, if we filter them, we will get the latency distribution for the basic block that ends with this branch, as shown in Table {@tbl:bb_latency}. This data can be plotted to obtain a chart similar to the one shown in Figure @fig:LBR_timing_BB.
 
 ----------------------------------------------
 Cycles  Number of samples  Probability density
@@ -235,14 +235,14 @@ Currently, timed LBR is the most precise cycle-accurate source of timing informa
 
 ### Estimating Branch Outcome Probability
 
-Later in [@sec:secFEOpt], we will discuss the importance of code layout for performance. Going forward a little bit, having a hot path in a fall through manner[^11] generally improves the performance of the program. Considering a single branch, knowing that `condition` 99% of the time is false or true is essential for a compiler to make better optimizing decisions.
+Later in [@sec:secFEOpt], we will discuss the importance of code layout for performance. Going forward a little bit, having a hot path in a fall through manner[^11] generally improves the performance of the program. Considering a single branch, knowing that `condition` 99% of the time is false or true is essential for a compiler to make better optimization decisions.
 
-LBR feature allows us to get this data without instrumenting the code. As the outcome from the analysis, the user will get a ratio between true and false outcomes of the condition, i.e., how many times the branch was taken and how much not taken. This feature especially shines when analyzing indirect jumps (switch statement) and indirect calls (virtual calls). One can find examples of using it on a real-world application on [easyperf blog](https://easyperf.net/blog/2019/05/06/Estimating-branch-probability)[^6].
+LBR enables us to get this data without instrumenting the code. As the outcome from the analysis, the user will get a ratio between true and false outcomes of the condition, i.e., how many times the branch was taken and how much not taken. This feature especially shines when analyzing indirect jumps (switch statement) and indirect calls (virtual calls). You can find examples of using it on a real-world application on the [easyperf blog](https://easyperf.net/blog/2019/05/06/Estimating-branch-probability)[^6].
 
 ### Other Use Cases
 
-* **Profile guided optimizations**: the LBR feature can provide profiling feedback data for optimizing compilers. LBR can be a better choice as opposed to static code instrumentation when runtime overhead is considered.
-* **Capturing function arguments**: when the LBR feature is used together with PEBS (see [@sec:secPEBS]), it is possible to capture function arguments, since according to [x86 calling conventions](https://en.wikipedia.org/wiki/X86_calling_conventions)[^12] first few arguments of a callee land in registers which are captured by PEBS record. [@IntelOptimizationManual, Appendix B, Chapter B.3.3.4]
+* **Profile guided optimizations**: LBR can provide profiling feedback data for optimizing compilers. LBR can be a better choice as opposed to static code instrumentation when runtime overhead is considered.
+* **Capturing function arguments**: when LBR is used together with PEBS (see [@sec:secPEBS]), it is possible to capture function arguments, since according to [x86 calling conventions](https://en.wikipedia.org/wiki/X86_calling_conventions),[^12] the first few arguments of a callee are passed in registers that are recorded in a PEBS entry. [@IntelOptimizationManual, Appendix B, Chapter B.3.3.4]
 * **Basic Block Execution Counts**: since all the basic blocks between a branch IP (source) and the previous target in the LBR stack are executed exactly once, it’s possible to evaluate the execution rate of basic blocks inside a program. This process involves building a map of starting addresses of each basic block and then traversing collected LBR stacks backward. [@IntelOptimizationManual, Appendix B, Chapter B.3.3.4]
 
 [^1]: Only since Skylake microarchitecture. In Haswell and Broadwell architectures LBR stack is 16 entries deep. Check the Intel manual for information about other architectures.

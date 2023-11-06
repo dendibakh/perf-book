@@ -25,7 +25,7 @@ There is a number of benefits that the PEBS mechanism brings to performance moni
 
 One of the major problems in profiling is pinpointing the exact instruction that caused a particular performance event. As discussed in [@sec:profiling], interrupt-based sampling is based on counting specific performance events and waiting until it overflows. When an overflow interrupt happens, it takes a processor some amount of time to stop the execution and tag the instruction that caused the overflow. This is especially difficult for modern complex out-of-order CPU architectures.
 
-It introduces the notion of a skid, which is defined as the distance between the IP that caused the event to the IP where the event is tagged (in the IP field inside the PEBS record). Skid makes it difficult to discover the instruction, which is actually causing the performance issue. Consider an application with a big number of cache misses and the hot assembly code that looks like this:
+It introduces the notion of a skid, which is defined as the distance between the IP that caused the event to the IP where the event is tagged (in the IP field inside the PEBS record). Skid makes it difficult to discover the instruction causing the performance issue. Consider an application with a big number of cache misses and the hot assembly code that looks like this:
 
 ```asm
 ; load1 
@@ -74,11 +74,11 @@ Memory accesses are a critical factor for the performance of many applications. 
 * Data Source Encoding (0xA0)
 * Latency value (0xA8)
 
-If the performance event supports Data Linear Address (DLA) facility, and it is enabled, CPU will dump memory addresses and latency of the sampled memory access. Keep in mind; this feature does not trace all the stores and loads. Otherwise, the overhead would be too big. Instead, it samples on memory accesses, i.e., analyzes only one from 1000 accesses or so. It is customizable how much samples per second you want. 
+If the performance event supports the Data Linear Address (DLA) facility, and DLA is enabled, the CPU will dump memory addresses and latency of the sampled memory access. Keep in mind; this feature does not trace all the stores and loads. Otherwise, the overhead would be too big. Instead, it samples on memory accesses, i.e., analyzes only one from 1000 accesses or so. You can customize how many sample per second you want.
 
 One of the most important use cases for this PEBS extension is detecting [True/False sharing](https://en.wikipedia.org/wiki/False_sharing),[^3] which we will discuss in [@sec:TrueFalseSharing]. Linux `perf c2c` tool heavily relies on DLA data to find contested memory accesses, which could experience True/False sharing.
 
-Also, with the help of Data Address Profiling, the user can get general statistics about memory accesses in the program:
+Also, with the help of Data Address Profiling, you can get general statistics for memory accesses in a program:
 
 ```bash
 $ perf mem record -- ./a.exe

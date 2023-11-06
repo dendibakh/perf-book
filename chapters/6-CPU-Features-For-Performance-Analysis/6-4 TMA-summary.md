@@ -6,7 +6,7 @@ TMA is great for identifying CPU performance bottlenecks in code. Ideally, when 
 
 Using TMA on a code that has major performance flaws is not recommended because it will likely steer you in the wrong direction, and instead of fixing real high-level performance problems, you will be tuning bad code, which is just a waste of time. Similarly, make sure the environment doesn’t get in the way of profiling. For example, if you drop filesystem cache and run the benchmark under TMA, it will likely show that your application is Memory Bound, which in fact, may be false when filesystem cache is warmed up.
 
-Workload characterization provided by TMA can increase the scope of potential optimizations beyond source code. For example, if the application is memory bound and all possible ways to speed it up on the software level are examined, it is possible to improve the memory subsystem by using faster memory. This enables educated experiments since the money will only be spent once you found that the program is memory bound and it will benefit from faster memory.
+Workload characterization provided by TMA can increase the scope of potential optimizations beyond source code. For example, if an application is memory bound and all possible ways to speed it up on the software level have been exhausted, it may be possible to improve performance by upgrading the memory subsystem with faster memory chips. This illustrates how using TMA to diagnose performance bottlenecks can ensure you do not prematurely spend money on upgrading hardware.
 
 At the time of this writing, the first level of TMA metrics is also available on AMD processors.
 
