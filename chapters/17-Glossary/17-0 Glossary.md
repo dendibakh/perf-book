@@ -76,7 +76,7 @@
 
 \textbf{TLB} Translation Lookaside Buffer
 
-\textbf{TMA} Top-Down Microarchitecture Analysis
+\textbf{TMA} Top-down Microarchitecture Analysis
 
 \textbf{TSC} Time Stamp Counter
 

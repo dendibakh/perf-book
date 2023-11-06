@@ -10,6 +10,6 @@ Another important metric which some performance tools use is the concept of a *p
 
 Intel's Skylake and AMD Zen3 cores have 4-wide allocation. Intel's SunnyCove microarchitecure was a 5-wide design. As of 2023, most recent Goldencove and Zen4 architectures both have 6-wide allocation. Apple M1 design is not officially disclosed but is measured to be 8-wide.[^1]
 
-Pipeline slot is one of the core metrics in Top-Down Microarchitecture Analysis (see [@sec:TMA]). For example, Front-End Bound and Back-End Bound metrics are expressed as a percentage of unutilized Pipeline Slots due to various reasons.
+Pipeline slot is one of the core metrics in Top-down Microarchitecture Analysis (see [@sec:TMA]). For example, Front-End Bound and Back-End Bound metrics are expressed as a percentage of unutilized Pipeline Slots due to various reasons.
 
 [^1]: Apple Microarchitecture Research - [https://dougallj.github.io/applecpu/firestorm.html](https://dougallj.github.io/applecpu/firestorm.html)
