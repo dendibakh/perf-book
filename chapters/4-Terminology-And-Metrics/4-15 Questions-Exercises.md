@@ -3,7 +3,7 @@
 1. What is the difference between CPU core clock and reference clock?
 2. What is the difference between retired and executed instruction?
 3. When you increase the frequency, does IPC goes up, down, or stays the same?
-4. Take a look at the `DRAM BW Use` formula in the table {@tbl:perf_metrics}. Why do you think there is a constant `64`?
+4. Take a look at the `DRAM BW Use` formula in Table {@tbl:perf_metrics}. Why do you think there is a constant `64`?
 5. Measure bandwidth and latency of the cache hierarchy and memory on the machine you use for development/benchmarking using MLC, stream or other tools.
 6. Run the application that you're working with on a daily basis. Collect performance metrics. Does anything surprises you?
 

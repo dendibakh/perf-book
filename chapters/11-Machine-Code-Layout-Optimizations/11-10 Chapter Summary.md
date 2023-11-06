@@ -4,7 +4,7 @@ typora-root-url: ..\..\img
 
 ## Chapter Summary {.unlisted .unnumbered}
 
-Summary of CPU Front-End optimizations is presented in table {@tbl:CPU_FE_OPT}.
+Summary of CPU Front-End optimizations is presented in Table {@tbl:CPU_FE_OPT}.
 
 --------------------------------------------------------------------------
 Transform  How transformed?  Why helps?    Works best for        Done by

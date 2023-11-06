@@ -32,7 +32,7 @@ It is very informative to know this data. First of all, it enables us to quickly
 
 Modern CPUs have hundreds of countable performance events. It's very hard to remember all of them and their meanings. Understanding when to use a particular PMC is even harder. That is why generally, we don't recommend manually collecting specific PMCs unless you really know what you are doing. Instead, we recommend using tools like Intel Vtune Profiler that automate this process. Nevertheless, there are situations when you are interested in collecting specific PMCs.
 
-A complete list of performance events for all Intel CPU generations can be found in [@IntelOptimizationManual, Volume 3B, Chapter 19]. PMCs description is also available at [perfmon-events.intel.com](https://perfmon-events.intel.com/). Every event is encoded with `Event` and `Umask` hexadecimal values. Sometimes performance events can also be encoded with additional parameters, like `Cmask`, `Inv` and others. An example of encoding two performance events for the Intel Skylake microarchitecture is shown in the table {@tbl:perf_count}.
+A complete list of performance events for all Intel CPU generations can be found in [@IntelOptimizationManual, Volume 3B, Chapter 19]. PMCs description is also available at [perfmon-events.intel.com](https://perfmon-events.intel.com/). Every event is encoded with `Event` and `Umask` hexadecimal values. Sometimes performance events can also be encoded with additional parameters, like `Cmask`, `Inv` and others. An example of encoding two performance events for the Intel Skylake microarchitecture is shown in Table {@tbl:perf_count}.
 
 --------------------------------------------------------------------------
 Event  Umask Event Mask            Description
