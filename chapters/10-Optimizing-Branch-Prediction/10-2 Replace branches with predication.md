@@ -63,4 +63,4 @@ The binary search is a neat example that shows how one can reason about when cho
 
 [^1]: Example of replacing branches with CMOV - [https://easyperf.net/blog/2019/04/10/Performance-analysis-and-tuning-contest-2#fighting-branch-mispredictions-9](https://easyperf.net/blog/2019/04/10/Performance-analysis-and-tuning-contest-2#fighting-branch-mispredictions-9)
 [^2]: Similar transformation can be done for floating-point numbers with `FCMOVcc,VMAXSS/VMINSS` instruction.
-[^3]: See more detailed discussion here: [https://stackoverflow.com/a/54273248](https://stackoverflow.com/a/54273248).
+[^3]: You can read a more detailed discussion at [https://stackoverflow.com/a/54273248](https://stackoverflow.com/a/54273248).

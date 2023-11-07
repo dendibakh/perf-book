@@ -9,7 +9,7 @@ Frequently branches can be avoided by using lookup tables. An example of code wh
 Listing: Replacing branches: baseline version.
 
 ~~~~ {#lst:LookupBranches1 .cpp}
-int mapToBucket(unsigned v) {
+int8_t mapToBucket(unsigned v) {
   if (v >= 0  && v < 10) return 0;
   if (v >= 10 && v < 20) return 1;
   if (v >= 20 && v < 30) return 2;
@@ -22,22 +22,21 @@ int mapToBucket(unsigned v) {
 Listing: Replacing branches: lookup version.
 
 ~~~~ {#lst:LookupBranches2 .cpp}
-int buckets[256] = {
+int8_t buckets[50] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
     2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
     3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-    4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
-    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    ... };
+    4, 4, 4, 4, 4, 4, 4, 4, 4, 4};
 
-int mapToBucket(unsigned v) {
-  if (v < (sizeof (buckets) / sizeof (int)))
+int8_t mapToBucket(unsigned v) {
+  if (v < (sizeof (buckets) / sizeof (int8_t)))
     return buckets[v];
   return -1;
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+[TODO]: Alternative impl: ```return v < 50 ? v / 10 : -1;```
 
 The assembly code of the `mapToBucket` function from [@lst:LookupBranches2] should be using only one branch instead of many. A typical hot path through this function will execute the untaken branch and one load instruction. Since we expect most of the input values to fall into the range covered by the `buckets` array, the branch that guards out-of-bounds access will be well-predicted by CPU. Also, the `buckets` array is relatively small, so we can expect it to reside in CPU caches, which should allow for fast accesses to it.[@LemireBranchless]
 
