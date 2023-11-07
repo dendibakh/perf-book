@@ -8,7 +8,7 @@ typora-root-url: ..\..\img
 
 Multiprocessor systems incorporate Cache Coherency Protocols to ensure data consistency during shared usage of memory by each individual core containing its own, separate cache entity. Without such a protocol, if both CPU `A` and CPU `B` read memory location `L` into their individual caches, and processor B subsequently modified its cached value for `L`, then the CPUs would have inconsistent values of the same memory location `L`. Cache Coherency Protocols ensure that any updates to cached entries are dutifully updated in any other cached entry of the same location.
 
-One of the most well-known cache coherency protocols is MESI (**M**odified **E**xclusive **S**hared **I**nvalid), which is used to support writeback caches like those used in modern CPUs. Its acronym denotes the four states with which a cache line can be marked (see fig. @fig:MESI):
+One of the most well-known cache coherency protocols is MESI (**M**odified **E**xclusive **S**hared **I**nvalid), which is used to support writeback caches like those used in modern CPUs. Its acronym denotes the four states with which a cache line can be marked (see Figure @fig:MESI):
 
 * **Modified**: cache line is present only in the current cache and has been modified from its value in RAM
 * **Exclusive**: cache line is present only in the current cache and matches its value in RAM

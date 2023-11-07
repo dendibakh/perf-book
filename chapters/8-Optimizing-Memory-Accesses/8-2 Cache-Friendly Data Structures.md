@@ -136,7 +136,7 @@ Secondly, it is possible to speed up allocations using custom allocators, for ex
 
 The performance of some applications depends on the size of the cache on a particular level. The most famous example here is improving matrix multiplication with [loop blocking](https://en.wikipedia.org/wiki/Loop_nest_optimization) (tiling). The idea is to break the working size of the matrix into smaller pieces (tiles) such that each tile will fit in the L2 cache.[^9] Most of the architectures provide `CPUID`-like instruction,[^11] which allows us to query the size of caches. Alternatively, one can use [cache-oblivious algorithms](https://en.wikipedia.org/wiki/Cache-oblivious_algorithm)[^19] whose goal is to work reasonably well for any size of the cache.
 
-Intel CPUs have Data Linear Address HW feature (see [@sec:sec_PEBS_DLA]) that supports cache blocking as described on easyperf [blogpost](https://easyperf.net/blog/2019/12/17/Detecting-false-sharing-using-perf#2-tune-the-code-for-better-utilization-of-cache-hierarchy)[^10].
+Intel CPUs have a Data Linear Address HW feature (see [@sec:sec_PEBS_DLA]) that supports cache blocking as described on an easyperf [blog post](https://easyperf.net/blog/2019/12/17/Detecting-false-sharing-using-perf#2-tune-the-code-for-better-utilization-of-cache-hierarchy)[^10].
 
 [^5]: The same applies to memory deallocation.
 [^6]: Row- and column-major order - [https://en.wikipedia.org/wiki/Row-_and_column-major_order](https://en.wikipedia.org/wiki/Row-_and_column-major_order).

@@ -19,11 +19,11 @@ Both Windows and Linux allow applications to establish huge-page memory regions.
 
 ### Explicit Hugepages.
 
-Explicit Huge Pages (EHP) are available as a part of the system memory, exposed as a huge page file system `hugetlbfs`. As the name implies, EHPs should be reserved either at boot time or at run time. See appendix C for instructions on how to do that. Reserving EHPs at boot time increases the possibility of successfull allocation because the memory has not yet been significantly fragmented. Explicitly preallocated pages reside in a reserved chunk of memory and cannot be swapped out under memory pressure. Also, this memory space cannot be used for other purposes, so users should be careful and reserve only the number of pages they need.
+Explicit Huge Pages (EHP) are available as part of the system memory, and are exposed as a huge page file system `hugetlbfs`. As the name implies, EHPs should be reserved either at boot time or at run time. See appendix C for instructions on how to do that. Reserving EHPs at boot time increases the possibility of successfull allocation because the memory has not yet been significantly fragmented. Explicitly preallocated pages reside in a reserved chunk of memory and cannot be swapped out under memory pressure. Also, this memory space cannot be used for other purposes, so users should be careful and reserve only the number of pages they need.
 
 The simplest method of using EHP in an application is to call `mmap` with `MAP_HUGETLB` as shown in [@lst:ExplicitHugepages1]. In this code, pointer `ptr` will point to a 2MB region of memory that was explicitly reserved for EHPs. Notice, that allocation may fail due to the EHPs were not reserved in advance. Another less popular ways to use EHPs in user code are provided in appendix C. Also, developers can write their own arena-based allocators that tap into EHPs.
 
-Listing: Mapping a memory region from explicitly allocated huge page.
+Listing: Mapping a memory region from an explicitly allocated huge page.
 
 ~~~~ {#lst:ExplicitHugepages1 .cpp}
 void ptr = mmap(nullptr, size, PROT_READ | PROT_WRITE,
