@@ -53,7 +53,7 @@ $ perf stat ./x264 -o /dev/null --slow --threads 8 Bosphorus_1920x1080_120fps_42
 
 ### Find Expensive Locks
 
-In order to find the most contended synchronization objects with Linux `perf`, one needs to sample on scheduler context switches (`sched:sched_switch`), which is a kernel event and thus requires root access:
+To find the most contended synchronization objects with Linux `perf`, one needs to sample on scheduler context switches (`sched:sched_switch`), which is a kernel event and thus requires root access:
 
 ```bash
 $ sudo perf record -s -e sched:sched_switch -g --call-graph dwarf -- ./x264 -o /dev/null --slow --threads 8 Bosphorus_1920x1080_120fps_420_8bit_YUV.y4m

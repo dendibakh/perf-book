@@ -11,7 +11,7 @@ typora-root-url: ..\..\img
 * It is very beneficial to employ an automated statistical performance tracking system for preventing performance regressions from leaking into production software. Such CI systems are supposed to run automated performance tests, visualize results, and alert on discovered perfomance anomalies.
 * Visualizing performance distributions also may help discover performance anomalies. It is a safe way of presenting performance results to a wide audience.
 * Statistical relationship between performance distributions is identified using Hypothesis Testing methods. Once it's determined that the difference is statistically significant, then the speedup can be calculated as a ratio between the means or geometric means.
-* It's OK to discard cold runs in order to ensure that everything is running hot, but do not deliberately discard unwanted data. If you decide to discard some samples, do it uniformly for all distributions. 
+* It's OK to discard cold runs to ensure that everything is running hot, but do not deliberately discard unwanted data. If you decide to discard some samples, do it uniformly for all distributions. 
 * To benchmark execution time, engineers can use two different timers, which all the modern platforms provide. The system-wide high-resolution timer is suitable for measuring events whose duration is more than a microsecond. For measuring short events with high accuracy, use Time Stamp Counter.
 * Microbenchmarks are good for proving something quickly, but you should always verify your ideas on a real application in practical conditions. Make sure that you are benchmarking the meaningful code by checking performance profiles.
 

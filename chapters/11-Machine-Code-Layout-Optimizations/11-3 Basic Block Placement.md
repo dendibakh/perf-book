@@ -30,7 +30,7 @@ Secondly, layout @fig:BB_better makes better use of the instruction and uop-cach
 
 Finally, taken branches are also more expensive for the fetch unit. It fetches contiguous chunks of 16 bytes, so every taken jump means the bytes after the jump are useless. This reduces the maximum effective fetch throughput.
 
-In order to suggest the compiler to generate an improved version of the machine code layout, one can provide a hint using [`__builtin_expect`](https://llvm.org/docs/BranchWeightMetadata.html#builtin-expect)[^3] construct: 
+To suggest a compiler to generate an improved version of the machine code layout, one can provide a hint using [`__builtin_expect`](https://llvm.org/docs/BranchWeightMetadata.html#builtin-expect)[^3] construct: 
 
 ```cpp
 // hot path

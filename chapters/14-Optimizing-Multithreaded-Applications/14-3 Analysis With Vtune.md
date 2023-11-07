@@ -14,7 +14,7 @@ Next, the workflow suggests that we identify the most contended synchronization 
 
 ![Intel VTune Profiler Threading Analysis showing the most contended synchronization objects for [x264](https://openbenchmarking.org/test/pts/x264) benchmark.](../../img/mt-perf/VtuneThreadingWaitingObjects.png){#fig:MT_VtuneThreadObjects width=90%}
 
-In order to know this, we can simply click on `__pthread_cond_wait`, which will get us to the Bottom-Up view that is shown on fig. @fig:MT_VtuneLockCallStack. We can see the most frequent path (47% of wait time) that lead to threads waiting on conditional variable: `__pthread_cond_wait <- x264_8_frame_cond_wait <- mb_analyse_init`.
+To find out, we can simply click on `__pthread_cond_wait`, which will get us to the Bottom-Up view that is shown on fig. @fig:MT_VtuneLockCallStack. We can see the most frequent path (47% of wait time) that lead to threads waiting on conditional variable: `__pthread_cond_wait <- x264_8_frame_cond_wait <- mb_analyse_init`.
 
 ![Intel VTune Profiler Threading Analysis showing the call stack for the most contended conditional variable in [x264](https://openbenchmarking.org/test/pts/x264) benchmark.](../../img/mt-perf/VtuneThreadingLockCallStack.png){#fig:MT_VtuneLockCallStack width=90%}
 
