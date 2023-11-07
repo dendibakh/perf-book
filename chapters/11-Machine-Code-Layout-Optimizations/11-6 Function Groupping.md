@@ -6,7 +6,7 @@ typora-root-url: ..\..\img
 
 Following the principles described in previous sections, hot functions can be grouped together to further improve the utilization of caches in the CPU Front-End. When hot functions are grouped together, they might share the same cache line, which reduces the number of cache lines the CPU needs to fetch.
 
-Figure @fig:FunctionGrouping gives a graphical representation of grouping `foo`, `bar`, and `zoo`. The default layout (see fig. @fig:FuncGroup_default) requires four cache line reads, while in the improved version (see fig. @fig:FuncGroup_better), code of `foo`, `bar` and `zoo` fits in only three cache lines. Additionally, when we call `zoo` from `foo`, the beginning of `zoo` is already in the I-cache since we fetched that cache line already.
+Figure @fig:FunctionGrouping gives a graphical representation of grouping `foo`, `bar`, and `zoo`. The default layout (see Figure @fig:FuncGroup_default) requires four cache line reads, while in the improved version (see Figure @fig:FuncGroup_better), code of `foo`, `bar` and `zoo` fits in only three cache lines. Additionally, when we call `zoo` from `foo`, the beginning of `zoo` is already in the I-cache since we fetched that cache line already.
 
 <div id="fig:FunctionGrouping">
 ![default layout](../../img/cpu_fe_opts/FunctionGrouping_Default.jpg){#fig:FuncGroup_default width=35%}

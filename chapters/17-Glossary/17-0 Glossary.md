@@ -14,9 +14,15 @@
 
 \textbf{CPU} Central Processing Unit
 
+\textbf{DSB} Decoded Stream Buffer
+
 \textbf{DRAM} Dynamic Random-Access Memory
 
-\textbf{DSB} Decoded Stream Buffer
+\textbf{DTLB} Data Translation Lookaside Buffer
+
+\textbf{EBS} Event-Based Sampling
+
+\textbf{FLOPS} FLoating-point Operations Per Second
 
 \textbf{FPGA} Field-Programmable Gate Array
 
@@ -34,9 +40,11 @@
 
 \textbf{ILP} Instruction-Level Parallelism
 
-\textbf{IPC} Instructions Per Clock
+\textbf{IPC} Instructions Per Clock cycle
 
 \textbf{IPO} Inter-Procedural Optimizations
+
+\textbf{ITLB} Instruction Translation Lookaside Buffer
 
 \textbf{LBR} Last Branch Record
 
@@ -57,6 +65,8 @@
 \textbf{PGO} Profile Guided Optimizations
 
 \textbf{PMC} Performance Monitoring Counter
+
+\textbf{PMI} Performance Monitoring Interrupt
 
 \textbf{PMU} Performance Monitoring Unit
 
