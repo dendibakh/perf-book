@@ -19,7 +19,7 @@ The primary mechanism for function inlining in many compilers relies on a cost m
 Also, there are situations when inlining is problematic:
 
 * A recursive function cannot be inlined into itself.
-* Function that is referred to through a pointer can be inlined in place of a direct call but has to stay in the binary, i.e., cannot be fully inlined and eliminated. The same is true for functions with external linkage.
+* A function that is referred to through a pointer can be inlined in place of a direct call but the functiona has to remain in the binary, i.e., it cannot be fully inlined and eliminated. The same is true for functions with external linkage.
 
 As we said earlier, compilers tend to use a cost model approach when making a decision about inlining a function, which typically works well in practice. In general, it is a good strategy to rely on the compiler for making all the inlining decisions and adjust if needed. The cost model cannot account for every possible situation, which leaves room for improvement. Sometimes compilers require special hints from the developer. One way to find potential candidates for inlining in a program is by looking at the profiling data, and in particular, how hot is the prologue and the epilogue of the function. Below is an example of a function profile with prologue and epilogue consuming `~50%` of the function time:
 
