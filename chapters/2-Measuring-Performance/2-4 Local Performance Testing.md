@@ -34,7 +34,6 @@ Once it has been determined that the difference is statistically significant via
 
 <div id="fig:Averages">
 ![Averages only](../../img/measurements/Averages1.png){#fig:Averages1 width=30%}
-
 ![Full measurement intervals](../../img/measurements/Averages2.png){#fig:Averages2 width=30%}
 
 Two histograms showing how averages could be misleading.

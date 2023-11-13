@@ -41,7 +41,6 @@ Figure @fig:FunctionSplitting gives a graphical representation of this transform
 
 <div id="fig:FunctionSplitting">
 ![default layout](../../img/cpu_fe_opts/FunctionSplitting_Default.jpg){#fig:FuncSplit_default width=45%}
-
 ![improved layout](../../img/cpu_fe_opts/FunctionSplitting_Improved.jpg){#fig:FuncSplit_better width=45%}
 
 Splitting cold code into a separate function.

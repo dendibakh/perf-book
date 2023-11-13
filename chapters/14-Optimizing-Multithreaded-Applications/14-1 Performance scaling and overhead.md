@@ -16,7 +16,6 @@ Figure @fig:MT_Scaling shows performance scaling of the `h264dec` benchmark from
 
 <div id="fig:MT_charts">
 ![Performance scaling with different number of threads.](../../img/mt-perf/scaling.png){#fig:MT_Scaling width=45%}
-
 ![Overhead of using different number of threads.](../../img/mt-perf/cycles.png){#fig:MT_cycles width=45%}
 
 Performance scaling and overhead of h264dec benchmark on Intel Core i5-8259U.
