@@ -65,6 +65,8 @@ with open(editTexFile, 'w') as g:
                 chapterRefs.append("{" + match.group(1) + "}")
         prev = line
 
+    startTableCPUFESummary = False
+    addTabularnewlineTableCPUFESummary = False
     for line in lines:
         # workaround for citations and bibliography
         if "\\usepackage[]{natbib}" in line:
@@ -72,8 +74,21 @@ with open(editTexFile, 'w') as g:
         elif "\\bibliographystyle{plainnat}" in line:
             g.write(line.replace("\\bibliographystyle{plainnat}", '\\bibliographystyle{apalike-ejor}'))
         else:
+            # Add \tabularnewline for the table in the CPU Front-End section
+            if "\\caption{Summary of CPU Front-End optimizations" in line:
+                startTableCPUFESummary = True
+            if startTableCPUFESummary and "\\endhead" in line:
+                addTabularnewlineTableCPUFESummary = True
+            if addTabularnewlineTableCPUFESummary and "\\end{minipage}\\tabularnewline" in line:
+                line = line.replace("\\end{minipage}\\tabularnewline", "\\end{minipage}\\tabularnewline\\tabularnewline")
+            if addTabularnewlineTableCPUFESummary and "\\end{longtable}" in line:
+                addTabularnewlineTableCPUFESummary = False
+                startTableCPUFESummary = False
+            
+            # workaround for citations and bibliography
             if "\\citep" in line:
                 line = line.replace("\\citep", '\\cite')
+
             # replace Section -> Chapter for top-level sections
             if "Section~\\ref{" in line:
                 for chref in chapterRefs:
