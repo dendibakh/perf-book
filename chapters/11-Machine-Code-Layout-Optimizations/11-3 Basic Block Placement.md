@@ -18,52 +18,50 @@ Figure @fig:BBLayout shows two possible physical layouts for this snippet of cod
 ![default layout](../../img/cpu_fe_opts/BBLayout_Default.png){#fig:BB_default width=40%}
 ![improved layout](../../img/cpu_fe_opts/BBLayout_Better.png){#fig:BB_better width=40%}
 
-Two different machine code layouts.
+Two versions of machine code layout for the snippet of code above.
 </div>
 
-Which layout is better in the common case greatly depends on whether `cond` is usually true or not. If `cond` is usually true, then we would better choose the default layout because otherwise, we would be doing two jumps instead of one. Also, in the general case, we want to inline the function that is guarded under `cond`. However, in this particular example, we know that coldFunc is an error handling function and is likely not executed very often. By choosing layout @fig:BB_better, we maintain fall through between hot pieces of the code and convert taken branch into not taken one.
+Which layout is better? Well, it depends on whether `cond` is usually true or false. If `cond` is usually true, then we would better choose the default layout because otherwise, we would be doing two jumps instead of one. Also, in the general case, if `coldFunc` is a relatively small function, we would want to have it inlined. However, in this particular example, we know that coldFunc is an error handling function and is likely not executed very often. By choosing layout @fig:BB_better, we maintain fall through between hot pieces of the code and convert taken branch into not taken one.
 
-There are a few reasons why for the code presented earlier in this section, layout @fig:BB_better performs better. First of all, not taken branches are fundamentally cheaper than taken. In the general case, modern Intel CPUs can execute two untaken branches per cycle but only one taken branch every two cycles. [^2]
+There are a few reasons why the layout presented in Figure @fig:BB_better performs better. First of all, layout in Figure @fig:BB_better makes better use of the instruction and uop-cache (DSB, see [@sec:uarchFE]). With all hot code contiguous, there is no cache line fragmentation: all the cache lines in the L1I-cache are used by hot code. The same is true for the uop-cache since it caches based on the underlying code layout as well. Secondly, taken branches are also more expensive for the fetch unit. The Front-End of a CPU fetches contiguous chunks of bytes, so every taken jump means the bytes after the jump are useless. This reduces the maximum effective fetch throughput. Finally, on some architectures, not taken branches are fundamentally cheaper than taken. For instance, Intel Skylake CPUs can execute two untaken branches per cycle but only one taken branch every two cycles.[^2]
 
-Secondly, layout @fig:BB_better makes better use of the instruction and uop-cache (DSB, see [@sec:uarchFE]). With all hot code contiguous, there is no cache line fragmentation: all the cache lines in the L1I-cache are used by hot code. The same is true for the uop-cache since it caches based on the underlying code layout as well. 
-
-Finally, taken branches are also more expensive for the fetch unit. It fetches contiguous chunks of 16 bytes, so every taken jump means the bytes after the jump are useless. This reduces the maximum effective fetch throughput.
-
-To suggest a compiler to generate an improved version of the machine code layout, one can provide a hint using [`__builtin_expect`](https://llvm.org/docs/BranchWeightMetadata.html#builtin-expect)[^3] construct: 
+To suggest a compiler to generate an improved version of the machine code layout, one can provide a hint using `[[likely]]`	and `[[unlikely]]` attributes, which is available since C++20. The code that uses this hint will look like this:
 
 ```cpp
 // hot path
-if (__builtin_expect(cond, 0)) // NOT likely to be taken
+if (cond) [[unlikely]] 
   coldFunc();
 // hot path again
 ```
 
-Developers usually write `LIKELY` helper macros to make the code more readable, so more often, you can find the code that looks like the one shown below. Since C++20, there is a standard `[[likely]]`[^10] attribute, which should be preferred.
+In the code above, `[[unlikely]]` hint will instruct the compiler that `cond` is unlikely to be true, so compiler should adjust the code layout accordingly. Prior to C++20, developers could have used [`__builtin_expect`](https://llvm.org/docs/BranchWeightMetadata.html#builtin-expect)[^3] construct and they usually created `LIKELY` wrapper hints themselves to make the code more readable. For example:
 
 ```cpp
 #define LIKELY(EXPR)   __builtin_expect((bool)(EXPR), true)
 #define UNLIKELY(EXPR) __builtin_expect((bool)(EXPR), false)
-
-if (LIKELY(ptr != nullptr))
-  // do something with ptr
+// hot path
+if (UNLIKELY(cond)) // NOT 
+  coldFunc();
+// hot path again
 ```
 
-Optimizing compilers will not only improve code layout when they encounter `LIKELY/UNLIKELY` hints. They will also leverage this information in other places. For example, when `UNLIKELY` hint is applied to our original example in this section, the compiler will prevent inlining `coldFunc` as it now knows that it is unlikely to be executed often and it's more beneficial to optimize it for size, i.e., just leave a `CALL` to this function. Inserting `__builtin_expect` hint is also possible for a switch statement as presented in [@lst:BuiltinSwitch].
+Optimizing compilers will not only improve code layout when they encounter "likely/unlikely" hints. They will also leverage this information in other places. For example, when `[[unlikely]]` attribute is applied, the compiler will prevent inlining `coldFunc` since it now knows that it is unlikely to be executed often and it's more beneficial to optimize it for size, i.e., just leave a `CALL` to this function. Inserting `[[likely]]` attribute is also possible for a switch statement as presented in [@lst:BuiltinSwitch].
 
-Listing: Built-in expect hint for switch statement
+Listing: Likely attribute used in a switch statement
 
 ~~~~ {#lst:BuiltinSwitch .cpp}
 for (;;) {
-  switch (__builtin_expect(instruction, ADD)) {
-    // handle different instructions
+  switch (instruction) {
+               case NOP: handleNOP(); break;
+    [[likely]] case ADD: handleADD(); break;
+               case RET: handleRET(); break;
+    // handle other instructions
   }
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Using this hint, a compiler will be able to reorder code a little bit differently and optimize the hot switch for faster processing `ADD` instructions. More details about this transformation is available on [easyperf](https://easyperf.net/blog/2019/11/22/data-driven-tuning-specialize-switch)[^9] blog.
+Using this hint, a compiler will be able to reorder code a little bit differently and optimize the hot switch for faster processing of `ADD` instructions.
 
-[^2]: There is a special small loop optimization that allows very small loops to have one taken branch per cycle.
+[^2]: Though, there is a special small loop optimization that allows very small loops to have one taken branch per cycle.
 [^3]: More about builtin-expect here: [https://llvm.org/docs/BranchWeightMetadata.html#builtin-expect](https://llvm.org/docs/BranchWeightMetadata.html#builtin-expect).
-[^9]: Using `__builtin_expect` for a switch statement - [https://easyperf.net/blog/2019/11/22/data-driven-tuning-specialize-switch](https://easyperf.net/blog/2019/11/22/data-driven-tuning-specialize-switch).
 [^10]: C++ standard `[[likely]]` attribute: [https://en.cppreference.com/w/cpp/language/attributes/likely](https://en.cppreference.com/w/cpp/language/attributes/likely).
-

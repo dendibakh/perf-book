@@ -12,7 +12,7 @@ Most of the time, inefficiencies in the CPU FE can be described as a situation w
 
 The TMA methodology captures FE performance issues in the `Front-End Bound` metric. It represents the percentage of cycles when the CPU FE is not able to deliver instructions to the BE, while it could have accepted them. Most of the real-world applications experience a non-zero 'Front-End Bound' metric, meaning that some percentage of running time will be lost on suboptimal instruction fetching and decoding. Below 10\% is the norm. If you see the "Front-End Bound" metric being more than 20\%, it's definitely worth to spend time on it.
 
-The reasons for why FE could not deliver instructions to the execution units can be plenty. Most of the time, it is due to the suboptimal code layout, whcih leads to the poor I-cache and ITLB utilization. Applications with a large codebase, e.g. millions lines of code, are especially vulnerable to FE performance issues. In this chapter, we will take a look at some typical optimizations to improve machine code layout and increase the overall performance of the program.
+There could be many reasons why FE cannot deliver instructions to the execution units. Most of the time, it is due to suboptimal code layout, whcih leads to the poor I-cache and ITLB utilization. Applications with a large codebase, e.g. millions lines of code, are especially vulnerable to FE performance issues. In this chapter, we will take a look at some typical optimizations to improve machine code layout and increase the overall performance of the program.
 
 ## Machine Code Layout
 
@@ -20,28 +20,35 @@ When a compiler translates a source code into machine code, it generates a seria
 
 ```cpp
 if (a <= b)
-  c = 1;
+  bar();
+else
+  baz();
 ```
 
-the compiler can generate assembly like this:
+the compiler can generate machine code like this:
 
 ```asm
-; a is in rax
-; b is in rdx
-; c is in rcx
-cmp rax, rdx
-jg .label
-mov rcx, 1
-.label:
+  ; a is in edi
+  ; b is in esi
+  cmp esi, edi
+  jb .label1
+  call bar()
+  jmp .label2
+.label1:
+  call baz()
+.label2:
+  ...
 ```
 
 Assembly instructions will be encoded and laid out in memory consequently:
 
 ```asm
-400510  cmp rax, rdx
-400512  jg 40051a
-400514  mov rcx, 1
-40051a  ...
+401125 cmp esi, edi
+401128 jb 401131
+40112a call bar
+40112f jmp 401136
+401131 call baz
+401136 ...
 ```
 
-This is what is called *machine code layout*. Note that for the same program, it's possible to lay out the code in many different ways. For example, given two functions: `foo` and `bar`, we can place `bar` first in the binary and then `foo` or reverse the order. This affects offsets at which instructions will be placed in memory, which in turn may affect the performance of the generated binary as you will see later. For the rest of this chapter, we will take a look at some typical optimizations for the machine code layout.
+The way code is placed in a binary is called *machine code layout*. Note that for the same program, it's possible to lay out the code in many different ways. For example, compiler may decide to reverse the branch in such a way that in the layout, a call to `baz` will come first. Also, the bodies of the functions `bar` and `baz` can be placed in two different orders: we can place `bar` first in the binary and then `baz` or reverse the order. This affects offsets at which instructions will be placed in memory, which in turn may affect the performance of the generated binary as you will see later. In the next section of this chapter, we will take a look at some typical optimizations for the machine code layout.
