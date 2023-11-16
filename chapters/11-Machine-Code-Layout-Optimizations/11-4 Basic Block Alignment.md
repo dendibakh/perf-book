@@ -24,12 +24,12 @@ void benchmark_func(int* a) {    │ 00000000004046a0 <_Z14benchmark_funcPi>:
 
 The code itself is pretty reasonable, but its layout is not perfect (see Figure @fig:Loop_default). Instructions that correspond to the loop are highlighted with yellow hachure. As well as for data caches, instruction cache lines are 64 bytes long. On Figure @fig:LoopLayout thick boxes denote cache line borders. Notice that the loop spans multiple cache lines: it begins on the cache line `0x80-0xBF` and ends in the cache-line `0xC0-0xFF`. To fetch instructions that are executed in the loop, a processor needs to read two cache lines. These kinds of situations usually cause performance problems for the CPU Front-End, especially for the small loops like presented above.
 
-To fix this, we can shift the loop instructions forward by 16 bytes using NOPs so that the whole loop will reside in one cache line. Figure @fig:Loop_better shows the effect of doing this with NOP instructions highlighted in blue. Interestingly, the performance impact is visible even you run nothing but this hot loop in a microbenchmark. It is somewhat puzzling since the amount of code is tiny and it shouldn't saturate the L1I-cache size on any modern CPU. The reason for the better performance of the layout in Figure @fig:Loop_better is not trivial to explain and will involve a fair amount of microarchitectural details,[^1] which we will avoid in this book. Interested readers can find more information in the article on easyperf blog ["Code alignment issues"](https://easyperf.net/blog/2018/01/18/Code_alignment_issues).[^1]
+To fix this, we can shift the loop instructions forward by 16 bytes using NOPs so that the whole loop will reside in one cache line. Figure @fig:Loop_better shows the effect of doing this with NOP instructions highlighted in blue. Interestingly, the performance impact is visible even you run nothing but this hot loop in a microbenchmark. It is somewhat puzzling since the amount of code is tiny and it shouldn't saturate the L1I-cache size on any modern CPU. The reason for the better performance of the layout in Figure @fig:Loop_better is not trivial to explain and will involve a fair amount of microarchitectural details, which we don't discuss in this book. Interested readers can find more information in the article on easyperf blog ["Code alignment issues"](https://easyperf.net/blog/2018/01/18/Code_alignment_issues).[^1]
 
 <div id="fig:LoopLayout">
-![default layout](../../img/cpu_fe_opts/LoopAlignment_Default.png){#fig:Loop_default width=95%}
+![default layout](../../img/cpu_fe_opts/LoopAlignment_Default.png){#fig:Loop_default width=85%}
 
-![improved layout](../../img/cpu_fe_opts/LoopAlignment_Better.png){#fig:Loop_better width=95%}
+![improved layout](../../img/cpu_fe_opts/LoopAlignment_Better.png){#fig:Loop_better width=85%}
 
 Two different alignments for the loop.
 </div>
