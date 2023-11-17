@@ -16,39 +16,23 @@ There could be many reasons why FE cannot deliver instructions to the execution 
 
 ## Machine Code Layout
 
-When a compiler translates a source code into machine code, it generates a serial byte sequence. For example, for the following C code:
+When a compiler translates a source code into machine code, it generates a serial byte sequence. [@lst:MachineCodeLayout] shows an example of a physical layout for a small snippet of C++ code. Once compiler finished generating assembly instructions, it needs to encode them and lay out in memory sequentially.
 
-```cpp
-if (a <= b)
-  bar();
-else
-  baz();
-```
+Listing: Example of machine code layout
 
-the compiler can generate machine code like this:
+~~~~ {#lst:MachineCodeLayout .cpp}
+  C++ Code        Assembly Listing      Disassembled Machine Code
+  ........        ................      ......................... 
+if (a <= b)   │    ; a is in edi     │  401125 cmp esi, edi
+  bar();      │    ; b is in esi     │  401128 jb 401131
+else          │    cmp esi, edi      │  40112a call bar
+  baz();      │    jb .label1        │  40112f jmp 401136
+              │    call bar()        │  401131 call baz
+              │    jmp .label2       │  401136 ...
+              │  .label1:            │
+              │    call baz()        │
+              │  .label2:            │
+              │    ...               │
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-```asm
-  ; a is in edi
-  ; b is in esi
-  cmp esi, edi
-  jb .label1
-  call bar()
-  jmp .label2
-.label1:
-  call baz()
-.label2:
-  ...
-```
-
-Assembly instructions will be encoded and laid out in memory consequently:
-
-```asm
-401125 cmp esi, edi
-401128 jb 401131
-40112a call bar
-40112f jmp 401136
-401131 call baz
-401136 ...
-```
-
-The way code is placed in a binary is called *machine code layout*. Note that for the same program, it's possible to lay out the code in many different ways. For example, compiler may decide to reverse the branch in such a way that in the layout, a call to `baz` will come first. Also, the bodies of the functions `bar` and `baz` can be placed in two different orders: we can place `bar` first in the binary and then `baz` or reverse the order. This affects offsets at which instructions will be placed in memory, which in turn may affect the performance of the generated binary as you will see later. In the next section of this chapter, we will take a look at some typical optimizations for the machine code layout.
+The way code is placed in a binary is called *machine code layout*. Note that for the same program, it's possible to lay out the code in many different ways. For the code in [@lst:MachineCodeLayout], compiler may decide to reverse the branch in such a way that a call to `baz` will come first. Also, bodies of the functions `bar` and `baz` can be placed in two different orders: we can place `bar` first in the binary and then `baz` or reverse the order. This affects offsets at which instructions will be placed in memory, which in turn may affect the performance of the generated binary as you will see later. In the following sections of this chapter, we will take a look at some typical optimizations for the machine code layout.
