@@ -36,17 +36,17 @@ Two different code layouts for the loop in [@lst:LoopAlignment].
 
 By default, the LLVM compiler recognizes loops and aligns them at 16B boundaries, as we saw in Figure @fig:Loop_default. To reach the desired code placement for our example, as shown in Figure @fig:Loop_better, one can use the `-mllvm -align-all-blocks=5` option that will align every basic block in an object file at a 32 bytes boundary. However, be careful with using this option, as it can easily degrade performance in other places. This option inserts NOPs on the executed path, which can add overhead to the program, especially if they stand on a critical path. NOPs do not require execution; however, they still require to be fetched from memory, decoded, and retired. The latter additionally consumes space in FE data structures and buffers for bookkeeping, similar to all other instructions. There are other less intrusive options in the LLVM compiler that can be used to control basic block alignment, which you can check in the easyperf blog [post](https://easyperf.net/blog/2018/01/25/Code_alignment_options_in_llvm).[^6]
 
-[TODO]: code align pragma
+A recent addition to the LLVM compiler is the new `[[clang::code_align()]]` loop attribute, which allows developers to specify the alignment of a loop in the source code. This gives a very fine-grained control over machine code layout. Before this attribute was introduced, developers had to resort to some less practical solutions like injecting `asm(".align 64;")` statements of inline assembly in the source code. The following code shows how the new Clang attribute can be used to align a loop at a 64 bytes boundary: 
 
-A less practical way, is to use [`ALIGN`](https://docs.oracle.com/cd/E26502_01/html/E28388/eoiyg.html)[^5] assembler directives. This gives a very fine-grained control over machine code layout, but should be used only for experimental purposes. Developers can emit assembly listing using `-S` compiler option and then insert the `ALIGN` directive manually. To align a loop at a 64 bytes boundary, one can use the following code:
-```asm
-ALIGN 64
-.loop
-  dec rdi
-  jnz rdi
+```cpp
+void benchmark_func(int* a) {
+  [[clang::code_align(64)]]
+  for (int i = 0; i < 32; ++i)
+    a[i] += 1;
+}
 ```
 
-Even though CPU architects try hard to minimize the impact of machine code layout, there are still cases when code placement (alignment) can make a difference in performance. Machine code layout is also one of the main sources of noise in performance measurements. It makes it harder to distinguish a real performance improvement or regression from the accidental one, that was caused by the change in the code layout.
+Even though CPU architects work hard to minimize the impact of machine code layout, there are still cases when code placement (alignment) can make a difference in performance. Machine code layout is also one of the main sources of noise in performance measurements. It makes it harder to distinguish a real performance improvement or regression from the accidental one, that was caused by the change in the code layout.
 
 [^1]: "Code alignment issues" - [https://easyperf.net/blog/2018/01/18/Code_alignment_issues](https://easyperf.net/blog/2018/01/18/Code_alignment_issues)
 [^5]: x86 assembler directives manual - [https://docs.oracle.com/cd/E26502_01/html/E28388/eoiyg.html](https://docs.oracle.com/cd/E26502_01/html/E28388/eoiyg.html). This example uses MASM. Otherwise, you will see the `.align` directive.
