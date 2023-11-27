@@ -26,7 +26,7 @@ splitting  blocks of code    utilization   complex CFG when
            functions                       hot parts
 
 Function   group hot         better cache  many small            linker
-grouping   functions         utilization   hot functions
+reorder    functions         utilization   hot functions
            together
 --------------------------------------------------------------------------
 
