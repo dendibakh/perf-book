@@ -8,7 +8,11 @@ We’ve addressed a variety of important areas for addressing optimal software p
 
 ### Avoid Minor Page Faults
 
-While the term contains the word “minor”, there’s nothing minor about the impact of minor page faults on runtime latency if, for example, you work in the HFT industry where every microsecond and nanosecond counts. Latency impact of minor faults can range from just under a microsecond up to several microseconds, especially if you’re using a Linux kernel with 5-level page tables instead of 4-level page tables.
+While the term contains the word “minor”, there’s nothing minor about the impact of minor page faults on runtime latency if, for example, you work in the HFT industry where every microsecond and nanosecond count. Latency impact of minor faults can range from just under a microsecond up to several microseconds, especially if you’re using a Linux kernel with 5-level page tables instead of 4-level page tables.
+
+How do you detect runtime minor page faults in your application? One simple way is by using the “top” utility (add the “-H” option for a thread-level view). Add the “vMn” field to the default selection of display columns to view the number of minor page faults occurring per display refresh interval. Another way involves attaching to the running process with “perf stat -e page-faults”. In the HFT world, anything more than ‘0’ is a problem. But for low latency applications in other business domains, a constant occurrence in the range of tens to hundreds of faults per interval should prompt further investigation.
+
+Investigating the root cause of runtime minor page faults can be as simple as firing up “perf record -e page-faults” and then “perf report” to locate offending source code lines.
 
 To avoid incurring this impact during runtime, pre-fault all the memory for the application at startup time. A toy example might look something like this:
 
@@ -39,11 +43,19 @@ for (int i = 0; i < size; i += sysconf(_SC_PAGESIZE))
 free(mem);
 ```
 
-In the code above, we tune three (3) glibc malloc settings: M_MMAP_MAX, M_TRIM_THRESHOLD, and M_ARENA_MAX. Setting M_MMAP_MAX to ‘0’ disables underlying mmap syscall usage for large allocations. Setting M_TRIM_THRESHOLD to ‘-1’ prevents glibc from returning memory to the OS after calls to free(). Finally, setting M_ARENA_MAX to ‘1’ prevents glibc from allocating multiple arenas to accommodate multiple cores (CAUTION: the latter hinders the glibc allocator’s multithreaded scalability feature). Combined, these settings force glibc into sbrk-only heap allocations which will not release its memory back to the OS until the application ends. As a result, the heap will remain the same size after the final call to “free(mem)” in the code above. Any subsequent runtime calls to malloc() or new() simply will reuse space in this pre-allocated/pre-faulted heap area if sufficiently sized during initialization.
+In the code above, we tune three (3) glibc malloc settings: M_MMAP_MAX, M_TRIM_THRESHOLD, and M_ARENA_MAX.
+
+- Setting M_MMAP_MAX to ‘0’ disables underlying mmap syscall usage for large allocations – this is necessary because the mlock() can be undone by library usage of munmap() when it attempts to release mmap-ed segments back to the OS, defeating the purpose of our efforts.
+- Setting M_TRIM_THRESHOLD to ‘-1’ prevents glibc from returning memory to the OS after calls to free() (NOTE: as indicated before, this option has no effect on mmap-ed segments).
+- Finally, setting M_ARENA_MAX to ‘1’ prevents glibc from allocating multiple arenas via mmap() to accommodate multiple cores. CAUTION: the latter hinders the glibc allocator’s multithreaded scalability feature.
+
+Combined, these settings force glibc into sbrk-only heap allocations which will not release its memory back to the OS until the application ends. As a result, the heap will remain the same size after the final call to “free(mem)” in the code above. Any subsequent runtime calls to malloc() or new() simply will reuse space in this pre-allocated/pre-faulted heap area if it is sufficiently sized at initialization.
 
 More importantly, all that heap memory that was pre-faulted in the for-loop will persist in RAM due to the previous mlockall call – the option MCL_CURRENT locks all pages which are currently mapped, while MCL_FUTURE locks all pages that will become mapped in the future. An added benefit of using mlockall this way is that any thread spawned by this process will have its stack pre-faulted and locked, as well.
 
-These are just two toy example methods for preventing runtime minor faults. Similar techniques may be employed using alternative allocators (e.g., jemalloc, tcmalloc, mimalloc, etc.) or STL features (e.g., creative use of PMR allocators/memory_resources).
+CAUTION: This technique reduces the amount of memory available to other processes running on the system.
+
+These are just two toy example methods for preventing runtime minor faults. Some or all of these techniques may be employed using alternative allocators such as jemalloc, tcmalloc, or mimalloc (check the docs of your chosen allocation library), or using C++ STL features via creative use of PMR allocators and memory_resources.
 
 ### Cache Warming {#sec:CacheWarm}
 
@@ -55,13 +67,19 @@ Cache Warming involves periodically exercising the latency-sensitive code to kee
 
 ### Avoid TLB Shootdowns
 
-We learned from earlier chapters that the TLB is a fast but finite per-core cache for virtual-to-physical memory address translations that reduces the need for time-consuming kernel page table walks. However, unlike the case with MESI-based protocols and per-core CPU caches (i.e., L1, L2, and LLC), the HW itself is incapable of maintaining core-to-core TLB coherency. Therefore, this task must be performed in software by the kernel. The kernel fulfills this role by means of Inter Processor Interrupts (IPI) called “TLB Shootdowns.” 
+We learned from earlier chapters that the TLB is a fast but finite per-core cache for virtual-to-physical memory address translations that reduces the need for time-consuming kernel page table walks. However, unlike the case with MESI-based protocols and per-core CPU caches (i.e., L1, L2, and LLC), the HW itself is incapable of maintaining core-to-core TLB coherency. Therefore, this task must be performed in software by the kernel. The kernel fulfills this role by means of Inter Processor Interrupts (IPI) called “TLB Shootdowns.”
 
-One of the most overlooked pitfalls to achieving low latency with multithreaded applications is the TLB Shootdown. Why? Because in a multithreaded application, process threads share the virtual address space. Therefore, the kernel must communicate specific types of updates to that shared address space among the TLBs of the cores on which any of the participating threads execute. For example, commonly used syscalls such as munmap, mprotect, and madvise effect the types of address space changes that the kernel must communicate among the constituent threads of a process. 
+TLB Shootdowns differ from wholesale TLB flushes, such as what occurs when a process is scheduled off a core to make way for a new process with an entirely different virtual address space. Instead, TLB Shootdowns involve more selective removal of TLB entries, such as via the INVLPG command on Intel CPUs. 
+
+One of the most overlooked pitfalls to achieving low latency with multithreaded applications is the TLB Shootdown. Why? Because in a multithreaded application, process threads share the virtual address space. Therefore, the kernel must communicate specific types of updates to that shared address space among the TLBs of the cores on which any of the participating threads execute. For example, commonly used syscalls such as munmap (which we disabled from glibc allocator usage in the prior section on “Avoiding Minor Page Faults”), mprotect, and madvise effect the types of address space changes that the kernel must communicate among the constituent threads of a process.
 
 Though a developer may avoid explicitly using these syscalls in his/her code, TLB Shootdowns may still erupt from external sources – e.g., allocator shared libraries or OS facilities. Not only will this type of IPI disrupt runtime application performance, but the magnitude of its impact grows with the number of threads involved since the interrupts are delivered in software.
 
-Preventing TLB Shootdowns requires limiting the number of updates made to the shared process address space – e.g., avoiding runtime execution of the aforementioned list of syscalls. Also, disable kernel features which induce TLB Shootdowns as a consequence of its function, such as Transparent Huge Pages and Automatic NUMA Balancing.
+How do you detect TLB Shootdowns in your multithreaded application? One simple way is to check the TLB row in /proc/interrupts. A useful method of detecting continuous TLB interrupts during runtime is to use the “watch” command while viewing this file. For example, you might run “watch -n5 -d ‘grep TLB /proc/interrupts’” – the “-n 5” option refreshes the view every 5 seconds while “-d” highlights the delta between each refresh output. 
+
+Preventing TLB Shootdowns requires limiting the number of updates made to the shared process address space – e.g., avoiding runtime execution of the aforementioned list of syscalls. Also, disable kernel features which induce TLB Shootdowns as a consequence of its function, such as Transparent Huge Pages and Automatic NUMA Balancing – these features either relocate or alter permissions of pages in the process of operation, which require page table updates and, thus, TLB Shootdowns.
+
+For more details on TLB Shootdowns, along with their detection and prevention, read https://www.jabperf.com/how-to-deter-or-disarm-tlb-shootdowns/.
 
 ### Prevent Unintentional Core Throttling
 
