@@ -7,8 +7,9 @@ from shlex import split
 import natsort 
 import re
 
-parser = argparse.ArgumentParser(description='Compare multiple EMON outputs and generate an Excel file')
-parser.add_argument("-ch", type=int, help="chapter to export", default="99")
+parser = argparse.ArgumentParser(description='Export book to PDF')
+parser.add_argument("-ch", type=int, help="Chapter to export", default="99")
+parser.add_argument("-paperback", help="Export for paperback print", action="store_true", default=False)
 parser.add_argument("-v", help="verbose", action="store_true", default=False)
 args = parser.parse_args()
 
@@ -38,13 +39,30 @@ if verbose:
     for file in file_list:
         print(file)
 
-default_pandoc_cmd = 'pandoc -N --file-scope --pdf-engine=xelatex --listings --include-in-header header.tex --include-before-body cover.tex --filter pandoc-fignos --filter pandoc-tablenos --filter pandoc-crossref --natbib -o book.tex metadata.txt '
+pandoc_cmd = 'pandoc -N --file-scope --pdf-engine=xelatex --listings --include-in-header header.tex '
+if args.paperback:
+  pandoc_cmd = pandoc_cmd + "-V papersize:a5 "
+  pandoc_cmd = pandoc_cmd + "-V geometry:left=2.2cm "
+  pandoc_cmd = pandoc_cmd + "-V geometry:right=1.5cm "
+  pandoc_cmd = pandoc_cmd + "-V geometry:top=1.6cm "
+  pandoc_cmd = pandoc_cmd + "-V geometry:bottom=1.6cm "
+  pandoc_cmd = pandoc_cmd + "-V fontsize:9pt "
+else:
+  pandoc_cmd = pandoc_cmd + "--include-before-body cover.tex "
+  pandoc_cmd = pandoc_cmd + "-V geometry:left=2cm "
+  pandoc_cmd = pandoc_cmd + "-V geometry:right=2cm "
+  pandoc_cmd = pandoc_cmd + "-V geometry:top=2cm "
+  pandoc_cmd = pandoc_cmd + "-V geometry:bottom=2cm "
+  pandoc_cmd = pandoc_cmd + "-V fontsize:10pt "
+
+pandoc_cmd = pandoc_cmd + "--filter pandoc-fignos --filter pandoc-tablenos --filter pandoc-crossref --natbib -o book.tex metadata.txt "
+
 files_string = " ".join(file_list)
 files_string += " footer.tex"
 
 if verbose:
-    print (default_pandoc_cmd + files_string)
-run_cmd(default_pandoc_cmd + files_string)
+    print (pandoc_cmd + files_string)
+run_cmd(pandoc_cmd + files_string)
 
 # post-processing
 
