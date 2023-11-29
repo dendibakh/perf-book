@@ -1,30 +1,35 @@
----
-typora-root-url: ..\..\img
----
-
 ## Low Latency Tuning Techniques {#sec:LowLatency}
 
-We’ve addressed a variety of important areas for addressing optimal software performance up to this point. In this section, we will discuss additional miscellaneous low-latency tuning techniques which did not fit neatly into previous chapters.
+So far we have discussed a variety of software optimizations that aim at improving overall performance of an application. In this section, we will discuss additional tuning techniques used in low-latency systems, such as real-time processing and high-frequency trading (HFT). In such an environment, the primary optimization goal is to make a certain portion of a program to run as fast as possible. When you work in the HFT industry, every microsecond and nanosecond count as it has a direct impact on profits. Usually, the low-latency portion implements a critical loop of a real-time of an HFT system, such as moving a robotic arm or sending an order to the exchange. Optimizing latency of a critical path is sometimes done at the expense of other portions of a program. And some techniques even sacrifice the overall throughput of a system.
+
+When developers optimize for latency, they avoid any unnecessary cost they need to pay on a hot path. That usually involves system calls, memory allocation, I/O, and anything else that has non-deterministic latency. To reach the lowest possible latency, the hot path needs to have all the resources ready and available for it ahead of time. 
+
+One relatively simple technique is to precompute some of the operations you would do on the hot path. That comes with a cost of using more memory which will be unavailable to other processes in the system but it may save you some precious cycles on a critical path. However, keep in mind that sometimes it is faster to compute the thing than to fetch the result from memory.
+
+Since this a book about low-level CPU performance, we will skip talking about higher-level techniques similar to the one we just mentioned. Instead, we will discuss how to avoid page faults, cache misses, TLB shootdowns, and core throttling on a critical path.
 
 ### Avoid Minor Page Faults
 
-While the term contains the word “minor”, there’s nothing minor about the impact of minor page faults on runtime latency if, for example, you work in the HFT industry where every microsecond and nanosecond count. Latency impact of minor faults can range from just under a microsecond up to several microseconds, especially if you’re using a Linux kernel with 5-level page tables instead of 4-level page tables.
+While the term contains the word "minor", there's nothing minor about the impact of minor page faults on runtime latency. Recall that when a user code allocates memory, OS only commits to provide a page, but it doesn't immediately execute on the committment by giving us a zeroed physical page. Instead, it will wait until the first time the user code will access it and only then the OS fulfills its duties. The very first access to a newly allocated page triggers a minor page fault, a HW interrupt that is handled by the OS. Latency impact of minor faults can range from just under a microsecond up to several microseconds, especially if you're using a Linux kernel with 5-level page tables instead of 4-level page tables.
 
-How do you detect runtime minor page faults in your application? One simple way is by using the “top” utility (add the “-H” option for a thread-level view). Add the “vMn” field to the default selection of display columns to view the number of minor page faults occurring per display refresh interval. Another way involves attaching to the running process with “perf stat -e page-faults”. In the HFT world, anything more than ‘0’ is a problem. But for low latency applications in other business domains, a constant occurrence in the range of tens to hundreds of faults per interval should prompt further investigation.
+How do you detect runtime minor page faults in your application? One simple way is by using the `top` utility (add the `-H` option for a thread-level view). Add the `vMn` field to the default selection of display columns to view the number of minor page faults occurring per display refresh interval. Another way involves attaching to the running process with `perf stat -e page-faults`. 
 
-Investigating the root cause of runtime minor page faults can be as simple as firing up “perf record -e page-faults” and then “perf report” to locate offending source code lines.
+[TODO]: add dump of `top -H`
 
-To avoid incurring this impact during runtime, pre-fault all the memory for the application at startup time. A toy example might look something like this:
+In the HFT world, anything more than `0` is a problem. But for low latency applications in other business domains, a constant occurrence in the range of 100-1000 faults per second should prompt further investigation. Investigating the root cause of runtime minor page faults can be as simple as firing up `perf record -e page-faults` and then `perf report` to locate offending source code lines.
+
+To avoid page fault penalties during runtime, you should pre-fault all the memory for the application at startup time. A toy example might look something like this:
 
 ```cpp
-    char *mem = malloc(size);
-    for (int i = 0; i < size; i += sysconf(_SC_PAGESIZE))
-        mem[i] = 0;
+char *mem = malloc(size);
+int pageSize = sysconf(_SC_PAGESIZE)
+for (int i = 0; i < size; i += pageSize)
+  mem[i] = 0;
 ```
 
-This sample code allocates “size” amount of memory on the heap. However, instead of just returning allocated space, it steps by and touches each page of memory to ensure each one is brought into RAM.
+First, this sample code allocates `size` amount of memory on the heap as usual. However, immediately after that, it steps by and touches each page of newly allocated memory to ensure each one is brought into RAM.
 
-A more comprehensive approach is to tune the glibc allocator in conjunction with mlock/mlockall like so (taken from the “Real-time Linux Wiki”):
+Another reason for a minor page fault is when the accessed page was swapped out to disk and is not currently stored in RAM. This can be prevented by *locking* pages in RAM. Let's take a look at a more comprehensive approach of tuning the glibc allocator in conjunction with `mlock/mlockall` syscalls:
 
 ```cpp
 #include <malloc.h>
@@ -39,23 +44,23 @@ mlockall(MCL_CURRENT | MCL_FUTURE);
 char *mem = malloc(size);
 for (int i = 0; i < size; i += sysconf(_SC_PAGESIZE))
     mem[i] = 0;
-
+//...
 free(mem);
 ```
 
-In the code above, we tune three (3) glibc malloc settings: M_MMAP_MAX, M_TRIM_THRESHOLD, and M_ARENA_MAX.
+In the code above, we tune three glibc malloc settings: `M_MMAP_MAX`, `M_TRIM_THRESHOLD`, and `M_ARENA_MAX`.
 
-- Setting M_MMAP_MAX to ‘0’ disables underlying mmap syscall usage for large allocations – this is necessary because the mlock() can be undone by library usage of munmap() when it attempts to release mmap-ed segments back to the OS, defeating the purpose of our efforts.
-- Setting M_TRIM_THRESHOLD to ‘-1’ prevents glibc from returning memory to the OS after calls to free() (NOTE: as indicated before, this option has no effect on mmap-ed segments).
-- Finally, setting M_ARENA_MAX to ‘1’ prevents glibc from allocating multiple arenas via mmap() to accommodate multiple cores. CAUTION: the latter hinders the glibc allocator’s multithreaded scalability feature.
+- Setting `M_MMAP_MAX` to `0` disables underlying `mmap` syscall usage for large allocations – this is necessary because the `mlockall` can be undone by library usage of `munmap` when it attempts to release `mmap`-ed segments back to the OS, defeating the purpose of our efforts.
+- Setting `M_TRIM_THRESHOLD` to `-1` prevents glibc from returning memory to the OS after calls to `free`. As indicated before, this option has no effect on `mmap`-ed segments.
+- Finally, setting `M_ARENA_MAX` to `1` prevents glibc from allocating multiple arenas via `mmap` to accommodate multiple cores. Keep in mind, the latter hinders the glibc allocator's multithreaded scalability feature.
 
-Combined, these settings force glibc into sbrk-only heap allocations which will not release its memory back to the OS until the application ends. As a result, the heap will remain the same size after the final call to “free(mem)” in the code above. Any subsequent runtime calls to malloc() or new() simply will reuse space in this pre-allocated/pre-faulted heap area if it is sufficiently sized at initialization.
+Combined, these settings force glibc into heap allocations which will not release memory back to the OS until the application ends. As a result, the heap will remain the same size after the final call to `free(mem)` in the code above. Any subsequent runtime calls to `malloc` or `new` simply will reuse space in this pre-allocated/pre-faulted heap area if it is sufficiently sized at initialization.
 
-More importantly, all that heap memory that was pre-faulted in the for-loop will persist in RAM due to the previous mlockall call – the option MCL_CURRENT locks all pages which are currently mapped, while MCL_FUTURE locks all pages that will become mapped in the future. An added benefit of using mlockall this way is that any thread spawned by this process will have its stack pre-faulted and locked, as well.
+More importantly, all that heap memory that was pre-faulted in the `for`-loop will persist in RAM due to the previous `mlockall` call – the option `MCL_CURRENT` locks all pages which are currently mapped, while `MCL_FUTURE` locks all pages that will become mapped in the future. An added benefit of using `mlockall` this way is that any thread spawned by this process will have its stack pre-faulted and locked, as well. For the finer control of page locking, developers should use `mlock` system call which gives you the option to choose which pages should persist in RAM. A downside of this technique is that it reduces the amount of memory available to other processes running on the system.
 
-CAUTION: This technique reduces the amount of memory available to other processes running on the system.
+[TODO]: double-check this: Developers of applications for Windows should look into the following APIs: lock pages with `VirtualLock`, avoid immediate release of memory with `VirtualFree` with `MEM_DECOMMIT`, but not `MEM_RELEASE` flag.
 
-These are just two toy example methods for preventing runtime minor faults. Some or all of these techniques may be employed using alternative allocators such as jemalloc, tcmalloc, or mimalloc (check the docs of your chosen allocation library), or using C++ STL features via creative use of PMR allocators and memory_resources.
+These are just two example methods for preventing runtime minor faults. Some or all of these techniques may be already integrated into memory allocation libraries such as jemalloc, tcmalloc, or mimalloc. Check the documentation of your chosen library to see what is available.
 
 ### Cache Warming {#sec:CacheWarm}
 
@@ -87,7 +92,7 @@ C/C++ compilers are a wonderful feat of engineering. However, they sometimes gen
 
 For this specific case, if heavy AVX instruction usage is not desired, include “-mprefer-vector-width=###” to your compilation flags to pin the highest width instruction set to either 128 or 256. Again, if your entire server fleet runs on the latest chips then this is much less of a concern since the throttling impact of AVX instruction sets is negligible nowadays.
 
-[MAYBE] Tradeoff Random RAM Access with Extra Computation (on 2nd thought, this is more of a coding technique than a tuning technique)
+
 
 [MAYBE] Tradeoff Random RAM Access with Larger Footprint (on 2nd thought, this is more of a coding technique than a tuning technique)
 
