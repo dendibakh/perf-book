@@ -41,6 +41,7 @@ if verbose:
 
 pandoc_cmd = 'pandoc -N --file-scope --pdf-engine=xelatex --listings --include-in-header header.tex '
 if args.paperback:
+  # use -V papersize:paperwidth=170.00mm and -V papersize:paperheight=240.00mm
   pandoc_cmd = pandoc_cmd + "-V papersize:a5 "
   pandoc_cmd = pandoc_cmd + "-V geometry:left=2.2cm "
   pandoc_cmd = pandoc_cmd + "-V geometry:right=1.5cm "
