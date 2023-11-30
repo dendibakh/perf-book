@@ -45,7 +45,7 @@ for (int i = 0; i < size; i += pageSize)
 
 First, this sample code allocates `size` amount of memory on the heap as usual. However, immediately after that, it steps by and touches each page of newly allocated memory to ensure each one is brought into RAM. This method helps to avoid runtime delays caused by minor page faults during future accesses.
 
-Take a look at [@lst:LockPagesAndNoRelease] with a more comprehensive approach of tuning the glibc allocator in conjunction with `mlock/mlockall` syscalls (taken from the "Real-time Linux Wiki").
+Take a look at [@lst:LockPagesAndNoRelease] with a more comprehensive approach of tuning the glibc allocator in conjunction with `mlock/mlockall` syscalls (taken from the "Real-time Linux Wiki" [^1]).
 
 Listing: Tuning the glibc allocator to lock pages in RAM and prevent releasing them to the OS.
 
@@ -130,5 +130,6 @@ C/C++ compilers are a wonderful feat of engineering. However, they sometimes gen
 
 For this specific case, if heavy AVX instruction usage is not desired, include “-mprefer-vector-width=###” to your compilation flags to pin the highest width instruction set to either 128 or 256. Again, if your entire server fleet runs on the latest chips then this is much less of a concern since the throttling impact of AVX instruction sets is negligible nowadays.
 
-[^4]: Cache Warming technique - [https://www.youtube.com/watch?v=XzRxikGgaHI](https://www.youtube.com/watch?v=XzRxikGgaHI).
+[^1]: The Linux Foundation Wiki: Memory for Rael-time Applications - [https://wiki.linuxfoundation.org/realtime/documentation/howto/applications/memory](https://wiki.linuxfoundation.org/realtime/documentation/howto/applications/memory)
+[^4]: Cache Warming technique - [https://www.youtube.com/watch?v=XzRxikGgaHI](https://www.youtube.com/watch?v=XzRxikGgaHI)
 [^5]: JabPerf blog: TLB Shootdowns - [https://www.jabperf.com/how-to-deter-or-disarm-tlb-shootdowns/](https://www.jabperf.com/how-to-deter-or-disarm-tlb-shootdowns/)
