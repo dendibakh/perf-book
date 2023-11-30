@@ -1,6 +1,6 @@
 ## Low Latency Tuning Techniques {#sec:LowLatency}
 
-So far we have discussed a variety of software optimizations that aim at improving overall performance of an application. In this section, we will discuss additional tuning techniques used in low-latency systems, such as real-time processing and high-frequency trading (HFT). In such an environment, the primary optimization goal is to make a certain portion of a program to run as fast as possible. When you work in the HFT industry, every microsecond and nanosecond count as it has a direct impact on profits. Usually, the low-latency portion implements a critical loop of a real-time of an HFT system, such as moving a robotic arm or sending an order to the exchange. Optimizing latency of a critical path is sometimes done at the expense of other portions of a program. And some techniques even sacrifice the overall throughput of a system.
+So far we have discussed a variety of software optimizations that aim at improving overall performance of an application. In this section, we will discuss additional tuning techniques used in low-latency systems, such as real-time processing and high-frequency trading (HFT). In such an environment, the primary optimization goal is to make a certain portion of a program to run as fast as possible. When you work in the HFT industry, every microsecond and nanosecond count as it has a direct impact on profits. Usually, the low-latency portion implements a critical loop of a real-time or an HFT system, such as moving a robotic arm or sending an order to the exchange. Optimizing latency of a critical path is sometimes done at the expense of other portions of a program. And some techniques even sacrifice the overall throughput of a system.
 
 When developers optimize for latency, they avoid any unnecessary cost they need to pay on a hot path. That usually involves system calls, memory allocation, I/O, and anything else that has non-deterministic latency. To reach the lowest possible latency, the hot path needs to have all the resources ready and available for it ahead of time. 
 
@@ -12,9 +12,11 @@ Since this a book about low-level CPU performance, we will skip talking about hi
 
 While the term contains the word "minor", there's nothing minor about the impact of minor page faults on runtime latency. Recall that when a user code allocates memory, OS only commits to provide a page, but it doesn't immediately execute on the committment by giving us a zeroed physical page. Instead, it will wait until the first time the user code will access it and only then the OS fulfills its duties. The very first access to a newly allocated page triggers a minor page fault, a HW interrupt that is handled by the OS. Latency impact of minor faults can range from just under a microsecond up to several microseconds, especially if you're using a Linux kernel with 5-level page tables instead of 4-level page tables.
 
-How do you detect runtime minor page faults in your application? One simple way is by using the `top` utility (add the `-H` option for a thread-level view). Add the `vMn` field to the default selection of display columns to view the number of minor page faults occurring per display refresh interval. The listing below shows a dump of `top` command with the top-10 processes while compiling a large C++ project. The additional `vMn` column shows the number of minor page faults occurred for the last 3 seconds.
+How do you detect runtime minor page faults in your application? One simple way is by using the `top` utility (add the `-H` option for a thread-level view). Add the `vMn` field to the default selection of display columns to view the number of minor page faults occurring per display refresh interval. [@lst:DumpTopWithMinorFaults] shows a dump of `top` command with the top-10 processes while compiling a large C++ project. The additional `vMn` column shows the number of minor page faults occurred during the last 3 seconds.
 
-```
+Listing: A dump of Linux top command with additional vMn field while compiling large C++ project.
+
+~~~~ {#lst:DumpTopWithMinorFaults .cpp}
    PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND  vMn
 341763 dendiba+  20   0  303332 165396  83200 R  99.3   1.0   0:05.09 c++      13k
 341705 dendiba+  20   0  285768 153872  87808 R  99.0   1.0   0:07.18 c++       5k
@@ -26,7 +28,7 @@ How do you detect runtime minor page faults in your application? One simple way 
 341765 dendiba+  20   0  351036 205268  76288 R  87.1   1.3   0:04.75 c++      18k
 341771 dendiba+  20   0  341148 194668  75776 R  86.4   1.2   0:03.43 c++      20k
 341776 dendiba+  20   0  286496 147460  82432 R  76.2   0.9   0:02.64 c++      25k
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Another way of detecting runtime minor page faults involves attaching to the running process with `perf stat -e page-faults`. 
 
@@ -41,11 +43,13 @@ for (int i = 0; i < size; i += pageSize)
   mem[i] = 0;
 ```
 
-First, this sample code allocates `size` amount of memory on the heap as usual. However, immediately after that, it steps by and touches each page of newly allocated memory to ensure each one is brought into RAM.
+First, this sample code allocates `size` amount of memory on the heap as usual. However, immediately after that, it steps by and touches each page of newly allocated memory to ensure each one is brought into RAM. This method helps to avoid runtime delays caused by minor page faults during future accesses.
 
-Another reason for a minor page fault is when the accessed page was swapped out to disk and is not currently stored in RAM. This can be prevented by *locking* pages in RAM. Let's take a look at a more comprehensive approach of tuning the glibc allocator in conjunction with `mlock/mlockall` syscalls:
+Take a look at [@lst:LockPagesAndNoRelease] with a more comprehensive approach of tuning the glibc allocator in conjunction with `mlock/mlockall` syscalls (taken from the "Real-time Linux Wiki").
 
-```cpp
+Listing: Tuning the glibc allocator to lock pages in RAM and prevent releasing them to the OS.
+
+~~~~ {#lst:LockPagesAndNoRelease .cpp}
 #include <malloc.h>
 #include <sys/mman.h>
 
@@ -60,9 +64,9 @@ for (int i = 0; i < size; i += sysconf(_SC_PAGESIZE))
     mem[i] = 0;
 //...
 free(mem);
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In the code above, we tune three glibc malloc settings: `M_MMAP_MAX`, `M_TRIM_THRESHOLD`, and `M_ARENA_MAX`.
+The code in [@lst:LockPagesAndNoRelease] tunes three glibc malloc settings: `M_MMAP_MAX`, `M_TRIM_THRESHOLD`, and `M_ARENA_MAX`.
 
 - Setting `M_MMAP_MAX` to `0` disables underlying `mmap` syscall usage for large allocations – this is necessary because the `mlockall` can be undone by library usage of `munmap` when it attempts to release `mmap`-ed segments back to the OS, defeating the purpose of our efforts.
 - Setting `M_TRIM_THRESHOLD` to `-1` prevents glibc from returning memory to the OS after calls to `free`. As indicated before, this option has no effect on `mmap`-ed segments.
@@ -80,7 +84,7 @@ These are just two example methods for preventing runtime minor faults. Some or 
 
 In some applications, the portions of code that are most latency-sensitive are the least frequently executed. An example of such an application might be an HFT application that continuously reads market data signals from the stock exchange and, once a favorable market signal is detected, sends a BUY order to the exchange. In the aforementioned workload, the code paths involved with reading the market data is most commonly executed, while the code paths for executing a BUY order is rarely executed.
 
-Since other players in the market are likely to catch the same market signal, the success of the strategy largely relies on how fast we can react, in other words, how fast we send the order to the exchange. If we want our BUY order to reach the exchange as fast as possible and to take advantage of the favorable signal detected in the market data, then the last thing we want is to meet roadblocks right at the moment we decide to take off. 
+Since other players in the market are likely to catch the same market signal, the success of the strategy largely relies on how fast we can react, in other words, how fast we send the order to the exchange. When we want our BUY order to reach the exchange as fast as possible and to take advantage of the favorable signal detected in the market data, the last thing we want is to meet roadblocks right at the moment we decide to take off. 
 
 When a certain code path is not exercised for a while, its instructions and associated data are likely to be evicted from of the I-cache and D-cache. Then, just when we need that critical piece of rarely executed code to run, we take I-cache and D-cache miss penalties, which may cause us loose the race. This is where the technique of *cache warming* would be helpful.
 
@@ -88,35 +92,37 @@ Cache warming involves periodically exercising the latency-sensitive code to kee
 
 ### Avoid TLB Shootdowns
 
-We learned from earlier chapters that the TLB is a fast but finite per-core cache for virtual-to-physical memory address translations that reduces the need for time-consuming kernel page table walks. When a process is scheduled off a core to make way for a new process with an entirely different virtual address space, the TLB that belongs to the core needs to flushed. In addition to wholesale TLB flushes, their is a more selective procedure for invalidating TLB entries called *TLB shootdowns*.
+We learned from earlier chapters that the TLB is a fast but finite per-core cache for virtual-to-physical memory address translations that reduces the need for time-consuming kernel page table walks. When a process is scheduled off a core to make way for a new process with an entirely different virtual address space, the TLB that belongs to the core needs to flushed. In addition to wholesale TLB flushes, there is a more selective procedure for invalidating TLB entries called *TLB shootdowns*.
 
-Unlike the case with MESI-based protocols and per-core CPU caches (i.e., L1, L2, and LLC), the HW itself is incapable of maintaining core-to-core TLB coherency. Therefore, this task must be performed in software by the kernel. The kernel fulfills this role by means of Inter Processor Interrupts (IPI), also called TLB shootdowns, which on x86 platforms are implemented via the `INVLPG` assembly instruction.
+Unlike the case with MESI-based protocols and per-core CPU caches (i.e., L1, L2, and LLC), the HW itself is incapable of maintaining core-to-core TLB coherency. Therefore, this task must be performed in software by the kernel. The kernel fulfills this role by means of a specific type of Inter Processor Interrupts (IPI), called TLB shootdowns, which on x86 platforms are implemented via the `INVLPG` assembly instruction.
 
 TLB shootdowns are one of the most overlooked pitfalls to achieving low latency with multithreaded applications. Why? Because in a multithreaded application, process threads share the virtual address space. Therefore, the kernel must communicate specific types of updates to that shared address space among the TLBs of the cores on which any of the participating threads execute. For example, commonly used syscalls such as `munmap` (which can be disabled from glibc allocator usage, see [@sec:AvoidPageFaults]), `mprotect`, and `madvise` effect the types of address space changes that the kernel must communicate among the constituent threads of a process.
 
 Though a developer may avoid explicitly using these syscalls in his/her code, TLB shootdowns may still erupt from external sources – e.g., allocator shared libraries or OS facilities. Not only will this type of IPI disrupt runtime application performance, but the magnitude of its impact grows with the number of threads involved since the interrupts are delivered in software.
 
-How do you detect TLB shootdowns in your multithreaded application? One simple way is to check the TLB row in `/proc/interrupts`. A useful method of detecting continuous TLB interrupts during runtime is to use the `watch` command while viewing this file. For example, you might run `watch -n5 -d ‘grep TLB /proc/interrupts’`, where the `-n 5` option refreshes the view every 5 seconds while `-d` highlights the delta between each refresh output. 
+How do you detect TLB shootdowns in your multithreaded application? One simple way is to check the TLB row in `/proc/interrupts`. A useful method of detecting continuous TLB interrupts during runtime is to use the `watch` command while viewing this file. For example, you might run `watch -n5 -d 'grep TLB /proc/interrupts'`, where the `-n 5` option refreshes the view every 5 seconds while `-d` highlights the delta between each refresh output. 
 
-Below is the dump of `/proc/interrupts` that shows a large number of TLB shootdowns on a CPU2 processor that executed the latency-critical thread. Notice the order of magnitude difference between other cores. In that scenario, the culprit of such a behavior was a Linux kernel feature called Automatic NUMA Balancing, that can be easily disarmed with `sysctl -w numa_balancing=0`.
+[@lst:ProcInterrupts] shows a dump of `/proc/interrupts` with a large number of TLB shootdowns on the `CPU2` processor that ran the latency-critical thread. Notice the order of magnitude difference between other cores. In that scenario, the culprit of such a behavior was a Linux kernel feature called Automatic NUMA Balancing, that can be easily disarmed with `sysctl -w numa_balancing=0`.
 
-```
+Listing: A dump of /proc/interrupts that shows a large number of TLB shootdowns on CPU2
+
+~~~~ {#lst:ProcInterrupts .bash}
            CPU0       CPU1       CPU2       CPU3       
-
+...
 NMI:          0          0          0          0   Non-maskable interrupts
 LOC:     552219    1010298    2272333    3179890   Local timer interrupts
 SPU:          0          0          0          0   Spurious interrupts
-
+...
 IWI:          0          0          0          0   IRQ work interrupts
 RTR:          7          0          0          0   APIC ICR read retries
 RES:      18708       9550        771        528   Rescheduling interrupts
 CAL:        711        934       1312       1261   Function call interrupts
 TLB:       4493       6108      73789       5014   TLB shootdowns
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 But that's not the only source of TLB shootdowns. Others include Transparent Huge Pages, memory compaction, page migration, and page cache writeback. Garbage collectors also can initiate TLB shootdowns. These features either relocate pages and/or alter permissions on pages in the process of fulfilling its duties, which require page table updates and, thus, TLB shootdowns.
 
-Preventing TLB shootdowns requires limiting the number of updates made to the shared process address space. On the source code level, you should avoid runtime execution of the aforementioned list of syscalls, namely `munmap`, `mprotect`, and `madvise`. On the OS level, disable kernel features which induce TLB shootdowns as a consequence of its function, such as Transparent Huge Pages and Automatic NUMA Balancing. For more nuanced discussion on TLB shootdowns, along with their detection and prevention, read the [article](https://www.jabperf.com/how-to-deter-or-disarm-tlb-shootdowns/)[^5] on the jabperf blog.
+Preventing TLB shootdowns requires limiting the number of updates made to the shared process address space. On the source code level, you should avoid runtime execution of the aforementioned list of syscalls, namely `munmap`, `mprotect`, and `madvise`. On the OS level, disable kernel features which induce TLB shootdowns as a consequence of its function, such as Transparent Huge Pages and Automatic NUMA Balancing. For more nuanced discussion on TLB shootdowns, along with their detection and prevention, read the [article](https://www.jabperf.com/how-to-deter-or-disarm-tlb-shootdowns/)[^5] on the JabPerf blog.
 
 ### Prevent Unintentional Core Throttling
 
@@ -125,4 +131,4 @@ C/C++ compilers are a wonderful feat of engineering. However, they sometimes gen
 For this specific case, if heavy AVX instruction usage is not desired, include “-mprefer-vector-width=###” to your compilation flags to pin the highest width instruction set to either 128 or 256. Again, if your entire server fleet runs on the latest chips then this is much less of a concern since the throttling impact of AVX instruction sets is negligible nowadays.
 
 [^4]: Cache Warming technique - [https://www.youtube.com/watch?v=XzRxikGgaHI](https://www.youtube.com/watch?v=XzRxikGgaHI).
-[^5]: Jabperf blog: TLB Shootdowns - [https://www.jabperf.com/how-to-deter-or-disarm-tlb-shootdowns/](https://www.jabperf.com/how-to-deter-or-disarm-tlb-shootdowns/)
+[^5]: JabPerf blog: TLB Shootdowns - [https://www.jabperf.com/how-to-deter-or-disarm-tlb-shootdowns/](https://www.jabperf.com/how-to-deter-or-disarm-tlb-shootdowns/)
