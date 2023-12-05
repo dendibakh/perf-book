@@ -51,7 +51,7 @@ $ dmesg | grep -i lbr
 [    0.228149] Performance Events: PEBS fmt3+, 32-deep LBR, Skylake events, full-width counters, Intel PMU driver.
 ```
 
-### Collecting LBR Stacks
+### Collect LBR Stacks
 
 With Linux `perf`, one can collect LBR stacks using the command below:
 
