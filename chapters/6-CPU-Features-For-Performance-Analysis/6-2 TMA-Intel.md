@@ -18,7 +18,7 @@ As an example for this case study, we took a very simple benchmark, such that it
 
 Most readers of this book will likely apply TMA to their own applications, with which they are familiar. But TMA is very effective even if you see the application for the first time. For this reason, we don't start with showing you the original source code of the benchmark. But here is a short description: the benchmark allocates a 200 MB array on the heap, then enters a loop of 100M iterations. On every iteration of the loop, it generates a random index into the allocated array, performs some dummy work and then reads the value from that index.
 
-We ran the experiments on the machine equipped with Intel Core i5-8259U CPU (Skylake based) and 16GB of DRAM (DDR4 @2400 MT/s), running 64-bit Ubuntu 20.04 (kernel version 5.13.0-27).
+We ran the experiments on the machine equipped with Intel Core i5-8259U CPU (Skylake based) and 16GB of DRAM (DDR4 2400 MT/s), running 64-bit Ubuntu 20.04 (kernel version 5.13.0-27).
 
 #### Step1: Identify the Bottleneck {.unlisted .unnumbered}
 
