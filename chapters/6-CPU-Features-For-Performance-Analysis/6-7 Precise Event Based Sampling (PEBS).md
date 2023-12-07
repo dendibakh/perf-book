@@ -2,9 +2,13 @@
 typora-root-url: ..\..\img
 ---
 
+[TODO]: rename to Hardware-Based Sampling?
+
 ## Processor Event-Based Sampling {#sec:secPEBS}
 
 The Processor Event-Based Sampling (PEBS) is another very useful feature in CPUs that provides many different ways to enhance performance analysis. Similar to Last Branch Record (see [@sec:lbr]), PEBS is used while profiling the program to capture additional data with every collected sample. In Intel processors, the PEBS feature was introduced in NetBurst microarchitecture. A similar feature on AMD processors is called Instruction Based Sampling (IBS) and is available starting with the Family 10h generation of cores (code-named "Barcelona" and "Shanghai").
+
+### PEBS on Intel Platforms
 
 The set of additional data has a defined format, which is called the PEBS record. When a performance counter is configured for PEBS, the processor saves the contents of the PEBS buffer, which is later stored in memory. The record contains the architectural state of the processor, for instance, the state of the general-purpose registers (`EAX`, `EBX`, `ESP`, etc.), instruction pointer register (`EIP`), flags register (`EFLAGS`) and more. The content layout of a PEBS record varies across different implementations that support PEBS. See [@IntelOptimizationManual, Volume 3B, Chapter 18.6.2.4 Processor Event-Based Sampling (PEBS)] for details of enumerating PEBS record format. PEBS Record Format for Intel Skylake CPU is shown in Figure @fig:PEBS_record.
 
@@ -18,6 +22,10 @@ $ dmesg | grep PEBS
 ```
 
 Linux `perf` doesn't export the raw PEBS output as it does for LBR.[^5] Instead, it processes PEBS records and extracts only the subset of data depending on a particular need. So, it's not possible to access the collection of raw PEBS records with Linux `perf`. However, Linux `perf` provides some PEBS data processed from raw samples, which can be accessed by `perf report -D`.  To dump raw PEBS records, one can use [`pebs-grabber`](https://github.com/andikleen/pmu-tools/tree/master/pebs-grabber)[^1] tool.
+
+### IBS on AMD Platforms
+
+### XXX on ARM Platforms
 
 There is a number of benefits that the PEBS mechanism brings to performance monitoring, which we will discuss in the next section.
 

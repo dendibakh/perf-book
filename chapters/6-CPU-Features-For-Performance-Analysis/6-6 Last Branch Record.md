@@ -4,13 +4,17 @@ typora-root-url: ..\..\img
 
 ## Last Branch Record {#sec:lbr}
 
-Modern Intel and AMD CPUs have a feature called Last Branch Record (LBR), where the CPU continuously logs a number of previously executed branches. But before going into the details, one might ask: *Why are we so interested in branches?* Well, because this is how we are able to determine the control flow of our program. We largely ignore other instructions in a basic block (see [@sec:BasicBlock]) because branches are always the last instruction in a basic block. Since all instructions in the basic block are guaranteed to be executed once, we can only focus on branches that will “represent” the entire basic block. Thus, it’s possible to reconstruct the entire line-by-line execution path of the program if we track the outcome of every branch. In fact, this is what the Intel Processor Traces (PT) feature is capable of doing, which is discussed in Appendix D. LBR, which predates PT, has different use cases and capabilities.
+Modern Intel and AMD CPUs have a feature called Last Branch Record (LBR), where the CPU continuously logs a number of previously executed branches. But before going into the details, one might ask: *Why are we so interested in branches?* Well, because this is how we can determine the control flow of a program. We largely ignore other instructions in a basic block (see [@sec:BasicBlock]) because branches are always the last instruction in a basic block. Since all instructions in a basic block are guaranteed to be executed once, we can only focus on branches that will “represent” the entire basic block. Thus, it’s possible to reconstruct the entire line-by-line execution path of the program if we track the outcome of every branch. In fact, this is what the Intel Processor Traces (PT) feature is capable of doing, which is discussed in Appendix D. LBR, which predates PT, has different use cases and capabilities.
 
-Thanks to the LBR mechanism, the CPU can continuously log branches to a set of model-specific registers (MSRs) in parallel with executing the program, causing minimal slowdown.[^15] Hardware logs the “from” and “to” address of each branch along with some additional metadata (see Figure @fig:LbrAddr). The registers act like a ring buffer that is continuously overwritten and provides only 32 most recent branch outcomes.[^1] If we collect a long enough history of source-destination pairs, we will be able to unwind the control flow of our program, just like a call stack with limited depth.
+Thanks to the LBR mechanism, the CPU can continuously log branches to a set of model-specific registers (MSRs) in parallel with executing the program, causing minimal slowdown. Runtime overhead for the majority of LBR use cases is below 1%. [@Nowak2014TheOO]
+
+Hardware logs the “from” and “to” address of each branch along with some additional metadata (see Figure @fig:LbrAddr). The LBR registers act like a ring buffer that is continuously overwritten and provides only 32 most recent branch outcomes.[^1] If we collect a long enough history of source-destination pairs, we will be able to unwind the control flow of our program, just like a call stack, but with limited depth.
+
+### LBR on Intel Platforms
 
 ![64-bit Address Layout of LBR MSR. *© Image from [@IntelOptimizationManual].*](../../img/pmu-features/LBR_ADDR.png){#fig:LbrAddr width=90%}
 
-With LBRs, we can sample branches, but during each sample, look at the previous branches inside the LBR stack that were executed. This gives reasonable coverage of the control flow in the hot code paths but does not overwhelm us with too much information, as only a smaller number of the total branches are examined. It is important to keep in mind that this is still sampling, so not every executed branch can be examined. A CPU generally executes too fast for that to be feasible[@LBR2016].
+With LBRs, we can sample branches, but during each sample, look at the previous branches inside the LBR stack that were executed. This gives reasonable coverage of the control flow in the hot code paths but does not overwhelm us with too much information, as only a smaller number of the total branches are examined. It is important to keep in mind that this is still sampling, so not every executed branch can be examined. A CPU generally executes too fast for that to be feasible. [@LBR2016]
 
 * **Last Branch Record (LBR) Stack**: since Skylake provides 32 pairs of MSRs that store the source and destination address of recently taken branches. 
 * **Last Branch Record Top-of-Stack (TOS) Pointer**: contains a pointer to the MSR in the LBR stack that contains the most recent branch, interrupt or exception recorded.
@@ -50,6 +54,10 @@ Users can make sure LBRs are enabled on their system by doing the following comm
 $ dmesg | grep -i lbr
 [    0.228149] Performance Events: PEBS fmt3+, 32-deep LBR, Skylake events, full-width counters, Intel PMU driver.
 ```
+
+### LBR on AMD Platforms
+
+### BRBE on ARM Platforms
 
 ### Collect LBR Stacks
 
@@ -257,5 +265,4 @@ LBR enables us to get this data without instrumenting the code. As the outcome f
 [^10]: In the source code, line `dec.c:174` expands a macro that has a self-contained branch. That’s why the source and destination happen to be on the same line.
 [^11]: I.e., when outcomes of branches are not taken.
 [^12]: X86 calling conventions - [https://en.wikipedia.org/wiki/X86_calling_conventions](https://en.wikipedia.org/wiki/X86_calling_conventions)
-[^15]: Runtime overhead for the majority of LBR use cases is below 1%. [@Nowak2014TheOO]
 [^16]: M - Mispredicted, P - Predicted.
