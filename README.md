@@ -22,18 +22,20 @@ For examples on how to add images, table, code listings, etc, see [how-to.md](ho
 
 # Building a book (pdf)
 
+At the moment, building a PDF only works on Windows and Linux. MacOS requires building some components (e.g. pandoc-crossref from sources).
+
 Requirements:
 
  * Python3. Install natsort module: `pip install natsort`.
  * [pandoc](https://pandoc.org/installing.html) - install [version 2.9](https://github.com/jgm/pandoc/releases/tag/2.9.2.1).
  * install pandoc filters: `pip install pandoc-fignos pandoc-tablenos`
  * install `pandoc-crossref`. This one requires manual installation. I just downloaded the binary from [here](https://github.com/lierdakil/pandoc-crossref/releases/tag/v0.3.6.4) and copied it to the same place where `pandoc-fignos` is.
- * [MiKTeX](https://miktex.org/download) - check `Yes` for automatic packets installation
+ * [MiKTeX](https://miktex.org/download) - check `Yes` for automatic package installation
 
 Run:
 ```bash
-# Linux bash & Mac
-python.exe export_book.py && pdflatex book.tex && bibtex book && pdflatex book.tex && pdflatex book.tex
+# Linux bash
+python export_book.py && pdflatex book.tex && bibtex book && pdflatex book.tex && pdflatex book.tex
 
 # Windows Powershell
 function Run-Block-With-Error($block) {
