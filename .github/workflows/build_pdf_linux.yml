@@ -1,0 +1,35 @@
+name: build PDF on Linux
+
+on: 
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+  # Needed for the 'trilom/file-changes-action' action
+  pull-requests: read
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    runs-on: [self-hosted, Linux]
+    timeout-minutes: 3
+    
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: build PDF
+      shell: bash
+      working-directory: ${{github.workspace}}
+      run: |
+        python export_book.py && pdflatex book.tex && bibtex book && pdflatex book.tex && pdflatex book.tex
+        mv book.pdf perf-book.pdf
+    
+    - uses: actions/upload-artifact@v3
+      with:
+        name: Performance Analysis and Tuning on Modern CPUs
+        path: perf-book.pdf
