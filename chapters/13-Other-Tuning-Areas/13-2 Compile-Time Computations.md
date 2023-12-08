@@ -2,6 +2,8 @@
 typora-root-url: ..\..\img
 ---
 
+[TODO]: maybe just remove and mention it in the beginning of part 2
+
 ## Compile-Time Computations
 
 If a portion of a program does some calculations that don't depend on the input, it can be precomputed ahead of time instead of doing it in the runtime.  Modern optimizing compilers already move a lot of computations into compile-time, especially trivial cases like `int x = 2 * 10` into `int x = 20`. Although, they cannot handle more complicated calculations at compile time if they involve branches, loops, function calls. C++ language provides features that allow us to make sure that certain calculations happen at compile time.
