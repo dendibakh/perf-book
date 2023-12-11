@@ -32,6 +32,8 @@ reorder    functions         utilization   hot functions
 
 Table: Summary of CPU Front-End optimizations. {#tbl:CPU_FE_OPT}
 
-\personal{I think code layout improvements are often underestimated and end up being omitted and forgotten. I agree that you might want to start with low hanging fruits like loop unrolling and vectorization opportunities. But knowing that you might get an extra 5-10\% just from better laying out the machine code is still useful. It is usually the best option to use PGO, Bolt, and other tools if you can come up with a set of typical use cases for your application.}
+* Code layout improvements are often underestimated and end up being omitted and forgotten. CPU Front-End performance issues like I-cache and ITLB misses represent a large portion of wasted cycles, especially for applications with large codebases. But even small- and medium-sized applications can benefit from optimizing the machine code layout.
+* It is usually not the first thing developers turn their attention to when trying to improve the performance of their application. They prefer to start with low hanging fruits like loop unrolling and vectorization. However, knowing that you might get an extra 5-10\% just from better machine code layout is still useful.
+* It is usually the best option to use LTO, PGO, BOLT, and other tools if you can come up with a set of typical use cases for your application. For large applications, it is the only practical way to improve machine code layout.
 
 \sectionbreak

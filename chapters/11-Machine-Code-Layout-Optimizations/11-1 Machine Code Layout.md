@@ -12,11 +12,11 @@ Most of the time, inefficiencies in the CPU FE can be described as a situation w
 
 The TMA methodology captures FE performance issues in the `Front-End Bound` metric. It represents the percentage of cycles when the CPU FE is not able to deliver instructions to the BE, while it could have accepted them. Most of the real-world applications experience a non-zero 'Front-End Bound' metric, meaning that some percentage of running time will be lost on suboptimal instruction fetching and decoding. Below 10\% is the norm. If you see the "Front-End Bound" metric being more than 20\%, it's definitely worth to spend time on it.
 
-There could be many reasons why FE cannot deliver instructions to the execution units. Most of the time, it is due to suboptimal code layout, whcih leads to the poor I-cache and ITLB utilization. Applications with a large codebase, e.g. millions lines of code, are especially vulnerable to FE performance issues. In this chapter, we will take a look at some typical optimizations to improve machine code layout and increase the overall performance of the program.
+There could be many reasons why FE cannot deliver instructions to the execution units. Most of the time, it is due to suboptimal code layout, which leads to the poor I-cache and ITLB utilization. Applications with a large codebase, e.g. millions lines of code, are especially vulnerable to FE performance issues. In this chapter, we will take a look at some typical optimizations to improve machine code layout and increase the overall performance of the program.
 
 ## Machine Code Layout
 
-When a compiler translates a source code into machine code, it generates a serial byte sequence. [@lst:MachineCodeLayout] shows an example of a physical layout for a small snippet of C++ code. Once compiler finished generating assembly instructions, it needs to encode them and lay out in memory sequentially.
+When a compiler translates source code into machine code, it generates a linear byte sequence. [@lst:MachineCodeLayout] shows an example of a binary layout for a small snippet of C++ code. Once compiler finished generating assembly instructions, it needs to encode them and lay out in memory sequentially.
 
 Listing: Example of machine code layout
 
