@@ -34,7 +34,7 @@ While the first method only works with explicit huge pages, the second approach 
 
 Besides from employing huge pages, standard techniques for optimizing I-cache performance can be used for improving ITLB performance. Namely, reordering functions so that hot functions are collocated better, reducing the size of hot regions via Link-Time Optimizations (LTO/IPO), using Profile-Guided Optimizations (PGO) and BOLT, and less aggressive inlining.
 
-BOLT provides the `-hugify` option to automatically use huge pages for hot code based on profile data. When this option is used, `llvm-bolt` will inject a trampoline to the program's entry point, with contains the code to put hot code on 2MB pages at runtime. The implementation leverages Linux Transparent Huge Pages (THP). The benefits of this approach is that only the small portion of the code is mapped to the huge pages and the number of required huge pages is minimized, and as a side effect, page fragmentation is reduced. 
+BOLT provides the `-hugify` option to automatically use huge pages for hot code based on profile data. When this option is used, `llvm-bolt` will inject the code to put hot code on 2MB pages at runtime. The implementation leverages Linux Transparent Huge Pages (THP). The benefit of this approach is that only a small portion of the code is mapped to the huge pages and the number of required huge pages is minimized, and as a consequence, page fragmentation is reduced. 
 
 [^1]: "Performance Benefits of Using Huge Pages for Code" - [https://easyperf.net/blog/2022/09/01/Utilizing-Huge-Pages-For-Code](https://easyperf.net/blog/2022/09/01/Utilizing-Huge-Pages-For-Code).
 [^2]: iodlr library - [https://github.com/intel/iodlr](https://github.com/intel/iodlr).
