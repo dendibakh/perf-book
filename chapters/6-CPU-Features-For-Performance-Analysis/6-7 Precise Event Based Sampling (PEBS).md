@@ -2,9 +2,9 @@
 typora-root-url: ..\..\img
 ---
 
-## Hardware-Based Sampling
+## Hardware-Based Sampling Features
 
-Hardware-Based Sampling is another useful set of features in modern CPUs to enhance performance analysis. Since CPU vendors approach performance monitoring in different ways, those capabilities vary in not only how they are called but also what you can do with them. In Intel processors, it is called Processor Event-Based Sampling (PEBS), first introduced in NetBurst microarchitecture. A similar feature on AMD processors is called Instruction Based Sampling (IBS) and is available starting with the Family 10h generation of cores (code-named "Barcelona" and "Shanghai"). Next we will discuss those features in more details, including their similarities and differences.
+Major CPU vendors provide a set of additional features to enhance performance analysis. Since CPU vendors approach performance monitoring in different ways, those capabilities vary in not only how they are called but also what you can do with them. In Intel processors, it is called Processor Event-Based Sampling (PEBS), first introduced in NetBurst microarchitecture. A similar feature on AMD processors is called Instruction Based Sampling (IBS) and is available starting with the Family 10h generation of cores (code-named "Barcelona" and "Shanghai"). Next we will discuss those features in more details, including their similarities and differences.
 
 ### PEBS on Intel Platforms
 
@@ -34,21 +34,21 @@ Instruction-Based Sampling (IBS) is a AMD64 processor feature that can be used t
 - IBS Fetch monitors the front-end of the pipeline and provides information about ITLB (hit or miss), I-cache (hit or miss), fetch address, fetch latency and a few other things.
 - IBS Execute monitors the back-end of the pipeline and provides information about instruction execution behavior by tracking the execution of a single op. For example: branch (taken or not, predicted or not), load/store (hit or miss in D-caches and DTLB, linear address, load latency).
 
-There is a number of important differences between PMC and IBS in AMD processors. PMC counters are programmable, whereas IBS acts like fixed counters. IBS counters can only be enabled or disabled for monitoring, they can't be programmed to any selective events. IBS Fetch and Op counters can be enabled/disabled independently. With PMC, the user has to decide what events to monitor ahead of time. With IBS, a rich set of data is collected for each sampled instruction and then it is up to the user to analyze parts of the data they are interested in.
+There is a number of important differences between PMC and IBS in AMD processors. PMC counters are programmable, whereas IBS acts like fixed counters. IBS counters can only be enabled or disabled for monitoring, they can't be programmed to any selective events. IBS Fetch and Op counters can be enabled/disabled independently. With PMC, user has to decide what events to monitor ahead of time. With IBS, a rich set of data is collected for each sampled instruction and then it is up to the user to analyze parts of the data they are interested in. IBS selects and tags an instruction to be monitored and then captures microarchitectural events caused by this instruction during its execution.
+
+Since IBS is integrated into the processor pipeline and acts as a fixed event counter, the sample collection overhead on the processor is minimal. Profilers are required to process the IBS generated data, which could be huge in size depending upon sampling interval, number of threads configured, whether Fetch/Op configured, etc. Until Linux kernel version 6.1, IBS always collects samples for all the cores. This limitation causes huge data collection and processing overhead. From Kernel 6.2 onwards, Linux perf supports IBS sample collection only for the configured cores. And of course, IBS is supported by the AMD uProf profiler.
 
 ### SPE on ARM Platforms
 
 [TODO]: Statistical Profiling Extension (SPE)
 
-There is a number of benefits that the PEBS mechanism brings to performance monitoring, which we will discuss in the next section.
-
 ### Precise Events
 
-IBS selects and tags an op to be monitored. The address of the parent instruction is saved to the IBS buffer when the op is tagged. Microarchitectural events caused by the tagged op are recorded during its execution. As the address is preserved, IBS samples attribution to the instructions are precise.
+Now that we covered the advanced sampling features, let's discuss **how** they can be used to improve performance analysis. We will start with the notion of precise events.
 
-One of the major problems in profiling is pinpointing the exact instruction that caused a particular performance event. As discussed in [@sec:profiling], interrupt-based sampling is based on counting specific performance events and waiting until it overflows. When an overflow interrupt happens, it takes a processor some amount of time to stop the execution and tag the instruction that caused the overflow. This is especially difficult for modern complex out-of-order CPU architectures.
+One of the major problems in profiling is pinpointing the exact instruction that caused a particular performance event. As discussed in [@sec:profiling], interrupt-based sampling is based on counting a specific performance event and waiting until it overflows. When an overflow interrupt happens, it takes a processor some time to stop the execution and tag the instruction that caused the overflow. This is especially difficult for modern complex out-of-order CPU architectures.
 
-It introduces the notion of a skid, which is defined as the distance between the IP that caused the event to the IP where the event is tagged (in the IP field inside the PEBS record). Skid makes it difficult to discover the instruction causing the performance issue. Consider an application with a big number of cache misses and the hot assembly code that looks like this:
+It introduces the notion of a skid, which is defined as the distance between the IP (instruction address) that caused the event to the IP where the event is tagged. Skid makes it difficult to discover the instruction causing the performance issue. Consider an application with a big number of cache misses and the hot assembly code that looks like this:
 
 ```asm
 ; load1 
@@ -56,26 +56,19 @@ It introduces the notion of a skid, which is defined as the distance between the
 ; load3
 ```
 
-The profiler might attribute `load3` as the instruction that causes a large number of cache misses, while in reality, `load1` is the instruction to blame. This usually causes a lot of confusion for beginners. Interested readers could learn more about underlying reasons for such issues on [Intel Developer Zone website](https://software.intel.com/en-us/vtune-help-hardware-event-skid)[^4].
+The profiler might tag `load3` as the instruction that causes a large number of cache misses, while in reality, `load1` is the instruction to blame. This usually causes a lot of confusion for beginners. Interested readers could learn more about underlying reasons for such issues on [Intel Developer Zone website](https://software.intel.com/en-us/vtune-help-hardware-event-skid)[^4].
 
-The problem with the skid is mitigated by having the processor itself store the instruction pointer (along with other information) in a PEBS record. The `EventingIP` field in the PEBS record indicates the instruction that caused the event. This needs to be supported by the hardware and is typically available only for a subset of supported events, called "Precise Events". A complete list of precise events for specific microarchitecture can be found in  [@IntelOptimizationManual, Volume 3B, Chapter 18]. Listed below are precise events for the Skylake Microarchitecture:
+The problem with the skid is mitigated by having the processor itself store the instruction pointer (along with other information). With Intel PEBS, the `EventingIP` field in the PEBS record indicates the instruction that caused the event. This is typically available only for a subset of supported events, called "Precise Events". A complete list of precise events for specific microarchitecture can be found in  [@IntelOptimizationManual, Volume 3B, Chapter 20 Performance Monitoring]. Listed below are precise events for the Skylake Microarchitecture:
 
 ```
-INST_RETIRED.*
-OTHER_ASSISTS.*
-BR_INST_RETIRED.*
-BR_MISP_RETIRED.*
-FRONTEND_RETIRED.*
-HLE_RETIRED.*
-RTM_RETIRED.*
-MEM_INST_RETIRED.*
-MEM_LOAD_RETIRED.*
-MEM_LOAD_L3_HIT_RETIRED.*
+INST_RETIRED.*          OTHER_ASSISTS.*      BR_INST_RETIRED.*       BR_MISP_RETIRED.*
+FRONTEND_RETIRED.*      HLE_RETIRED.*        RTM_RETIRED.*           MEM_INST_RETIRED.*
+MEM_LOAD_RETIRED.*      MEM_LOAD_L3_HIT_RETIRED.*
 ```
 
 , where `.*` means that all sub-events inside a group can be configured as precise events.
 
-In IBS sampling, whenever overflow occurs, IBS saves the instruction causing the overflow into a buffer which is then read by the interrupt handler. This capability of IBS makes it precise. 
+AMD IBS works in a very similar fashion. With IBS sampling, whenever an overflow occurs, IBS saves the instruction causing the overflow into the IBS buffer which is then read by the interrupt handler. As the address is preserved, IBS samples attribution to the instructions are precise.
 
 uProf and Linux perf support IBS sampling. Perf supports two-levels of precision.
 
