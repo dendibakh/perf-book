@@ -40,8 +40,9 @@ For example, in the Intel Skylake architecture (PMU version 4, see [@lst:QueryPM
 
 It's not unusual for a PMU to provide more than one hundred events available for monitoring. Figure @fig:PMU shows just a small part of all the performance events available for monitoring on a modern Intel CPU. It's not hard to notice that the number of available PMCs is much smaller than the number of performance events. It's not possible to count all the events at the same time, but analysis tools solve this problem by multiplexing between groups of performance events during the execution of a program (see [@sec:secMultiplex]).
 
-[TODO]: where is the list of AMD events? [@AMDProgrammingManual]
-
-The complete list of performance events for Intel CPUs can be found in [@IntelOptimizationManual, Volume 3B, Chapter 20] or at [perfmon-events.intel.com](https://perfmon-events.intel.com/). For ARM chips, it is not that strictly defined. Vendors implement cores following an ARM architecture, but performance events vary widely, both in what they mean and what events are supported.
+- For Intel CPUs, the complete list of performance events can be found in [@IntelOptimizationManual, Volume 3B, Chapter 20] or at [perfmon-events.intel.com](https://perfmon-events.intel.com/). 
+- ADM doesn't publish a list of performance monitoring events for every AMD processor. Curious readers may find some information in the Linux perf source [code](https://github.com/torvalds/linux/blob/master/arch/x86/events/amd/core.c)[^3]. General information about AMD performance counters can be found in [@AMDProgrammingManual, 13.2 Performance Monitoring Counters].
+- For ARM chips, performance events are not strictly defined. Vendors implement cores following an ARM architecture, but performance events vary widely, both in what they mean and what events are supported. For the ARM Neoverse V1 processor, that ARM designs themselves, the list of performance events can be found in [@ARMNeoverseV1].
 
 [^2]: When the value of PMCs overflows, the execution of a program must be interrupted. SW then should save the fact of an overflow. We will discuss it in more details later.
+[^3]: Linux source code for AMD cores - [https://github.com/torvalds/linux/blob/master/arch/x86/events/amd/core.c](https://github.com/torvalds/linux/blob/master/arch/x86/events/amd/core.c)
