@@ -27,28 +27,24 @@ $ dmesg | grep PEBS
 
 For LBR, Linux perf dumps entire contents of LBR stack with every collected sample. So, it is possible to analyze raw LBR dumps collected by Linux perf. However, for PEBS, Linux `perf` doesn't export the raw output as it does for LBR. Instead, it processes PEBS records and extracts only the subset of data depending on a particular need. So, it's not possible to access the collection of raw PEBS records with Linux `perf`. However, Linux `perf` provides some PEBS data processed from raw samples, which can be accessed by `perf report -D`. To dump raw PEBS records, one can use [`pebs-grabber`](https://github.com/andikleen/pmu-tools/tree/master/pebs-grabber)[^1] tool.
 
-[TODO]: sort this out:
-
-[@ComparisonPEBSIBS]
-
-PEBS has been used to sample a variety of events to capture performance bottlenecks in multithreaded programs. In [11], PEBS and PEBS with load latency (PEBS-LL) are used to sample retired instructions and long-latency memory loads to approximate NUMA latency per instruction by dividing the total latency of the sampled loads with the number of instruction samples. A work in [36] samples memory loads and stores in each CPU core and has each core monitor effective addresses sampled by other cores using debug registers to detect false sharing. Another work in [16] samples loads that miss in L1 data caches to capture cache access patterns and identify cache conflict misses.
-
 ### IBS on AMD Platforms
 
-[TODO]:
-Instruction-Based Sampling (IBS) is a AMD64 processor feature that can be used to collect specific metrics related to instruction fetch and instruction execution.
-The processor pipeline of an AMD processor consists of two separate phases: a front-end phase that fetches AMD64 instruction bytes and a back-end phase that executes “ops”.
-As the phases are separate, IBS samples fetches and ops, there are two independent sampling mechanisms. Instruction fetch sampling provides information about instruction address translation look-aside buffer (ITLB) and instruction cache behavior. Instruction execution sampling provides information about instruction execution behavior by tracking the execution of a single op.
+Instruction-Based Sampling (IBS) is a AMD64 processor feature that can be used to collect specific metrics related to instruction fetch and instruction execution. The processor pipeline of an AMD processor consists of two separate phases: a front-end phase that fetches AMD64 instruction bytes and a back-end phase that executes `ops`. As the phases are logically separated, there are two independent sampling mechanisms: IBS Fetch and IBS Execute. 
 
-IBS selects and tags an op to be monitored. The address of the parent instruction is saved to the IBS buffer when the op is tagged. Microarchitectural events caused by the tagged op are recorded during its execution. As the address is preserved, IBS samples attribution to the instructions are precise.
+- IBS Fetch monitors the front-end of the pipeline and provides information about ITLB (hit or miss), I-cache (hit or miss), fetch address, fetch latency and a few other things.
+- IBS Execute monitors the back-end of the pipeline and provides information about instruction execution behavior by tracking the execution of a single op. For example: branch (taken or not, predicted or not), load/store (hit or miss in D-caches and DTLB, linear address, load latency).
+
+There is a number of important differences between PMC and IBS in AMD processors. PMC counters are programmable, whereas IBS acts like fixed counters. IBS counters can only be enabled or disabled for monitoring, they can't be programmed to any selective events. IBS Fetch and Op counters can be enabled/disabled independently. With PMC, the user has to decide what events to monitor ahead of time. With IBS, a rich set of data is collected for each sampled instruction and then it is up to the user to analyze parts of the data they are interested in.
 
 ### SPE on ARM Platforms
 
-Statistical Profiling Extension (SPE)
+[TODO]: Statistical Profiling Extension (SPE)
 
 There is a number of benefits that the PEBS mechanism brings to performance monitoring, which we will discuss in the next section.
 
 ### Precise Events
+
+IBS selects and tags an op to be monitored. The address of the parent instruction is saved to the IBS buffer when the op is tagged. Microarchitectural events caused by the tagged op are recorded during its execution. As the address is preserved, IBS samples attribution to the instructions are precise.
 
 One of the major problems in profiling is pinpointing the exact instruction that caused a particular performance event. As discussed in [@sec:profiling], interrupt-based sampling is based on counting specific performance events and waiting until it overflows. When an overflow interrupt happens, it takes a processor some amount of time to stop the execution and tag the instruction that caused the overflow. This is especially difficult for modern complex out-of-order CPU architectures.
 
@@ -103,11 +99,11 @@ One of the most important use cases for this PEBS extension is detecting True an
 
 Also, with the help of Data Address Profiling, you can get general statistics for memory accesses in a program:
 
+[TODO]: check on the latest uarch
+
 ```bash
 $ perf mem record -- ./a.exe
 $ perf mem -t load report --sort=mem --stdio
-# Samples: 656  of event 'cpu/mem-loads,ldlat=30/P'
-# Total weight : 136578
 # Overhead       Samples  Memory access
 # ........  ............  ........................
     44.23%           267  LFB or LFB hit
@@ -117,7 +113,13 @@ $ perf mem -t load report --sort=mem --stdio
      8.34%           123  L1 or L1 hit
 ```
 
-From this output, we can see that 8% of the loads in the application were satisfied with L1 cache, 15% from DRAM, and so on.
+From this output, we can see that `44% + 8% = 52%` of all loads in the application hit either Load Fill Buffer (LFB) or L1 cache, 13% missed L1 but hit L2, 19% hit L3, and 19% were served from the main memory. This information can be used to estimate the performance impact of improving the cache hit rate. 
+
+[TODO]: sort this out:
+
+[@ComparisonPEBSIBS]
+
+PEBS has been used to sample a variety of events to capture performance bottlenecks in multithreaded programs. In [11], PEBS and PEBS with load latency (PEBS-LL) are used to sample retired instructions and long-latency memory loads to approximate NUMA latency per instruction by dividing the total latency of the sampled loads with the number of instruction samples. A work in [36] samples memory loads and stores in each CPU core and has each core monitor effective addresses sampled by other cores using debug registers to detect false sharing. Another work in [16] samples loads that miss in L1 data caches to capture cache access patterns and identify cache conflict misses.
 
 [^1]: PEBS grabber tool - [https://github.com/andikleen/pmu-tools/tree/master/pebs-grabber](https://github.com/andikleen/pmu-tools/tree/master/pebs-grabber). Requires root access.
 [^2]: Performance skid - [https://easyperf.net/blog/2018/08/29/Understanding-performance-events-skid](https://easyperf.net/blog/2018/08/29/Understanding-performance-events-skid).
