@@ -33,7 +33,7 @@ Listing: Example of logging branches.
  ---- 4eda2d:  jne   4eda10              <== (1)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Below is one of the possibile branch histories that is logged with a branch recording mechanisms. It shows the last 7 branch outcomes (many more not shown) at the moment we executed the `CALL` instruction. Because on the latest iteration of the loop the `JNS` branch (`4eda14` -> `4eda1e`) was not taken, it is not logged and thus does not appear in the history.
+Below is one of the possibile branch histories that is logged with a branch recording mechanism. It shows the last 7 branch outcomes (many more not shown) at the moment we executed the `CALL` instruction. Because on the latest iteration of the loop the `JNS` branch (`4eda14` -> `4eda1e`) was not taken, it is not logged and thus does not appear in the history.
 
 ```
     Source Address    Destination Address
@@ -64,7 +64,7 @@ There are important applications to the additional information saved besides jus
 
 When a sampling counter overflows and a Performance Monitoring Interrupt (PMI) is triggered, the LBR logging freezes until software captures the LBR records and resumes collection.
 
-LBR collection can be limited to a set of specific branch types, for example a user may choose to log only function calls and returns. When applying such filter to the code in [@lst:LogBranches], we would only see branches (3) and (4) in the history. Users can also filter in/out conditional and unconditional jumps, indirect jumps and calls, system calls, interrupts and others.
+LBR collection can be limited to a set of specific branch types, for example a user may choose to log only function calls and returns. When applying such filter to the code in [@lst:LogBranches], we would only see branches (3) and (4) in the history. Users can also filter in/out conditional and unconditional jumps, indirect jumps and calls, system calls, interrupts and others. In Linux perf there is a `-j` option that enables filter recording various branch types.
 
 By default, the LBR array works as a ring buffer that captures control flow transitions. However, the depth of the LBR array is limited, which can be a limiting factor when profiling certain applications, in which a transition of the execution flow is accompanied by a large number of leaf function calls. These calls to leaf functions, and their returns, are likely to displace the main execution context from the LBRs. Consider the example in [@lst:LogBranches] again. Say, we want to unwind the call stack from our LBS, and thus we configured LBR to capture only function calls and returns. If the loop runs thousands of iterations and taking into account that the LBR array is 32 entries deep, there is a very high chance we would only see 16 pairs of entries (3) and (4). Those are all leaf function calls which don't help us to unwind the call stack.
 
@@ -79,7 +79,41 @@ $ dmesg | grep -i lbr
 
 [TODO]: add Intel manual reference
 
-Runtime overhead for the majority of LBR use cases is below 1%. [@Nowak2014TheOO]
+With Linux `perf`, you can collect LBR stacks using the following command:
+
+```bash
+$ perf record -b -e cycles ./benchmark.exe
+[ perf record: Woken up 68 times to write data ]
+[ perf record: Captured and wrote 17.205 MB perf.data (22089 samples) ]
+```
+
+LBR stacks can also be collected using `perf record --call-graph lbr` command, but the amount of information collected is less than using `perf record -b`. For example, branch misprediction and cycles data is not collected when running `perf record --call-graph lbr`. 
+
+Because each collected sample captures the entire LBR stack (32 last branch records), the size of collected data (`perf.data`) is significantly bigger than sampling without LBRs. Still, runtime overhead for the majority of LBR use cases is below 1%. [@Nowak2014TheOO]
+
+Users can export raw LBR stacks for custom analysis. Below is the Linux perf command you can use to dump the contents of collected branch stacks:
+
+```bash
+$ perf record -b -e cycles ./benchmark.exe
+$ perf script -F brstack &> dump.txt
+```
+
+The `dump.txt` file, which can be quite large, contains lines like those shown below:
+
+```
+...
+0x4edaf9/0x4edab0/P/-/-/29   
+0x4edabd/0x4edad0/P/-/-/2
+0x4edadd/0x4edb00/M/-/-/4
+0x4edb24/0x4edab0/P/-/-/24
+0x4edabd/0x4edad0/P/-/-/2
+0x4edadd/0x4edb00/M/-/-/1
+0x4edb24/0x4edab0/P/-/-/3
+0x4edabd/0x4edad0/P/-/-/1
+...
+```
+
+On the block above, we present eight entries from the LBR stack, which typically consists of 32 LBR entries. Each entry has `FROM` and `TO` addresses (hexadecimal values), predicted flag (`M` - Mispredicted, `P` - Predicted), and a number of cycles (number in the last position of each entry). Components marked with "`-`" are related to transactional memory (TSX), which we won't discuss here. Curious readers can look up the format of a decoded LBR entry in the `perf script` [specification](http://man7.org/linux/man-pages/man1/perf-script.1.html)[^2].
 
 ### LBR on AMD Platforms
 
@@ -88,53 +122,20 @@ Runtime overhead for the majority of LBR use cases is below 1%. [@Nowak2014TheOO
 [TODO]: read https://documentation-service.arm.com/static/632dbdace68c6809a6b41710?token=
 Chapter F1 Branch Record Buffer Extension
 
-### Collect LBR Stacks
+### Capture Call Stacks
 
-With Linux `perf`, one can collect LBR stacks using the command below:
+There is a number of important use cases that become possible thanks to branch recording. In this and a few later sections, we will cover the most important ones.
 
-```bash
-$ ~/perf record -b -e cycles ./a.exe
-[ perf record: Woken up 68 times to write data ]
-[ perf record: Captured and wrote 17.205 MB perf.data (22089 samples) ]
-```
+One of the most popular use cases for branch recording is capturing call stacks. We already covered it in [@sec:secCollectCallStacks]. At the time of writing (2023), AMD's LBR doesn't support call stack collection. Intel's LBR can be used as a light-weight substituion for collecting call-graph information even if you compiled a program without frame pointers or debug information. Here is how you can do it with Intel LBR:
 
-LBR stacks can also be collected using `perf record --call-graph lbr` command, but the amount of information collected is less than using `perf record -b`. For example, branch misprediction and cycles data is not collected when running `perf record --call-graph lbr`. 
-
-Because each collected sample captures the entire LBR stack (32 last branch records), the size of collected data (`perf.data`) is significantly bigger than sampling without LBRs. Below is the Linux perf command one can use to dump the contents of collected branch stacks:
-
-```bash
-$ perf script -F brstack &> dump.txt
-```
-
-The `dump.txt` file, which can be quite large, contains lines like those shown below:
-
-```
-...
-0x4edabd/0x4edad0/P/-/-/2   0x4edaf9/0x4edab0/P/-/-/29
-0x4edabd/0x4edad0/P/-/-/2   0x4edb24/0x4edab0/P/-/-/23
-0x4edadd/0x4edb00/M/-/-/4   0x4edabd/0x4edad0/P/-/-/2
-0x4edb24/0x4edab0/P/-/-/24  0x4edadd/0x4edb00/M/-/-/4
-0x4edabd/0x4edad0/P/-/-/2   0x4edb24/0x4edab0/P/-/-/23
-0x4edadd/0x4edb00/M/-/-/1   0x4edabd/0x4edad0/P/-/-/1
-0x4edb24/0x4edab0/P/-/-/3   0x4edadd/0x4edb00/P/-/-/1
-0x4edabd/0x4edad0/P/-/-/1   0x4edb24/0x4edab0/P/-/-/3
-...
-```
-
-On the block above, we present eight entries from the LBR stack, which typically consists of 32 LBR entries. Each entry has `FROM` and `TO` addresses (hexadecimal values), predicted flag (`M`/`P`),[^16] and a number of cycles (number in the last position of each entry). Components marked with "`-`" are related to transactional memory (TSX), which we won't discuss here. Curious readers can look up the format of a decoded LBR entry in the `perf script` [specification](http://man7.org/linux/man-pages/man1/perf-script.1.html)[^2].
-
-There is a number of important use cases for LBR. In the next sections, we will address the most important ones.
-
-### Capture Call Graph
-
-Discussions on collecting call graph and its importance were covered in [@sec:secCollectCallStacks]. LBR can be used for collecting call-graph information even if you compiled a program without frame pointers (controlled by compiler option `-fomit-frame-pointer`, ON by default) or debug information:[^3]
+[TODO]: what about ARM BRBE?
 
 ```bash
 $ perf record --call-graph lbr -- ./a.exe
 $ perf report -n --stdio
 # Children   Self    Samples  Command  Object  Symbol       
 # ........  .......  .......  .......  ......  .......
-	99.96%  99.94%    65447    a.out    a.out  [.] bar
+	99.96%  99.94%    65447    a.exe    a.exe  [.] bar
             |          
              --99.94%--main
                        |          
@@ -146,13 +147,16 @@ $ perf report -n --stdio
                                   bar
 ```
 
-As you can see, we identified the hottest function in the program (which is `bar`). Also, we found out callers that contribute to the most time spent in function `bar` (it is `foo`). In this case, we can see that 91% of samples in `bar` have `foo` as its caller function.[^4]
+As you can see, we've identified the hottest function in the program (which is `bar`). Also, we found out callers that contribute to the most time spent in function `bar`: 91% of the time the tool captured the `main->foo->bar` call stack and 9% it captured `main->zoo->bar`. In other words, 91% of samples in `bar` have `foo` as its caller function.
 
-Using LBR, we can determine a Hyper Block (sometimes called Super Block), which is a chain of basic blocks executed most frequently in the whole program. Basic blocks from that chain are not necessarily laid in the sequential physical order; they're executed sequentially.
+It's important to mention that we cannot necessarily drive conclusions about function call counts in this case. For example, we cannot say that `foo` calls `bar` 10 times more frequently than `zoo`. It could be the case that `foo` calls `bar` once, but it executes an expensive path inside `bar` while `zoo` calls `bar` many times but returns quickly from it.
 
 ### Identify Hot Branches {#sec:lbr_hot_branch}
 
-LBR also enables us to know what were the most frequently taken branches: 
+Branch recording also enables us to know what were the most frequently taken branches. Here is an example of using Intel's LBR:
+
+[TODO]: what about ARM BRBE?
+[TODO]: what about AMD LBR?
 
 ```bash
 $ perf record -e cycles -b -- ./a.exe
@@ -169,16 +173,23 @@ $ perf report -n --sort overhead,srcline_from,srcline_to -F +dso,symbol_from,sym
    4.03%        863   a.exe   [.] main   [.] foo      a.c:21     (null)
 ```
 
-From this example, we can see that more than 50% of taken branches are inside the `bar` function, 22% of branches are function calls from `foo` to `bar`, and so on. Notice how `perf` switched from `cycles` events to analyzing LBR stacks: only 670 samples were collected, yet we have an entire LBR stack captured with every sample. This gives us `670 * 32 = 21440` LBR entries (branch outcomes) for analysis.[^5]
+From this example, we can see that more than 50% of taken branches are within the `bar` function, 22% of branches are function calls from `foo` to `bar`, and so on. Notice how `perf` switched from `cycles` events to analyzing LBR stacks: only 670 samples were collected, yet we have an entire LBR stack captured with every sample. This gives us `670 * 32 = 21440` LBR entries (branch outcomes) for analysis.[^5]
 
-Most of the time, it’s possible to determine the location of the branch just from the line of code and target symbol. However, theoretically, one could write code with two `if` statements written on a single line. Also, when expanding the macro definition, all the expanded code gets the same source line, which is another situation when this might happen. This issue does not totally block the analysis but only makes it a little more difficult. To disambiguate two branches, you likely need to analyze raw LBR stacks yourself (see example on [easyperf](https://easyperf.net/blog/2019/05/06/Estimating-branch-probability)[^6] blog).
+Most of the time, it’s possible to determine the location of the branch just from the line of code and target symbol. However, theoretically, one could write code with two `if` statements written on a single line. Also, when expanding the macro definition, all the expanded code is attributed to the same source line, which is another situation when this might happen. This issue does not totally block the analysis but only makes it a little more difficult. To disambiguate two branches, you likely need to analyze raw LBR stacks yourself (see example on [easyperf](https://easyperf.net/blog/2019/05/06/Estimating-branch-probability)[^6] blog).
+
+Using branch recording, we can also find a *hyper block* (sometimes called *super block*), which is a chain of hot basic blocks in a function that are not necessarily laid out in the sequential physical order but they're executed sequentially. Thus, a hyper block represents a typical hot path through a function, piece of code, or a program.
 
 ### Analyze Branch Misprediction Rate {#sec:secLBR_misp_rate}
 
-It’s also possible to know the misprediction rate for hot branches:[^7]
+Thanks to the mispredict bit in the additional information saved inside each record, it is also possible to know the misprediction rate for hot branches. In this example we take a C-code-only version of the 7-zip benchmark from the LLVM test-suite.[^7] The output of perf report is slightly trimmed to fit nicely on a page.
+
+[TODO]: what about ARM BRBE?
+[TODO]: confirm it's possible with AMD LBR?
+
+[TODO]: Check: "Adding `-F +srcline_from,srcline_to` slows down building report. Hopefully, in newer versions of perf, decoding time will be improved".
 
 ```bash
-$ perf record -e cycles -b -- ./a.exe
+$ perf record -e cycles -b -- ./7zip.exe b
 $ perf report -n --sort symbol_from,symbol_to -F +mispredict,srcline_from,srcline_to --stdio
 # Samples: 657K of event 'cycles'
 # Event count (approx.): 657888
@@ -190,13 +201,16 @@ $ perf report -n --sort symbol_from,symbol_to -F +mispredict,srcline_from,srclin
      6.33%    41665   Y   dec.c:36   dec.c:40  LzmaDec     LzmaDec 
 ```
 
-In this example,[^8] lines that correspond to function `LzmaDec` are of particular interest to us. Using the reasoning from [@sec:lbr_hot_branch], we can conclude that the branch on source line `dec.c:36` is the most executed branch in the benchmark. In the output that Linux `perf` provides, we can spot two entries that correspond to the `LzmaDec` function: one with `Y` and one with `N` letters. Analyzing those two entries together gives us a misprediction rate of the branch. In this case, we know that the branch on line `dec.c:36` was predicted `303391` times (corresponds to `N`) and was mispredicted `41665` times (corresponds to `Y`), which gives us `88%` prediction rate.
+In this example, the lines that correspond to function `LzmaDec` are of particular interest to us. Following a similar analysis from the previous section, we can conclude that the branch on source line `dec.c:36` is the most executed branch in the benchmark. In the output that Linux `perf` provides, we can spot two entries that correspond to the `LzmaDec` function: one with `Y` and one with `N` letters. Analyzing those two entries together gives us a misprediction rate of the branch. In this case, we know that the branch on line `dec.c:36` was predicted `303391` times (corresponds to `N`) and was mispredicted `41665` times (corresponds to `Y`), which gives us `88%` prediction rate.
 
 Linux `perf` calculates the misprediction rate by analyzing each LBR entry and extracting misprediction bits from it. So that for every branch, we have a number of times it was predicted correctly and a number of mispredictions. Again, due to the nature of sampling, it is possible that some branches might have an `N` entry but no corresponding `Y` entry. It could mean there are no LBR entries for the branch being mispredicted, but that doesn’t necessarily mean the prediction rate is `100%`.
 
 ### Precise Timing of Machine Code {#sec:timed_lbr}
 
-As was discussed in [@sec:lbr], starting from Skylake, LBR entries provide `Cycle Count` information. This additional field specifies the number of elapsed cycles between two taken branches. If the target address in the previous LBR entry is the beginning of a basic block (BB) and the source address of the current LBR entry is the last instruction of the same basic block, then the cycle count is the latency of this basic block. For example:
+[TODO]: what about ARM BRBE?
+[TODO]: not supported with AMD LBR, correct?
+
+As we showed in the Intel's LBR section, starting from Skylake microarchitecture, there is a special `Cycle Count` field in the LBR entry. This additional field specifies the number of elapsed cycles between two taken branches. Since the target address in the previous (N-1) LBR entry is the beginning of a basic block (BB) and the source address of the current (N) LBR entry is the last instruction of the same basic block, then the cycle count is the latency of this basic block. For example:
 
 ```
 400618:   movb  $0x0, (%rbp,%rdx,1)    <= start of a BB
@@ -214,16 +228,22 @@ Suppose we have two entries in the LBR stack:
   400628    400644     5          <== LBR TOS
 ```
 
-Given that information, we know that there was one occurrence when the basic block that starts at offset `400618` was executed in 5 cycles. If we collect enough samples, we could plot a probability density function of the latency for that basic block (see Figure @fig:LBR_timing_BB). This chart was compiled by analyzing all LBR entries that satisfy the rule described above. For example, the basic block was executed in ~75 cycles only 4% of the time, but more often, it was executed between 260 and 314 cycles. This block has a random load inside a huge array that doesn’t fit in CPU L3 cache, so the latency of the basic block largely depends on this load. There are two important spikes on the chart that is shown in Figure @fig:LBR_timing_BB: first, around 80 cycles corresponds to the L3 cache hit, and the second spike, around 300 cycles, corresponds to L3 cache miss where the load request goes all the way down to the main memory.
+Given that information, we know that there was one occurrence when the basic block that starts at offset `400618` was executed in 5 cycles. If we collect enough samples, we could plot a probability density function of the latency for that basic block (see Figure @fig:LBR_timing_BB). This chart was compiled by analyzing all LBR entries that satisfy the rule described above. For example, the basic block was executed in ~75 cycles only 4% of the time, but more often, it was executed in between 260 and 314 cycles. This block has a non-sequential load from a large array that doesn’t fit in CPU L3 cache, so the latency of the basic block largely depends on this load. There are two important spikes on the chart: first, around 80 cycles corresponds to the L3 cache hit, and the second spike, around 300 cycles, corresponds to L3 cache miss where the load request goes all the way down to the main memory.
+
+[TODO]: make the chart more readable
 
 ![Probability density function for latency of the basic block that starts at address `0x400618`.](../../img/pmu-features/LBR_timing_BB.jpg){#fig:LBR_timing_BB width=90%}
 
-This information can be used for further fine-grained tuning of this basic block. This example might benefit from memory prefetching, which we will discuss in [@sec:memPrefetch]. Also, this cycle information can be used for timing loop iterations, where every loop iteration ends with a taken branch (back edge).
+This information can be used for further fine-grained tuning of this basic block. This example might benefit from memory prefetching, which we will discuss in [@sec:memPrefetch]. Also, cycle count information can be used for timing loop iterations, where every loop iteration ends with a taken branch (back edge).
 
-An example of how to build a probability density function for the latency of a basic block can be found on the [easyperf blog](https://easyperf.net/blog/2019/04/03/Precise-timing-of-machine-code-with-Linux-perf)[^9]. However, in newer versions of Linux perf, getting this information is much easier. For example:[^7]
+An example of how to build a probability density function for the latency of a basic block can be found on the [easyperf blog](https://easyperf.net/blog/2019/04/03/Precise-timing-of-machine-code-with-Linux-perf)[^9]. However, in newer versions of Linux perf, getting this information is much easier. 
+
+Below is an example that shows that it is feasible to plot basic block latencies for a real-world application as well. When running the same 7-zip benchmark from the LLVM test-suite we introduce earlier, we have:
+
+[TODO]: Check: "Adding `-F +srcline_from,srcline_to` slows down building report. Hopefully, in newer versions of perf, decoding time will be improved".
 
 ```bash
-$ perf record -e cycles -b -- ./a.exe
+$ perf record -e cycles -b -- ./7zip.exe b
 $ perf report -n --sort symbol_from,symbol_to -F +cycles,srcline_from,srcline_to --stdio
 # Samples: 658K of event 'cycles'
 # Event count (approx.): 658240
@@ -246,7 +266,9 @@ $ perf report -n --sort symbol_from,symbol_to -F +cycles,srcline_from,srcline_to
      0.58%   3804      24      dec.c:174    dec.c:174   
 ```
 
-Several insignificant lines were removed from the output of `perf record` to make it fit on the page. If we now focus on the branch in which source and destination is `dec.c:174`[^10], we can find multiple lines associated with it. Linux `perf` sorts entries by overhead first, which requires us to manually filter entries for the branch which we are interested in. In fact, if we filter them, we will get the latency distribution for the basic block that ends with this branch, as shown in Table {@tbl:bb_latency}. This data can be plotted to obtain a chart similar to the one shown in Figure @fig:LBR_timing_BB.
+Notice we've added the `-F +cycles` option to show cycle counts in the output (`BBCycles` column). Several insignificant lines were removed from the output of `perf report` to make it fit on the page. Let's focus on lines in which source and destination is `dec.c:174`, there are seven such lines in the output. In the source code, the line `dec.c:174` expands a macro that has a self-contained branch. That’s why the source and destination happen to be on the same line.
+
+Linux `perf` sorts entries by overhead first, so we need to manually filter entries for the branch which we are interested in. Luckily, they can be grepped very easily. In fact, if we filter them, we will get the latency distribution for the basic block that ends with this branch, as shown in Table {@tbl:bb_latency}. This data can be plotted to obtain a chart similar to the one shown in Figure @fig:LBR_timing_BB.
 
 ----------------------------------------------
 Cycles  Number of samples  Probability density
@@ -268,9 +290,11 @@ Cycles  Number of samples  Probability density
 
 Table: Probability density for basic block latency. {#tbl:bb_latency}
 
-Currently, timed LBR is the most precise cycle-accurate source of timing information in the system.
+Currently, LBR is the most precise cycle-accurate source of timing information on Intel systems.
 
 ### Estimating Branch Outcome Probability
+
+I STOPPED HERE
 
 Later in [@sec:secFEOpt], we will discuss the importance of code layout for performance. Going forward a little bit, having a hot path in a fall through manner[^11] generally improves the performance of the program. Considering a single branch, knowing that `condition` 99% of the time is false or true is essential for a compiler to make better optimization decisions.
 
@@ -282,16 +306,12 @@ LBR enables us to get this data without instrumenting the code. As the outcome f
 * **Capturing function arguments**: when LBR is used together with PEBS (see [@sec:secPEBS]), it is possible to capture function arguments, since according to [x86 calling conventions](https://en.wikipedia.org/wiki/X86_calling_conventions),[^12] the first few arguments of a callee are passed in registers that are recorded in a PEBS entry. [@IntelOptimizationManual, Appendix B, Chapter B.3.3.4]
 * **Basic Block Execution Counts**: since all the basic blocks between a branch IP (source) and the previous target in the LBR stack are executed exactly once, it’s possible to evaluate the execution rate of basic blocks inside a program. This process involves building a map of starting addresses of each basic block and then traversing collected LBR stacks backward. [@IntelOptimizationManual, Appendix B, Chapter B.3.3.4]
 
-
 [^2]: Linux `perf script` manual page - [http://man7.org/linux/man-pages/man1/perf-script.1.html](http://man7.org/linux/man-pages/man1/perf-script.1.html).
-[^3]: Utilized by `perf record --call-graph dwarf`.
-[^4]: We cannot necessarily drive conclusions about function call counts in this case. For example, we cannot say that `foo` calls `bar` 10 times more than `zoo`. It could be the case that `foo` calls `bar` once, but it executes an expensive path inside `bar` while `zoo` calls `bar` lots of times but returns quickly from it.
-[^5]: The report header generated by perf confuses users because it says `21K of event cycles`. But there are `21K` LBR entries, not `cycles`.
-[^6]: Analyzing raw LBR stacks - [https://easyperf.net/blog/2019/05/06/Estimating-branch-probability](https://easyperf.net/blog/2019/05/06/Estimating-branch-probability).
-[^7]: Adding `-F +srcline_from,srcline_to` slows down building report. Hopefully, in newer versions of perf, decoding time will be improved.
-[^8]: This example is taken from the real-world application, 7-zip benchmark: [https://github.com/llvm-mirror/test-suite/tree/master/MultiSource/Benchmarks/7zip](https://github.com/llvm-mirror/test-suite/tree/master/MultiSource/Benchmarks/7zip). Although the output of perf report is trimmed a little bit to fit nicely on a page.
+
+[^5]: The report header generated by perf might still be confusing because it says `21K of event cycles`. But there are `21K` LBR entries, not `cycles`.
+[^6]: Analyzing raw LBR stacks - [https://easyperf.net/blog/2019/05/06/Estimating-branch-probability](https://easyperf.net/blog/2019/05/06/Estimating-branch-probability)
+[^7]: LLVM test-suite 7zip benchmark - [https://github.com/llvm-mirror/test-suite/tree/master/MultiSource/Benchmarks/7zip](https://github.com/llvm-mirror/test-suite/tree/master/MultiSource/Benchmarks/7zip)
 [^9]: Building a probability density function for the latency of an arbitrary basic block - [https://easyperf.net/blog/2019/04/03/Precise-timing-of-machine-code-with-Linux-perf](https://easyperf.net/blog/2019/04/03/Precise-timing-of-machine-code-with-Linux-perf).
-[^10]: In the source code, line `dec.c:174` expands a macro that has a self-contained branch. That’s why the source and destination happen to be on the same line.
+
 [^11]: I.e., when outcomes of branches are not taken.
 [^12]: X86 calling conventions - [https://en.wikipedia.org/wiki/X86_calling_conventions](https://en.wikipedia.org/wiki/X86_calling_conventions)
-[^16]: M - Mispredicted, P - Predicted.
