@@ -1,5 +1,7 @@
 # Glossary {.unnumbered}
 
+[TODO]: provide list of Intel,AMD,ARM microarchitectures with years and gens
+
 \begin{multicols}{2}
 
 \textbf{AOS} Array Of Structures

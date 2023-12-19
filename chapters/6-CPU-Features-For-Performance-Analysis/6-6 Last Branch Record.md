@@ -9,7 +9,7 @@ typora-root-url: ..\..\img
 
 ## Branch Recording Mechanisms {#sec:lbr}
 
-Modern high-performance CPUs provide branch recording mechanisms that enable a processor to continuously log a set of previously executed branches. But before going into the details, one might ask: *Why are we so interested in branches?* Well, because this is how we can determine the control flow of a program. We largely ignore other instructions in a basic block (see [@sec:BasicBlock]) because branches are always the last instruction in a basic block. Since all instructions in a basic block are guaranteed to be executed once, we can only focus on branches that will “represent” the entire basic block. Thus, it’s possible to reconstruct the entire line-by-line execution path of the program if we track the outcome of every branch. In fact, this is what the Intel Processor Traces (PT) feature is capable of doing, which is discussed in Appendix D. Branch recording mechanisms that we will discuss here are based on samling, not tracing, and thus have different use cases and capabilities.
+Modern high-performance CPUs provide branch recording mechanisms that enable a processor to continuously log a set of previously executed branches. But before going into the details, you may ask: *Why are we so interested in branches?* Well, because this is how we can determine the control flow of a program. We largely ignore other instructions in a basic block (see [@sec:BasicBlock]) because branches are always the last instruction in a basic block. Since all instructions in a basic block are guaranteed to be executed once, we can only focus on branches that will “represent” the entire basic block. Thus, it’s possible to reconstruct the entire line-by-line execution path of the program if we track the outcome of every branch. In fact, this is what the Intel Processor Traces (PT) feature is capable of doing, which is discussed in Appendix D. Branch recording mechanisms that we will discuss here are based on samling, not tracing, and thus have different use cases and capabilities.
 
 Processors designed by Intel, AMD, and ARM all have announced their branch recording extensions. Exact implementations may vary but the idea is the same. Hardware logs the “from” and “to” address of each branch along with some additional data in parallel with executing the program. If we collect a long enough history of source-destination pairs, we will be able to unwind the control flow of our program, just like a call stack, but with limited depth. Such extensions are designed to cause minimal slowdown to a running program often within 1%. 
 
@@ -33,7 +33,7 @@ Listing: Example of logging branches.
  ---- 4eda2d:  jne   4eda10              <== (1)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Below is one of the possibile branch histories that is logged with a branch recording mechanism. It shows the last 7 branch outcomes (many more not shown) at the moment we executed the `CALL` instruction. Because on the latest iteration of the loop the `JNS` branch (`4eda14` -> `4eda1e`) was not taken, it is not logged and thus does not appear in the history.
+Below is one of the possibile branch histories that can be logged with a branch recording mechanism. It shows the last 7 branch outcomes (many more not shown) at the moment we executed the `CALL` instruction. Because on the latest iteration of the loop the `JNS` branch (`4eda14` -> `4eda1e`) was not taken, it is not logged and thus does not appear in the history.
 
 ```
     Source Address    Destination Address
@@ -52,7 +52,7 @@ Next we will take a look at each vendor's branch recording mechanism and then ex
 
 ### LBR on Intel Platforms
 
-Intel has first implemented its Last Branch Record (LBR) facility in its Netburst microarchitecture. Initially, it could record only 4 most recent branch outcomes. It was later enhanced to 16 starting with Nehalem and to 32 starting from Skylake. Prior to the Goldencove microarchitecture, LBR was implemented as a set of model-specific registers (MSRs), but now it works within architectural registers. The primary advantage is that LBR features are clearly exposed without knowing the model number of the current CPU. Also, LBR entries can be configured to be included in the PEBS records (see [@sec:secPEBS]).
+Intel has first implemented its Last Branch Record (LBR) facility in the Netburst microarchitecture. Initially, it could record only 4 most recent branch outcomes. It was later enhanced to 16 starting with Nehalem and to 32 starting from Skylake. Prior to the Goldencove microarchitecture, LBR was implemented as a set of model-specific registers (MSRs), but now it works within architectural registers. The primary advantage of it is that LBR features are clearly exposed and there is no need to check the exact model number of the current CPU. It makes support in the OS and profiling tools much easier. Also, LBR entries can be configured to be included in the PEBS records (see [@sec:secPEBS]).
 
 The LBR registers act like a ring buffer that is continuously overwritten and provides only 32 most recent branch outcomes. Each LBR entry is comprised of three 64-bit values:
 
@@ -64,11 +64,11 @@ There are important applications to the additional information saved besides jus
 
 When a sampling counter overflows and a Performance Monitoring Interrupt (PMI) is triggered, the LBR logging freezes until software captures the LBR records and resumes collection.
 
-LBR collection can be limited to a set of specific branch types, for example a user may choose to log only function calls and returns. When applying such filter to the code in [@lst:LogBranches], we would only see branches (3) and (4) in the history. Users can also filter in/out conditional and unconditional jumps, indirect jumps and calls, system calls, interrupts and others. In Linux perf there is a `-j` option that enables filter recording various branch types.
+LBR collection can be limited to a set of specific branch types, for example a user may choose to log only function calls and returns. When applying such filter to the code in [@lst:LogBranches], we would only see branches (3) and (4) in the history. Users can also filter in/out conditional and unconditional jumps, indirect jumps and calls, system calls, interrupts and others. In Linux perf there is a `-j` option that enables/disables recording of various branch types.
 
-By default, the LBR array works as a ring buffer that captures control flow transitions. However, the depth of the LBR array is limited, which can be a limiting factor when profiling certain applications, in which a transition of the execution flow is accompanied by a large number of leaf function calls. These calls to leaf functions, and their returns, are likely to displace the main execution context from the LBRs. Consider the example in [@lst:LogBranches] again. Say, we want to unwind the call stack from our LBS, and thus we configured LBR to capture only function calls and returns. If the loop runs thousands of iterations and taking into account that the LBR array is 32 entries deep, there is a very high chance we would only see 16 pairs of entries (3) and (4). Those are all leaf function calls which don't help us to unwind the call stack.
+By default, the LBR array works as a ring buffer that captures control flow transitions. However, the depth of the LBR array is limited, which can be a limiting factor when profiling certain applications, in which a transition of the execution flow is accompanied by a large number of leaf function calls. These calls to leaf functions, and their returns, are likely to displace the main execution context from the LBRs. Consider the example in [@lst:LogBranches] again. Say, we want to unwind the call stack from the history in LBR, and so we configured LBR to capture only function calls and returns. If the loop runs thousands of iterations and taking into account that the LBR array is only 32 entries deep, there is a very high chance we would only see 16 pairs of entries (3) and (4). In such a scenario, the LBR array is cluttered with leaf function calls which don't help us to unwind the current call stack.
 
-This is why LBR supports call-stack mode. With this mode enabled, the LBR array captures function calls as before, but as return instructions are executed the last captured branch (`call`) record is flushed from the array in a last-in first-out (LIFO) manner. Thus, branch information pertaining to completed leaf functions will not be retained, while preserving the call stack information of the main line execution path. When configured in this manner, the LBR array emulates a call stack, where `CALL`s are “pushed” and `RET`s “pop” entries off the stack.
+This is why LBR supports call-stack mode. With this mode enabled, the LBR array captures function calls as before, but as return instructions are executed the last captured branch (`call`) record is flushed from the array in a last-in first-out (LIFO) manner. Thus, branch information pertaining to completed leaf functions will not be retained, while preserving the call stack information of the main line execution path. When configured in this manner, the LBR array emulates a call stack, where `CALL`s are “pushed” and `RET`s “pop” entries off the stack. If the depth of the call stack in your application never goes beyond 32 nested frames, LBRs will give you a very accurate information.
 
 Users can make sure LBRs are enabled on their system by doing the following command:
 
@@ -113,7 +113,7 @@ The `dump.txt` file, which can be quite large, contains lines like those shown b
 ...
 ```
 
-On the block above, we present eight entries from the LBR stack, which typically consists of 32 LBR entries. Each entry has `FROM` and `TO` addresses (hexadecimal values), predicted flag (`M` - Mispredicted, `P` - Predicted), and a number of cycles (number in the last position of each entry). Components marked with "`-`" are related to transactional memory (TSX), which we won't discuss here. Curious readers can look up the format of a decoded LBR entry in the `perf script` [specification](http://man7.org/linux/man-pages/man1/perf-script.1.html)[^2].
+In the output above, we present eight entries from the LBR stack, which typically consists of 32 LBR entries. Each entry has `FROM` and `TO` addresses (hexadecimal values), predicted flag (`M` - Mispredicted, `P` - Predicted), and a number of cycles (number in the last position of each entry). Components marked with "`-`" are related to transactional memory extension (TSX), which we won't discuss here. Curious readers can look up the format of a decoded LBR entry in the `perf script` [specification](http://man7.org/linux/man-pages/man1/perf-script.1.html)[^2].
 
 ### LBR on AMD Platforms
 
@@ -126,7 +126,9 @@ Chapter F1 Branch Record Buffer Extension
 
 There is a number of important use cases that become possible thanks to branch recording. In this and a few later sections, we will cover the most important ones.
 
-One of the most popular use cases for branch recording is capturing call stacks. We already covered it in [@sec:secCollectCallStacks]. At the time of writing (2023), AMD's LBR doesn't support call stack collection. Intel's LBR can be used as a light-weight substituion for collecting call-graph information even if you compiled a program without frame pointers or debug information. Here is how you can do it with Intel LBR:
+One of the most popular use cases for branch recording is capturing call stacks. We already covered why we need to collect them in [@sec:secCollectCallStacks]. Branch recording can be used as a light-weight substituion for collecting call-graph information even if you compiled a program without frame pointers or debug information.
+
+At the time of writing (2023), AMD's LBR doesn't support call stack collection, but Intel's LBR does. Here is how you can do it with Intel LBR:
 
 [TODO]: what about ARM BRBE?
 
