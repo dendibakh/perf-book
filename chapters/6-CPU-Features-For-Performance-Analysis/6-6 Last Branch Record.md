@@ -230,17 +230,15 @@ Suppose we have two entries in the LBR stack:
   400628    400644     5          <== LBR TOS
 ```
 
-Given that information, we know that there was one occurrence when the basic block that starts at offset `400618` was executed in 5 cycles. If we collect enough samples, we could plot a probability density function of the latency for that basic block (see Figure @fig:LBR_timing_BB). This chart was compiled by analyzing all LBR entries that satisfy the rule described above. For example, the basic block was executed in ~75 cycles only 4% of the time, but more often, it was executed in between 260 and 314 cycles. This block has a non-sequential load from a large array that doesn’t fit in CPU L3 cache, so the latency of the basic block largely depends on this load. There are two important spikes on the chart: first, around 80 cycles corresponds to the L3 cache hit, and the second spike, around 300 cycles, corresponds to L3 cache miss where the load request goes all the way down to the main memory.
+Given that information, we know that there was one occurrence when the basic block that starts at offset `400618` was executed in 5 cycles. If we collect enough samples, we could plot a probability density function of the latency for that basic block. The chart in Figure @fig:LBR_timing_BB was compiled by analyzing all LBR entries that satisfy the rule described above. For example, the basic block was executed in ~75 cycles only 4% of the time, but more often, it was executed in between 260 and 314 cycles. This block has a non-sequential load from a large array that doesn’t fit in CPU L3 cache, so the latency of the basic block largely depends on this load. There are two important spikes on the chart: first, around 80 cycles corresponds to the L3 cache hit, and the second spike, around 300 cycles, corresponds to L3 cache miss where the load request goes all the way down to the main memory.
 
 [TODO]: make the chart more readable
 
-![Probability density function for latency of the basic block that starts at address `0x400618`.](../../img/pmu-features/LBR_timing_BB.jpg){#fig:LBR_timing_BB width=90%}
+![Probability density chart for latency of the basic block that starts at address `0x400618`.](../../img/pmu-features/LBR_timing_BB.jpg){#fig:LBR_timing_BB width=90%}
 
-This information can be used for further fine-grained tuning of this basic block. This example might benefit from memory prefetching, which we will discuss in [@sec:memPrefetch]. Also, cycle count information can be used for timing loop iterations, where every loop iteration ends with a taken branch (back edge).
+This information can be used for a fine-grained tuning of this basic block. This example might benefit from memory prefetching, which we will discuss in [@sec:memPrefetch]. Also, cycle count information can be used for timing loop iterations, where every loop iteration ends with a taken branch (back edge).
 
-An example of how to build a probability density function for the latency of a basic block can be found on the [easyperf blog](https://easyperf.net/blog/2019/04/03/Precise-timing-of-machine-code-with-Linux-perf)[^9]. However, in newer versions of Linux perf, getting this information is much easier. 
-
-Below is an example that shows that it is feasible to plot basic block latencies for a real-world application as well. When running the same 7-zip benchmark from the LLVM test-suite we introduce earlier, we have:
+Before the proper support from profiling tools was in place, building probability density graphs similar to Figure @fig:LBR_timing_BB required manual parsing of raw LBR dumps. Example of how to do this can be found on the [easyperf blog](https://easyperf.net/blog/2019/04/03/Precise-timing-of-machine-code-with-Linux-perf)[^9]. Luckily, in newer versions of Linux perf, getting this information is much easier. The example below demonstrates this method directly using Linux perf on the same 7-zip benchmark from the LLVM test-suite we introduced earlier:
 
 [TODO]: Check: "Adding `-F +srcline_from,srcline_to` slows down building report. Hopefully, in newer versions of perf, decoding time will be improved".
 
@@ -292,7 +290,9 @@ Cycles  Number of samples  Probability density
 
 Table: Probability density for basic block latency. {#tbl:bb_latency}
 
-Currently, LBR is the most precise cycle-accurate source of timing information on Intel systems.
+Here is how we can interpret the data: from all the collected samples, 17% of the time the latency of the basic block was one cycle, 27% of the time it was 2 cycles, and so on. Notice a distribution mostly concentrates from 1 to 6 cycles, but also there is a second mode of much higher latency of 24 and 32 cycles, which likely corresponds to branch misprediction penalty. The second mode in the distribution accounts for 15% of all samples.
+
+This example that shows that it is feasible to plot basic block latencies not only for tiny microbenchmarks, but for real-world applications as well. Currently, LBR is the most precise cycle-accurate source of timing information on Intel systems.
 
 ### Estimating Branch Outcome Probability
 
