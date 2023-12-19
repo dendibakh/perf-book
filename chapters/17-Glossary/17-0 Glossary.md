@@ -1,6 +1,6 @@
 # Glossary {.unnumbered}
 
-[TODO]: provide list of Intel,AMD,ARM microarchitectures with years and gens
+\markright{Glossary}
 
 \begin{multicols}{2}
 
@@ -95,6 +95,4 @@
 \textbf{UOP} MicroOperation
 
 \end{multicols}
-
-\bibliography{biblio}
 
