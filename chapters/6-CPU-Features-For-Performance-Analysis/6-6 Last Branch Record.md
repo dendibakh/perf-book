@@ -63,16 +63,14 @@ LBR collection can be limited to a set of specific branch types, for example a u
 
 By default, the LBR array works as a ring buffer that captures control flow transitions. However, the depth of the LBR array is limited, which can be a limiting factor when profiling certain applications, in which a transition of the execution flow is accompanied by a large number of leaf function calls. These calls to leaf functions, and their returns, are likely to displace the main execution context from the LBRs. Consider the example in [@lst:LogBranches] again. Say, we want to unwind the call stack from the history in LBR, and so we configured LBR to capture only function calls and returns. If the loop runs thousands of iterations and taking into account that the LBR array is only 32 entries deep, there is a very high chance we would only see 16 pairs of entries (3) and (4). In such a scenario, the LBR array is cluttered with leaf function calls which don't help us to unwind the current call stack.
 
-This is why LBR supports call-stack mode. With this mode enabled, the LBR array captures function calls as before, but as return instructions are executed the last captured branch (`call`) record is flushed from the array in a last-in first-out (LIFO) manner. Thus, branch information pertaining to completed leaf functions will not be retained, while preserving the call stack information of the main line execution path. When configured in this manner, the LBR array emulates a call stack, where `CALL`s are “pushed” and `RET`s “pop” entries off the stack. If the depth of the call stack in your application never goes beyond 32 nested frames, LBRs will give you a very accurate information.
+This is why LBR supports call-stack mode. With this mode enabled, the LBR array captures function calls as before, but as return instructions are executed the last captured branch (`call`) record is flushed from the array in a last-in first-out (LIFO) manner. Thus, branch information pertaining to completed leaf functions will not be retained, while preserving the call stack information of the main line execution path. When configured in this manner, the LBR array emulates a call stack, where `CALL`s are “pushed” and `RET`s “pop” entries off the stack. If the depth of the call stack in your application never goes beyond 32 nested frames, LBRs will give you a very accurate information. [@IntelOptimizationManual, Volume 3B, Chapter 19 Last Branch Records]
 
-Users can make sure LBRs are enabled on their system by doing the following command:
+You can make sure LBRs are enabled on your system with the following command:
 
 ```bash
 $ dmesg | grep -i lbr
 [    0.228149] Performance Events: PEBS fmt3+, 32-deep LBR, Skylake events, full-width counters, Intel PMU driver.
 ```
-
-[TODO]: add Intel manual reference
 
 With Linux `perf`, you can collect LBR stacks using the following command:
 
@@ -111,6 +109,16 @@ The `dump.txt` file, which can be quite large, contains lines like those shown b
 In the output above, we present eight entries from the LBR stack, which typically consists of 32 LBR entries. Each entry has `FROM` and `TO` addresses (hexadecimal values), predicted flag (`M` - Mispredicted, `P` - Predicted), and a number of cycles (number in the last position of each entry). Components marked with "`-`" are related to transactional memory extension (TSX), which we won't discuss here. Curious readers can look up the format of a decoded LBR entry in the `perf script` [specification](http://man7.org/linux/man-pages/man1/perf-script.1.html)[^2].
 
 ### LBR on AMD Platforms
+
+AMD processors also support Last Branch Record (LBR) on AMD Zen4 processors. Zen4 has 16 pairs of "from" and "to" address logging along with some additional metadata. Similar to Intel LBR, AMD processors have the capability to record various types of branches. The main difference to Intel LBR is that AMD processors don't support call stack mode yet, hence the LBR feature can't be used for call stack collection. Another noticeable difference is that there is no cycle count field in the AMD LBR record. For more details see [@AMDProgrammingManual, 13.1.1.9 Last Branch Stack Registers].
+
+Since Linux kernel 6.1 onwards, Linux 'perf' on AMD Zen4 processors supports the branch analysis use cases we discuss below unless explicitly mentioned otherwise. The Linux `perf` commands to collect AMD LBRs use the same `-b` and `-j` options.
+
+Branch analysis is also possible with AMD uProf CLI tool. The example command below with dump collected raw LBR records and generate a CSV report:
+
+```bash
+$ AMDuProfCLI collect --branch-filter -o /tmp/ ./AMDTClassicMatMul-bin
+```
 
 ### BRBE on ARM Platforms
 
@@ -153,10 +161,11 @@ It's important to mention that we cannot necessarily drive conclusions about fun
 
 ### Identify Hot Branches {#sec:lbr_hot_branch}
 
-Branch recording also enables us to know what were the most frequently taken branches. Here is an example of using Intel's LBR:
+Branch recording also enables us to know what were the most frequently taken branches. It is suppoted on Intel and AMD. Here is an example:
 
 [TODO]: what about ARM BRBE?
-[TODO]: what about AMD LBR?
+
+[TODO]: Check: "Adding `-F +srcline_from,srcline_to` slows down building report. Hopefully, in newer versions of perf, decoding time will be improved".
 
 ```bash
 $ perf record -e cycles -b -- ./a.exe
@@ -181,12 +190,9 @@ Using branch recording, we can also find a *hyper block* (sometimes called *supe
 
 ### Analyze Branch Misprediction Rate {#sec:secLBR_misp_rate}
 
-Thanks to the mispredict bit in the additional information saved inside each record, it is also possible to know the misprediction rate for hot branches. In this example we take a C-code-only version of the 7-zip benchmark from the LLVM test-suite.[^7] The output of perf report is slightly trimmed to fit nicely on a page.
+Thanks to the mispredict bit in the additional information saved inside each record, it is also possible to know the misprediction rate for hot branches. In this example we take a C-code-only version of the 7-zip benchmark from the LLVM test-suite.[^7] The output of perf report is slightly trimmed to fit nicely on a page. The following use case is suppoted on Intel and AMD:
 
 [TODO]: what about ARM BRBE?
-[TODO]: confirm it's possible with AMD LBR?
-
-[TODO]: Check: "Adding `-F +srcline_from,srcline_to` slows down building report. Hopefully, in newer versions of perf, decoding time will be improved".
 
 ```bash
 $ perf record -e cycles -b -- ./7zip.exe b
@@ -207,10 +213,11 @@ Linux `perf` calculates the misprediction rate by analyzing each LBR entry and e
 
 ### Precise Timing of Machine Code {#sec:timed_lbr}
 
-[TODO]: what about ARM BRBE?
-[TODO]: not supported with AMD LBR, correct?
+As we showed in the Intel's LBR section, starting from Skylake microarchitecture, there is a special `Cycle Count` field in the LBR entry. This additional field specifies the number of elapsed cycles between two taken branches. Since the target address in the previous (N-1) LBR entry is the beginning of a basic block (BB) and the source address of the current (N) LBR entry is the last instruction of the same basic block, then the cycle count is the latency of this basic block. 
 
-As we showed in the Intel's LBR section, starting from Skylake microarchitecture, there is a special `Cycle Count` field in the LBR entry. This additional field specifies the number of elapsed cycles between two taken branches. Since the target address in the previous (N-1) LBR entry is the beginning of a basic block (BB) and the source address of the current (N) LBR entry is the last instruction of the same basic block, then the cycle count is the latency of this basic block. For example:
+This type of analysis is not supported on AMD platforms since they don't record cycle count in the LBR record. According to the ARM BRBE spec, there is a cycle count field, but we cannot test it due to lack of production systems that support this extension. However, Intel support it. Here is an example:
+
+[TODO]: what about ARM BRBE?
 
 ```
 400618:   movb  $0x0, (%rbp,%rdx,1)    <= start of a BB
