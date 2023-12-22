@@ -2,11 +2,6 @@
 typora-root-url: ..\..\img
 ---
 
-[TODO:] 1. reformat
-[TODO:] 2. enhance Intel's section
-[TODO:] 3. read about ARM's BRBE
-[TODO:] 4. incorporate AMD's LBR
-
 ## Branch Recording Mechanisms {#sec:lbr}
 
 Modern high-performance CPUs provide branch recording mechanisms that enable a processor to continuously log a set of previously executed branches. But before going into the details, you may ask: *Why are we so interested in branches?* Well, because this is how we can determine the control flow of a program. We largely ignore other instructions in a basic block (see [@sec:BasicBlock]) because branches are always the last instruction in a basic block. Since all instructions in a basic block are guaranteed to be executed once, we can only focus on branches that will “represent” the entire basic block. Thus, it’s possible to reconstruct the entire line-by-line execution path of the program if we track the outcome of every branch. In fact, this is what the Intel Processor Traces (PT) feature is capable of doing, which is discussed in Appendix D. Branch recording mechanisms that we will discuss here are based on samling, not tracing, and thus have different use cases and capabilities.

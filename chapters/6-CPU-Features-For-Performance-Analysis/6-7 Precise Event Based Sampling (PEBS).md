@@ -40,6 +40,7 @@ There is a number of important differences between PMC and IBS in AMD processors
 Since IBS is integrated into the processor pipeline and acts as a fixed event counter, the sample collection overhead on the processor is minimal. Profilers are required to process the IBS generated data, which could be huge in size depending upon sampling interval, number of threads configured, whether Fetch/Op configured, etc. Until Linux kernel version 6.1, IBS always collects samples for all the cores. This limitation causes huge data collection and processing overhead. From Kernel 6.2 onwards, Linux perf supports IBS sample collection only for the configured cores. And of course, IBS is supported by the AMD uProf profiler.
 
 [TODO]: Add relevant Linux perf commands.
+[TODO]: show controls/filters for IBS collection.
 [TODO]: what will perf report show?
 [TODO]: How to parse IBS raw dumps?
 
@@ -114,7 +115,7 @@ Memory accesses are a critical factor for the performance of many applications. 
 
 In PEBS, the feature that allows this to happen is called Data Address Profiling (DLA). To provide additional information about sampled loads and stores, it uses the `Data Linear Address` and `Latency Value` fields inside the PEBS facility (see Figure @fig:PEBS_record). If the performance event supports the DLA facility, and DLA is enabled, the processor will dump the memory address and latency of the sampled memory access. You can also filter memory accesses that have latency higher than a certain threshold. This is useful for finding long-latency memory accesses, which can be a performance bottleneck for many applications.
 
-[TODO]: can IBS capture load latency?
+[TODO]: can IBS capture load latency? - YES
 
 With the IBS Execute and ARM SPE sampling, you can also do in-depth analysis of memory accesses performed by an application. One approach is to dump collected samples and process them manually. IBS saves the exact linear address, where the access was served from (cache or DRAM) and whether it hit or missed in the DTLB. SPE can be used to estimate latency and bandwidht of the memory subsystem components, estimate memory latencies of individual loads/stores, and more.
 

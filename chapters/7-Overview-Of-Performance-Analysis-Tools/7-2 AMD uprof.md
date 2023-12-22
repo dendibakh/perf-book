@@ -24,6 +24,8 @@ Due to the sampling nature of the tool, it will eventually miss events with a ve
 
 To demonstrate the look-and-feel of AMD uProf tool, we ran the dense LU matrix factorization component from the [Scimark2](https://math.nist.gov/scimark2/index.html)[^2] benchmark on AMD Ryzen 9 7950X, Windows 11, 64 GB RAM.
 
+[TODO]: `filter in` is not supported yet in uProf 4.1. Revisit in January 2024.
+
 Figure @fig:uProfHotspots shows the function hotpots analysis. At the top of the image, you can see event timeline which shows the number of events observed at various times of the application execution. On the right, you can select which metric to plot, we selected `RETIRED_BR_INST_MISP`. Notice a spike in branch mispredictions in the time range from 20s to 40s. You can select this region to analyze closely what's going on there. Once you do that, it will update the bottom panels to show statistics only for that time interval.
 
 ![uProf's Function Hotspots view.](../../img/perf-tools/uProf_Hopspot.png){#fig:uProfHotspots width=100% }
