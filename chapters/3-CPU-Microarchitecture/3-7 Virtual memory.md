@@ -6,7 +6,7 @@ In a CPU that supports virtual memory, programs use virtual addresses for their 
 
 Address translation is required for accessing data as well as the code (instructions). The mechanism for a system with a page size of 4KB is shown on Figure @fig:VirtualMem. The virtual address is split into two parts. The virtual page number (52 most signicant bits) is used to index into the page table to produce a mapping between the virtual page number and the corresponding physical page. To offset within a 4KB page we need 12 bits, the rest 52 bits of a 64-bit pointer can be used for the address of page itself. Notice that the offset whitin a page (12 least signicant bits) does not require translation, and it is used "as-is" to access the physical memory location.
 
-![Virtual-to-physical address translation for 4KB pages.](../../img/uarch/VirtualMem2.png){#fig:VirtualMem width=70%}
+![Virtual-to-physical address translation for 4KB pages.](../../img/uarch/VirtualMem.png){#fig:VirtualMem width=70%}
 
 The page table can either be single-level or nested. Figure @fig:L2PageTables shows one example of a 2-level page table. Notice, how the address gets split into more piecies. First thing to mention, is that 16 most significant bits are not used. This can seem like a waste of bits, but even with the remaining 48 bits we can address 256 TB of total memory (2^48^). Some applications use those unused bits to keep metadata, also known as *pointer tagging*.
 
