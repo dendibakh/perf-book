@@ -53,4 +53,9 @@ if (__builtin_unpredictable(x == 3))
   y = 1;
 ```
 
+BOLT has an experimental CMOV conversion optimization[^1] that leverages LBR misprediction information available in recent microarchitectures (Skylake and higher). However, LLVM's CMOV conversion passes[^2][^4] that take dataflow and scheduling information into account are still generally more effective. A hybrid or cooperative approach might yield the best result but there has not been much progress in this area.
+
+[^1]: BOLT CMOVConversion - [https://github.com/llvm/llvm-project/commit/687e4af1c05ae36af88900d41150e260d8f273c0](llvm/llvm-project@687e4af).
+[^2]: LLVM cmov-vs-branch optimization - RFC [https://discourse.llvm.org/t/rfc-cmov-vs-branch-optimization/6040](https://discourse.llvm.org/t/rfc-cmov-vs-branch-optimization/6040), [https://github.com/llvm/llvm-project/commit/ca7c307d18160485ab30289dc1b14bd16ac35c52](llvm/llvm-project@ca7c307) `SelectOpti` commit.
 [^3]: Discussion on branchless binary search - [https://stackoverflow.com/a/54273248](https://stackoverflow.com/a/54273248).
+[^4]: LLVM `X86CmovConverterPass`.
