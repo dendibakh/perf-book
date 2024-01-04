@@ -37,12 +37,9 @@ Run:
 # Linux bash
 python export_book.py && pdflatex book.tex && bibtex book && pdflatex book.tex && pdflatex book.tex
 
-# Windows Powershell
-function Run-Block-With-Error($block) {
-    $ErrorActionPreference="Stop"
-    Invoke-Command -ScriptBlock $block
-}
-Run-Block-With-Error {python.exe export_book.py; pdflatex book.tex; bibtex book; pdflatex book.tex; pdflatex book.tex}
+# Windows
+cmd
+python export_book.py && pdflatex book.tex && bibtex book && pdflatex book.tex && pdflatex book.tex
 ```
 
 As a result, `book.pdf` will be generated. The first compilation may be slow due to the installation of required packets.
