@@ -20,7 +20,7 @@ User-mode sampling incurs more runtime overhead than EBS. The average overhead o
 
 ### Finding Hotspots
 
-In this section, we will discuss the mechanics of using PMCs with EBS. Figure @fig:Sampling illustrates the counter overflow feature of the PMU, which is used to trigger performance monitoring interrupt (PMI), aka `SIGPROF`. At the start of a benchmark, we configure the event that we want to sample on. Identifying hotspots means knowing where the program spends most of the time. So sampling on cycles is very natural, and it is a default for many profiling tools. But it's not necessarily a strict rule; we can sample on any performance event we want. For example, if we would like to know the place where the program experiences the biggest number of L3-cache misses, we would sample on the corresponding event, i.e., `MEM_LOAD_RETIRED.L3_MISS`.
+In this section, we will discuss the mechanics of using PMCs with EBS. Figure @fig:Sampling illustrates the counter overflow feature of the PMU, which is used to trigger performance monitoring interrupt (PMI), also known as `SIGPROF`. At the start of a benchmark, we configure the event that we want to sample on. Identifying hotspots means knowing where the program spends most of the time. So sampling on cycles is very natural, and it is a default for many profiling tools. But it's not necessarily a strict rule; we can sample on any performance event we want. For example, if we would like to know the place where the program experiences the biggest number of L3-cache misses, we would sample on the corresponding event, i.e., `MEM_LOAD_RETIRED.L3_MISS`.
 
 ![Using performance counter for sampling](../../img/perf-analysis/SamplingFlow.png){#fig:Sampling width=60%}
 
@@ -90,7 +90,7 @@ Analyzing the source code of all the callers of `foo` might be very time-consumi
 
 Collecting call stacks in Linux `perf` is possible with three methods:
 
-1.  Frame pointers (`perf record --call-graph fp`). Requires binary being built with `--fnoomit-frame-pointer`. Historically, the frame pointer (`RBP` register) was used for debugging since it enables us to get the call stack without popping all the arguments from the stack (aka stack unwinding). The frame pointer can tell the return address immediately. However, it consumes one register just for this purpose, so it was expensive. It can also be used for profiling since it enables cheap stack unwinding.
+1.  Frame pointers (`perf record --call-graph fp`). Requires binary being built with `--fnoomit-frame-pointer`. Historically, the frame pointer (`RBP` register) was used for debugging since it enables us to get the call stack without popping all the arguments from the stack (also known as stack unwinding). The frame pointer can tell the return address immediately. However, it consumes one register just for this purpose, so it was expensive. It can also be used for profiling since it enables cheap stack unwinding.
 2.  DWARF debug info (`perf record --call-graph dwarf`). Requires binary being built with DWARF debug information `-g` (`-gline-tables-only`). Obtains call stacks through stack unwinding procedure.
 3.  Intel Last Branch Record (LBR) Hardware feature `perf record --call-graph lbr`. Obtains call stacks by parsing the LBR stack (a set of HW registers). Not as deep call graph as the first two methods. See more information about LBR in [@sec:lbr].
 

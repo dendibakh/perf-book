@@ -6,7 +6,7 @@ typora-root-url: ..\..\img
 
 \markright{Part2. Source Code Tuning}
 
-Welcome to the second part of this book where we will discuss various techniques for low-level source code optimization, aka *tuning*. In the first part, we learned how to find performance bottlenecks in the code, which is only half of the developer's job. Another half is to fix the problem.
+Welcome to the second part of this book where we will discuss various techniques for low-level source code optimization, also known as *tuning*. In the first part, we learned how to find performance bottlenecks in the code, which is only half of the developer's job. Another half is to fix the problem.
 
 Modern CPU is a very complicated device, and it's nearly impossible to predict how fast certain pieces of code will run. SW and HW performance depends on many factors, and the number of moving parts is too big for a human mind to overlook. Hopefully, observing how your code runs from a CPU perspective is possible thanks to all the performance monitoring capabilities we discussed in the first part of the book. We will extensively rely on methods and tools we learned about earlier in the book to guide our performance engineering process.
 
