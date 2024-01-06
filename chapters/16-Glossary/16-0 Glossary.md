@@ -92,7 +92,7 @@
 
 \textbf{TSC} Time Stamp Counter
 
-\textbf{μop} MicroOperation
+\textbf{$\mu$op} MicroOperation
 
 \end{multicols}
 
