@@ -125,7 +125,7 @@ $ perf report -n --stdio --no-children
 
 When using Intel Vtune Profiler, one can collect call stacks data by checking the corresponding "Collect stacks" box while configuring analysis. When using the command-line interface, specify the `-knob enable-stack-collection=true` option.
 
-It is very important to know an effective way to collect call stacks. Developers that are not familiar with the concept try to obtain this information by using a debugger. They do so by interrupting the execution of a program and analyze the call stack (e.g. `backtrace` command in `gdb` debugger). Don't do this, let a profiling tool to do the job, which is much faster and gives much more accurate data.
+It is very important to know an effective way to collect call stacks. Developers that are not familiar with the concept try to obtain this information by using a debugger. They do so by interrupting the execution of a program and analyze the call stack (e.g., `backtrace` command in `gdb` debugger). Don't do this, let a profiling tool to do the job, which is much faster and gives much more accurate data.
 
 [^1]: Profiling(wikipedia) - [https://en.wikipedia.org/wiki/Profiling_(computer_programming)](https://en.wikipedia.org/wiki/Profiling_(computer_programming)).
 [^4]: In the past there were LLVM compiler bugs when compiling with debug info (`-g`). Code transformation passes incorrectly treated the presence of debugging intrinsics which caused different optimizations decisions. It did not affect functionality, only performance. Some of them were fixed, but it's hard to say if any of them are still there.

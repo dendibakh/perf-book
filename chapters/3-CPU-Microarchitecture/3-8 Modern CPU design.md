@@ -38,8 +38,8 @@ Third, ROB tracks the speculative execution. When the instruction finished its e
 
 There are certain operations which processors handle in a specific manner, often called idioms, which require no or less costly execution. Processors recognize such cases and allow them to run faster then regular instructions. Here are some of such cases:
 
-* **Zeroing**: to assign zero to a register, compilers often use `XOR / PXOR / XORPS / XORPD` instructions, e.g. `XOR RAX, RAX`, which are preferred by compilers instead of the equivalent `MOV RAX, 0x0` instruction as the XOR encoding uses fewer encoding bytes. Such zeroing idioms are not executed as any other regular instruction and are resolved in the CPU front-end, which saves execution resources. The instruction later retires as usual.
-* **Move elimination**: similarly to the previous one, register-to-register mov operations, e.g. `MOV RAX, RBX`, are executed with zero cycle delay.
+* **Zeroing**: to assign zero to a register, compilers often use `XOR / PXOR / XORPS / XORPD` instructions, e.g., `XOR RAX, RAX`, which are preferred by compilers instead of the equivalent `MOV RAX, 0x0` instruction as the XOR encoding uses fewer encoding bytes. Such zeroing idioms are not executed as any other regular instruction and are resolved in the CPU front-end, which saves execution resources. The instruction later retires as usual.
+* **Move elimination**: similarly to the previous one, register-to-register mov operations, e.g., `MOV RAX, RBX`, are executed with zero cycle delay.
 * **NOP instruction**: `NOP` is often used for padding or alignment purposes. It simply gets marked as completed without allocating it into the reservation station.
 * **Other bypases**: CPU architects also optimized certain arithmetical operations. For example, multiplying any number by one will always gives the same number. The same goes for dividing any number by one. Multiplying any number by zero always gives the same number, etc. Some CPUs can recognize such cases in runtime and run them with shorter latency than regular multiplication or divide.
 
@@ -52,7 +52,7 @@ As shown in Figure @fig:Goldencove_diag, there are 12 execution ports:
 * Ports 4 and 9 are used for store operations (STD).
 * Ports 7 and 8 are used for address generation.
 
-A dispatched arithmetical operation can go to either INT or VEC execution port. Integer and Vector/FP register stacks are located separately. Operations that move values from Int stack to FP and vice-versa (e.g. convert, extraxt, insert) incur additional penalty.
+A dispatched arithmetical operation can go to either INT or VEC execution port. Integer and Vector/FP register stacks are located separately. Operations that move values from Int stack to FP and vice-versa (e.g., convert, extraxt, insert) incur additional penalty.
 
 ### Load-Store Unit
 

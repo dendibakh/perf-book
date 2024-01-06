@@ -13,7 +13,7 @@ If you want to not only record but also view the recorded ETW data you need to i
 ### What you can do with it: {.unlisted .unnumbered}
 
 - Look at CPU hotspots with a configurable CPU sampling rate from 125 microseconds up to 10 seconds. Default is 1 millisecond which costs approximately 5-10% runtime overhead.
-- Who blocks a certain thread and for how long (e.g. late event signals, unnecessary thread sleeps, etc).
+- Who blocks a certain thread and for how long (e.g., late event signals, unnecessary thread sleeps, etc).
 - Examine how fast a disk serves read/write requests and who initiates that work.
 - Check file access performance and patterns (includes cached read/writes which lead to no disk IO).
 - Trace the TCP/IP stack how packets flow between network interfaces and computers.
@@ -85,7 +85,7 @@ Next comes *Generic Events* view which displays such events like mouse clicks an
 
 The bottom Graph *CPU Usage (Precise)* uses different source of data than *Sampled* view. While sampling data only captures running threads, *Precise* collection takes into account time intervals during which a process was not running. The data for precise view comes from the Windows Thread Scheduler. It traces how long and on which CPU a thread was running (CPU Usage), how long it was blocked in a kernel call (Wait), in which priority and how long the thread had been waiting for a CPU to become free (Ready Time), etc. Consequently, precise view doesn't show the top CPU consumers. But this view is very helpful for understanding for how long and *why* a certain process was blocked.
 
-Now that we familiarized ourselves with the WPA interface, let's observe the charts. First, we can find the `MouseButton` events 63 and 64 on the timeline. ETWController saves all the screenshots taken during collection in a newly created folder. The profiling data itself is saved in the file named `SlowProcessStart.etl` and there is a new folder named `SlowProcessStart.etl.Screenshots`. This folder contains the screenshots and a `Report.html` file which you can view in the browser. Every recorded keyboard/mouse interaction is saved in a file with the event number in its name, e.g. `Screenshot_63.jpg`. Figure @fig:ETWController_ClickScreenshot (cropped) displays the mouse double-click (events 63 and 64). The mouse pointer position is marked as a green square, except if a click event did occur, then it is red. This makes it easy to spot when and where a mouse click was performed.
+Now that we familiarized ourselves with the WPA interface, let's observe the charts. First, we can find the `MouseButton` events 63 and 64 on the timeline. ETWController saves all the screenshots taken during collection in a newly created folder. The profiling data itself is saved in the file named `SlowProcessStart.etl` and there is a new folder named `SlowProcessStart.etl.Screenshots`. This folder contains the screenshots and a `Report.html` file which you can view in the browser. Every recorded keyboard/mouse interaction is saved in a file with the event number in its name, e.g., `Screenshot_63.jpg`. Figure @fig:ETWController_ClickScreenshot (cropped) displays the mouse double-click (events 63 and 64). The mouse pointer position is marked as a green square, except if a click event did occur, then it is red. This makes it easy to spot when and where a mouse click was performed.
 
 ![A mouse click screenshot captured with ETWController.](../../img/perf-tools/ETWController_ClickScreenshot.png){#fig:ETWController_ClickScreenshot width=60% }
 

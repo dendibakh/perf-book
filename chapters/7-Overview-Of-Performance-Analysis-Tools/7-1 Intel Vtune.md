@@ -1,6 +1,6 @@
 ## Intel Vtune
 
-VTune Profiler (formerly VTune Amplifier) is a performance analysis tool for x86-based machines with a rich GUI interface. It can be run on Linux or Windows operating systems. We skip discussion about MacOS support for VTune since it doesn't work on Apple's chips (e.g. M1 and M2), and Intel-based Macbooks quickly become obsolete.
+VTune Profiler (formerly VTune Amplifier) is a performance analysis tool for x86-based machines with a rich GUI interface. It can be run on Linux or Windows operating systems. We skip discussion about MacOS support for VTune since it doesn't work on Apple's chips (e.g., M1 and M2), and Intel-based Macbooks quickly become obsolete.
 
 Vtune can be used on both Intel and AMD systems, many features will work. However, advanced hardware-based sampling requires an Intel-manufactured CPU. For example, you won't be able to collect HW performance counters on an AMD system with Intel Vtune.
 
@@ -30,7 +30,7 @@ Windows does not require any additional configuration after you install Vtune. C
 ### What you can do with it: {.unlisted .unnumbered}
 
 - find hotspots: functions, loops, statements.
-- monitor various CPU-specific performance events, e.g. branch mispredictions and L3 cache misses.
+- monitor various CPU-specific performance events, e.g., branch mispredictions and L3 cache misses.
 - locate lines of code where these events happen.
 - characterize CPU performance bottlenecks with TMA methodology.
 - filter data for a specific function, process, time period or logical core.
@@ -43,7 +43,7 @@ VTune can provide very rich information about a running process. It is the right
 - analyze very short execution anomalies.
 - observe system-wide complicated SW dynamics.
 
-Due to the sampling nature of the tool, it will eventually miss events with a very short duration (e.g. submicrosecond).
+Due to the sampling nature of the tool, it will eventually miss events with a very short duration (e.g., submicrosecond).
 
 ### Examples {.unlisted .unnumbered}
 

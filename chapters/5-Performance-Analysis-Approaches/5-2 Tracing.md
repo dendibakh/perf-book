@@ -29,7 +29,7 @@ $ strace -tt -T -- git status
 ...
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The overhead of tracing very much depends on what exactly we try to trace. For example, if we trace a program that almost never makes system calls, the overhead of running it under `strace` will be close to zero. On the other hand, if we trace a program that heavily relies on system calls, the overhead could be very large, e.g. 100x.[^1] Also, tracing can generate a massive amount of data since it doesn't skip any sample. To compensate for this, tracing tools 
+The overhead of tracing very much depends on what exactly we try to trace. For example, if we trace a program that almost never makes system calls, the overhead of running it under `strace` will be close to zero. On the other hand, if we trace a program that heavily relies on system calls, the overhead could be very large, e.g., 100x.[^1] Also, tracing can generate a massive amount of data since it doesn't skip any sample. To compensate for this, tracing tools 
 provide filters that enable you to restrict data collection to a specific time slice or for a specific section of code.
 
 Usually, tracing similar to instrumentation is used for exploring anomalies in the system. For example, you may want to determine what was going on in an application during a 10s period of unresponsiveness. As you will see later, sampling methods are not designed for this, but with tracing, you can see what lead to the program being unresponsive. For example, with Intel PT, you can reconstruct the control flow of the program and know exactly what instructions were executed.

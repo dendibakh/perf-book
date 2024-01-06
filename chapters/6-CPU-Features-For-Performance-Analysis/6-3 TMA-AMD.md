@@ -1,6 +1,6 @@
 ### TMA on AMD Platforms {#sec:secTMA_AMD}
 
-Starting from Zen4 processors, AMD platforms support Level-1 and Level-2 TMA analysis but with some limitations. At the time of writing, it is only supported on server platforms (e.g. Genoa), and not on client (Ryzen). TMA support was added in AMD uProf version 4.1, but only in the command line tool `AMDuProfPcm` tool which is part of AMD uProf installation. Graphical version of the tool doesn't have the TMA analysis yet. Linux perf support is also ongoing.
+Starting from Zen4 processors, AMD platforms support Level-1 and Level-2 TMA analysis but with some limitations. At the time of writing, it is only supported on server platforms (e.g., Genoa), and not on client (Ryzen). TMA support was added in AMD uProf version 4.1, but only in the command line tool `AMDuProfPcm` tool which is part of AMD uProf installation. Graphical version of the tool doesn't have the TMA analysis yet. Linux perf support is also ongoing.
 
 Here is an example of runnning a classical matrix multiplication kernel on a Genoa system:
 
