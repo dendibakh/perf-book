@@ -92,7 +92,7 @@
 
 \textbf{TSC} Time Stamp Counter
 
-\textbf{UOP} MicroOperation
+\textbf{μop} MicroOperation
 
 \end{multicols}
 

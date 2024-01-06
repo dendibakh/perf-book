@@ -2,7 +2,7 @@
 typora-root-url: ..\..\img
 ---
 
-## UOPs (micro-ops) {#sec:sec_UOP}
+## μops (micro-ops) {#sec:sec_UOP}
 
 Microprocessors with the x86 architecture translate complex CISC-like instructions into simple RISC-like microoperations, abbreviated as µops or μops. A simple addition instruction such as `ADD rax, rbx` generates only one µop, while more complex instruction like `ADD rax, [mem]` may generate two: one for reading from `mem` memory location into a temporary (un-named) register, and one for adding it to the `rax` register. The instruction `ADD [mem], rax` generates three μops: one for reading from memory, one for adding, and one for writing the result back to memory.
 
