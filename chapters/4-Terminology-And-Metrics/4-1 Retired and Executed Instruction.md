@@ -8,7 +8,7 @@ Modern processors typically execute more instructions than the program flow requ
 
 There is an exception. Certain instructions are recognized as idioms and are resolved without actual execution. An example of it can be NOP, move elimination and zeroing, see [@sec:uarchBE]. Such instructions do not require an execution unit but are still retired. So, theoretically, there could be a case when the number of retired instructions is higher than the number of executed instructions.
 
-There is a fixed performance counter (PMC) in most modern processors that collects the number of retired instructions. There is no performance event to collect executed instructions, though there is a way to collect executed and retired *uops* as we shall see soon. The number of retired instructions can be easily obtained with Linux `perf` by running:
+There is a fixed performance counter (PMC) in most modern processors that collects the number of retired instructions. There is no performance event to collect executed instructions, though there is a way to collect executed and retired *μops* as we shall see soon. The number of retired instructions can be easily obtained with Linux `perf` by running:
 
 ```bash
 $ perf stat -e instructions ./a.exe

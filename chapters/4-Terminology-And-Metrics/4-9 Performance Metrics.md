@@ -43,7 +43,7 @@ Latency (in core cycles)
 
 ILP     Instr.-Level-Parallelism   UOPS_EXECUTED.THREAD / 
         per-core (average number   UOPS_EXECUTED.CORE_CYCLES_GE_1,
-        of uops executed when      divide by 2 if SMT is enabled
+        of μops executed when      divide by 2 if SMT is enabled
         there is execution) 
 
 MLP     Memory-Level-Parallelism   L1D_PEND_MISS.PENDING / 
