@@ -35,7 +35,7 @@ $$
 
 #### Finding Data in the Cache.
 
-Every block in the m-way set-associative cache has an address tag associated with it. In addition, the tag also contains state bits such as valid bits to indicate whether the data is valid. Tags can also contain additional bits to indicate access information, sharing information, etc. that will be described in later sections. 
+Every block in the m-way set-associative cache has an address tag associated with it. In addition, the tag also contains state bits such as valid bits to indicate whether the data is valid. Tags can also contain additional bits to indicate access information, sharing information, etc., that will be described in later sections. 
 
 ![Address organization for cache lookup.](../../img/uarch/CacheLookup.png){#fig:CacheLookup width=80%}
 
