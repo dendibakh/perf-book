@@ -46,7 +46,7 @@ ALL Reads        :      33691.53
 Stream-triad like:      30503.68
 ```
 
-The new options here are `-k`, which specifies a list of CPU numbers used for measurements. The `-Y` option tells MLC to use AVX2 loads, i.e. 32 bytes at a time. MLC measures bandwidth with different read-write ratios, but in the diagram below we only show all-read bandwidth as it gives us an intuition about peak memory bandwidth. But other ratios can also be important. Combined latency and bandwidth numbers for our system under test as measured with Intel MLC are shown in @fig:MemBandwidthAndLatenciesDiagram.
+The new options here are `-k`, which specifies a list of CPU numbers used for measurements. The `-Y` option tells MLC to use AVX2 loads, i.e., 32 bytes at a time. MLC measures bandwidth with different read-write ratios, but in the diagram below we only show all-read bandwidth as it gives us an intuition about peak memory bandwidth. But other ratios can also be important. Combined latency and bandwidth numbers for our system under test as measured with Intel MLC are shown in @fig:MemBandwidthAndLatenciesDiagram.
 
 ![Block diagram of the memory hierarchy of Intel Core i7-1260P and external DDR4 memory.](../../img/terms-and-metrics/MemBandwidthAndLatenciesDiagram.png){#fig:MemBandwidthAndLatenciesDiagram width=100% }
 

@@ -50,7 +50,7 @@ A more detailed comparison of Intel PEBS and AMD IBS can be found in [@Compariso
 
 The Arm Statistical Profiling Extension (SPE) is an architectural feature designed for enhanced instruction execution profiling within Arm CPUs. This feature has been available since Neoverse N1 cores introduced in 2019. The SPE feature extension is specified as part of Armv8-A architecture, with support from Arm v8.2 onwards. Compared to other solutions, SPE is more similar to AMD IBS than it is to Intel PEBS. Similar to IBS, SPE is separate from the general performance monitor counters (PMC), but instead of two flavors of IBS (fetch and execute), there is just a single mechanism.
 
-[TODO]: Is SPE optional? I.e. is it available in Apple/Qualcomm silicon?
+[TODO]: Is SPE optional? i.e., is it available in Apple/Qualcomm silicon?
 
 The SPE sampling process is built in as part of the instruction execution pipeline. Sample collection is still based on a configurable interval, but operations are statistically selected. Each sampled operation generates a sample record, which contains various data about execution of this operation. SPE record saves address of the instruction, virtual and physical address for the data accessed by loads and stores, the source of the data access (cache or DRAM) and timestamp to correlate with other events in the system. Also, it can give latency of various pipeline stages, such as Issue latency (from dispatch to execution), Translation latency (cycle count for a virtual-to-physical address translation) and Execution latency (latency of load/stores in the functional unit). The whitepaper [@ARMSPE] describes ARM SPE in more details as well as shows a few optimization examples using it.
 

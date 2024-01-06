@@ -122,7 +122,7 @@ $ AMDuProfCLI collect --branch-filter -o /tmp/ ./AMDTClassicMatMul-bin
 
 ### BRBE on ARM Platforms
 
-ARM has introduced its branch recording extension called BRBE in 2020 as a part of ARMv9.2-A ISA. ARM BRBE is very similar to Intel's LBR and provide many similar features. Just like Intel's LBR, BRBE records contain source and destination addresses, misprediction bit and cycle count value. The Branch records only contain information for a branch that is architecturally executed, i.e. not on a mispredicted path. Users can also filter records based on specific branch types. One notable difference is that BRBE supports configurable depth of the BRBE buffer: processors can choose the capacity of the BRBE buffer to be 8, 16, 32 or 64 records. More details are available in [@Armv9ManualSupplement, Chapter F1 "Branch Record Buffer Extension"].
+ARM has introduced its branch recording extension called BRBE in 2020 as a part of ARMv9.2-A ISA. ARM BRBE is very similar to Intel's LBR and provide many similar features. Just like Intel's LBR, BRBE records contain source and destination addresses, misprediction bit and cycle count value. The Branch records only contain information for a branch that is architecturally executed, i.e., not on a mispredicted path. Users can also filter records based on specific branch types. One notable difference is that BRBE supports configurable depth of the BRBE buffer: processors can choose the capacity of the BRBE buffer to be 8, 16, 32 or 64 records. More details are available in [@Armv9ManualSupplement, Chapter F1 "Branch Record Buffer Extension"].
 
 [TODO]: what about call stacks?
 
