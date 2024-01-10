@@ -18,7 +18,7 @@ At a very high level, software optimizations can be divided into five categories
 * **Batching**. Idea: aggregate multiple similar operations and do them in one go, thus reducing the overhead of repeating the action multiple times. Examples: send large TCP packets instead of many small ones, allocate large block of memory rather than allocating space for hundreds of tiny objects.
 * **Ordering**. Idea: reorder the sequence of operations in an algorithm. Examples: change the data layout to enable sequential memory accesses, sort an array of C++ polymorphic objects based on their types to allow better prediction of virtual function calls, group hot functions together and place them closer to each other in a binary.
 
-Many optimizations that we will discuss later in the book, fall under multiple categories. For example, we can say that vectorization is a combination of parallelizing and batching; loop blocking (tiling) is a manifestation of batching and eliminating redundant work.
+Many optimizations that we discuss in this book, fall under multiple categories. For example, we can say that vectorization is a combination of parallelizing and batching; loop blocking (tiling) is a manifestation of batching and eliminating redundant work.
 
 To make the picture complete, let us also list other maybe obvious but still quite reasonable ways to speed up things:
 
