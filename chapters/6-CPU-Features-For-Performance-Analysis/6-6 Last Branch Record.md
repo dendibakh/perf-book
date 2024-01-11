@@ -225,13 +225,13 @@ Suppose we have two entries in the LBR stack:
   400628    400644     5          <== LBR TOS
 ```
 
-Given that information, we know that there was one occurrence when the basic block that starts at offset `400618` was executed in 5 cycles. If we collect enough samples, we could plot a probability density function of the latency for that basic block. 
+Given that information, we know that there was one occurrence when the basic block that starts at offset `400618` was executed in 5 cycles. If we collect enough samples, we could plot a probability density chart of latency for that basic block. 
 
 The example of such chart is shown in Figure @fig:LBR_timing_BB. It was compiled by analyzing all LBR entries that satisfy the rule described above. The way to read this chart is as follows: it tells what was the rate of occurence of a given latency value. For example, the basic block latency was measured to be exactly 100 cycles roughly 2% of the time, 14% of the time we measured 280 cycles and never did we see anything between 150 and 200 cycles. Another way to read is: based on the collected data, what is the probability to see a certain basic block latency if you were to measure it.
 
 ![Probability density chart for latency of the basic block that starts at address `0x400618`.](../../img/pmu-features/LBR_timing_BB.png){#fig:LBR_timing_BB width=90%}
 
-We could clearly see two humps: a small one around 80 cycles (\circled{1}) and two bigger ones at 280 and 305 cycles (\circled{2}). The block has a non-sequential load from a large array that doesn’t fit in CPU L3 cache, so the latency of the basic block largely depends on this load. Based on the chart we can conclude that the first spike (\circled{1}) corresponds to the L3 cache hit and the second spike (\circled{2}) corresponds to L3 cache miss where the load request goes all the way down to the main memory.
+We could clearly see two humps: a small one around 80 cycles \circled{1} and two bigger ones at 280 and 305 cycles \circled{2}. The block has a non-sequential load from a large array that doesn’t fit in CPU L3 cache, so the latency of the basic block largely depends on this load. Based on the chart we can conclude that the first spike \circled{1} corresponds to the L3 cache hit and the second spike \circled{2} corresponds to L3 cache miss where the load request goes all the way down to the main memory.
 
 This information can be used for a fine-grained tuning of this basic block. This example might benefit from memory prefetching, which we will discuss in [@sec:memPrefetch]. Also, cycle count information can be used for timing loop iterations, where every loop iteration ends with a taken branch (back edge).
 
