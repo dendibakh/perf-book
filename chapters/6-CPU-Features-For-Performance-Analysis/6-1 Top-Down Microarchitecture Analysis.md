@@ -15,7 +15,3 @@ Here is a short guide on how to read this diagram. As we know from [@sec:uarch],
 To accomplish its goal, TMA observes the execution of the program by monitoring specific set of performance events and then calculating metrics based on predefined formulas. Based on those metrics, TMA characterizes the program by assigning it to one of the four high-level buckets. Each of the four high-level categories has several nested levels, which CPU vendors may choose to implement differently. Each generation of processors may have different formulas for calculating those metrics, so it's better to rely on tools to do the analysis rather than trying to calculate them yourself.
 
 In the upcoming sections, we will discuss the TMA implementation in AMD, ARM and Intel processors.
-
-[TODO]: where to put it?
-
-A high `Retiring` metric for non-vectorized code may be a good hint for users to vectorize the code (see [@sec:Vectorization]). Another situation in which we might see a high Retiring value but slow overall performance is in a program that operates on denormalized floating-point values, thus making such operations extremely slow (see [@sec:SlowFPArith]).
