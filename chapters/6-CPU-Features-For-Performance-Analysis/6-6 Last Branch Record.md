@@ -122,9 +122,7 @@ $ AMDuProfCLI collect --branch-filter -o /tmp/ ./AMDTClassicMatMul-bin
 
 ### BRBE on ARM Platforms
 
-ARM has introduced its branch recording extension called BRBE in 2020 as a part of ARMv9.2-A ISA. ARM BRBE is very similar to Intel's LBR and provide many similar features. Just like Intel's LBR, BRBE records contain source and destination addresses, misprediction bit and cycle count value. The Branch records only contain information for a branch that is architecturally executed, i.e., not on a mispredicted path. Users can also filter records based on specific branch types. One notable difference is that BRBE supports configurable depth of the BRBE buffer: processors can choose the capacity of the BRBE buffer to be 8, 16, 32 or 64 records. More details are available in [@Armv9ManualSupplement, Chapter F1 "Branch Record Buffer Extension"].
-
-[TODO]: what about call stacks?
+ARM has introduced its branch recording extension called BRBE in 2020 as a part of ARMv9.2-A ISA. ARM BRBE is very similar to Intel's LBR and provide many similar features. Just like Intel's LBR, BRBE records contain source and destination addresses, misprediction bit and cycle count value. According to the latest available BRBE specification, the call stack mode is not supported. The Branch records only contain information for a branch that is architecturally executed, i.e., not on a mispredicted path. Users can also filter records based on specific branch types. One notable difference is that BRBE supports configurable depth of the BRBE buffer: processors can choose the capacity of the BRBE buffer to be 8, 16, 32 or 64 records. More details are available in [@Armv9ManualSupplement, Chapter F1 "Branch Record Buffer Extension"].
 
 At the time of writing, there were no commercially available machines that implement ARMv9.2-A, so it is not possible to test this extension in action.
 
@@ -134,9 +132,7 @@ There is a number of important use cases that become possible thanks to branch r
 
 One of the most popular use cases for branch recording is capturing call stacks. We already covered why we need to collect them in [@sec:secCollectCallStacks]. Branch recording can be used as a light-weight substituion for collecting call-graph information even if you compiled a program without frame pointers or debug information.
 
-At the time of writing (2023), AMD's LBR doesn't support call stack collection, but Intel's LBR does. Here is how you can do it with Intel LBR:
-
-[TODO]: what about ARM BRBE?
+At the time of writing (2023), AMD's LBR and ARM's BRBE doesn't support call stack collection, but Intel's LBR does. Here is how you can do it with Intel LBR:
 
 ```bash
 $ perf record --call-graph lbr -- ./a.exe
@@ -161,9 +157,7 @@ It's important to mention that we cannot necessarily drive conclusions about fun
 
 ### Identify Hot Branches {#sec:lbr_hot_branch}
 
-Branch recording also enables us to know what were the most frequently taken branches. It is suppoted on Intel and AMD. Here is an example:
-
-[TODO]: what about ARM BRBE?
+Branch recording also enables us to know what were the most frequently taken branches. It is supported on Intel and AMD. According to ARM's BRBE specification, it can be supported, but due to unavailability of processors that implement this extension, it is not possible to verify. Here is an example:
 
 [TODO]: Check: "Adding `-F +srcline_from,srcline_to` slows down building report. Hopefully, in newer versions of perf, decoding time will be improved".
 
@@ -190,9 +184,7 @@ Using branch recording, we can also find a *hyper block* (sometimes called *supe
 
 ### Analyze Branch Misprediction Rate {#sec:secLBR_misp_rate}
 
-Thanks to the mispredict bit in the additional information saved inside each record, it is also possible to know the misprediction rate for hot branches. In this example we take a C-code-only version of the 7-zip benchmark from the LLVM test-suite.[^7] The output of perf report is slightly trimmed to fit nicely on a page. The following use case is suppoted on Intel and AMD:
-
-[TODO]: what about ARM BRBE?
+Thanks to the mispredict bit in the additional information saved inside each record, it is also possible to know the misprediction rate for hot branches. In this example we take a C-code-only version of the 7-zip benchmark from the LLVM test-suite.[^7] The output of perf report is slightly trimmed to fit nicely on a page. The following use case is supported on Intel and AMD. According to ARM's BRBE specification, it can be supported, but due to unavailability of processors that implement this extension, it is not possible to verify.
 
 ```bash
 $ perf record -e cycles -b -- ./7zip.exe b
@@ -215,9 +207,7 @@ Linux `perf` calculates the misprediction rate by analyzing each LBR entry and e
 
 As we showed in the Intel's LBR section, starting from Skylake microarchitecture, there is a special `Cycle Count` field in the LBR entry. This additional field specifies the number of elapsed cycles between two taken branches. Since the target address in the previous (N-1) LBR entry is the beginning of a basic block (BB) and the source address of the current (N) LBR entry is the last instruction of the same basic block, then the cycle count is the latency of this basic block. 
 
-This type of analysis is not supported on AMD platforms since they don't record cycle count in the LBR record. According to the ARM BRBE spec, there is a cycle count field, but we cannot test it due to lack of production systems that support this extension. However, Intel support it. Here is an example:
-
-[TODO]: what about ARM BRBE?
+This type of analysis is not supported on AMD platforms since they don't record cycle count in the LBR record. According to ARM's BRBE specification, it can be supported, but due to unavailability of processors that implement this extension, it is not possible to verify. However, Intel support it. Here is an example:
 
 ```
 400618:   movb  $0x0, (%rbp,%rdx,1)    <= start of a BB
@@ -235,11 +225,13 @@ Suppose we have two entries in the LBR stack:
   400628    400644     5          <== LBR TOS
 ```
 
-Given that information, we know that there was one occurrence when the basic block that starts at offset `400618` was executed in 5 cycles. If we collect enough samples, we could plot a probability density function of the latency for that basic block. The chart in Figure @fig:LBR_timing_BB was compiled by analyzing all LBR entries that satisfy the rule described above. For example, the basic block was executed in ~75 cycles only 4% of the time, but more often, it was executed in between 260 and 314 cycles. This block has a non-sequential load from a large array that doesn’t fit in CPU L3 cache, so the latency of the basic block largely depends on this load. There are two important spikes on the chart: first, around 80 cycles corresponds to the L3 cache hit, and the second spike, around 300 cycles, corresponds to L3 cache miss where the load request goes all the way down to the main memory.
+Given that information, we know that there was one occurrence when the basic block that starts at offset `400618` was executed in 5 cycles. If we collect enough samples, we could plot a probability density function of the latency for that basic block. 
 
-[TODO]: make the chart more readable
+The example of such chart is shown in Figure @fig:LBR_timing_BB. It was compiled by analyzing all LBR entries that satisfy the rule described above. The way to read this chart is as follows: it tells what was the rate of occurence of a given latency value. For example, the basic block latency was measured to be exactly 100 cycles roughly 2% of the time, 14% of the time we measured 280 cycles and never did we see anything between 150 and 200 cycles. Another way to read is: based on the collected data, what is the probability to see a certain basic block latency if you were to measure it.
 
-![Probability density chart for latency of the basic block that starts at address `0x400618`.](../../img/pmu-features/LBR_timing_BB.jpg){#fig:LBR_timing_BB width=90%}
+![Probability density chart for latency of the basic block that starts at address `0x400618`.](../../img/pmu-features/LBR_timing_BB.png){#fig:LBR_timing_BB width=90%}
+
+We could clearly see two humps: a small one around 80 cycles (\circled{1}) and two bigger ones at 280 and 305 cycles (\circled{2}). The block has a non-sequential load from a large array that doesn’t fit in CPU L3 cache, so the latency of the basic block largely depends on this load. Based on the chart we can conclude that the first spike (\circled{1}) corresponds to the L3 cache hit and the second spike (\circled{2}) corresponds to L3 cache miss where the load request goes all the way down to the main memory.
 
 This information can be used for a fine-grained tuning of this basic block. This example might benefit from memory prefetching, which we will discuss in [@sec:memPrefetch]. Also, cycle count information can be used for timing loop iterations, where every loop iteration ends with a taken branch (back edge).
 
