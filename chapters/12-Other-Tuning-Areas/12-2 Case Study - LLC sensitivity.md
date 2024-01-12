@@ -45,23 +45,7 @@ The 7313P processor consists of four Core Complex Dies (CCDs) connected to each 
 
 Although there is a total of 128 MiB of LLC, the four cores of a CCX cannot store cache blocks in an LLC other than their own 32 MiB LLC (32 MiB/CCX x 4 CCX). Since we will be running single-threaded benchmarks, we can focus on a single CCX. The size of LLC in our experiments will vary from 0 Mib to 32 Mib with steps of 2 Mib.
 
-### Monitoring & Control Tools {.unlisted .unnumbered}
-
-To characterize the applications we use hardware counters. Hardware counters record events that occur during the execution of an application (see section {@sec:PMU}), for example, retired instructions, elapsed cycles, or misses experienced in the LLC. Hardware counters can be configured and read through the model-specific registers (MSR) [@amd_ppr]. The configuration consists of specifying the event to be monitored and how it will be monitored[^1]. In our system, this is done by writing to a `PERF_CTL[0-5]` register (MSR `0xC001020[0,2,4,6,8,A]`). The `PERF_CTR[0-5]` registers (MSR `0xC001020[1,3,5,7,9,B]`) are the counters associated to the previous control registers. For example, for counter 0 to register the number of instructions retired from an application running in thread 1, the following command is executed:
-
-```bash
-$ wrmsr -p 1 0xC0010200 0x5100C0
-```
-
-where `-p 1` refers to the hardware thread 1, `0xC0010200` is the MSR for the control of counter 0 (`PERF_CTL[0]`), and `0x5100C0` specifies the identifier of the event to be measured (retired instructions, `PMCx0C0`) and the way in which it will be measured (user events ...).
-
-Once the configuration is done, the following command is executed to read counter 0:
-
-```bash
-$ rdmsr -p 1 0xC0010201
-```
-
-where `-p 1` refers to the hardware thread 1 and `0xC0010201` is the MSR to read (`PERF_CTR[0]`).
+### Controling and Monitoring LLC allocation {.unlisted .unnumbered}
 
 In addition, there are specific banks of MSRs registers, belonging to _AMD64 Technology Platform Quality of Service Extensions_ (AMD QoSE) [@QoSAMD] that are used to monitor and enforce limits on LLC allocation and memory _read_ bandwidth per thread.
 
@@ -99,6 +83,22 @@ We use a subset of benchmarks from the SPEC CPU2017 suite[^4]. Specifically, we 
 The methodology is detailed in [@Navarro-Torres2023]. The code and the information necessary to reproduce the experiments can be found in the following public repository: <https://github.com/agusnt/BALANCER>.
 
 ### Metrics {.unlisted .unnumbered}
+
+To characterize the applications we use hardware counters. Hardware counters record events that occur during the execution of an application (see [@sec:PMU]), for example, retired instructions, elapsed cycles, or misses experienced in the LLC. Hardware counters can be configured and read through the model-specific registers (MSR) [@amd_ppr]. The configuration consists of specifying the event to be monitored and how it will be monitored[^1]. In our system, this is done by writing to a `PERF_CTL[0-5]` register (MSR `0xC001020[0,2,4,6,8,A]`). The `PERF_CTR[0-5]` registers (MSR `0xC001020[1,3,5,7,9,B]`) are the counters associated to the previous control registers. For example, for counter 0 to register the number of instructions retired from an application running in thread 1, the following command is executed:
+
+```bash
+$ wrmsr -p 1 0xC0010200 0x5100C0
+```
+
+where `-p 1` refers to the hardware thread 1, `0xC0010200` is the MSR for the control of counter 0 (`PERF_CTL[0]`), and `0x5100C0` specifies the identifier of the event to be measured (retired instructions, `PMCx0C0`) and the way in which it will be measured (user events ...).
+
+Once the configuration is done, the following command is executed to read counter 0:
+
+```bash
+$ rdmsr -p 1 0xC0010201
+```
+
+where `-p 1` refers to the hardware thread 1 and `0xC0010201` is the MSR to read (`PERF_CTR[0]`).
 
 The ultimate metric for quantifying the performance of an application is execution time. Other metrics, such as cache miss rates, are used to analyze the influence of the memory hierarchy on system performance. In our case, we will characterize applications with these three metrics: 1) CPI, cycles per instruction[^6], 2) DMPKI, demand misses in the LLC per thousand instructions, and 3) MPKI, total misses (demand + prefetch) in the LLC per thousand instructions.
 
