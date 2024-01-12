@@ -57,12 +57,14 @@ Table: List of the most recent AMD microarchitectures. {#tbl:AMDUarchs}
                                                   Quallcomm Kryo;
                                                  Samsung M1/M2/M3
 
- ARMv8.2-A         2016         Neoverse N1;         Apple A11
-                                 Cortex-X1           Samsung M4
+ ARMv8.2-A         2016         Neoverse N1;         Apple A11;
+                                 Cortex-X1           Samsung M4;
+                                                    Ampere Altra
 
- ARMv8.4-A         2017         Neoverse V1        Apple A13, M1
+ ARMv8.4-A         2017         Neoverse V1        AWS Graviton3;
+                                                   Apple A13, M1
 
- ARMv9.0-A         2018         Neoverse V2;            --- 
+ ARMv9.0-A         2018         Neoverse V2;        NVIDIA Grace
 (64bit-only)                    Neoverse N2;
                                  Cortex X3
 
