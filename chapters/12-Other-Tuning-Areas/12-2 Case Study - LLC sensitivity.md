@@ -1,16 +1,16 @@
 ## Sensitivity to Last Level Cache {#sec:Sensitivity2LLC}
 
-Processors have an increasing number of cores and execution threads. For instance, AMD integrates up to 128 cores capable of executing 256 threads in its Genoa microarchitecture [@amd_micro]. 
+Processors have an increasing number of cores and execution threads. For instance, AMD integrates up to 128 cores capable of executing 256 threads in its Genoa microarchitecture . 
 This trend causes shared resources such as last-level cache (LLC) and off-chip memory bandwidth to come under increased pressure. Therefore, they must be scaled and/or managed as best as possible.
 
-Recent commercial processors such as Intel Xeon [@7446102], ARM ThunderX [@7920819], or AMD EPYC [@amd_rome][@amd_milan] include hardware support for users to control the allocation of both LLC space and memory bandwidth to processor threads. In this way, each thread can only use its allocated amount of shared resources, which helps to reduce interference with other threads.
+Recent commercial processors such as Intel Xeon [@QoSXeon], ARM ThunderX [@QoSThunderX], or AMD EPYC  include hardware support for users to control the allocation of both LLC space and memory bandwidth to processor threads. In this way, each thread can only use its allocated amount of shared resources, which helps to reduce interference with other threads.
 
 In this section we will characterize the shared cache usage of an AMD Milan processor running single-threaded memory intensive benchmarks of SPEC CPU2017. Our analysis will allow us to identify three different types of applications according to their use of the LLC. This result can be applied to properly size the processor LLC, especially considering the wide range available on the market. For example, we can determine whether an application could benefit from a larger LLC, i.e., whether an investment in new hardware would be justified. Or conversely, if an application has enough with a tight cache size and therefore we can buy a cheaper processor.
 
 
 ### AMD Milan Core Organization
 
-AMD launched in 2021 its AMD EPYC 7003 Series Processors, a processor family targeting the high-performance server segment. These processors are composed of Zen 3 cores, code-named Milan [@amd_micro].
+AMD launched in 2021 its AMD EPYC 7003 Series Processors, a processor family targeting the high-performance server segment. These processors are composed of Zen 3 cores, code-named Milan [@amd_milan].
 
 For this study, we have used a server with a 16-core AMD EPYC 7313P processor. The main characteristics of this system are specified in table @tbl:experimental_setup.
 
@@ -45,10 +45,10 @@ Table: Main features of the server used in the experiments. {#tbl:experimental_s
 
 The 7313P processor consists of four Core Complex Dies (CCDs) connected to each other and to off-chip memory via an I/O chiplet (see figure @fig:milan7313P).
 Each CCD integrates a Core CompleX (CCX) and an I/O connection. In turn, each CCX has four Zen3 cores capable of executing eight threads that share a 32 MiB victim LLC, i.e., the LLC is filled with the cache blocks evicted from the four L2 caches of a CCX.
-Recent processors such as ARM Neoverse [@8986666] and Intel Skylake-SP [@7924286] also implement this mostly-exclusive content management.
+Recent processors such as ARM Neoverse and Intel Skylake-SP also implement this mostly-exclusive content management.
 Although there is a total of 128 MiB of LLC, the four cores of a CCX cannot store cache blocks in an LLC other than their own 32 MiB LLC (32 MiB/CCX x 4 CCX).
 
-![AMD Milan 7313P clustered memory hierarchy. This processor is a multichip module with five dies: one I/O die and four Core Complex Dies (CCDs) with a total of 16 cores. On each CCD there is a Core CompleX (CCX) with four 2-SMT Zen3 cores (2SMT C) sharing a 32 MiB LLC [@amd_micro].](../../img/other-tuning/Milan7313P.png){#fig:milan7313P width=90%}
+![AMD Milan 7313P clustered memory hierarchy. This processor is a multichip module with five dies: one I/O die and four Core Complex Dies (CCDs) with a total of 16 cores. On each CCD there is a Core CompleX (CCX) with four 2-SMT Zen3 cores (2SMT C) sharing a 32 MiB LLC.](../../img/other-tuning/Milan7313P.png){#fig:milan7313P width=90%}
 
 
 ## Monitoring & Control Tools
@@ -73,7 +73,7 @@ $ rdmsr -p 1 0xC0010201
 
 where `-p 1` refers to the hardware thread 1 and `0xC0010201` is the MSR to read (`PERF_CTR[0]`).
 
-In addition, there are specific banks of MSRs registers, belonging to _AMD64 Technology Platform Quality of Service Extensions_ (AMD QoSE) [@amd_qose] that are used to monitor and enforce limits on LLC allocation and memory _read_ bandwidth per thread.
+In addition, there are specific banks of MSRs registers, belonging to _AMD64 Technology Platform Quality of Service Extensions_ (AMD QoSE) [@QoSAMD] that are used to monitor and enforce limits on LLC allocation and memory _read_ bandwidth per thread.
 
 Specifically, to monitor LLC usage, first a resource management identifier (RMID), and a class of service (COS) are associated to a thread or group of threads[^2]. Then the monitoring identifier RMID and the event associated with the LLC monitoring (L3 Cache Occupancy Monitoring, `evtID 0x1`) are written to the `QM_EVTSEL` control register (MSR `0xC8D`). Finally, the `QM_CTR` register (MSR `0xC8E`) is read. For example, if we want to monitor the use of the LLC by the hardware thread 1:
 
@@ -106,7 +106,7 @@ Similarly, the memory _read_ bandwidth allocated to a thread can be limited. Thi
 
 ## Workload: SPEC CPU2017
 
-We use a subset of benchmarks from the SPEC CPU2017 suite[^4]. Specifically, we selected the 33 memory-intensive single-threaded applications suggested in [@0220135].
+We use a subset of benchmarks from the SPEC CPU2017 suite[^4]. Specifically, we selected the 33 memory-intensive single-threaded applications suggested in [@MemCharacterizationSPEC2006].
 These applications have been compiled with the version of GCC and the base flags specified by SPEC in the configuration file provided with the suite. Specifically, version 6.3.1 has been used, and the following options: `-g -O3 -march=native -fno-unsafe-math-optimizations -fno-tree-loop-vectorize`. `-DBIG_MEMORY` has been used for `deepsjeng` and `-m64` when required.
 SPEC CPU2017 contains a collection of industry-standardized performance benchmarks that stress the processor, memory subsystem and compiler. It is widely used to compare the performance of high-performance systems[^5]. It is also extensively used in computer architecture research. 
 
@@ -131,7 +131,7 @@ MPKI     L3PMCx04 / (PMCx0C0 / 1000)
 
 ------------------------------------
 
-Table: Metrics calculation from hardware counters [@amd_ppr][@amd_qose]. {#tbl:metrics}
+Table: Metrics calculation from hardware counters [@amd_ppr][@QoSAMD]. {#tbl:metrics}
 
 
 ## Performance vs. LLC Capacity
@@ -162,4 +162,4 @@ Higher bandwidth consumption may increase memory access latency, which in turn i
 [^4]: SPEC CPU® 2017 - [https://www.spec.org/cpu2017/](https://www.spec.org/cpu2017/).
 [^5]: SPEC CPU2017 Results: [https://www.spec.org/cpu2017/results/](https://www.spec.org/cpu2017/results/)
 [^6]: We use CPI instead of time per instruction since we assume that the CPU frequency does not change during the experiments.
-[^7]: AMD documentation [@amd_qose] rather uses the term L3 Cache Conversion Factor, which can be determined with the `cpuid` instruction.
+[^7]: AMD documentation [@QoSAMD] rather uses the term L3 Cache Conversion Factor, which can be determined with the `cpuid` instruction.
