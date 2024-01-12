@@ -45,6 +45,12 @@ The 7313P processor consists of four Core Complex Dies (CCDs) connected to each 
 
 Although there is a total of 128 MiB of LLC, the four cores of a CCX cannot store cache blocks in an LLC other than their own 32 MiB LLC (32 MiB/CCX x 4 CCX). Since we will be running single-threaded benchmarks, we can focus on a single CCX. The size of LLC in our experiments will vary from 0 Mib to 32 Mib with steps of 2 Mib.
 
+### Workload: SPEC CPU2017 {.unlisted .unnumbered}
+
+We use a subset of benchmarks from the SPEC CPU2017 suite[^4]. Specifically, we selected the 33 memory-intensive single-threaded applications suggested in [@MemCharacterizationSPEC2006]. These applications have been compiled with the version of GCC and the base flags specified by SPEC in the configuration file provided with the suite. Specifically, version 6.3.1 has been used, and the following options: `-g -O3 -march=native -fno-unsafe-math-optimizations -fno-tree-loop-vectorize`. `-DBIG_MEMORY` has been used for `deepsjeng` and `-m64` when required. SPEC CPU2017 contains a collection of industry-standardized performance benchmarks that stress the processor, memory subsystem and compiler. It is widely used to compare the performance of high-performance systems. It is also extensively used in computer architecture research. 
+
+The methodology is detailed in [@Navarro-Torres2023]. The code and the information necessary to reproduce the experiments can be found in the following public repository: <https://github.com/agusnt/BALANCER>.
+
 ### Controling and Monitoring LLC allocation {.unlisted .unnumbered}
 
 In addition, there are specific banks of MSRs registers, belonging to _AMD64 Technology Platform Quality of Service Extensions_ (AMD QoSE) [@QoSAMD] that are used to monitor and enforce limits on LLC allocation and memory _read_ bandwidth per thread.
@@ -75,12 +81,6 @@ $ wrmsr -p 1 0xC92 0x00FF
 ```
 
 Similarly, the memory _read_ bandwidth allocated to a thread can be limited. This is achieved by writing an unsigned integer to a specific MSR register, which sets a maximum read bandwidth in 1/8 GB/s increments.
-
-### Workload: SPEC CPU2017 {.unlisted .unnumbered}
-
-We use a subset of benchmarks from the SPEC CPU2017 suite[^4]. Specifically, we selected the 33 memory-intensive single-threaded applications suggested in [@MemCharacterizationSPEC2006]. These applications have been compiled with the version of GCC and the base flags specified by SPEC in the configuration file provided with the suite. Specifically, version 6.3.1 has been used, and the following options: `-g -O3 -march=native -fno-unsafe-math-optimizations -fno-tree-loop-vectorize`. `-DBIG_MEMORY` has been used for `deepsjeng` and `-m64` when required. SPEC CPU2017 contains a collection of industry-standardized performance benchmarks that stress the processor, memory subsystem and compiler. It is widely used to compare the performance of high-performance systems[^5]. It is also extensively used in computer architecture research. 
-
-The methodology is detailed in [@Navarro-Torres2023]. The code and the information necessary to reproduce the experiments can be found in the following public repository: <https://github.com/agusnt/BALANCER>.
 
 ### Metrics {.unlisted .unnumbered}
 
@@ -142,6 +142,5 @@ Higher bandwidth consumption may increase memory access latency, which in turn i
 [^2]: AMD64 Technology Platform Quality of Service Extensions.
 [^3]: Class Of Service (COS) in AMD terminology.
 [^4]: SPEC CPU® 2017 - [https://www.spec.org/cpu2017/](https://www.spec.org/cpu2017/).
-[^5]: SPEC CPU2017 Results: [https://www.spec.org/cpu2017/results/](https://www.spec.org/cpu2017/results/)
 [^6]: We use CPI instead of time per instruction since we assume that the CPU frequency does not change during the experiments.
 [^7]: AMD documentation [@QoSAMD] rather uses the term L3 Cache Conversion Factor, which can be determined with the `cpuid` instruction.
