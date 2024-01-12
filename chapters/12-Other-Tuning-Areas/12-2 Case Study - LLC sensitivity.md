@@ -45,7 +45,7 @@ The 7313P processor consists of four Core Complex Dies (CCDs) connected to each 
 
 Although there is a total of 128 MiB of LLC, the four cores of a CCX cannot store cache blocks in an LLC other than their own 32 MiB LLC (32 MiB/CCX x 4 CCX). Since we will be running single-threaded benchmarks, we can focus on a single CCX. The size of LLC in our experiments will vary from 0 Mib to 32 Mib with steps of 2 Mib.
 
-## Monitoring & Control Tools
+### Monitoring & Control Tools {.unlisted .unnumbered}
 
 To characterize the applications we use hardware counters. Hardware counters record events that occur during the execution of an application (see section {@sec:PMU}), for example, retired instructions, elapsed cycles, or misses experienced in the LLC. Hardware counters can be configured and read through the model-specific registers (MSR) [@amd_ppr]. The configuration consists of specifying the event to be monitored and how it will be monitored[^1]. In our system, this is done by writing to a `PERF_CTL[0-5]` register (MSR `0xC001020[0,2,4,6,8,A]`). The `PERF_CTR[0-5]` registers (MSR `0xC001020[1,3,5,7,9,B]`) are the counters associated to the previous control registers. For example, for counter 0 to register the number of instructions retired from an application running in thread 1, the following command is executed:
 
@@ -92,13 +92,13 @@ $ wrmsr -p 1 0xC92 0x00FF
 
 Similarly, the memory _read_ bandwidth allocated to a thread can be limited. This is achieved by writing an unsigned integer to a specific MSR register, which sets a maximum read bandwidth in 1/8 GB/s increments.
 
-## Workload: SPEC CPU2017
+### Workload: SPEC CPU2017 {.unlisted .unnumbered}
 
 We use a subset of benchmarks from the SPEC CPU2017 suite[^4]. Specifically, we selected the 33 memory-intensive single-threaded applications suggested in [@MemCharacterizationSPEC2006]. These applications have been compiled with the version of GCC and the base flags specified by SPEC in the configuration file provided with the suite. Specifically, version 6.3.1 has been used, and the following options: `-g -O3 -march=native -fno-unsafe-math-optimizations -fno-tree-loop-vectorize`. `-DBIG_MEMORY` has been used for `deepsjeng` and `-m64` when required. SPEC CPU2017 contains a collection of industry-standardized performance benchmarks that stress the processor, memory subsystem and compiler. It is widely used to compare the performance of high-performance systems[^5]. It is also extensively used in computer architecture research. 
 
 The methodology is detailed in [@Navarro-Torres2023]. The code and the information necessary to reproduce the experiments can be found in the following public repository: <https://github.com/agusnt/BALANCER>.
 
-## Metrics 
+### Metrics {.unlisted .unnumbered}
 
 The ultimate metric for quantifying the performance of an application is execution time. Other metrics, such as cache miss rates, are used to analyze the influence of the memory hierarchy on system performance. In our case, we will characterize applications with these three metrics: 1) CPI, cycles per instruction[^6], 2) DMPKI, demand misses in the LLC per thousand instructions, and 3) MPKI, total misses (demand + prefetch) in the LLC per thousand instructions.
 
@@ -117,7 +117,7 @@ MPKI     L3PMCx04 / (PMCx0C0 / 1000)
 
 Table: Metrics calculation from hardware counters [@amd_ppr][@QoSAMD]. {#tbl:metrics}
 
-## Performance vs. LLC Capacity
+### Performance vs. LLC Capacity {.unlisted .unnumbered}
 
 In this section we are going to characterize the behavior of applications *running alone* when their allocated space in the LLC changes from 0 to 32 MiB with 2 MiB steps.
 
