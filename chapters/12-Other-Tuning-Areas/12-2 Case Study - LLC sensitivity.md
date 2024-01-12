@@ -53,28 +53,20 @@ We use a subset of benchmarks from the SPEC CPU2017[^4] suite. SPEC CPU2017 cont
 
 Specifically, we selected the 33 memory-intensive single-threaded applications suggested in [@MemCharacterizationSPEC2006]. These applications have been compiled with GCC 6.3.1 and the following options: `-g -O3 -march=native -fno-unsafe-math-optimizations -fno-tree-loop-vectorize`, as specified by SPEC in the configuration file provided with the suite.
 
-### Controling and Monitoring LLC allocation {.unlisted .unnumbered}
+### Controlling and Monitoring LLC allocation {.unlisted .unnumbered}
 
-In addition, there are specific banks of MSRs registers, belonging to _AMD64 Technology Platform Quality of Service Extensions_ (AMD QoSE) [@QoSAMD] that are used to monitor and enforce limits on LLC allocation and memory _read_ bandwidth per thread.
-
-Specifically, to monitor LLC usage, first a resource management identifier (RMID), and a class of service (COS) are associated to a thread or group of threads[^2]. Then the monitoring identifier RMID and the event associated with the LLC monitoring (L3 Cache Occupancy Monitoring, `evtID 0x1`) are written to the `QM_EVTSEL` control register (MSR `0xC8D`). Finally, the `QM_CTR` register (MSR `0xC8E`) is read. For example, if we want to monitor the use of the LLC by the hardware thread 1:
+To monitor and enforce limits on LLC allocation and memory _read_ bandwidth, we will use _AMD64 Technology Platform Quality of Service Extensions_ [@QoSAMD]. Users can manage this QoS extension through the specific banks of MSR registers. First, a thread or a group of threads must be assigned a resource management identifier (RMID), and a class of service (COS) by writing to the `PQR_ASSOC` register (MSR 0xC8F). Here is a sample command for the hardware thread 1:
 
 ```bash
 # write PQR_ASSOC (MSR 0xC8F): RMID=1, COS=2 -> (COS << 32) + RMID
 $ wrmsr -p 1 0xC8F 0x200000001
-
-# write QM_EVTSEL (MSR 0xC8D): RMID=1, evtID=1 -> (RMID << 32) + evtID
-$ wrmsr -p 1 0xC8D 0x100000001
-
-# Read QM_CTR (MSR 0xC8E)
-$ rdmsr -p 1 0xC8E 
 ```
-
-To obtain the estimate of the LLC usage measured in bytes, we have to multiply the value returned by this reading by the cache line size.[^7]
 
 LLC space management is performed by writing to a 16-bit per-thread binary mask. Each bit of the mask allows a thread to use a given sixteenth fraction of the LLC (1/16 = 2 MiB in the case of the AMD Milan 7313P). Multiple threads can use the same fraction(s), implying a competitive shared use of the same subset of LLC.
 
-To set limits, assuming that there is already an assignment of RMID and COS to a thread (`wrmsr -p 1 0xC8F 0x200000001`), we have to write in the `L3_MASK_n` register, where `n` is the COS, the cache partitions that can be used by the corresponding COS. For example, to limit to thread 1 the available space in the LLC to half of the total space[^3]:
+To set limits on the LLC usage by thread 1, we need to write to the `L3_MASK_n` register, where `n` is the COS, the cache partitions that can be used by the corresponding COS. For example, to limit thread 1 to use only half of the available space in the LLC, run the following command:
+
+[TODO] do previous commands require root access?
 
 ```bash
 # this command requires root access
@@ -82,7 +74,18 @@ To set limits, assuming that there is already an assignment of RMID and COS to a
 $ wrmsr -p 1 0xC92 0x00FF
 ```
 
-Similarly, the memory _read_ bandwidth allocated to a thread can be limited. This is achieved by writing an unsigned integer to a specific MSR register, which sets a maximum read bandwidth in 1/8 GB/s increments.
+Now, to monitor the LLC usage by the hardware thread 1, first we need to associate the monitoring identifier RMID with the LLC monitoring event (L3 Cache Occupancy Monitoring, `evtID 0x1`). We do so by writing to the `QM_EVTSEL` control register (MSR `0xC8D`). After that we should read the `QM_CTR` register (MSR `0xC8E`):
+
+```bash
+# write QM_EVTSEL (MSR 0xC8D): RMID=1, evtID=1 -> (RMID << 32) + evtID
+$ wrmsr -p 1 0xC8D 0x100000001
+# Read QM_CTR (MSR 0xC8E)
+$ rdmsr -p 1 0xC8E 
+```
+
+This will give us the estimate of the LLC usage in cache lines. [^7] To convert this value to bytes, we need to multiply the value returned by the `rdmsr` command by the cache line size.
+
+Similarly, the memory read bandwidth allocated to a thread can be limited. This is achieved by writing an unsigned integer to a specific MSR register, which sets a maximum read bandwidth in 1/8 GB/s increments. Interested readers are welcome to read [@QoSAMD] for more details. 
 
 ### Metrics {.unlisted .unnumbered}
 
@@ -143,8 +146,6 @@ Higher bandwidth consumption may increase memory access latency, which in turn i
 \highlight{The MPKI metric allows quantifying the benefit associated with LLC occupancy more comprehensively than CPI or DMPKI, which are the commonly used metrics. The variation of CPI or DMPKI only reflects the benefit that affects the application itself, while MPKI additionally reflects the benefit that is achieved for the system.}
 
 [^1]: Preliminary Processor Programming Reference (PPR) for AMD Family 19h Model 01h, Revision B1 Processors, volume 1.
-[^2]: AMD64 Technology Platform Quality of Service Extensions.
-[^3]: Class Of Service (COS) in AMD terminology.
 [^4]: SPEC CPU® 2017 - [https://www.spec.org/cpu2017/](https://www.spec.org/cpu2017/).
 [^6]: We use CPI instead of time per instruction since we assume that the CPU frequency does not change during the experiments.
 [^7]: AMD documentation [@QoSAMD] rather uses the term L3 Cache Conversion Factor, which can be determined with the `cpuid` instruction.
