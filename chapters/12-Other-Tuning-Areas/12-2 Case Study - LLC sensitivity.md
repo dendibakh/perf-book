@@ -6,13 +6,11 @@ In this case study, we run the same set of applications multiple times with vary
 
 Our analysis will help us identify applications which performance drops significantly with decreasing the size of LLC. We say that such applications are sensitive to the size of LLC. Also, we identified applications that  are not sensitive, i.e., LLC size doesn't have impact on performance. This result can be applied to properly size the processor LLC, especially considering the wide range available on the market. For example, we can determine whether an application could benefit from a larger LLC, i.e., whether an investment in new hardware would be justified. Or conversely, if an application has enough with a tight cache size and therefore we can buy a cheaper processor.
 
-For this case study we use an AMD Milan processor, but other server processors such as Intel Xeon [@QoSXeon], ARM ThunderX [@QoSThunderX], also include hardware support for users to control the allocation of both LLC space and memory read bandwidth to processor threads.
+For this case study, we use an AMD Milan processor, but other server processors such as Intel Xeon [@QoSXeon], ARM ThunderX [@QoSThunderX], also include hardware support for users to control the allocation of both LLC space and memory read bandwidth to processor threads.
 
-### AMD Milan Core Organization
+### Target machine: AMD EPYC 7313P {.unlisted .unnumbered}
 
-AMD launched in 2021 its AMD EPYC 7003 Series Processors, a processor family targeting the high-performance server segment. These processors are composed of Zen 3 cores, code-named Milan [@amd_milan].
-
-For this study, we have used a server with a 16-core AMD EPYC 7313P processor. The main characteristics of this system are specified in table @tbl:experimental_setup.
+We have used a server system with a 16-core AMD EPYC 7313P processor, code-named Milan, which AMD launched in 2021. The main characteristics of this system are specified in table @tbl:experimental_setup.
 
 ----------------------------------------------------------------------------
  Feature               Value
@@ -43,9 +41,9 @@ For this study, we have used a server with a 16-core AMD EPYC 7313P processor. T
 
 Table: Main features of the server used in the experiments. {#tbl:experimental_setup}
 
-The 7313P processor consists of four Core Complex Dies (CCDs) connected to each other and to off-chip memory via an I/O chiplet (see figure @fig:milan7313P). Each CCD integrates a Core CompleX (CCX) and an I/O connection. In turn, each CCX has four Zen3 cores capable of executing eight threads that share a 32 MiB victim LLC, i.e., the LLC is filled with the cache blocks evicted from the four L2 caches of a CCX. Recent processors such as ARM Neoverse and Intel Skylake-SP also implement this mostly-exclusive content management. Although there is a total of 128 MiB of LLC, the four cores of a CCX cannot store cache blocks in an LLC other than their own 32 MiB LLC (32 MiB/CCX x 4 CCX).
+The 7313P processor consists of four Core Complex Dies (CCDs) connected to each other and to off-chip memory via an I/O chiplet. Each CCD integrates a Core CompleX (CCX) and an I/O connection. In turn, each CCX has four Zen3 cores capable of running eight threads that share a 32 MiB victim LLC, i.e., the LLC is filled with the cache blocks evicted from the four L2 caches of a CCX. 
 
-![AMD Milan 7313P clustered memory hierarchy. This processor is a multichip module with five dies: one I/O die and four Core Complex Dies (CCDs) with a total of 16 cores. On each CCD there is a Core CompleX (CCX) with four 2-SMT Zen3 cores (2SMT C) sharing a 32 MiB LLC.](../../img/other-tuning/Milan7313P.png){#fig:milan7313P width=90%}
+Although there is a total of 128 MiB of LLC, the four cores of a CCX cannot store cache blocks in an LLC other than their own 32 MiB LLC (32 MiB/CCX x 4 CCX). Since we will be running single-threaded benchmarks, we can focus on a single CCX. The size of LLC in our experiments will vary from 0 Mib to 32 Mib with steps of 2 Mib.
 
 ## Monitoring & Control Tools
 
