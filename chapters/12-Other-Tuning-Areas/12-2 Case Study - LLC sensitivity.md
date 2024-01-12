@@ -88,34 +88,7 @@ $ wrmsr -p 1 0xC8D 0x100000001
 $ rdmsr -p 1 0xC8E 
 ```
 
-To obtain the estimate of the LLC usage measured in bytes, we have to multiply the value returned by this reading by the L3 conversion factor. This factor is provided by the `cpuid` instruction, and in our system it is 64:
-
-```C
-#include <stdio.h>
-
-/* http://lxr.linux.no/#linux+v6.0.9/arch/x86/include/asm/processor.h#L216 */
-static inline void native_cpuid(unsigned int *eax, unsigned int *ebx,
-                                unsigned int *ecx, unsigned int *edx)
-{
-    /* ecx is often an input as well as an output. */
-    asm volatile("cpuid"
-        : "=a" (*eax),
-          "=b" (*ebx),
-          "=c" (*ecx),
-          "=d" (*edx)
-        : "0" (*eax), "2" (*ecx)
-        : "memory");
-}
-
-int main()
-{
-    unsigned int eax = 0, ebx = 0, ecx = 0, edx = 0;
-    eax = 0xF;
-    ecx = 0x1;
-    native_cpuid(&eax, &ebx, &ecx, &edx);
-    printf ("L3 cache conversion factor = %u\n", ebx);
-}
-```
+To obtain the estimate of the LLC usage measured in bytes, we have to multiply the value returned by this reading by the cache line size.[^7]
 
 LLC space management is performed by writing to a 16-bit per-thread binary mask. Each bit of the mask allows a thread to use a given sixteenth fraction of the LLC (1/16 = 2 MiB in the case of the AMD Milan 7313P). Multiple threads can use the same fraction(s), implying a competitive shared use of the same subset of LLC.
 
@@ -189,4 +162,4 @@ Higher bandwidth consumption may increase memory access latency, which in turn i
 [^4]: SPEC CPU® 2017 - [https://www.spec.org/cpu2017/](https://www.spec.org/cpu2017/).
 [^5]: SPEC CPU2017 Results: [https://www.spec.org/cpu2017/results/](https://www.spec.org/cpu2017/results/)
 [^6]: We use CPI instead of time per instruction since we assume that the CPU frequency does not change during the experiments.
-
+[^7]: AMD documentation [@amd_qose] rather uses the term L3 Cache Conversion Factor, which can be determined with the `cpuid` instruction.
