@@ -1,12 +1,10 @@
 ## Sensitivity to Last Level Cache {#sec:Sensitivity2LLC}
 
-Processors have an increasing number of cores and execution threads. For instance, AMD integrates up to 128 cores capable of executing 256 threads in its Genoa microarchitecture . 
-This trend causes shared resources such as last-level cache (LLC) and off-chip memory bandwidth to come under increased pressure. Therefore, they must be scaled and/or managed as best as possible.
+Processors have an increasing number of cores and execution threads. For instance, AMD integrates up to 128 cores capable of executing 256 threads in its Genoa microarchitecture. This trend causes shared resources such as last-level cache (LLC) and off-chip memory bandwidth to come under increased pressure. Therefore, they must be scaled and/or managed as best as possible.
 
 Recent commercial processors such as Intel Xeon [@QoSXeon], ARM ThunderX [@QoSThunderX], or AMD EPYC  include hardware support for users to control the allocation of both LLC space and memory bandwidth to processor threads. In this way, each thread can only use its allocated amount of shared resources, which helps to reduce interference with other threads.
 
 In this section we will characterize the shared cache usage of an AMD Milan processor running single-threaded memory intensive benchmarks of SPEC CPU2017. Our analysis will allow us to identify three different types of applications according to their use of the LLC. This result can be applied to properly size the processor LLC, especially considering the wide range available on the market. For example, we can determine whether an application could benefit from a larger LLC, i.e., whether an investment in new hardware would be justified. Or conversely, if an application has enough with a tight cache size and therefore we can buy a cheaper processor.
-
 
 ### AMD Milan Core Organization
 
@@ -43,21 +41,13 @@ For this study, we have used a server with a 16-core AMD EPYC 7313P processor. T
 
 Table: Main features of the server used in the experiments. {#tbl:experimental_setup}
 
-The 7313P processor consists of four Core Complex Dies (CCDs) connected to each other and to off-chip memory via an I/O chiplet (see figure @fig:milan7313P).
-Each CCD integrates a Core CompleX (CCX) and an I/O connection. In turn, each CCX has four Zen3 cores capable of executing eight threads that share a 32 MiB victim LLC, i.e., the LLC is filled with the cache blocks evicted from the four L2 caches of a CCX.
-Recent processors such as ARM Neoverse and Intel Skylake-SP also implement this mostly-exclusive content management.
-Although there is a total of 128 MiB of LLC, the four cores of a CCX cannot store cache blocks in an LLC other than their own 32 MiB LLC (32 MiB/CCX x 4 CCX).
+The 7313P processor consists of four Core Complex Dies (CCDs) connected to each other and to off-chip memory via an I/O chiplet (see figure @fig:milan7313P). Each CCD integrates a Core CompleX (CCX) and an I/O connection. In turn, each CCX has four Zen3 cores capable of executing eight threads that share a 32 MiB victim LLC, i.e., the LLC is filled with the cache blocks evicted from the four L2 caches of a CCX. Recent processors such as ARM Neoverse and Intel Skylake-SP also implement this mostly-exclusive content management. Although there is a total of 128 MiB of LLC, the four cores of a CCX cannot store cache blocks in an LLC other than their own 32 MiB LLC (32 MiB/CCX x 4 CCX).
 
 ![AMD Milan 7313P clustered memory hierarchy. This processor is a multichip module with five dies: one I/O die and four Core Complex Dies (CCDs) with a total of 16 cores. On each CCD there is a Core CompleX (CCX) with four 2-SMT Zen3 cores (2SMT C) sharing a 32 MiB LLC.](../../img/other-tuning/Milan7313P.png){#fig:milan7313P width=90%}
 
-
 ## Monitoring & Control Tools
 
-To characterize the applications we use hardware counters. 
-Hardware counters record events that occur during the execution of an application (see section {@sec:PMU}), for example, retired instructions, elapsed cycles, or misses experienced in the LLC. 
-Hardware counters can be configured and read through the model-specific registers (MSR) [@amd_ppr].
-The configuration consists of specifying the event to be monitored and how it will be monitored[^1]. In our system, this is done by writing to a `PERF_CTL[0-5]` register (MSR `0xC001020[0,2,4,6,8,A]`). The `PERF_CTR[0-5]` registers (MSR `0xC001020[1,3,5,7,9,B]`) are the counters associated to the previous control registers.
-For example, for counter 0 to register the number of instructions retired from an application running in thread 1, the following command is executed:
+To characterize the applications we use hardware counters. Hardware counters record events that occur during the execution of an application (see section {@sec:PMU}), for example, retired instructions, elapsed cycles, or misses experienced in the LLC. Hardware counters can be configured and read through the model-specific registers (MSR) [@amd_ppr]. The configuration consists of specifying the event to be monitored and how it will be monitored[^1]. In our system, this is done by writing to a `PERF_CTL[0-5]` register (MSR `0xC001020[0,2,4,6,8,A]`). The `PERF_CTR[0-5]` registers (MSR `0xC001020[1,3,5,7,9,B]`) are the counters associated to the previous control registers. For example, for counter 0 to register the number of instructions retired from an application running in thread 1, the following command is executed:
 
 ```bash
 $ wrmsr -p 1 0xC0010200 0x5100C0
@@ -92,8 +82,7 @@ To obtain the estimate of the LLC usage measured in bytes, we have to multiply t
 
 LLC space management is performed by writing to a 16-bit per-thread binary mask. Each bit of the mask allows a thread to use a given sixteenth fraction of the LLC (1/16 = 2 MiB in the case of the AMD Milan 7313P). Multiple threads can use the same fraction(s), implying a competitive shared use of the same subset of LLC.
 
-To set limits, assuming that there is already an assignment of RMID and COS to a thread (`wrmsr -p 1 0xC8F 0x200000001`), we have to write in the `L3_MASK_n` register, where `n` is the COS, the cache partitions that can be used by the corresponding COS.
-For example, to limit to thread 1 the available space in the LLC to half of the total space[^3]:
+To set limits, assuming that there is already an assignment of RMID and COS to a thread (`wrmsr -p 1 0xC8F 0x200000001`), we have to write in the `L3_MASK_n` register, where `n` is the COS, the cache partitions that can be used by the corresponding COS. For example, to limit to thread 1 the available space in the LLC to half of the total space[^3]:
 
 ```bash
 # this command requires root access
@@ -103,20 +92,15 @@ $ wrmsr -p 1 0xC92 0x00FF
 
 Similarly, the memory _read_ bandwidth allocated to a thread can be limited. This is achieved by writing an unsigned integer to a specific MSR register, which sets a maximum read bandwidth in 1/8 GB/s increments.
 
-
 ## Workload: SPEC CPU2017
 
-We use a subset of benchmarks from the SPEC CPU2017 suite[^4]. Specifically, we selected the 33 memory-intensive single-threaded applications suggested in [@MemCharacterizationSPEC2006].
-These applications have been compiled with the version of GCC and the base flags specified by SPEC in the configuration file provided with the suite. Specifically, version 6.3.1 has been used, and the following options: `-g -O3 -march=native -fno-unsafe-math-optimizations -fno-tree-loop-vectorize`. `-DBIG_MEMORY` has been used for `deepsjeng` and `-m64` when required.
-SPEC CPU2017 contains a collection of industry-standardized performance benchmarks that stress the processor, memory subsystem and compiler. It is widely used to compare the performance of high-performance systems[^5]. It is also extensively used in computer architecture research. 
+We use a subset of benchmarks from the SPEC CPU2017 suite[^4]. Specifically, we selected the 33 memory-intensive single-threaded applications suggested in [@MemCharacterizationSPEC2006]. These applications have been compiled with the version of GCC and the base flags specified by SPEC in the configuration file provided with the suite. Specifically, version 6.3.1 has been used, and the following options: `-g -O3 -march=native -fno-unsafe-math-optimizations -fno-tree-loop-vectorize`. `-DBIG_MEMORY` has been used for `deepsjeng` and `-m64` when required. SPEC CPU2017 contains a collection of industry-standardized performance benchmarks that stress the processor, memory subsystem and compiler. It is widely used to compare the performance of high-performance systems[^5]. It is also extensively used in computer architecture research. 
 
 The methodology is detailed in [@Navarro-Torres2023]. The code and the information necessary to reproduce the experiments can be found in the following public repository: <https://github.com/agusnt/BALANCER>.
-
 
 ## Metrics 
 
 The ultimate metric for quantifying the performance of an application is execution time. Other metrics, such as cache miss rates, are used to analyze the influence of the memory hierarchy on system performance. In our case, we will characterize applications with these three metrics: 1) CPI, cycles per instruction[^6], 2) DMPKI, demand misses in the LLC per thousand instructions, and 3) MPKI, total misses (demand + prefetch) in the LLC per thousand instructions.
-
 
 Table @tbl:metrics shows the formulas used to calculate each metric from specific hardware counters.
 
@@ -133,13 +117,11 @@ MPKI     L3PMCx04 / (PMCx0C0 / 1000)
 
 Table: Metrics calculation from hardware counters [@amd_ppr][@QoSAMD]. {#tbl:metrics}
 
-
 ## Performance vs. LLC Capacity
 
 In this section we are going to characterize the behavior of applications *running alone* when their allocated space in the LLC changes from 0 to 32 MiB with 2 MiB steps.
 
-Figure @fig:characterization_llc shows in graphs, from left to right, CPI, DMPKI and MPKI for each assigned LLC size.
-Three lines corresponding to `503.bwaves` (blue), `520.omnetpp` (green) and `554.roms` (red), representative of the three main trends observed in all applications, are represented in each graph.
+Figure @fig:characterization_llc shows in graphs, from left to right, CPI, DMPKI and MPKI for each assigned LLC size. Three lines corresponding to `503.bwaves` (blue), `520.omnetpp` (green) and `554.roms` (red), representative of the three main trends observed in all applications, are represented in each graph.
 
 ![CPI, DMPKI, and MPKI for increasing LLC allocation limits (2 MiB steps).](../../img/other-tuning/llc-bw.png){#fig:characterization_llc width=90%}
 
