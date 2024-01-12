@@ -49,8 +49,6 @@ Although there is a total of 128 MiB of LLC, the four cores of a CCX cannot stor
 
 We use a subset of benchmarks from the SPEC CPU2017[^4] suite. SPEC CPU2017 contains a collection of industry-standardized performance benchmarks that stress the processor, memory subsystem and compiler. It is widely used to compare the performance of high-performance systems. It is also extensively used in computer architecture research. 
 
-[TODO] 33 benchmarks? there are 10 INT and 14 FP components.
-
 Specifically, we selected the 33 memory-intensive single-threaded applications suggested in [@MemCharacterizationSPEC2006]. These applications have been compiled with GCC 6.3.1 and the following options: `-g -O3 -march=native -fno-unsafe-math-optimizations -fno-tree-loop-vectorize`, as specified by SPEC in the configuration file provided with the suite.
 
 ### Controlling and Monitoring LLC allocation {.unlisted .unnumbered}
@@ -65,8 +63,6 @@ $ wrmsr -p 1 0xC8F 0x200000001
 where `-p 1` refers to the hardware thread 1. LLC space management is performed by writing to a 16-bit per-thread binary mask. Each bit of the mask allows a thread to use a given sixteenth fraction of the LLC (1/16 = 2 MiB in the case of the AMD Milan 7313P). Multiple threads can use the same fraction(s), implying a competitive shared use of the same subset of LLC.
 
 To set limits on the LLC usage by thread 1, we need to write to the `L3_MASK_n` register, where `n` is the COS, the cache partitions that can be used by the corresponding COS. For example, to limit thread 1 to use only half of the available space in the LLC, run the following command:
-
-[TODO] do previous commands require root access?
 
 ```bash
 # this command requires root access
@@ -90,9 +86,6 @@ Similarly, the memory read bandwidth allocated to a thread can be limited. This 
 ### Metrics {.unlisted .unnumbered}
 
 The ultimate metric for quantifying the performance of an application is execution time. To analyze the impact of the memory hierarchy on system performance, we will also use the following three metrics: 1) CPI, cycles per instruction[^6], 2) DMPKI, demand misses in the LLC per thousand instructions, and 3) MPKI, total misses (demand + prefetch) in the LLC per thousand instructions. While CPI has direct correlation with performance of an application, DMPKI and MPKI do not necessary impact performance. Table @tbl:metrics shows the formulas used to calculate each metric from specific hardware counters. Detailed description for each of the counters is available in AMD's Processor Programming Reference [@amd_ppr].
-
-[TODO]: according to AMD's PPR, the L3 Miss counter is L3PMCx06, not L3PMCx04
-[TODO]: I'm looking at the AMD's PPR, and it's not clear to me why PMCx043 should be used in DMPKI formula. Isn't this counter about L1-d cache? It is described as "Demand Data Cache Fills by Data Source" in PPR.
 
 ------   ----------------------------------------------------------------------------
 Metric                                     Formula                   
@@ -125,8 +118,6 @@ We run a set of SPEC 2017 benchmarks *alone* in the system using only one instan
 ![CPI, DMPKI, and MPKI for increasing LLC allocation limits (2 MiB steps).](../../img/other-tuning/llc-bw.png){#fig:characterization_llc width=95%}
 
 Two behaviors can be distinguished in the CPI and DMPKI graphs. On one hand, `520.omnetpp` takes advantage of its available space in the LLC: both CPI and DMPKI decrease significantly as the space allocated in the LLC increases. We can say that the behavior of `520.omnetpp` is sensitive to the size available in the LLC. Increasing the allocated LLC space improves performance because it avoids evicting cache lines that will be used in the future.
-
-[TODO]: Do we have a chart for raw performance scores?
 
 In contrast, `503.bwaves` and `554.roms` don't make use of all available LLC space. For both benchmarks, CPI and DMPKI remain roughly constant as the allocation limit in the LLC grows. We would say that the performance of these two applications is insensitive to their available space in the LLC. If our applications show this behavior, we can select a processor with a smaller LLC size without sacrificing performance.
 
