@@ -47,9 +47,11 @@ Although there is a total of 128 MiB of LLC, the four cores of a CCX cannot stor
 
 ### Workload: SPEC CPU2017 {.unlisted .unnumbered}
 
-We use a subset of benchmarks from the SPEC CPU2017 suite[^4]. Specifically, we selected the 33 memory-intensive single-threaded applications suggested in [@MemCharacterizationSPEC2006]. These applications have been compiled with the version of GCC and the base flags specified by SPEC in the configuration file provided with the suite. Specifically, version 6.3.1 has been used, and the following options: `-g -O3 -march=native -fno-unsafe-math-optimizations -fno-tree-loop-vectorize`. `-DBIG_MEMORY` has been used for `deepsjeng` and `-m64` when required. SPEC CPU2017 contains a collection of industry-standardized performance benchmarks that stress the processor, memory subsystem and compiler. It is widely used to compare the performance of high-performance systems. It is also extensively used in computer architecture research. 
+We use a subset of benchmarks from the SPEC CPU2017[^4] suite. SPEC CPU2017 contains a collection of industry-standardized performance benchmarks that stress the processor, memory subsystem and compiler. It is widely used to compare the performance of high-performance systems. It is also extensively used in computer architecture research. 
 
-The methodology is detailed in [@Navarro-Torres2023]. The code and the information necessary to reproduce the experiments can be found in the following public repository: <https://github.com/agusnt/BALANCER>.
+[TODO] 33 benchmarks? there are 10 INT and 14 FP components.
+
+Specifically, we selected the 33 memory-intensive single-threaded applications suggested in [@MemCharacterizationSPEC2006]. These applications have been compiled with GCC 6.3.1 and the following options: `-g -O3 -march=native -fno-unsafe-math-optimizations -fno-tree-loop-vectorize`, as specified by SPEC in the configuration file provided with the suite.
 
 ### Controling and Monitoring LLC allocation {.unlisted .unnumbered}
 
@@ -116,6 +118,8 @@ MPKI     L3PMCx04 / (PMCx0C0 / 1000)
 ------------------------------------
 
 Table: Metrics calculation from hardware counters [@amd_ppr][@QoSAMD]. {#tbl:metrics}
+
+The methodology is detailed in [@Navarro-Torres2023]. The code and the information necessary to reproduce the experiments can be found in the following public repository: <https://github.com/agusnt/BALANCER>.
 
 ### Performance vs. LLC Capacity {.unlisted .unnumbered}
 
