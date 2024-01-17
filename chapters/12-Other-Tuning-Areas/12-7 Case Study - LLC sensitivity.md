@@ -53,7 +53,7 @@ Specifically, we selected 15 memory-intensive benchmarks from SPEC CPU2017 (6 IN
 
 ### Controlling and Monitoring LLC allocation {.unlisted .unnumbered}
 
-To monitor and enforce limits on LLC allocation and memory _read_ bandwidth, we will use _AMD64 Technology Platform Quality of Service Extensions_ [@QoSAMD]. Users can manage this QoS extension through the specific banks of MSR registers. First, a thread or a group of threads must be assigned a resource management identifier (RMID), and a class of service (COS) by writing to the `PQR_ASSOC` register (MSR `0xC8F`). Here is a sample command for the hardware thread 1:
+To monitor and enforce limits on LLC allocation and memory _read_ bandwidth, we will use _AMD64 Technology Platform Quality of Service Extensions_ [@QoSAMD]. Users can manage this QoS extension through the banks of model-specific registers (MSRs). First, a thread or a group of threads must be assigned a resource management identifier (RMID), and a class of service (COS) by writing to the `PQR_ASSOC` register (MSR `0xC8F`). Here is a sample command for the hardware thread 1:
 
 ```bash
 # write PQR_ASSOC (MSR 0xC8F): RMID=1, COS=2 -> (COS << 32) + RMID
@@ -96,13 +96,13 @@ CPI      Cycles not in Halt (PMCx076) / Retired Instructions (PMCx0C0)
 
 DMPKI    Demand Data Cache Fills (PMCx043) / (Retired Instructions (PMCx0C0) / 1000)
 
-MPKI     L3 Miss (L3PMCx04) / (Retired Instructions (PMCx0C0) / 1000)
+MPKI     L3 Miss[^8] (L3PMCx04) / (Retired Instructions (PMCx0C0) / 1000)
 
 ------   ----------------------------------------------------------------------------
 
 Table: Formulas for calculating metrics used in the case study. {#tbl:metrics}
 
-Hardware counters can be configured and read through the model-specific registers (MSR). The configuration consists of specifying the event to be monitored and how it will be monitored. In our system, this is done by writing to a `PERF_CTL[0-5]` control register (MSR `0xC001020[0,2,4,6,8,A]`). The `PERF_CTR[0-5]` registers (MSR `0xC001020[1,3,5,7,9,B]`) are the counters associated to the control registers. For example, for counter 0 to collect the number of instructions retired from an application running on hardware thread 1, the following commands are executed:
+Hardware counters can be configured and read through the MSRs. The configuration consists of specifying the event to be monitored and how it will be monitored. In our system, this is done by writing to a `PERF_CTL[0-5]` control register (MSR `0xC001020[0,2,4,6,8,A]`). The `PERF_CTR[0-5]` registers (MSR `0xC001020[1,3,5,7,9,B]`) are the counters associated to the control registers. For example, for counter 0 to collect the number of instructions retired from an application running on hardware thread 1, the following commands are executed:
 
 ```bash
 $ wrmsr -p 1 0xC0010200 0x5100C0
@@ -132,3 +132,4 @@ By looking at the the CPI and DMPKI, we initially thought that `554.roms` is ins
 [^4]: SPEC CPU® 2017 - [https://www.spec.org/cpu2017/](https://www.spec.org/cpu2017/).
 [^6]: We use CPI instead of time per instruction since we assume that the CPU frequency does not change during the experiments.
 [^7]: AMD documentation [@QoSAMD] rather uses the term L3 Cache Conversion Factor, which can be determined with the `cpuid` instruction.
+[^8]: We used a mask to count only L3 Misses, specifically, `L3Event[0x0300C00000400104]`.
