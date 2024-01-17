@@ -1,4 +1,4 @@
-name: build PDF
+name: build PDF on Windows
 
 on: 
   push:
