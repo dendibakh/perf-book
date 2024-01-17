@@ -1,4 +1,4 @@
-![Build PDF](https://github.com/dendibakh/perf-book/actions/workflows/build_pdf_linux.yml/badge.svg)
+![Build PDF Windows](https://github.com/dendibakh/perf-book/actions/workflows/build_pdf.yml/badge.svg) ![Build PDF Linux](https://github.com/dendibakh/perf-book/actions/workflows/build_pdf_linux.yml/badge.svg)
 
 # perf-book
 
