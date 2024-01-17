@@ -49,7 +49,7 @@ Although there is a total of 128 MiB of LLC, the four cores of a CCX cannot stor
 
 We use a subset of benchmarks from the SPEC CPU2017[^4] suite. SPEC CPU2017 contains a collection of industry-standardized performance benchmarks that stress the processor, memory subsystem and compiler. It is widely used to compare the performance of high-performance systems. It is also extensively used in computer architecture research. 
 
-Specifically, we selected the 33 memory-intensive single-threaded applications suggested in [@MemCharacterizationSPEC2006]. These applications have been compiled with GCC 6.3.1 and the following options: `-g -O3 -march=native -fno-unsafe-math-optimizations -fno-tree-loop-vectorize`, as specified by SPEC in the configuration file provided with the suite.
+Specifically, we selected 15 memory-intensive benchmarks from SPEC CPU2017 (6 INT and 9 FP) as suggested in [@MemCharacterizationSPEC2006]. These applications have been compiled with GCC 6.3.1 and the following compiler options: `-g -O3 -march=native -fno-unsafe-math-optimizations -fno-tree-loop-vectorize`, as specified by SPEC in the configuration file provided with the suite.
 
 ### Controlling and Monitoring LLC allocation {.unlisted .unnumbered}
 
@@ -60,7 +60,9 @@ To monitor and enforce limits on LLC allocation and memory _read_ bandwidth, we 
 $ wrmsr -p 1 0xC8F 0x200000001
 ```
 
-where `-p 1` refers to the hardware thread 1. LLC space management is performed by writing to a 16-bit per-thread binary mask. Each bit of the mask allows a thread to use a given sixteenth fraction of the LLC (1/16 = 2 MiB in the case of the AMD Milan 7313P). Multiple threads can use the same fraction(s), implying a competitive shared use of the same subset of LLC.
+where `-p 1` refers to the hardware thread 1. All `rdmsr` and `wrmsr` commands that we show require root access.
+
+LLC space management is performed by writing to a 16-bit per-thread binary mask. Each bit of the mask allows a thread to use a given sixteenth fraction of the LLC (1/16 = 2 MiB in the case of the AMD Milan 7313P). Multiple threads can use the same fraction(s), implying a competitive shared use of the same subset of LLC.
 
 To set limits on the LLC usage by thread 1, we need to write to the `L3_MASK_n` register, where `n` is the COS, the cache partitions that can be used by the corresponding COS. For example, to limit thread 1 to use only half of the available space in the LLC, run the following command:
 
