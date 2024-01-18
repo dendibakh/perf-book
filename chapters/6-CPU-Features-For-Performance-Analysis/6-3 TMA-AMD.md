@@ -13,3 +13,5 @@ $ AMDuProfPcm -X -m pipeline_util -A core -C -o /tmp/plutil.csv -- taskset -c 0 
 The report is captured in the CSV output file passed with `-o` option, which may look like the screenshot in @fig:AMD_TMA.
 
 ![The TMA breakdown for a matmul kernel generated with AMDuProfPcm. Topdown metrics are reported in % of slots.](../../img/pmu-features/AMD_TMA.png){#fig:AMD_TMA width=45%}
+
+[TODO]: describe the output, suggest next analysis steps.
