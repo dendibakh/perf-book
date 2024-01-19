@@ -2,7 +2,7 @@
 typora-root-url: ..\..\img
 ---
 
-## Loop Optimizations
+## Loop Optimizations {#sec:LoopOpts}
 
 Loops are at the heart of nearly all high performance programs. Since loops represent a piece of code that is executed a large number of times, they are where the majority of the execution time is spent. Small changes in such a critical piece of code may have a high impact on the performance of a program. That's why it is so important to carefully analyze the performance of hot loops in a program and know possible ways to improve them.
 
