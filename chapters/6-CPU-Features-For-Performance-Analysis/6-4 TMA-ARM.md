@@ -8,7 +8,7 @@ To demonstrate ARM's Topdown analysis on V1-based processor, we launched an AWS 
 
 We apply the Topdown methodology to [AI Benchmark Alpha](https://ai-benchmark.com/alpha.html),[^1] which is an open source python library for evaluating AI performance of various hardware platforms, including CPUs, GPUs and TPUs. The benchmark relies on TensorFlow machine learning library to measure inference and training speed for key Deep Learning models. In total, AI Benchmark Alpha consists of 42 tests, including classification, image segmentation, text translation, and others.
 
-ARM engineers have developed the [topdown-tool](https://learn.arm.com/install-guides/topdown-tool/)[^2] that we will use below. Similar to Intel's TMA, the ARM's methodology employs the "drill-down" concept, i.e. you first determine the high-level performance bottleneck and then drill down for a more nuanced root cause analysis. Here are the command we used:
+ARM engineers have developed the [topdown-tool](https://learn.arm.com/install-guides/topdown-tool/)[^2] that we will use below. The tool works both on Linux and Windows on ARM. On Linux, it utilizes a standard perf tool, while on Windows it uses [WindowsPerf](https://gitlab.com/Linaro/WindowsPerf/windowsperf)[^3], which  is a Windows on Arm performance profiling tool. Similar to Intel's TMA, the ARM's methodology employs the "drill-down" concept, i.e. you first determine the high-level performance bottleneck and then drill down for a more nuanced root cause analysis. Here are the command we used:
 
 ```bash
 $ topdown-tool --all-cpus -m Topdown_L1 -- python -c "from ai_benchmark import AIBenchmark; results = AIBenchmark(use_CPU=True).run()"
@@ -83,3 +83,4 @@ The AI Benchmark Alpha has various tests that could exhibit different performanc
 
 [^1]: AI Benchmark Alpha - [https://ai-benchmark.com/alpha.html](https://ai-benchmark.com/alpha.html)
 [^2]: ARM `topdown-tool` - [https://learn.arm.com/install-guides/topdown-tool/](https://learn.arm.com/install-guides/topdown-tool/)
+[^3]: WindowsPerf - [https://gitlab.com/Linaro/WindowsPerf/windowsperf](https://gitlab.com/Linaro/WindowsPerf/windowsperf)

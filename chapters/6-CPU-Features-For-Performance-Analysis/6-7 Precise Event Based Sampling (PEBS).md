@@ -30,21 +30,27 @@ For LBR, Linux perf dumps entire contents of LBR stack with every collected samp
 
 ### IBS on AMD Platforms
 
-Instruction-Based Sampling (IBS) is a AMD64 processor feature that can be used to collect specific metrics related to instruction fetch and instruction execution. The processor pipeline of an AMD processor consists of two separate phases: a front-end phase that fetches AMD64 instruction bytes and a back-end phase that executes `ops`. As the phases are logically separated, there are two independent sampling mechanisms: IBS Fetch and IBS Execute. 
+Instruction-Based Sampling (IBS) is an AMD64 processor feature that can be used to collect specific metrics related to instruction fetch and instruction execution. The processor pipeline of an AMD processor consists of two separate phases: a front-end phase that fetches AMD64 instruction bytes and a back-end phase that executes `ops`. As the phases are logically separated, there are two independent sampling mechanisms: IBS Fetch and IBS Execute. 
 
 - IBS Fetch monitors the front-end of the pipeline and provides information about ITLB (hit or miss), I-cache (hit or miss), fetch address, fetch latency and a few other things.
 - IBS Execute monitors the back-end of the pipeline and provides information about instruction execution behavior by tracking the execution of a single op. For example: branch (taken or not, predicted or not), load/store (hit or miss in D-caches and DTLB, linear address, load latency).
 
-There is a number of important differences between PMC and IBS in AMD processors. PMC counters are programmable, whereas IBS acts like fixed counters. IBS counters can only be enabled or disabled for monitoring, they can't be programmed to any selective events. IBS Fetch and Op counters can be enabled/disabled independently. With PMC, user has to decide what events to monitor ahead of time. With IBS, a rich set of data is collected for each sampled instruction and then it is up to the user to analyze parts of the data they are interested in. IBS selects and tags an instruction to be monitored and then captures microarchitectural events caused by this instruction during its execution.
+There is a number of important differences between PMC and IBS in AMD processors. PMC counters are programmable, whereas IBS acts like fixed counters. IBS counters can only be enabled or disabled for monitoring, they can't be programmed to any selective events. IBS Fetch and Execute counters can be enabled/disabled independently. With PMC, user has to decide what events to monitor ahead of time. With IBS, a rich set of data is collected for each sampled instruction and then it is up to the user to analyze parts of the data they are interested in. IBS selects and tags an instruction to be monitored and then captures microarchitectural events caused by this instruction during its execution. A more detailed comparison of Intel PEBS and AMD IBS can be found in [@ComparisonPEBSIBS].
 
-Since IBS is integrated into the processor pipeline and acts as a fixed event counter, the sample collection overhead on the processor is minimal. Profilers are required to process the IBS generated data, which could be huge in size depending upon sampling interval, number of threads configured, whether Fetch/Op configured, etc. Until Linux kernel version 6.1, IBS always collects samples for all the cores. This limitation causes huge data collection and processing overhead. From Kernel 6.2 onwards, Linux perf supports IBS sample collection only for the configured cores. And of course, IBS is supported by the AMD uProf profiler.
+Since IBS is integrated into the processor pipeline and acts as a fixed event counter, the sample collection overhead is minimal. Profilers are required to process the IBS generated data, which could be huge in size depending upon sampling interval, number of threads configured, whether Fetch/Execute configured, etc. Until Linux kernel version 6.1, IBS always collects samples for all the cores. This limitation causes huge data collection and processing overhead. From Kernel 6.2 onwards, Linux perf supports IBS sample collection only for the configured cores. 
 
-[TODO]: Add relevant Linux perf commands.
-[TODO]: show controls/filters for IBS collection.
-[TODO]: what will perf report show?
-[TODO]: How to parse IBS raw dumps?
+IBS is supported by Linux perf and the AMD uProf profiler. Here are sample commands to collect IBS Execute and Fetch samples:
 
-A more detailed comparison of Intel PEBS and AMD IBS can be found in [@ComparisonPEBSIBS].
+```bash
+$ perf record -a -e ibs_op/cnt_ctl=1,l3missonly=0/ -- benchmark.exe
+$ perf record -a -e ibs_fetch/l3missonly=1/ -- benchmark.exe
+$ perf report
+```
+
+where `cnt_ctl=0` counts clock cycles, `cnt_ctl=1` counts dispatched ops for an interval period; `l3missonly=1` only keeps the samples that had an L3 miss. Note that in both of the commands above, `-a` option is used to collect IBS samples for all cores, otherwise `perf` would fail to collect samples on Linux kernel 6.1. From the version 6.2 onwards, `-a` option is no longer needed unless you want to collect IBS samples for all cores. The `perf report` command will show samples attributed to functions and source code lines similar to regular PMU events but with added features that we will discuss later.
+
+[TODO]: Are these `cnt_ctl,l3missonly` IBS controls/filters the only ones that exist? Where are they documented?
+[TODO]: How do I parse IBS raw dumps in case I want to do custom analysis?
 
 ### SPE on ARM Platforms
 
@@ -66,7 +72,7 @@ $ spe-parser perf.data -t csv
 
 , where `<controls>` lets you optionally specify various controls and filters for the collection. `perf report` will give the usual output according to what user asked for with `<controls>` options. `spe-parser`[^5] is a tool developed by ARM engineers to parse the captured perf record data and save all the SPE records into a CSV file.
 
-[TODO]: SPE is only supported by Linux perf? What about Windows? - winPerf
+[TODO]: Is it possible to use SPE on Windows on ARM? Can `WindowsPerf` collect SPE data that can be parsed by `spe-parser`?
 
 ### Precise Events
 
@@ -96,20 +102,19 @@ MEM_LOAD_RETIRED.*      MEM_LOAD_L3_HIT_RETIRED.*
 
 , where `.*` means that all sub-events inside a group can be configured as precise events.
 
-Users of Linux `perf` on Intel platforms should add `pp` suffix to the event to enable precise tagging:
+Users of Linux `perf` on Intel platforms should add `pp` suffix to one of the events listed above to enable precise tagging:
 
 ```bash
 $ perf record -e cycles:pp -- ./a.exe
 ```
 
-[TODO]: show example of regular vs. precise events?
+[TODO]: For Denis: show example of regular vs. precise events?
 
-With AMD IBS and ARM SPE, all the collected samples are precise by design since the HW captures the exact instruction address. In fact, they work in a very similar fashion. Whenever an overflow occurs, the mechanism saves the instruction causing the overflow into a dedicated buffer which is then read by the interrupt handler. As the address is preserved, IBS and SPE samples attribution to the instructions are precise.
+With AMD IBS and ARM SPE, all the collected samples are precise by design since the HW captures the exact instruction address. In fact, they both work in a very similar fashion. Whenever an overflow occurs, the mechanism saves the instruction causing the overflow into a dedicated buffer which is then read by the interrupt handler. As the address is preserved, IBS and SPE samples attribution to the instructions are precise.
 
-[TODO]: What is the relevant IBS command?
 [TODO]: Does Linux perf on ARM supports `:p` suffixes?
 
-Precise events provide a relief for performance engineers. Also, the TMA methodology heavily relies on precise events to locate the exact line of source code where the inefficient execution takes place.
+Precise events provide a relief for performance engineers as they help to avoid misleading data that often confuses beginners and even senior developers. The TMA methodology heavily relies on precise events to locate the exact line of source code where the inefficient execution takes place.
 
 ### Analyzing Memory Accesses {#sec:sec_PEBS_DLA}
 
