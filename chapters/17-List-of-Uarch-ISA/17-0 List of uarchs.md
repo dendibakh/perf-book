@@ -27,7 +27,7 @@ Redwood Cove       RWC              2023         AVX2 / AVX512
 
 ---------------------------------------------------------------
 
-Table: List of the most recent Intel Core microarchitectures. {#tbl:IntelUarchs}
+Table: List of the recent Intel Core microarchitectures. {#tbl:IntelUarchs}
 
 ----------------------------------------------
     Name       Year released    Supported ISA
@@ -46,15 +46,12 @@ Streamroller       2014              AVX
 
 ----------------------------------------------
 
-Table: List of the most recent AMD microarchitectures. {#tbl:AMDUarchs}
+Table: List of the recent AMD microarchitectures. {#tbl:AMDUarchs}
 
 ------------------------------------------------------------------
-    ISA        Year released     ARM uarchs         Third-party
-                                  (latest)            uarchs
+    ISA        Year of ISA      ARM uarchs         Third-party
+                 release         (latest)            uarchs
 ------------  ---------------  --------------   ------------------
-  ARMv7-A          2005          Cortex-A17          Apple A6;
-  (32bit)                                       Quallcomm Scorpion
-
   ARMv8-A          2011          Cortex-A73        Apple A7-A10;
                                                   Quallcomm Kryo;
                                                  Samsung M1/M2/M3
@@ -66,18 +63,16 @@ Table: List of the most recent AMD microarchitectures. {#tbl:AMDUarchs}
  ARMv8.4-A         2017         Neoverse V1        AWS Graviton3;
                                                    Apple A13, M1
 
- ARMv9.0-A         2018         Neoverse N2;        NVIDIA Grace;
-(64bit-only)                    Neoverse V2;    Microsoft Cobalt 100
+ ARMv9.0-A         2018         Neoverse N2;    Microsoft Cobalt 100;
+(64bit-only)                    Neoverse V2;        NVIDIA Grace
                                  Cortex X3
 
- ARMv8.6-A         2019             ---           Apple A15,A16,M2
+ ARMv8.6-A         2019             ---          Apple A15, A16, M2, M3
 (64bit-only)
 
  ARMv9.2-A         2020          Cortex X4              ---
-
- ARMv9.4-A         2022             ---                 ---
 ------------------------------------------------------------------
 
-Table: List of ARM ISAs along with their own and third-party implementations. {#tbl:ARMUarchs}
+Table: List of recent ARM ISAs along with their own and third-party implementations. {#tbl:ARMUarchs}
 
 \bibliography{biblio}

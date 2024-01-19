@@ -85,7 +85,9 @@ with open(editTexFile, 'w') as g:
         prev = line
 
     startTableCPUFESummary = False
+    startTableARMsChip = False
     addTabularnewlineTableCPUFESummary = False
+    addTabularnewlineTableARMsChip = False
     for line in lines:
         # workaround for citations and bibliography
         if "\\usepackage[]{natbib}" in line:
@@ -103,6 +105,16 @@ with open(editTexFile, 'w') as g:
             if addTabularnewlineTableCPUFESummary and "\\end{longtable}" in line:
                 addTabularnewlineTableCPUFESummary = False
                 startTableCPUFESummary = False
+
+            if "\\caption{List of recent ARM ISAs along with their own and third-party" in line:
+                startTableARMsChip = True
+            if startTableARMsChip and "\\endhead" in line:
+                addTabularnewlineTableARMsChip = True
+            if addTabularnewlineTableARMsChip and "\\end{minipage}\\tabularnewline" in line:
+                line = line.replace("\\end{minipage}\\tabularnewline", "\\end{minipage}\\tabularnewline\\tabularnewline")                
+            if addTabularnewlineTableARMsChip and "\\end{longtable}" in line:
+                addTabularnewlineTableARMsChip = False
+                startTableARMsChip = False                
             
             # workaround for citations and bibliography
             if "\\citep" in line:
