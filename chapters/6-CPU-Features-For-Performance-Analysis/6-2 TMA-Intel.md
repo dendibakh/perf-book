@@ -12,7 +12,7 @@ The top two-levels of TMA metrics are expressed in the percentage of all pipelin
 
 The first step of TMA is to identify the performance bottleneck in the program. After we have done that, we need to know where exactly in the code it is happening. The second step in TMA is to locate the source of the problem down to the exact line of code and assembly instruction. The analysis methodology provides exact performance event that you should use for each category of the performance problem. Then you can sample on this event to find the line in the source code that contributes to the performance bottleneck identified by the first stage. Don't worry if this process sounds complicated to you, everything becomes clear once you read through the case study.
 
-#### Case Study: Reduce The Number of Cache Misses with TMA {.unlisted .unnumbered}
+### Case Study: Reduce The Number of Cache Misses with TMA {.unlisted .unnumbered}
 
 As an example for this case study, we took a very simple benchmark, such that it is easy to understand and change. It is obviously not representative of real-world applications, but it is good enough to demonstrate the workflow of TMA. We have a lot more practical examples in the second part of the book.
 
@@ -20,7 +20,7 @@ Most readers of this book will likely apply TMA to their own applications, with 
 
 We ran the experiments on the machine equipped with Intel Core i5-8259U CPU (Skylake based) and 16GB of DRAM (DDR4 2400 MT/s), running 64-bit Ubuntu 20.04 (kernel version 5.13.0-27).
 
-#### Step1: Identify the Bottleneck {.unlisted .unnumbered}
+### Step1: Identify the Bottleneck {.unlisted .unnumbered}
 
 As a first step, we run our microbenchmark and collect a limited set of events that will help us to calculate Level 1 metrics. Here, we try to identify high-level performance bottlenecks of our application by attributing them to the four L1 buckets: `Front End Bound`, `Back End Bound`, `Retiring`, `Bad Speculation`. It is possible to collect Level 1 metrics using Linux `perf` tool. As of Linux kernel 4.8, `perf` has an option `--topdown` used in `perf stat` command that prints TMA Level 1 metrics. Below is the breakdown for our benchmark. Command outputs in this section are trimmed to save space.
 
@@ -94,7 +94,7 @@ $ perf stat -e cycles,cycle_activity.stalls_l3_miss -- ./benchmark.exe
 
 The `CYCLE_ACTIVITY.STALLS_L3_MISS` event counts cycles when execution stalls, while the L3 cache miss demand load is outstanding. We can see that there are ~60% of such cycles, which is pretty bad.
 
-#### Step2: Locate the Place in the Code {.unlisted .unnumbered}
+### Step2: Locate the Place in the Code {.unlisted .unnumbered}
 
 As the second step in the TMA process, we locate the place in the code where the identified performance event occurs most frequently. To do so, one should sample the workload using an event that corresponds to the type of bottleneck that was identified during Step 1.
 
@@ -157,7 +157,7 @@ int main() {
 
 By looking at [@lst:TMA_asm], we can see that all L3-Cache misses in function `foo` are tagged to a single instruction. Now that we know which instruction caused so many L3 misses, let’s fix it. 
 
-#### Step3: Fix the Issue {.unlisted .unnumbered}
+### Step3: Fix the Issue {.unlisted .unnumbered}
 
 Remember that there is a dummy work emulated with NOPs in the beginning of the `foo` function. This creates a time window between the moment when we get the next address that will be accessed and the actual load instruction. The presence of this time windows gives us an opportunity to start prefetching the memory location in parallel with the dummy work. [@lst:TMA_prefetch] shows this idea in action. More information about explicit memory prefetching technique can be found in [@sec:memPrefetch].
 

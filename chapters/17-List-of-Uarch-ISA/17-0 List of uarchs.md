@@ -2,6 +2,8 @@
 
 \markright{List of the Major CPU Microarchitectures}
 
+[TODO]: add border lines in the tables below
+
 In the tables below we present the most recent ISAs and microarchitectures from Intel, AMD, and ARM-based vendors. Of course, not all the designs are listed here. We only include those that we reference in the book or if they represent a big transition in the evolution of the platform.
 
 ---------------------------------------------------------------
@@ -64,8 +66,8 @@ Table: List of the most recent AMD microarchitectures. {#tbl:AMDUarchs}
  ARMv8.4-A         2017         Neoverse V1        AWS Graviton3;
                                                    Apple A13, M1
 
- ARMv9.0-A         2018         Neoverse V2;        NVIDIA Grace
-(64bit-only)                    Neoverse N2;
+ ARMv9.0-A         2018         Neoverse N2;        NVIDIA Grace;
+(64bit-only)                    Neoverse V2;    Microsoft Cobalt 100
                                  Cortex X3
 
  ARMv8.6-A         2019             ---           Apple A15,A16,M2
