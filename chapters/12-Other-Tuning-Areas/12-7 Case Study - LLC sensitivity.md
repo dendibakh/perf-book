@@ -94,7 +94,7 @@ Metric                                     Formula
 ------   ----------------------------------------------------------------------------
 CPI      Cycles not in Halt (PMCx076) / Retired Instructions (PMCx0C0)
 
-DMPKI    Demand Data Cache Fills (PMCx043) / (Retired Instructions (PMCx0C0) / 1000)
+DMPKI    Demand Data Cache Fills[^9] (PMCx043) / (Retired Instructions (PMCx0C0) / 1000)
 
 MPKI     L3 Miss[^8] (L3PMCx04) / (Retired Instructions (PMCx0C0) / 1000)
 
@@ -133,3 +133,4 @@ By looking at the the CPI and DMPKI, we initially thought that `554.roms` is ins
 [^6]: We use CPI instead of time per instruction since we assume that the CPU frequency does not change during the experiments.
 [^7]: AMD documentation [@QoSAMD] rather uses the term L3 Cache Conversion Factor, which can be determined with the `cpuid` instruction.
 [^8]: We used a mask to count only L3 Misses, specifically, `L3Event[0x0300C00000400104]`.
+[^9]: We used subevents `MemIoRemote` and `MemIoLocal`, that count demand data cache fills from DRAM or IO connected in remote/local NUMA node.
