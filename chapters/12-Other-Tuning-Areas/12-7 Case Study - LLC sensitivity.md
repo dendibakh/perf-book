@@ -115,7 +115,9 @@ The methodology used in this case study is described in more details in [@Balanc
 
 ### Results {.unlisted .unnumbered}
 
-We run a set of SPEC 2017 benchmarks *alone* in the system using only one instance and a single hardware thread. We repeat those runs while changing available LLC size from 0 to 32 MiB with 2 MiB steps. Figure @fig:characterization_llc shows in graphs, from left to right, CPI, DMPKI and MPKI for each assigned LLC size. For the CPI chart, lower value on the Y-axis means better performance. For the DMPKI and MPKI charts, the lower value on the Y-axis, the better. Three lines corresponding to `503.bwaves` (solid), `520.omnetpp` (dotted) and `554.roms` (dashed), represents the three main trends observed in all applications. We do not show the rest of benchmarks.
+We run a set of SPEC 2017 benchmarks *alone* in the system using only one instance and a single hardware thread. We repeat those runs while changing available LLC size from 0 to 32 MiB with 2 MiB steps. Figure @fig:characterization_llc shows in graphs, from left to right, CPI, DMPKI and MPKI for each assigned LLC size. For the CPI chart, lower value on the Y-axis means better performance. Also, since the frequency on the system is fixed, the CPI chart is reflective of absolute scores. For example, `520.omnetpp` (dotted line) with 32 MiB LLC is 2.5 times faster than with 0 Mib LLC.
+
+For the DMPKI and MPKI charts, the lower value on the Y-axis, the better. Three lines corresponding to `503.bwaves` (solid), `520.omnetpp` (dotted) and `554.roms` (dashed), represents the three main trends observed in all applications. We do not show the rest of the benchmarks.
 
 ![CPI, DMPKI, and MPKI for increasing LLC allocation limits (2 MiB steps).](../../img/other-tuning/llc-bw.png){#fig:characterization_llc width=95%}
 
