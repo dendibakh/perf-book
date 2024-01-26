@@ -31,7 +31,7 @@ non-cold code 4KB-pages                 6614       546          104          61
 Frontend Bound, Alderlake-P [%]         52.3      29.4          5.3        25.8
 -------------------------------------------------------------------------------
 
-Table: Code Footprint of Four Benchmarks. {#tbl:code_footprint}
+Table: Code footprint of the benchmarks used in the case study. {#tbl:code_footprint}
 
 Let's first look at the binary and `.text` sizes. CloverLeaf is a tiny application compared to Clang17 and Blender; Stockfish embeds the neural network file which accounts for the largest part of the binary, but its code section is relatively small; Clang17 and Blender have gigantic code bases. The `.text size` metric is the upper bound for our applications, i.e. we assume[^3] the code footprint should not exceed `.text` size.
 
