@@ -2,7 +2,7 @@
 typora-root-url: ..\..\img
 ---
 
-# CPU Features for Performance Analysis {#sec:sec4}
+# CPU Features for Performance Analysis {#sec:PmuChapter}
 
 The ultimate goal of performance analysis is to identify performance bottlenecks and locate parts of the code that are associated with them. Unfortunately, there are no predetermined steps to follow, so it can be approached in many different ways. 
 
