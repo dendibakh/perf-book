@@ -1,5 +1,7 @@
 ## Case Study: Measuring Code Footprint
 
+[TODO]: define hot and non-cold code; maybe get rid of non-cold; also there is warm and cold code with a threshold.
+
 As we mentioned a couple of times in this chapter, code layout optimizations are most impactful on applications with large amounts of code. The best way to clarify the uncertainty about the size of the hot code in your program is to measure its *code footprint*, which we define as the number of bytes/cache lines/pages with machine instructions the program touches during its execution.
 
 A large code footprint by itself doesn't necessarily negatively impact performance. Code footprint is not a decisive metric, and it doesn't immediately tell you if there is a problem. Nevertheless, it has proven to be useful as an additional data point in performance analysis. In conjunction with TMA's `Frontend_Bound`, L1-instruction cache miss rate, and other metrics, it may strengthen the argument for investing time in optimizing the machine code layout of your application.
