@@ -4,16 +4,16 @@ typora-root-url: ..\..\img
 
 ## Micro-ops {#sec:sec_UOP}
 
-Microprocessors with the x86 architecture translate complex CISC-like instructions into simple RISC-like microoperations, abbreviated as $\mu$ops or $\mu$ops. A simple addition instruction such as `ADD rax, rbx` generates only one $\mu$op, while more complex instruction like `ADD rax, [mem]` may generate two: one for reading from `mem` memory location into a temporary (un-named) register, and one for adding it to the `rax` register. The instruction `ADD [mem], rax` generates three $\mu$ops: one for reading from memory, one for adding, and one for writing the result back to memory.
+Microprocessors with the x86 architecture translate complex CISC-like instructions into simple RISC-like microoperations, abbreviated as $\mu$ops or $\mu$ops. A simple addition instruction such as `ADD rax, rbx` generates only one $\mu$op, while a more complex instruction like `ADD rax, [mem]` may generate two: one for reading from the `mem` memory location into a temporary (un-named) register, and one for adding it to the `rax` register. The instruction `ADD [mem], rax` generates three $\mu$ops: one for reading from memory, one for adding, and one for writing the result back to memory.
 
 The main advantage of splitting instructions into micro operations is that $\mu$ops can be executed:
 
-* **Out of order**: consider `PUSH rbx` instruction, that decrements the stack pointer by 8 bytes and then stores the source operand on the top of the stack. Suppose that `PUSH rbx` is "cracked" into two dependent micro operations after decode:
+* **Out of order**: consider the `PUSH rbx` instruction, which decrements the stack pointer by 8 bytes and then stores the source operand on the top of the stack. Suppose that `PUSH rbx` is "cracked" into two dependent micro operations after decode:
   ```
   SUB rsp, 8
   STORE [rsp], rbx
   ```
-  Often, function prologue saves multiple registers using `PUSH` instructions. In our case, the next `PUSH` instruction can start executing after the `SUB` $\mu$op of the previous `PUSH` instruction finishes, and doesn't have to wait for the `STORE` $\mu$op, which can now go asynchronously.
+  Often, a function prologue saves multiple registers by using multiple `PUSH` instructions. In our case, the next `PUSH` instruction can start executing after the `SUB` $\mu$op of the previous `PUSH` instruction finishes, and doesn't have to wait for the `STORE` $\mu$op, which can now execute asynchronously.
 
 * **In parallel**: consider `HADDPD xmm1, xmm2` instruction, that will sum up (reduce) two double precision floating point values in both `xmm1` and `xmm2` and store two results in `xmm1` as follows: 
   ```
