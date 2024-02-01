@@ -1,17 +1,16 @@
-## Memory Profiling
+## Memory Profiling {#sec:MemoryProfiling}
 
-So far in this chapter, we have discussed a few techniques to optimize memory accesses in a particular piece of code. In this section, we will learn how to collect high-level information about a program's interaction with memory. This process is usually called *memory profiling*. Memory profiling allows you to understand how an application interacts with the memory over time. It helps you build the right mental model of a program's behavior and can sched light on many aspects of the execution, for example:
+So far in this chapter, we have discussed a few techniques to optimize memory accesses in a particular piece of code. In this section, we will learn how to collect high-level information about a program's interaction with memory. This process is usually called *memory profiling*. Memory profiling helps you understand how an application uses memory over time and helps you build the right mental model of a program's behavior. Here are some questions it can answer:
 
 * What is a program's total memory consumption and how it changes over time?
 * Where and when a program makes heap allocations?
-* What are the code places with the largest amount of allocated space?
+* What are the code places with the largest amount of allocated memory?
 * How much memory a program accesses every second?
-* And others.
 
-When developers talk about memory consumption, they implicitly mean heap usage. Heap is, in fact, the biggest memory consumer in most applications as it accomodates all dynamically allocated objects. For completeness, let's mention other memory consumers:
+When developers talk about memory consumption, they implicitly mean heap usage. Heap is, in fact, the biggest memory consumer in most applications as it accomodates all dynamically allocated objects. But heap is not the only memory consumer. For completeness, let's mention others:
 
-* Stack: Memory used by frame stacks in an application. Each application and each thread inside an application gets its own stack. Usually the stack size is only a few MB, and the application will crush if the limit is overflowed. The total stack memory consumption is proportional to the number of threads running in the system.
-* Code: Memory that is used to store the code (instructions) of an application and its libraries. In most cases it doesn't contribute much to the memory consumption but there are exceptions. For example, Clang C++ compiler and chrome have large codebases, and tens of MB code sections in their binaries.
+* Stack: Memory used by frame stacks in an application. Each thread inside an application gets its own stack memory space. Usually the stack size is only a few MB, and the application will crush if it exceeds the limit. The total stack memory consumption is proportional to the number of threads running in the system.
+* Code: Memory that is used to store the code (instructions) of an application and its libraries. In most cases it doesn't contribute much to the memory consumption but there are exceptions. For example, Clang C++ compiler and chrome have large codebases, and tens of MB code sections in their binaries. We show how to measure code footprint in [@sec:CodeFootprint].
 
 Next, we will introduce terms *memory usage* and *memory footprint* and see how to profile both.
 

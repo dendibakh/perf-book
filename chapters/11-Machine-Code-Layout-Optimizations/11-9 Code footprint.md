@@ -1,4 +1,4 @@
-## Case Study: Measuring Code Footprint
+## Case Study: Measuring Code Footprint {#sec:CodeFootprint}
 
 [TODO]: define hot and non-cold code; maybe get rid of non-cold; also there is warm and cold code with a threshold.
 
