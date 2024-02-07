@@ -15,7 +15,7 @@ The main advantage of splitting instructions into micro operations is that $\mu$
   ```
   Often, a function prologue saves multiple registers by using multiple `PUSH` instructions. In our case, the next `PUSH` instruction can start executing after the `SUB` $\mu$op of the previous `PUSH` instruction finishes, and doesn't have to wait for the `STORE` $\mu$op, which can now execute asynchronously.
 
-* **In parallel**: consider `HADDPD xmm1, xmm2` instruction, that will sum up (reduce) two double precision floating point values in both `xmm1` and `xmm2` and store two results in `xmm1` as follows: 
+* **In parallel**: consider `HADDPD xmm1, xmm2` instruction, which will sum up (reduce) two double precision floating point values in both `xmm1` and `xmm2` and store two results in `xmm1` as follows: 
   ```
   xmm1[63:0] = xmm2[127:64] + xmm2[63:0]
   xmm1[127:64] = xmm1[127:64] + xmm1[63:0]
@@ -38,9 +38,9 @@ Even though we were just talking about how instructions are split into smaller p
     dec rdi
     jnz .loop
   ```
-  With macrofusion, wwo $\mu$ops from `DEC` and `JNZ` instructions are fused into one.
+  With macrofusion, two $\mu$ops from the `DEC` and `JNZ` instructions are fused into one.
 
-Both Micro- and Macrofusion save bandwidth in all stages of the pipeline from decoding to retirement. The fused operations share a single entry in the reorder buffer (ROB). The capacity of the ROB is utilized better when a fused $\mu$op uses only one entry. Such fused ROB entry is later dispatched to two different execution ports but is retired again as a single unit. Readers can learn more about $\mu$op fusion in [@fogMicroarchitecture].
+Both micro- and macrofusion save bandwidth in all stages of the pipeline from decoding to retirement. The fused operations share a single entry in the reorder buffer (ROB). The capacity of the ROB is utilized better when a fused $\mu$op uses only one entry. Such a fused ROB entry is later dispatched to two different execution ports but is retired again as a single unit. Readers can learn more about $\mu$op fusion in [@fogMicroarchitecture].
 
 To collect the number of issued, executed, and retired $\mu$ops for an application, you can use Linux `perf` as follows:
 
@@ -51,6 +51,6 @@ $ perf stat -e uops_issued.any,uops_executed.thread,uops_retired.slots -- ./a.ex
   2557884  uops_retired.slots
 ```
 
-The way instructions are split into micro operations may vary across CPU generations. Usually, the lower number of $\mu$ops used for an instruction means that HW has a better support for it and is likely to have lower latency and higher throughput. For the latest Intel and AMD CPUs, the vast majority of instructions generate exactly one $\mu$op. Latency, throughput, port usage, and the number of $\mu$ops for x86 instructions on recent microarchitectures can be found at the [uops.info](https://uops.info/table.html)[^1] website.
+The way instructions are split into micro operations may vary across CPU generations. Usually, a lower number of $\mu$ops used for an instruction means that HW has better support for it and is likely to have lower latency and higher throughput. For the latest Intel and AMD CPUs, the vast majority of instructions generate exactly one $\mu$op. Latency, throughput, port usage, and the number of $\mu$ops for x86 instructions on recent microarchitectures can be found at the [uops.info](https://uops.info/table.html)[^1] website.
 
 [^1]: Instruction latency and Throughput - [https://uops.info/table.html](https://uops.info/table.html)
