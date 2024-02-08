@@ -1,5 +1,8 @@
 ![Build PDF Windows](https://github.com/dendibakh/perf-book/actions/workflows/build_pdf.yml/badge.svg) ![Build PDF Linux](https://github.com/dendibakh/perf-book/actions/workflows/build_pdf_linux.yml/badge.svg)
 
+[![X (formerly Twitter) Follow](https://img.shields.io/twitter/follow/dendibakh)](https://twitter.com/dendibakh)
+![GitHub Repo stars](https://img.shields.io/github/stars/dendibakh/perf-book)
+
 # perf-book
 
 This is a repository with source files of the book "Performance Analysis and Tuning on Modern CPU" by Denis Bakhvalov, et al.
