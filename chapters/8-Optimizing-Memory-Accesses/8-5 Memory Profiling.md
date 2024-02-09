@@ -187,7 +187,7 @@ Since a unit of memory accesses in a modern processor is cache line, we define t
 
 Figure @fig:ReuseDistanceHisto provides an exmaple of reuse distance histogram of a hypothetical program. Its X-axis is clustered in `log2` bins each scaled by 1000. Y-axis provides rate of occurence, i.e., how frequently we observed a certain reuse distance. Ideally, we would like to see all of the accesses in the first bin [0;1000], for both temporal and spatial reuses. For instance, for sequential access to a large array, we would see big temporal reuse distance (bad), but small spatial reuse distance (good). For a program that traverses a binary tree of 1000 elements (fits in L1 cache) many times, we would see relatively small temporal reuse distance (good), but big spatial reuse distance (bad). Random accesses to a large buffer represent both bad temporal and spatial locality. As a general rule, if a memory access has either a small temporal *or* spatial reuse distance, then it is likely to hit in CPU caches. Consequently, if an access has both big temporal *and* big spatial reuse distances, then it is likely to miss in CPU caches. 
 
-<div id="fig:LoopLayout">
+<div id="fig:TemporalSpatialReuse">
 ![Example of temporal and spatial reuse.](../../img/memory-access-opts/ReuseDistances.png){#fig:ReuseDistances width=50%}
 ![Example of a reuse distance histogram. X-axis is the reuse distance, Y-axis is the rate of occurence.](../../img/memory-access-opts/ReuseDistanceHisto.png){#fig:ReuseDistanceHisto width=45%}
 
