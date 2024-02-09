@@ -171,7 +171,7 @@ Blender benchmark is very stable; we can clearly see the start and the end of ea
 
 There could still be some confusion about instructions as a measure of time, so let us address that. You can approximately convert the timeline from instructions to seconds if you know the IPC of the workload and the frequency at which a processor was running. For instance, at IPC=1 and processor frequency of 4GHz, 1B instructions run in 250 milliseconds, at IPC=2, 1B instructions run in 125 ms, and so on. This way, you can convert X-axis of a memory footprint chart from instructions to seconds. But keep in mind, that it will be accurate only if the workload has steady IPC and the frequency of the CPU doesn't change while the workload is running.
 
-### Limitations and Future Research
+### Limitations and Future Work
 
 As you have seen from the previous case studies, there is a lot of information you can extract using modern memory profiling tools. Still, there are limitations which we will discuss next.
 
@@ -181,16 +181,24 @@ However, even this information is not enough to fully assess temporal locality o
 
 Also, none of the memory profiling methods we discussed so far gave us insights into spatial locality of a program. Memory usage and memory footprint only tell us how much memory was accessed, but we don't know whether those accesses were sequential, strided or completely random. We need a better approach.
 
-The topic of temporal and spatial locality of applications has been researched for a long time, unfortunately, as of early 2024, there are no production-quality tools available that would support such analysis. The central metric in measuring data locality of a program is *reuse distance*, which is the number of unique memory locations that are accessed between two consecutive accesses to a particular memory location. Reuse distance shows the likelihood of a cache hit for a memory access in a typical least-recently used (LRU) cache. If the reuse distance of a memory access is larger than the cache size, then the latter access (reuse) is likely to cause a cache miss.
+The topic of temporal and spatial locality of applications has been researched for a long time, unfortunately, as of early 2024, there are no production-quality tools available that would give us such information. The central metric in measuring data locality of a program is *reuse distance*, which is the number of unique memory locations that are accessed between two consecutive accesses to a particular memory location. Reuse distance shows the likelihood of a cache hit for a memory access in a typical least-recently used (LRU) cache. If the reuse distance of a memory access is larger than the cache size, then the latter access (reuse) is likely to cause a cache miss.
 
-Since a unit of memory accesses in a modern processor is cache line, we define two additional terms: *temporal reuse* happens when both use and reuse access exactly the same address, while a *spatial reuse* occurs when its use and reuse access different addresses that are located in the same cache line. Consider a sequence of memory accesses shown in Figure @fig:ReuseDistances: `a1,b1,e1,b2,c1,d1,a2`, where locations `a`, `b`, and `c` occupy the same cache line, and locations `d` and `e` reside on the subsequent cache line. In this example, the temporal reuse distance of access `a2` is four, because there are four unique locations accessed between the two consecutive accesses to `a`, namely, `b`, `c`, `d`, and `e`. Access `d1` is not a temporal reuse, however, it is a spatial reuse since we previously accessed location `e`, which resides on the same cache line as `d`. The spatial reuse distance of access `d1` is two.
+Since a unit of memory accesses in a modern processor is cache line, we define two additional terms: *temporal reuse* happens when both use and reuse access exactly the same address, *spatial reuse* occurs when its use and reuse access different addresses that are located in the same cache line. Consider a sequence of memory accesses shown in Figure @fig:ReuseDistances: `a1,b1,e1,b2,c1,d1,a2`, where locations `a`, `b`, and `c` occupy cache line `N`, and locations `d` and `e` reside on subsequent cache line `N+1`. In this example, the temporal reuse distance of access `a2` is four, because there are four unique locations accessed between the two consecutive accesses to `a`, namely, `b`, `c`, `d`, and `e`. Access `d1` is not a temporal reuse, however, it is a spatial reuse since we previously accessed location `e`, which resides on the same cache line as `d`. The spatial reuse distance of access `d1` is two.
 
 ![Reuse Distance](../../img/memory-access-opts/ReuseDistances.png){#fig:ReuseDistances width=60%}
 
-[TODO]: Describe how tracking reuse distances could help in performance analysis.
+A number of tools were developed during the years that attempt to analyze temporal and spatial locality of programs. Here are the three most recent tools along with their short description and current state:
 
-[TODO]: Describe the modern tools
-[TODO]: give pointers 
+- **loca**, a reuse distance analysis tool implemented using PIN binary-instrumentation tool. It prints reuse distance histograms for an entire program, however it can't provide a similar breakdown for individual loads. Since it uses dynamic binary instrumentation, it incurs huge runtime (~50x) and memory (~40x) overheads, which makes the tool impractical to use in real-life applications. The tool is no longer maintained, and requires some source code modifications to get it working on newer platforms. Github URL: [https://github.com/dcompiler/loca](https://github.com/dcompiler/loca); paper: [@LocaPaper].
+- **RDX**, utilizes hardware performance counter sampling with hardware debug registers to produce reuse-distance histograms. In contrast to `loca`, it incurrs an order of magnitude smaller overhead while maintaining 90% acuracy. The tool is no longer maintained and there is almost no documentation on how to use the tool. [@RDXpaper]
+- **ReuseTracker**, is built upon `RDX`, but it extends it by taking cache-coherence and cache line invalidation effects into account. Using this tool we were able to produce meaningful results on a small program, however, it is not production quality yet and is not easy to use. Github URL: [https://github.com/ParCoreLab/ReuseTracker](https://github.com/ParCoreLab/ReuseTracker); paper: [@ReuseTrackerPaper].
+
+
+
+Aggregating reuse distances for all memory accesses in a program may be useful in some cases, but future profiling tools should also be able to provide reuse distance histograms for individual loads. Once an engineer found a problematic load or store by traditional sampling approach, it should be able to request a temporal and spatial reuse distance histogram for that memory operation. Perhaps, it should be a separate collection since it may involve a bigger overhead.
+
+
+[TODO]: Describe how tracking reuse distances could help in performance analysis.
 
 [TODO]: Conclusion from Aditya:
 I think people do need temporal and spatial locality information for purposes such as predicting cache misses and deciding code transformations. However, the reason why there are fewer memory profilers supporting locality measurement is probably the difficulty to implement it and the overhead it might introduce. To measure data locality, the profiler needs to read the accessed memory addresses one by one and check if there is an exact match among the addresses or the cache lines. If using binary instrumentation, the overhead will be huge as each memory operation has to be intercepted. So this overhead and practicality problem might discourage developers of profilers from adding this feature.

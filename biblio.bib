@@ -691,4 +691,53 @@ doi = {10.1145/2858792}
   url          = {https://doi.org/10.1007/s11227-023-05070-0}
 }
 
+@article{ReuseTrackerPaper,
+  author = {Sasongko, Muhammad Aditya and Chabbi, Milind and Marzijarani, Mandana Bagheri and Unat, Didem},
+  title = {ReuseTracker: Fast Yet Accurate Multicore Reuse Distance Analyzer},
+  year = {2021},
+  issue_date = {March 2022},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  volume = {19},
+  number = {1},
+  issn = {1544-3566},
+  url = {https://doi.org/10.1145/3484199},
+  doi = {10.1145/3484199},
+  abstract = {One widely used metric that measures data locality is reuse distance—the number of unique memory locations that are accessed between two consecutive accesses to a particular memory location. State-of-the-art techniques that measure reuse distance in parallel applications rely on simulators or binary instrumentation tools that incur large performance and memory overheads. Moreover, the existing sampling-based tools are limited to measuring reuse distances of a single thread and discard interactions among threads in multi-threaded programs. In this work, we propose ReuseTracker—a fast and accurate reuse distance analyzer that leverages existing hardware features in commodity CPUs. ReuseTracker is designed for multi-threaded programs and takes cache-coherence effects into account. By utilizing hardware features like performance monitoring units and debug registers, ReuseTracker can accurately profile reuse distance in parallel applications with much lower overheads than existing tools. It introduces only 2.9\texttimes{} runtime and 2.8\texttimes{} memory overheads. Our tool achieves 92\% accuracy when verified against a newly developed configurable benchmark that can generate a variety of different reuse distance patterns. We demonstrate the tool’s functionality with two use-case scenarios using PARSEC, Rodinia, and Synchrobench benchmark suites where ReuseTracker guides code refactoring in these benchmarks by detecting spatial reuses in shared caches that are also false sharing and successfully predicts whether some benchmarks in these suites can benefit from adjacent cache line prefetch optimization.},
+  journal = {ACM Trans. Archit. Code Optim.},
+  month = {dec},
+  articleno = {3},
+  numpages = {25},
+  keywords = {address sampling, debug registers, hardware performance counters, Reuse distance}
+}
+
+@INPROCEEDINGS{RDXpaper,
+  author={Wang, Qingsen and Liu, Xu and Chabbi, Milind},
+  booktitle={2019 IEEE International Symposium on High Performance Computer Architecture (HPCA)}, 
+  title={Featherlight Reuse-Distance Measurement}, 
+  year={2019},
+  volume={},
+  number={},
+  pages={440-453},
+  keywords={Phasor measurement units;Registers;Histograms;Hardware;Instruments;Monitoring;Tools;reuse distance;locality;hardware performance counters;debug registers;profiling},
+  doi={10.1109/HPCA.2019.00056}
+}
+
+@inproceedings{LocaPaper,
+  author = {Xiang, Xiaoya and Ding, Chen and Luo, Hao and Bao, Bin},
+  title = {HOTL: a higher order theory of locality},
+  year = {2013},
+  isbn = {9781450318709},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  url = {https://doi.org/10.1145/2451116.2451153},
+  doi = {10.1145/2451116.2451153},
+  booktitle = {Proceedings of the Eighteenth International Conference on Architectural Support for Programming Languages and Operating Systems},
+  pages = {343–356},
+  numpages = {14},
+  keywords = {locality modeling, locality metrics},
+  location = {Houston, Texas, USA},
+  series = {ASPLOS '13}
+}
+
 @Comment{jabref-meta: databaseType:bibtex;}
