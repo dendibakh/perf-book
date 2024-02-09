@@ -41,9 +41,11 @@ We have used a server system with a 16-core AMD EPYC 7313P processor, code-named
 
 Table: Main features of the server used in the experiments. {#tbl:experimental_setup}
 
-The 7313P processor consists of four Core Complex Dies (CCDs) connected to each other and to off-chip memory via an I/O chiplet. Each CCD integrates a Core CompleX (CCX) and an I/O connection. In turn, each CCX has four Zen3 cores capable of running eight threads that share a 32 MiB victim LLC, i.e., the LLC is filled with the cache blocks evicted from the four L2 caches of a CCX. 
+Figure @fig:milan7313P shows clustered memory hierarchy of AMD Milan 7313P processor. It consists of four Core Complex Dies (CCDs) connected to each other and to off-chip memory via an I/O chiplet. Each CCD integrates a Core CompleX (CCX) and an I/O connection. In turn, each CCX has four Zen3 cores capable of running eight threads that share a 32 MiB victim LLC, i.e., the LLC is filled with the cache lines evicted from the four L2 caches of a CCX. 
 
-Although there is a total of 128 MiB of LLC, the four cores of a CCX cannot store cache blocks in an LLC other than their own 32 MiB LLC (32 MiB/CCX x 4 CCX). Since we will be running single-threaded benchmarks, we can focus on a single CCX. The size of LLC in our experiments will vary from 0 to 32 Mib with steps of 2 Mib.
+![Clustered memory hierarchy of AMD Milan 7313P processor.](../../img/other-tuning/Milan7313P.png){#fig:milan7313P width=80%}
+
+Although there is a total of 128 MiB of LLC, the four cores of a CCX cannot store cache lines in an LLC other than their own 32 MiB LLC (32 MiB/CCX x 4 CCX). Since we will be running single-threaded benchmarks, we can focus on a single CCX. The size of LLC in our experiments will vary from 0 to 32 Mib with steps of 2 Mib.
 
 ### Workload: SPEC CPU2017 {.unlisted .unnumbered}
 
