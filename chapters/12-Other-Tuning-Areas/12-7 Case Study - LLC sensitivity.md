@@ -1,10 +1,10 @@
-## Case Study: Sensitivity to Last Level Cache {#sec:Sensitivity2LLC}
+## Case Study: Sensitivity to Last Level Cache Size {#sec:Sensitivity2LLC}
 
-The goal of this case study is to show how you can determine whether an applicatoin is sensitive to the size of last-level cache (LLC). Using this information, you can make educated decisions when buying HW components for your computing systems. In a similar manner, you can later determine sensitivity to other factors, such as memory bandwidth, core count, processor frequency, etc., and perhaps buy less expensive computers while maintaining the same level of performance.
+The goal of this case study is to show how you can determine whether an application is sensitive to the size of last-level cache (LLC). Using this information, you can make educated decisions when buying HW components for your computing systems. In a similar manner, you can later determine sensitivity to other factors, such as memory bandwidth, core count, processor frequency, etc., and perhaps buy less expensive computers while maintaining the same level of performance.
 
 In this case study, we run the same set of applications multiple times with varying LLC sizes. Modern server processors let users control the allocation of LLC space to processor threads. In this way, a user can limit each thread to only use its allocated amount of shared resources. Such facilities are often called Quality of Service (QoS) extensions. They can be used to prioritize performance-critical applications and to reduce interference with other threads in the same system. Besides LLC allocation, QoS extensions support limiting memory read bandwidth.
 
-Our analysis will help us identify applications which performance drops significantly with decreasing the size of LLC. We say that such applications are sensitive to the size of LLC. Also, we identified applications that  are not sensitive, i.e., LLC size doesn't have impact on performance. This result can be applied to properly size the processor LLC, especially considering the wide range available on the market. For example, we can determine whether an application could benefit from a larger LLC, i.e., whether an investment in new hardware would be justified. Or conversely, if an application has enough with a tight cache size and therefore we can buy a cheaper processor.
+Our analysis will help us identify applications whose performance drops significantly when decreasing the size of LLC. We say that such applications are sensitive to the size of LLC. Also, we identified applications that  are not sensitive, i.e., LLC size doesn't have impact on performance. This result can be applied to properly size the processor LLC, especially considering the wide range available on the market. For example, we can determine whether an application could benefit from a larger LLC, i.e., whether an investment in new hardware would be justified. Or conversely, if an application has enough with a tight cache size and therefore we can buy a cheaper processor.
 
 For this case study, we use an AMD Milan processor, but other server processors such as Intel Xeon [@QoSXeon], ARM ThunderX [@QoSThunderX], also include hardware support for users to control the allocation of both LLC space and memory read bandwidth to processor threads.
 
@@ -47,7 +47,7 @@ Although there is a total of 128 MiB of LLC, the four cores of a CCX cannot stor
 
 ### Workload: SPEC CPU2017 {.unlisted .unnumbered}
 
-We use a subset of benchmarks from the SPEC CPU2017[^4] suite. SPEC CPU2017 contains a collection of industry-standardized performance benchmarks that stress the processor, memory subsystem and compiler. It is widely used to compare the performance of high-performance systems. It is also extensively used in computer architecture research. 
+We use a subset of benchmarks from the SPEC CPU2017 suite[^4]. SPEC CPU2017 contains a collection of industry-standardized performance benchmarks that stress the processor, memory subsystem and compiler. It is widely used to compare the performance of high-performance systems. It is also extensively used in computer architecture research. 
 
 Specifically, we selected 15 memory-intensive benchmarks from SPEC CPU2017 (6 INT and 9 FP) as suggested in [@MemCharacterizationSPEC2006]. These applications have been compiled with GCC 6.3.1 and the following compiler options: `-g -O3 -march=native -fno-unsafe-math-optimizations -fno-tree-loop-vectorize`, as specified by SPEC in the configuration file provided with the suite.
 
@@ -67,7 +67,6 @@ LLC space management is performed by writing to a 16-bit per-thread binary mask.
 To set limits on the LLC usage by thread 1, we need to write to the `L3_MASK_n` register, where `n` is the COS, the cache partitions that can be used by the corresponding COS. For example, to limit thread 1 to use only half of the available space in the LLC, run the following command:
 
 ```bash
-# this command requires root access
 # write L3_MASK_2 (MSR 0xC92): 0x00FF (half of the LLC space)
 $ wrmsr -p 1 0xC92 0x00FF
 ```
@@ -81,7 +80,7 @@ $ wrmsr -p 1 0xC8D 0x100000001
 $ rdmsr -p 1 0xC8E 
 ```
 
-This will give us the estimate of the LLC usage in cache lines. [^7] To convert this value to bytes, we need to multiply the value returned by the `rdmsr` command by the cache line size.
+This will give us the estimate of the LLC usage in cache lines[^7]. To convert this value to bytes, we need to multiply the value returned by the `rdmsr` command by the cache line size.
 
 Similarly, the memory read bandwidth allocated to a thread can be limited. This is achieved by writing an unsigned integer to a specific MSR register, which sets a maximum read bandwidth in 1/8 GB/s increments. Interested readers are welcome to read [@QoSAMD] for more details. 
 
@@ -96,13 +95,13 @@ CPI      Cycles not in Halt (PMCx076) / Retired Instructions (PMCx0C0)
 
 DMPKI    Demand Data Cache Fills[^9] (PMCx043) / (Retired Instructions (PMCx0C0) / 1000)
 
-MPKI     L3 Miss[^8] (L3PMCx04) / (Retired Instructions (PMCx0C0) / 1000)
+MPKI     L3 Misses[^8] (L3PMCx04) / (Retired Instructions (PMCx0C0) / 1000)
 
 ------   ----------------------------------------------------------------------------
 
 Table: Formulas for calculating metrics used in the case study. {#tbl:metrics}
 
-Hardware counters can be configured and read through the MSRs. The configuration consists of specifying the event to be monitored and how it will be monitored. In our system, this is done by writing to a `PERF_CTL[0-5]` control register (MSR `0xC001020[0,2,4,6,8,A]`). The `PERF_CTR[0-5]` registers (MSR `0xC001020[1,3,5,7,9,B]`) are the counters associated to the control registers. For example, for counter 0 to collect the number of instructions retired from an application running on hardware thread 1, the following commands are executed:
+Hardware counters can be configured and read through the MSRs. The configuration consists of specifying the event to be monitored and how it will be monitored. In our system, there are six core counters per thread, six counters per L3-CCX and four data fabric counters. Access to a core event is done by writing to a `PERF_CTL[0-5]` control register (MSR `0xC001020[0,2,4,6,8,A]`). The `PERF_CTR[0-5]` registers (MSR `0xC001020[1,3,5,7,9,B]`) are the counters associated to these control registers. For example, for counter 0 to collect the number of instructions retired from an application running on hardware thread 1, the following commands are executed:
 
 ```bash
 $ wrmsr -p 1 0xC0010200 0x5100C0
@@ -111,11 +110,13 @@ $ rdmsr -p 1 0xC0010201
 
 where `-p 1` refers to the hardware thread 1, `0xC0010200` is the MSR for the control of counter 0 (`PERF_CTL[0]`), and `0x5100C0` specifies the identifier of the event to be measured (retired instructions, `PMCx0C0`) and the way in which it will be measured (user events). Once the configuration with `wrmsr` is done, the `rdmsr` command can be used to read the counter 0 that collects the number of retired instructions.
 
+Similarly, access to a L3 cache event is done by writing to a L3 control register (MSR `0xC001023[0,2,4,6,8,A]`) and reading its associated counter (MSR `0xC001023[1,3,5,7,9,B]`). Finally, access to a data fabric event is performed by writing to a `DF_PERF_CTL[0-3]` control register (MSR `0xC001024[0,2,4,6]`) and reading its associated `DF_PERF_CTR[0-3]` register (MSR `0xC001024[1,3,5,7]`)[^10]. 
+
 The methodology used in this case study is described in more details in [@Balancer2023]. The code and the information necessary to reproduce the experiments can be found in the following public repository: [https://github.com/agusnt/BALANCER](https://github.com/agusnt/BALANCER).
 
 ### Results {.unlisted .unnumbered}
 
-We run a set of SPEC 2017 benchmarks *alone* in the system using only one instance and a single hardware thread. We repeat those runs while changing available LLC size from 0 to 32 MiB with 2 MiB steps. Figure @fig:characterization_llc shows in graphs, from left to right, CPI, DMPKI and MPKI for each assigned LLC size. For the CPI chart, lower value on the Y-axis means better performance. Also, since the frequency on the system is fixed, the CPI chart is reflective of absolute scores. For example, `520.omnetpp` (dotted line) with 32 MiB LLC is 2.5 times faster than with 0 Mib LLC.
+We run a set of SPEC CPU2017 benchmarks *alone* in the system using only one instance and a single hardware thread. We repeat those runs while changing available LLC size from 0 to 32 MiB with 2 MiB steps. Figure @fig:characterization_llc shows in graphs, from left to right, CPI, DMPKI and MPKI for each assigned LLC size. For the CPI chart, lower value on the Y-axis means better performance. Also, since the frequency on the system is fixed, the CPI chart is reflective of absolute scores. For example, `520.omnetpp` (dotted line) with 32 MiB LLC is 2.5 times faster than with 0 Mib LLC.
 
 For the DMPKI and MPKI charts, the lower value on the Y-axis, the better. Three lines corresponding to `503.bwaves` (solid), `520.omnetpp` (dotted) and `554.roms` (dashed), represents the three main trends observed in all applications. We do not show the rest of the benchmarks.
 
@@ -136,3 +137,4 @@ By looking at the the CPI and DMPKI, we initially thought that `554.roms` is ins
 [^7]: AMD documentation [@QoSAMD] rather uses the term L3 Cache Conversion Factor, which can be determined with the `cpuid` instruction.
 [^8]: We used a mask to count only L3 Misses, specifically, `L3Event[0x0300C00000400104]`.
 [^9]: We used subevents `MemIoRemote` and `MemIoLocal`, that count demand data cache fills from DRAM or IO connected in remote/local NUMA node.
+[^10]: In our study we did not use data fabric counters.
