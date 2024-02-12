@@ -78,6 +78,8 @@ Percent | Source code & Disassembly of x264 for cycles:ppp
 
 Most profilers with a Graphical User Interface (GUI), like the Intel VTune Profiler, can show source code and associated assembly side-by-side. Also, there are tools that can visualize the output of Linux `perf` raw data with a rich graphical interface similar to Intel Vtune and other tools. You'll see all that in more details in chapter 7.
 
+[TODO]: Sampling techniques squash valuable information, not allowing us to detect abnormal behaviors.
+
 ### Collecting Call Stacks {#sec:secCollectCallStacks}
 
 [TODO]: unwinding is painful
