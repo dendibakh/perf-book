@@ -1,6 +1,6 @@
 ### TMA On ARM Platforms
 
-ARM CPU architects also have developed a TMA performance analysis methodology for their processors, which we will discuss next. ARM calls it "Topdown" in their documentation, so we will use their naming. At the time of writing this chapter (late 2023), Topdown is only supported on cores designed by ARM, e.g. Neoverse N1 and Neoverse V1, and their derivatives, e.g. Ampere Altra and AWS Graviton3. Refer to the list of major CPU microarchitectures in the end of this book if you need to refresh your memory on ARM chip families. Processors designed by Apple doesn't support the ARM Topdown performance analysis methodology yet.
+ARM CPU architects also have developed a TMA performance analysis methodology for their processors, which we will discuss next. ARM calls it "Topdown" in their documentation [@ARMNeoverseV1TopDown], so we will use their naming. At the time of writing this chapter (late 2023), Topdown is only supported on cores designed by ARM, e.g. Neoverse N1 and Neoverse V1, and their derivatives, e.g. Ampere Altra and AWS Graviton3. Refer to the list of major CPU microarchitectures in the end of this book if you need to refresh your memory on ARM chip families. Processors designed by Apple doesn't support the ARM Topdown performance analysis methodology yet.
 
 ARM Neoverse V1 is the first CPU in the Neoverse family that supports a full set of level 1 Topdown metrics: `Bad Speculation`, `Frontend Bound`, `Backend Bound`, and `Retiring`. Future Neoverse cores are said to support further levels of TMA. At the time of writing, there are no analysis guides for Neoverse N2 and V2 cores. Prior to V1 cores, Neoverse N1 supported only two L1 categories: `Frontend Stalled Cycles` and `Backend Stalled Cycles`.
 
@@ -66,6 +66,7 @@ Stage 2 (uarch metrics)
 ```
 
 [TODO]: why operation mix doesn't sum up to 100%?
+Misc category include instructions that are not in the main category. For example, barriers
 
 In the command above, the option `-n BackendBound` collects all the metrics associated the `Backend Bound` category as well as its descendants. The description for every metric in the output is given in [@ARMNeoverseV1TopDown]. Note, that they are quite similar to what we have discussed in [@sec:PerfMetricsCaseStudy], so you may want to revisit it as well.
 
@@ -75,11 +76,15 @@ Looking at the `L1/L2/LL Cache Effectiveness` metrics, we can spot a potential p
 
 [TODO]: AI algorithms are known for being "memory hungry", however, this data doesn't give insights into the memory bandwidth consumption.
 
+[TODO]: prove this by checking which libraries showed samples high, run `perf record` with `-p` or `-t`.
+
 The final category gives the operation mix, which can be useful in certain scenarios. In our case, we should be concerned by the low percentage of SIMD operations, especially given that the highly optimized `Tensorflow` and `numpy` libraries are used. In contrast, the percentage of integer operations and branches seem too high. Branches could be coming from the Python interpreter or excessive function calls. While high percentage of integer operations could be caused by lack of vectorization, or thread synchronization. [@ARMNeoverseV1TopDown] gives an example of discovering a vectorization opportunity using data from the `Speculative Operation Mix` category. 
 
 In our case study, we ran the benchmark two times, however, in practice, one run is usually sufficient. Running the `topdown-tool` without options will collect all the available metrics using a single run. Also, the `-s combined` option will group the metrics by the L1 category, and output data in a format similar to `Intel Vtune`, `toplev`, and other tools. The only practical reason for making multiple runs is when a workload has a bursty behavior with very short phases that have different performance characteristics. In such a scenario, you would like to avoid event multiplexing (see [@sec:secMultiplex]) and improve collection accuracy by running the workload multiple times. 
 
 The AI Benchmark Alpha has various tests that could exhibit different performance characteristics. The output presented above aggregates all the benchmarks and gives an overall breakdown. This is generally not a good idea if the individual tests indeed have different performance bottlenecks. You need to have a separate Topdown analysis for each of the tests. One way the `topdown-tool` can help is to to use `-i` option which will output data per configurable interval of time. You can then compare the intervals and decide on next steps.
+
+[TODO]: update when N2 paper will become public.
 
 [^1]: AI Benchmark Alpha - [https://ai-benchmark.com/alpha.html](https://ai-benchmark.com/alpha.html)
 [^2]: ARM `topdown-tool` - [https://learn.arm.com/install-guides/topdown-tool/](https://learn.arm.com/install-guides/topdown-tool/)
