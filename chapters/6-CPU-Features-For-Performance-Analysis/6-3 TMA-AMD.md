@@ -1,8 +1,6 @@
 ### TMA on AMD Platforms {#sec:secTMA_AMD}
 
-[TODO]: Starting from which kernel version TMA is supported in Linux perf?
-
-Starting from Zen4, AMD processors support Level-1 and Level-2 TMA analysis. According to AMD documentation, it is called "Pipeline Utilization" analysis but the idea remains the same. The L1 and L2 buckets are also very similar to Intel's. Linux users can utilize the `perf` tool to collect the pipeline utilization data.
+Starting from Zen4, AMD processors support Level-1 and Level-2 TMA analysis. According to AMD documentation, it is called "Pipeline Utilization" analysis but the idea remains the same. The L1 and L2 buckets are also very similar to Intel's. Since kernel 6.2, Linux users can utilize the `perf` tool to collect the pipeline utilization data.
 
 Next, we will examine [Crypto++](https://github.com/weidai11/cryptopp)[^1] implementation of SHA-256 (Secure Hash Algorithm 256), the fundamental cryptographic algorithm in Bitcoin mining. Crypto++ is an open-source C++ class library of cryptographic algorithms and contains an implementation of many algorithms, not just SHA-256. However, for our example, we disabled benchmarking all other algorithms by commenting out the corresponding line in the `BenchmarkUnkeyedAlgorithms` function in `bench1.cpp`.
 
@@ -34,11 +32,9 @@ Crypto instructions are not trivial, so internally they are broken into smaller 
 
 [TODO]: Why do we have 6.1% for both `frontend_bound_bandwidth` AND `retiring_microcode`? Is there a specific relationship between those metrics? Did I describe it correctly in the text?
 
-The majority of cycles are stalled in the CPU backend (`backend_bound`), but only 1,7% of cycles are stalled waiting for memory accesses (`backend_bound_memory`). So, we know that the benchmark is mostly limited by the computing capabilities of the machine. As you will know from Part 2 of this book, it could be related to either data flow dependencies or execution throughput of certain cryptographic operations. They are less frequent than traditional `ADD`, `SUB`, `CMP`, and other instructions and thus can be often executed only on a single execution unit. A large number of such operations may saturate the execution throughput of this particular unit. Further analysis should involve a closer look at the source code and generated assembly, checking execution port utilization, finding data dependencies, etc.; we will stop at this point.
+The majority of cycles are stalled in the CPU backend (`backend_bound`), but only 1.7% of cycles are stalled waiting for memory accesses (`backend_bound_memory`). So, we know that the benchmark is mostly limited by the computing capabilities of the machine. As you will know from Part 2 of this book, it could be related to either data flow dependencies or execution throughput of certain cryptographic operations. They are less frequent than traditional `ADD`, `SUB`, `CMP`, and other instructions and thus can be often executed only on a single execution unit. A large number of such operations may saturate the execution throughput of this particular unit. Further analysis should involve a closer look at the source code and generated assembly, checking execution port utilization, finding data dependencies, etc.; we will stop at this point.
 
 When it comes to Windows, at the time of writing, TMA methodology is only supported on server platforms (codename Genoa), and not on client systems (codename Raphael). TMA support was added in AMD uProf version 4.1, but only in the command line tool `AMDuProfPcm` tool which is part of AMD uProf installation. You can consult [@AMDUprofManual, Chapter 2.8 Pipeline Utilization] for more details on how to run the analysis. The graphical version of AMD uProf doesn't have the TMA analysis yet. 
-
-[TODO]: does the 4.2 version of AMDuProfPcm work on client parts?
 
 [^1]: Crypto++ - [https://github.com/weidai11/cryptopp](https://github.com/weidai11/cryptopp)
 [^2]: uops.info - [https://uops.info/table.html](https://uops.info/table.html)

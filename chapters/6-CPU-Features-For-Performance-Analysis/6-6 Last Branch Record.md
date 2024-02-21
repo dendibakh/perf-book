@@ -159,8 +159,6 @@ It's important to mention that we cannot necessarily drive conclusions about fun
 
 Branch recording also enables us to know what were the most frequently taken branches. It is supported on Intel and AMD. According to ARM's BRBE specification, it can be supported, but due to unavailability of processors that implement this extension, it is not possible to verify. Here is an example:
 
-[TODO]: Check: "Adding `-F +srcline_from,srcline_to` slows down building report. Hopefully, in newer versions of perf, decoding time will be improved".
-
 ```bash
 $ perf record -e cycles -b -- ./a.exe
 [ perf record: Woken up 3 times to write data ]
@@ -236,8 +234,6 @@ We could clearly see two humps: a small one around 80 cycles \circled{1} and two
 This information can be used for a fine-grained tuning of this basic block. This example might benefit from memory prefetching, which we will discuss in [@sec:memPrefetch]. Also, cycle count information can be used for timing loop iterations, where every loop iteration ends with a taken branch (back edge).
 
 Before the proper support from profiling tools was in place, building probability density graphs similar to Figure @fig:LBR_timing_BB required manual parsing of raw LBR dumps. Example of how to do this can be found on the [easyperf blog](https://easyperf.net/blog/2019/04/03/Precise-timing-of-machine-code-with-Linux-perf)[^9]. Luckily, in newer versions of Linux perf, getting this information is much easier. The example below demonstrates this method directly using Linux perf on the same 7-zip benchmark from the LLVM test-suite we introduced earlier:
-
-[TODO]: Check: "Adding `-F +srcline_from,srcline_to` slows down building report. Hopefully, in newer versions of perf, decoding time will be improved".
 
 ```bash
 $ perf record -e cycles -b -- ./7zip.exe b
