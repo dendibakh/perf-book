@@ -124,6 +124,8 @@ In PEBS, the feature that allows this to happen is called Data Address Profiling
 
 With the IBS Execute and ARM SPE sampling, you can also do in-depth analysis of memory accesses performed by an application. One approach is to dump collected samples and process them manually. IBS saves the exact linear address, its latency, where the access was served from (cache or DRAM), and whether it hit or missed in the DTLB. SPE can be used to estimate latency and bandwidht of the memory subsystem components, estimate memory latencies of individual loads/stores, and more.
 
+[TODO]: refer to section that shows using `perf mem` in Chapter 8 as an example of using PEBS/IBS/SPE features.
+
 One of the most important use cases for these extensions is detecting True and False Sharing, which we will discuss in [@sec:TrueFalseSharing]. The Linux `perf c2c` tool heavily relies on all three mechanisms (PEBS, IBS and SPE) to find contested memory accesses, which could experience True/False sharing: it matches load/store addresses for different threads and checks if the hit occurrs in a cache line modified by other threads.
 
 [^1]: PEBS grabber tool - [https://github.com/andikleen/pmu-tools/tree/master/pebs-grabber](https://github.com/andikleen/pmu-tools/tree/master/pebs-grabber). Requires root access.

@@ -1,5 +1,7 @@
 ## Memory Profiling {#sec:MemoryProfiling}
 
+[TODO]: maybe rename the section to avoid confusion. This section discusses how to measure memory usage and memory footprint, which is application-level memory profiling. But using `perf mem` is also can be called "memory profiling", so maybe I should rename this section as "Memory Usage and Footprint" or split it into two level-2-header sections.
+
 So far in this chapter, we have discussed a few techniques to optimize memory accesses in a particular piece of code. In this section, we will learn how to collect high-level information about a program's interaction with memory. This process is usually called *memory profiling*. Memory profiling helps you understand how an application uses memory over time and helps you build the right mental model of a program's behavior. Here are some questions it can answer:
 
 * What is a program's total memory consumption and how it changes over time?

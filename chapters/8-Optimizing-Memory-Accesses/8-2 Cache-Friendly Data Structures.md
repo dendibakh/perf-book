@@ -33,6 +33,8 @@ Additionally, choose the data storage, bearing in mind what the code will do wit
 
 ### Packing the Data.
 
+[TODO]: include example of using data-type profiling (https://lwn.net/Articles/955709/).
+
 Memory hierarchy utilization can be improved by making the data more compact. There are many ways to pack data. One of the classic examples is to use bitfields. An example of code when packing data might be profitable is shown on [@lst:PackingData1]. If we know that `a`, `b`, and `c` represent enum values which take a certain number of bits to encode, we can reduce the storage of the struct `S` (see [@lst:PackingData2]).
 
 Listing: Packing Data: baseline struct.
