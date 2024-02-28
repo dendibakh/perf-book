@@ -4,15 +4,17 @@ typora-root-url: ..\..\img
 
 ## Workload Characterization {#sec:counting}
 
-Workload characterization is a process of describing a workload by means of quantitative parameters and functions. In simple words, it means counting total number of certain performance events. The goal of characterization is to define the behavior of the workload and extract its most important features. At a high level, an application can belong to one or many types: interactive, database, real-time, network-based, massively parallel, etc. Different workloads can be characterized using different metrics and parameters to address a particular application domain.
+Workload characterization is a process of describing a workload by means of quantitative parameters and functions. In simple words, it means counting total number of certain performance monitoring events. The goal of characterization is to define the behavior of the workload and extract its most important features. At a high level, an application can belong to one or many types: interactive, database, real-time, network-based, massively parallel, etc. Different workloads can be characterized using different metrics and parameters to address a particular application domain.
 
 This is a book about low-level performance, remember? So, we will focus on extracting features related to the CPU and memory performance. The best example of a workload characterization from a CPU perspective is Top-down Microarchitecture Analysis (TMA) methodology, which we will closely look at in [@sec:TMA]. TMA attempts to characterize an application by putting it into one of 4 buckets: CPU Front End, CPU Back End, Retiring, and Bad Speculation, depending on what is causing the most significant performance bottleneck. TMA uses Performance Monitoring Counters (PMCs) to collect the needed information and identify the inefficient use of CPU microarchitecture.
 
 But even without a fully-fledged characterization methodology, collecting total number of certain performance events can be helpful. We hope that the case studies in the previous chapter that examined performance metrics of four different benchmarks, proved that. PMCs are a very important instrument of low-level performance analysis. They can provide unique information about the execution of a program. PMCs are generally used in two modes: "Counting" and "Sampling". Counting mode is used for workload characterization, while sampling mode is used for finding hotspots, which we will discuss soon. 
 
-### Counting Performance Events
+[TODO]: create an abbreviation PME = performance monitoring event and use it accross the chapter
 
-The idea behind counting is very simple: we want to count the total number of certain performance events while our program is running. Figure @fig:Counting illustrates the process of counting performance events from the start to the end of a program.
+### Counting Performance Monitoring Events
+
+The idea behind counting is very simple: we want to count the total number of certain performance monitoring events while our program is running. Figure @fig:Counting illustrates the process of counting performance events from the start to the end of a program.
 
 ![Counting performance events.](../../img/perf-analysis/CountingFlow.png){#fig:Counting width=60%}
 
@@ -28,9 +30,7 @@ $ perf stat -- ./my_program.exe
 
 It is very informative to know this data. First of all, it enables us to quickly spot some anomalies, such as a high branch misprediction rate or low IPC. In addition, it might come in handy when you've made a code change and you want to verify that the change has improved performance. Looking at relevant numbers might help you justify or reject the code change. The `perf stat` utility can be used as a lightweight benchmark wrapper. Since the overhead of counting events is minimal, almost all benchmarks can be automatically ran under `perf stat`. It serves as a first step in performance investigation. Sometimes anomalies can be spotted right away, which can save you some analysis time.
 
-### Performance Monitoring Counters (PMC) Collection
-
-Modern CPUs have hundreds of observable performance events. It's very hard to remember all of them and their meanings. Understanding when to use a particular PMC is even harder. That is why generally, we don't recommend manually collecting specific PMCs unless you really know what you are doing. Instead, we recommend using tools like Intel Vtune Profiler that automate this process. Nevertheless, there are situations when you are interested in collecting specific PMCs.
+Modern CPUs have hundreds of observable performance events. It's very hard to remember all of them and their meanings. Understanding when to use a particular event is even harder. That is why generally, we don't recommend manually collecting a specific event unless you really know what you are doing. Instead, we recommend using tools like Intel Vtune Profiler that automate this process. Nevertheless, there are situations when you are interested in collecting a set of specific performance events.
 
 A complete list of performance events for all Intel CPU generations can be found in [@IntelOptimizationManual, Volume 3B, Chapter 19]. A description is also available online at [perfmon-events.intel.com](https://perfmon-events.intel.com/). Every event is encoded with `Event` and `Umask` hexadecimal values. Sometimes performance events can also be encoded with additional parameters, like `Cmask`, `Inv` and others. An example of encoding two performance events for the Intel Skylake microarchitecture is shown in Table {@tbl:perf_count}.
 
@@ -47,7 +47,7 @@ C4H     00H  BR_INST_RETIRED.      Branch instructions that retired.
 
 Table: Example of encoding Skylake performance events. {#tbl:perf_count}
 
-Linux `perf` provides mappings for commonly used performance counters. They can be accessed via pseudo names instead of specifying `Event` and `Umask` hexadecimal values. For example, `branches` is just a synonym for `BR_INST_RETIRED.ALL_BRANCHES` and will measure the same thing. List of available mapping names can be viewed with `perf list`:
+Linux `perf` provides mappings for commonly used performance events. They can be accessed via pseudo names instead of specifying `Event` and `Umask` hexadecimal values. For example, `branches` is just a synonym for `BR_INST_RETIRED.ALL_BRANCHES` and will measure the same thing. A list of available mapping names can be viewed with `perf list`:
 
 ```bash
 $ perf list
@@ -58,21 +58,22 @@ $ perf list
   cycles            [Hardware event]
   instructions      [Hardware event]
   ref-cycles        [Hardware event]
+  ...
 ```
 
-However, Linux `perf` doesn't provide mappings for all performance counters for every CPU architecture. If the PMC you are looking for doesn't have a mapping, it can be collected with the following syntax:
+However, Linux `perf` does not necessarily provide mappings for all performance events for every CPU architecture. If the PMC you are looking for doesn't have a mapping, it can be collected with the following syntax:
 
 ```bash
 $ perf stat -e cpu/event=0xc4,umask=0x0,name=BR_INST_RETIRED.ALL_BRANCHES/ -- ./a.exe
 ```
 
-Performance counters are not available in every environment since accessing PMCs requires root access, which applications running in a virtualized environment typically do not have. For programs executing in a public cloud, running a PMU-based profiler directly in a guest container does not result in useful output if a virtual machine (VM) manager does not expose the PMU programming interfaces properly to a guest. Thus profilers based on CPU performance counters do not work well in a virtualized and cloud environment [@PMC_virtual]. Although the situation is improving. VmWare® was one of the first VM managers to enable[^4] virtual CPU Performance Counters (vPMC). AWS EC2 cloud enabled[^5] PMCs for dedicated hosts.
+Performance events are not available in every environment since accessing PMCs requires root access, which applications running in a virtualized environment typically do not have. For programs executing in a public cloud, running a PMU-based profiler directly in a guest container does not result in useful output if a virtual machine (VM) manager does not expose the PMU programming interfaces properly to a guest. Thus profilers based on CPU performance monitoring counters do not work well in a virtualized and cloud environment [@PMC_virtual], although the situation is improving. VmWare® was one of the first VM managers to enable[^4] virtual Performance Monitoring Counters (vPMC). AWS EC2 cloud enabled[^5] PMCs for dedicated hosts.
 
 ### Multiplexing and Scaling Events {#sec:secMultiplex}
 
-There are situations when we want to count many different events at the same time. But with only one counter, it's possible to count only one thing at a time. That's why PMUs have multiple counters in it (in recent Intel's Goldencove microarchitecture there are 12 programmable PMCs, 6 per HW thread). Even then, the number of fixed and programmable counter is not always sufficient. Top-down Microarchitecture Analysis (TMA) methodology requires collecting up to 100 different performance events in a single execution of a program. Modern CPUs don't have that many counters, and here is when multiplexing comes into play.
+There are situations when we want to count many different events at the same time. But with only one counter, it's possible to count only one thing at a time. That's why PMUs contain multiple counters (in Intel's recent Goldencove microarchitecture there are 12 programmable PMCs, 6 per HW thread). Even then, the number of fixed and programmable counter is not always sufficient. Top-down Microarchitecture Analysis (TMA) methodology requires collecting up to 100 different performance events in a single execution of a program. Modern CPUs don't have that many counters, and here is when multiplexing comes into play.
 
-If there are more events than counters, the analysis tool uses time multiplexing to give each event a chance to access the monitoring hardware. Figure @fig:Multiplexing1 shows an example of multiplexing between 8 performance events with only 4 PMCs available.
+If you need to collect more events than the number of available PMCs, the analysis tool uses time multiplexing to give each event a chance to access the monitoring hardware. Figure @fig:Multiplexing1 shows an example of multiplexing between 8 performance events with only 4 counters available.
 
 <div id="fig:Multiplexing">
 ![](../../img/perf-analysis/Multiplexing1.png){#fig:Multiplexing1 width=50%}
