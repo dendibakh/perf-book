@@ -62,6 +62,12 @@ The SPE sampling process is built in as part of the instruction execution pipeli
 
 Similar to Intel PEBS and AMD IBS, ARM SPE helps to reduce the sampling overhead and enables longer collections. In addition to that, it supports post-filtering of sample records, which helps to reduce the memory required for storage. 
 
+[TODO]: Linux perf driver for arm_spe should be installed first
+https://developer.arm.com/documentation/ka005362/latest/
+On Amazon Linux 2 and 2023, the SPE PMU is available by default on Graviton metal instances, you can check for its existence by verifying:
+https://github.com/aws/aws-graviton-getting-started/blob/main/perfrunbook/debug_hw_perf.md#capturing-statistical-profiling-extension-spe-hardware-events-on-graviton-metal-instances
+```$ sudo apt install linux-modules-extra-$(uname -r)```
+
 SPE profiling is enabled in the Linux `perf` tool and can be used as follows:
 
 ```bash
