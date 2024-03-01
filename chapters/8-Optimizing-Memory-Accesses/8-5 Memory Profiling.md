@@ -13,11 +13,7 @@ Next, we will introduce the terms *memory usage* and *memory footprint* and see 
 
 ### Memory Usage
 
-Memory usage is frequently described by Virtual Memory Size (VSZ) and Resident Set Size (RSS). VSZ includes all memory that a process can access, e.g., stack, heap, the memory used to encode instructions of an executable, and instructions from linked shared libraries, including the memory that is swapped out to disk. On the other hand, RSS measures how much memory allocated to a process resides in RAM. Thus, RSS does not include memory that is swapped out or was never touched yet by that process. Also, RSS does not include memory from shared libraries that were not loaded to memory.
-
-[TODO]: mention that on Windows VSZ relates to Committed Memory Size and RSZ relates to Working Set.
-
-[TODO]: Maybe mention also memory mapped files. They contribute both to VSZ and RSS just like any other memory.
+Memory usage is frequently described by Virtual Memory Size (VSZ) and Resident Set Size (RSS). VSZ includes all memory that a process can access, e.g., stack, heap, the memory used to encode instructions of an executable, and instructions from linked shared libraries, including the memory that is swapped out to disk. On the other hand, RSS measures how much memory allocated to a process resides in RAM. Thus, RSS does not include memory that is swapped out or was never touched yet by that process. Also, RSS does not include memory from shared libraries that were not loaded to memory. Files that are mapped to memory with `mmap` also contribute both to VSZ and RSS in a similar way.
 
 Consider an example. Process `A` has 200K of stack and heap allocations of which 100K resides in the main memory, the rest is swapped out or unused. It has a 500K binary, from which only 400K was touched. Process `A` is linked against 2500K of shared libraries and has only loaded 1000K in the main memory.
 
@@ -26,20 +22,22 @@ VSZ: 200K + 500K + 2500K = 3200K
 RSS: 100K + 400K + 1000K = 1500K
 ```
 
-Developers can observe both RSS and VSZ on Linux with a standard `top` utility, however, they can change very rapidly. Luckily, there are tools that can record and visualize memory usage. Figure @fig:MemoryUsageAIBench shows example of a PSPNet image segmentation algorithm, which is a part of the [AI Benchmark Alpha](https://ai-benchmark.com/alpha.html).[^5] This chart was created based on the output of a tool called [memory_profiler](https://github.com/pythonprofilers/memory_profiler)[^6], a Python library built on top of the cross-platform [psutil](https://github.com/giampaolo/psutil)[^7] package.
+Developers can observe both RSS and VSZ on Linux with a standard `top` utility, however, both metrics can change very rapidly. Luckily, there are tools that can record and visualize memory usage over time. Figure @fig:MemoryUsageAIBench shows memory usage of PSPNet image segmentation algorithm, which is a part of the [AI Benchmark Alpha](https://ai-benchmark.com/alpha.html).[^5] This chart was created based on the output of a tool called [memory_profiler](https://github.com/pythonprofilers/memory_profiler)[^6], a Python library built on top of the cross-platform [psutil](https://github.com/giampaolo/psutil)[^7] package.
 
 ![RSS and VSZ memory utilization of AI_bench PSPNet image segmentation.](../../img/memory-access-opts/MemoryUsageAIBench.png){#fig:MemoryUsageAIBench width=90%}
 
-In addition to standard RSS and VSZ metrics, people have developed a few more sophisticated metrics. Since RSS includes both the memory which is unique to the process and the memory shared with other processes, you cannot determine how much memory a process really uses. The USS (Unique Set Size) is the memory which is unique to a process and which would be freed if the process was terminated right now. The PSS (Proportional Set Size) represents unique memory plus the amount of shared memory, evenly divided between the processes that share it. E.g. if a process has 10 MB all to itself (USS) and 10 MBs shared with another process, its PSS will be 15 MBs.
+In addition to standard RSS and VSZ metrics, people have developed a few more sophisticated metrics. Since RSS includes both the memory which is unique to the process and the memory shared with other processes, it's not clear how much memory a process really has to itself. The USS (Unique Set Size) is the memory which is unique to a process and which would be freed if the process was terminated right now. The PSS (Proportional Set Size) represents unique memory plus the amount of shared memory, evenly divided between the processes that share it. E.g. if a process has 10 MB all to itself (USS) and 10 MBs shared with another process, its PSS will be 15 MBs. The `psutil` library support measuring these metrics (Linux-only), which can be visualized by `memory_profiler`. 
+
+On Windows, similar concepts are defined by Committed Memory Size and Working Set Size. They are not direct equivalents to VSZ and RSS, but can be used to effectively estimate memory usage of Windows applications. The [RAMMap](https://learn.microsoft.com/en-us/sysinternals/downloads/rammap)[^8] tool provides a rich set of information about memory usage for the system and individual processes.
 
 When developers talk about memory consumption, they implicitly mean heap usage. Heap is, in fact, the biggest memory consumer in most applications as it accommodates all dynamically allocated objects. But heap is not the only memory consumer. For completeness, let's mention others:
 
-* Stack: Memory used by frame stacks in an application. Each thread inside an application gets its own stack memory space. Usually, the stack size is only a few MB, and the application will crash if it exceeds the limit. The total stack memory consumption is proportional to the number of threads running in the system. [TODO]: give concrete examples for Linux, Windows, macOS.
-* Code: Memory that is used to store the code (instructions) of an application and its libraries. In most cases, it doesn't contribute much to the memory consumption but there are exceptions. For example, the Clang C++ compiler and Chrome browser have large codebases and tens of MB code sections in their binaries. We show how to measure code footprint in [@sec:CodeFootprint]. [TODO]: give concrete examples for example for Windows Chrome binary.
+* Stack: Memory used by frame stacks in an application. Each thread inside an application gets its own stack memory space. Usually, the stack size is only a few MB, and the application will crash if it exceeds the limit. For example, the default size of stack memory on Linux is usually 8MB, although it may vary depending on the distribution and kernel settings. The default stack size on macOS is also 8MB, but on Windows it's only 1MB. The total stack memory consumption is proportional to the number of threads running in the system.
+* Code: Memory that is used to store the code (instructions) of an application and its libraries. In most cases, it doesn't contribute much to the memory consumption but there are exceptions. For example, the latest Windows Chrome browser has 33MB code section, while Clang 17 C++ compiler has 67MB of its 114MB binary dedicated to code. However, not all parts of the code are frequently exercised while a program is running. We show how to measure code footprint in [@sec:CodeFootprint].
 
 Since heap is usually the largest consumer of memory resources, it makes sense for developers to focus on this part of memory when they analyze memory utilization of their applications. In the following section, we will examine heap consumption and memory allocations in a popular real-world application.
 
-### Case Study: Stockfish Heap Usage {.unlisted .unnumbered}
+### Case Study: Analyzing Stockfish's Heap Usage {.unlisted .unnumbered}
 
 In this case study, we use [heaptrack](https://github.com/KDE/heaptrack)[^2], an open-sourced heap memory profiler for Linux developed by KDE. Ubuntu users can install it very easily with `apt install heaptrack heaptrack-gui`. Heaptrack can find places in the code where the largest and most frequent allocations happen among many other things. On Windows, you can use [Mtuner](https://github.com/milostosic/MTuner)[^3] which has similar capabilities as Heaptrack.
 
@@ -145,4 +143,6 @@ Temporal and spatial locality analysis provides unique insights that can be used
 [^3]: MTuner - [https://github.com/milostosic/MTuner](https://github.com/milostosic/MTuner)
 [^4]: Stockfish - [https://github.com/official-stockfish/Stockfish](https://github.com/official-stockfish/Stockfish)
 [^5]: AI Benchmark Alpha - [https://ai-benchmark.com/alpha.html](https://ai-benchmark.com/alpha.html)
-[^6]: Easyper blog: Measuring memory footprint with SDE - [https://easyperf.net/blog/2024/02/12/Memory-Profiling-Part3](https://easyperf.net/blog/2024/02/12/Memory-Profiling-Part3).
+[^6]: Easyper blog: Measuring memory footprint with SDE - [https://easyperf.net/blog/2024/02/12/Memory-Profiling-Part3](https://easyperf.net/blog/2024/02/12/Memory-Profiling-Part3)
+[^7]: psutil - [https://github.com/giampaolo/psutil](https://github.com/giampaolo/psutil)
+[^8]: RAMMap - [https://learn.microsoft.com/en-us/sysinternals/downloads/rammap](https://learn.microsoft.com/en-us/sysinternals/downloads/rammap)
