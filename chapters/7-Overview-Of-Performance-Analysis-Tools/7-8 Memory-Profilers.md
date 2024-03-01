@@ -1,15 +1,12 @@
 ## Memory Profiling {#sec:MemoryProfiling}
 
-[TODO]: maybe rename the section to avoid confusion. This section discusses how to measure memory usage and memory footprint, which is application-level memory profiling. But using `perf mem` is also can be called "memory profiling", so maybe I should rename this section as "Memory Usage and Footprint" or split it into two level-2-header sections.
+So far in this chapter, we have discussed tools that identify places where a program spends most of the time. In this section, we will focus on a program's interaction with memory. This is usually called *memory profiling*. In particular, we will learn how to collect memory usage, profile heap allocations and measure memory footprint. Memory profiling helps you understand how an application uses memory over time and helps you build the accurate mental model of a program's interaction with memory. Here are some questions it can answer:
 
-So far in this chapter, we have discussed a few techniques to optimize memory accesses in a particular piece of code. In this section, we will learn how to collect high-level information about a program's interaction with memory. This process is usually called *memory profiling*. Memory profiling helps you understand how an application uses memory over time and helps you build the right mental model of a program's behavior. Here are some questions it can answer:
-
-* What is a program's total memory consumption and how it changes over time?
+* What is a program's total virtual memory consumption and how it changes over time?
 * Where and when does a program make heap allocations?
 * What are the code places with the largest amount of allocated memory?
 * How much memory a program accesses every second?
-
-Next, we will introduce the terms *memory usage* and *memory footprint* and see how to profile both.
+* What is the total memory footprint of a program?
 
 ### Memory Usage
 
@@ -37,7 +34,7 @@ When developers talk about memory consumption, they implicitly mean heap usage. 
 
 Since heap is usually the largest consumer of memory resources, it makes sense for developers to focus on this part of memory when they analyze memory utilization of their applications. In the following section, we will examine heap consumption and memory allocations in a popular real-world application.
 
-### Case Study: Analyzing Stockfish's Heap Usage {.unlisted .unnumbered}
+### Case Study: Analyzing Stockfish's Heap Allocations
 
 In this case study, we use [heaptrack](https://github.com/KDE/heaptrack)[^2], an open-sourced heap memory profiler for Linux developed by KDE. Ubuntu users can install it very easily with `apt install heaptrack heaptrack-gui`. Heaptrack can find places in the code where the largest and most frequent allocations happen among many other things. On Windows, you can use [Mtuner](https://github.com/milostosic/MTuner)[^3] which has similar capabilities as Heaptrack.
 
