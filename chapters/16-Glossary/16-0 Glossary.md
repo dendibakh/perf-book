@@ -12,6 +12,8 @@
 
 \textbf{CI/CD} Contiguous Integration/ Contiguous Development
 
+\textbf{CFG} Control Flow Graph
+
 \textbf{CPI} Clocks Per Instruction
 
 \textbf{CPU} Central Processing Unit
