@@ -1,4 +1,4 @@
-### Dynamic Memory Allocation.
+## Dynamic Memory Allocation.
 
 [TODO]: Elaborate. Add reference to heaptrack.
 
@@ -6,7 +6,7 @@ First of all, there are many drop-in replacements for `malloc`, which are faster
 
 Secondly, it is possible to speed up allocations using custom allocators, for example, [arena allocators](https://en.wikipedia.org/wiki/Region-based_memory_management)[^16]. One of the main advantages is their low overhead since such allocators don't execute system calls for every memory allocation. Another advantage is its high flexibility. Developers can implement their own allocation strategies based on the memory region provided by the OS. One simple strategy could be to maintain two different allocators with their own arenas (memory regions): one for the hot data and one for the cold data. Keeping hot data together creates opportunities for it to share cache lines, which improves memory bandwidth utilization and spatial locality. It also improves TLB utilization since hot data occupies less amount of memory pages. Also, custom memory allocators can use thread-local storage to implement per-thread allocation and get rid of any synchronization between threads. This becomes useful when an application is based on a thread pool and does not spawn a large number of threads.
 
-### Tune the Code for Memory Hierarchy.
+## Tune the Code for Memory Hierarchy.
 
 [TODO]: Elaborate more
 

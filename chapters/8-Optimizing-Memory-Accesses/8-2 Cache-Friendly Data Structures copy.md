@@ -32,8 +32,6 @@ Additionally, choose the data storage, bearing in mind what the code will do wit
 
 [TODO]: Cosmetics
 
-[TODO]: include example of using data-type profiling (https://lwn.net/Articles/955709/). Find a good example for a case study.
-
 Memory hierarchy utilization can be improved by making the data more compact. There are many ways to pack data. One of the classic examples is to use bitfields. An example of code when packing data might be profitable is shown on [@lst:PackingData1]. If we know that `a`, `b`, and `c` represent enum values which take a certain number of bits to encode, we can reduce the storage of the struct `S` (see [@lst:PackingData2]).
 
 Listing: Packing Data: baseline struct.
@@ -75,6 +73,10 @@ struct S2 {
   bool b;
 }; // S2 is `sizeof(int) * 2` bytes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+### Field Reordering
+
+[TODO]: include example of using data-type profiling (https://lwn.net/Articles/955709/). Find a good example for a case study using `perf mem`.
 
 ### Aligning and Padding. {#sec:secMemAlign}
 
@@ -142,11 +144,71 @@ One of the most important areas for alignment considerations is the SIMD code. W
 __m512 * ptr = new __m512[N];
 ```
 
-[TODO]: other data structure reorganization techniques:
-* structure splitting
-* field reordering
-* pointer inlining 
+### Other Data Structure Reorganization Techniques
 
+[TODO]: to be written
+
+- **structure splitting**
+
+Simple example:
+```cpp
+struct Point {
+  int X;
+  int Y;
+  int Z;
+  /*many other fields*/
+};
+std::vector<Point> points;
+
+=>
+
+struct PointCoords {
+  int X;
+  int Y;
+  int Z;
+};
+struct PointInfo {
+  /*many other fields*/
+};
+std::vector<PointCoords> pointCoords;
+std::vector<PointInfo> pointInfos;
+
+* **pointer inlining**
+
+```cpp
+struct GraphEdge {
+  unsigned int from;
+  unsigned int to;
+  GraphEdgeProperties* prop;
+};
+struct GraphEdgeProperties {
+  float weight;
+  std::string label;
+  // ...
+};
+
+=>
+
+struct GraphEdge {
+  unsigned int from;
+  unsigned int to;
+  float weight;
+  GraphEdgeProperties* prop;
+};
+struct GraphEdgeProperties {
+  std::string label;
+  // ...
+};
+```
+
+This code was in one of the open-source graph analytics codes.
+
+Use data-type profiling to find opportunities.
+
+Recent kernel history is full of examples of commits that reorder structures, pad fields, or pack them to improve performance.
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=54ff8ad69c6e93c0767451ae170b41c000e565dd
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=e5598d6ae62626d261b046a2f19347c38681ff51
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=aee79d4e5271cee4ffa89ed830189929a6272eb8
 
 [TODO]: Trim footnotes
 
