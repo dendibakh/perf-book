@@ -118,7 +118,7 @@ $ perf record -e cycles:pp -- ./a.exe
 
 With AMD IBS and ARM SPE, all the collected samples are precise by design since the HW captures the exact instruction address. In fact, they both work in a very similar fashion. Whenever an overflow occurs, the mechanism saves the instruction causing the overflow into a dedicated buffer which is then read by the interrupt handler. As the address is preserved, IBS and SPE samples attribution to the instructions are precise.
 
-[TODO]: Does Linux perf on ARM supports `:p` suffixes?
+[TODO]: Does Linux perf on ARM supports `:p` suffixes? - Yes, but it makes no difference.
 
 Precise events provide a relief for performance engineers as they help to avoid misleading data that often confuses beginners and even senior developers. The TMA methodology heavily relies on precise events to locate the exact line of source code where the inefficient execution takes place.
 

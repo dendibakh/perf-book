@@ -1,17 +1,12 @@
----
-typora-root-url: ..\..\img
----
-
-[TODO]: Memory profiling. How to measure memory footprint? Flamescope
-[TODO]: Trim footnotes
-[TODO]: Elaborate more on "Tune the code for memory hierarchy"
-[TODO]: Discuss what to do when memory bandwidth is a limitation
-
 ## Cache-Friendly Data Structures {#sec:secCacheFriendly}
+
+[TODO]: Elaborate.
 
 Writing cache-friendly algorithms and data structures, is one of the key items in the recipe for a well-performing application. The key pillar of cache-friendly code is the principles of temporal and spatial locality that we described in [@sec:MemHierar]. The goal here is to allow required data to be fetched from caches efficiently. When designing cache-friendly code, it's helpful to think in terms of cache lines, not only individual variables and their location in memory.
 
 ### Access Data Sequentially.
+
+[TODO]: Elaborate
 
 The best way to exploit the spatial locality of the caches is to make sequential memory accesses. By doing so, we allow the HW prefetcher (see [@sec:HwPrefetch]) to recognize the memory access pattern and bring in the next chunk of data ahead of time. An example of a C-code that does such cache-friendly accesses is shown on [@lst:CacheFriend]. The code is "cache-friendly" because it accesses the elements of the matrix in the order in which they are laid out in memory ([row-major traversal](https://en.wikipedia.org/wiki/Row-_and_column-major_order)[^6]). Swapping the order of indexes in the array (i.e., `matrix[column][row]`) will result in column-major order traversal of the matrix, which does not exploit spatial locality and hurts performance.
 
@@ -27,13 +22,17 @@ The example presented in [@lst:CacheFriend] is classical, but usually, real-worl
 
 ### Use Appropriate Containers. 
 
+[TODO]: Elaborate
+
 There is a wide variety of ready-to-use containers in almost any language. But it's important to know their underlying storage and performance implications. A good step-by-step guide for choosing appropriate C++ containers can be found in [@fogOptimizeCpp, Chapter 9.7 Data structures, and container classes].
 
 Additionally, choose the data storage, bearing in mind what the code will do with it. Consider a situation when there is a need to choose between storing objects in the array versus storing pointers to those objects while the object size is big. An array of pointers take less amount of memory. This will benefit operations that modify the array since an array of pointers requires less memory being transferred. However, a linear scan through an array will be faster when keeping the objects themselves since it is more cache-friendly and does not require indirect memory accesses.[^8]
 
 ### Packing the Data.
 
-[TODO]: include example of using data-type profiling (https://lwn.net/Articles/955709/).
+[TODO]: Cosmetics
+
+[TODO]: include example of using data-type profiling (https://lwn.net/Articles/955709/). Find a good example for a case study.
 
 Memory hierarchy utilization can be improved by making the data more compact. There are many ways to pack data. One of the classic examples is to use bitfields. An example of code when packing data might be profitable is shown on [@lst:PackingData1]. If we know that `a`, `b`, and `c` represent enum values which take a certain number of bits to encode, we can reduce the storage of the struct `S` (see [@lst:PackingData2]).
 
@@ -78,6 +77,21 @@ struct S2 {
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ### Aligning and Padding. {#sec:secMemAlign}
+
+[TODO]: Cosmetics. Mention that vtune tracks it with the `Split Loads` metric.
+https://www.intel.com/content/www/us/en/docs/vtune-profiler/user-guide/2023-0/cpu-metrics-reference.html#SPLIT-LOADS
+
+[TODO]: “Aligned” here means the memory address is a multiple of a specific size. For example, the low 5 bits of a 32 byte aligned memory address will be zero. A “misaligned” access crosses an alignment boundary
+
+[TODO]: Update Agner Fog references. Or maybe just remove them?
+
+[TODO]: Explain why misaligned loads can be a source of perf problems?
+A “misaligned” access crosses an alignment boundary, forcing the load/store unit to make two L1D lookups to satisfy the request.
+
+[TODO]: Accesses that cross a 4 KB boundary:
+Accesses that cross a 4 KB boundary introduce more complications, because virtual to physical address translations are usually handled in 4 KB pages. Handling such an access would require accessing two TLB entries as well. TLBs must support multiple lookups per cycle.
+
+[TODO]: Should I add images for better explanation?
 
 Another technique to improve the utilization of the memory subsystem is to align the data. There could be a situation when an object of size 16 bytes occupies two cache lines, i.e., it starts on one cache line and ends in the next cache line. Fetching such an object requires two cache line reads, which could be avoided would the object be aligned properly. [@lst:AligningData] shows how memory objects can be aligned using C++11 `alignas` keyword.
 
@@ -128,29 +142,10 @@ One of the most important areas for alignment considerations is the SIMD code. W
 __m512 * ptr = new __m512[N];
 ```
 
-### Dynamic Memory Allocation.
-
-First of all, there are many drop-in replacements for `malloc`, which are faster, more scalable,[^15] and address [fragmentation](https://en.wikipedia.org/wiki/Fragmentation_(computing))[^20] problems better. You can have a few percent performance improvement just by using a non-standard memory allocator. A typical issue with dynamic memory allocation is when at startup threads race with each other trying to allocate their memory regions at the same time.[^5] One of the most popular memory allocation libraries are [jemalloc](http://jemalloc.net/)[^17] and [tcmalloc](https://github.com/google/tcmalloc)[^18].
-
-Secondly, it is possible to speed up allocations using custom allocators, for example, [arena allocators](https://en.wikipedia.org/wiki/Region-based_memory_management)[^16]. One of the main advantages is their low overhead since such allocators don't execute system calls for every memory allocation. Another advantage is its high flexibility. Developers can implement their own allocation strategies based on the memory region provided by the OS. One simple strategy could be to maintain two different allocators with their own arenas (memory regions): one for the hot data and one for the cold data. Keeping hot data together creates opportunities for it to share cache lines, which improves memory bandwidth utilization and spatial locality. It also improves TLB utilization since hot data occupies less amount of memory pages. Also, custom memory allocators can use thread-local storage to implement per-thread allocation and get rid of any synchronization between threads. This becomes useful when an application is based on a thread pool and does not spawn a large number of threads.
-
-### Tune the Code for Memory Hierarchy.
-
-The performance of some applications depends on the size of the cache on a particular level. The most famous example here is improving matrix multiplication with [loop blocking](https://en.wikipedia.org/wiki/Loop_nest_optimization) (tiling). The idea is to break the working size of the matrix into smaller pieces (tiles) such that each tile will fit in the L2 cache.[^9] Most of the architectures provide `CPUID`-like instruction,[^11] which allows us to query the size of caches. Alternatively, one can use [cache-oblivious algorithms](https://en.wikipedia.org/wiki/Cache-oblivious_algorithm)[^19] whose goal is to work reasonably well for any size of the cache.
-
-Intel CPUs have a Data Linear Address HW feature (see [@sec:sec_PEBS_DLA]) that supports cache blocking as described on an easyperf [blog post](https://easyperf.net/blog/2019/12/17/Detecting-false-sharing-using-perf#2-tune-the-code-for-better-utilization-of-cache-hierarchy)[^10].
+[TODO]: Trim footnotes
 
 [^5]: The same applies to memory deallocation.
 [^6]: Row- and column-major order - [https://en.wikipedia.org/wiki/Row-_and_column-major_order](https://en.wikipedia.org/wiki/Row-_and_column-major_order).
 [^8]: Blog article "Vector of Objects vs Vector of Pointers" by B. Filipek - [https://www.bfilipek.com/2014/05/vector-of-objects-vs-vector-of-pointers.html](https://www.bfilipek.com/2014/05/vector-of-objects-vs-vector-of-pointers.html).
-[^9]: Usually, people tune for the size of the L2 cache since it is not shared between the cores.
-[^10]: Blog article "Detecting false sharing" - [https://easyperf.net/blog/2019/12/17/Detecting-false-sharing-using-perf#2-tune-the-code-for-better-utilization-of-cache-hierarchy](https://easyperf.net/blog/2019/12/17/Detecting-false-sharing-using-perf#2-tune-the-code-for-better-utilization-of-cache-hierarchy).
-[^11]: In Intel processors `CPUID` instruction is described in [@IntelOptimizationManual, Volume 2]
 [^13]: Linux manual page for `memalign` - [https://linux.die.net/man/3/memalign](https://linux.die.net/man/3/memalign).
 [^14]: Generating aligned memory - [https://embeddedartistry.com/blog/2017/02/22/generating-aligned-memory/](https://embeddedartistry.com/blog/2017/02/22/generating-aligned-memory/).
-[^15]: Typical `malloc` implementation involves synchronization in case multiple threads would try to dynamically allocate the memory
-[^16]: Region-based memory management - [https://en.wikipedia.org/wiki/Region-based_memory_management](https://en.wikipedia.org/wiki/Region-based_memory_management)
-[^17]: jemalloc - [http://jemalloc.net/](http://jemalloc.net/).
-[^18]: tcmalloc - [https://github.com/google/tcmalloc](https://github.com/google/tcmalloc)
-[^19]: Cache-oblivious algorithm - [https://en.wikipedia.org/wiki/Cache-oblivious_algorithm](https://en.wikipedia.org/wiki/Cache-oblivious_algorithm).
-[^20]: Fragmentation - [https://en.wikipedia.org/wiki/Fragmentation_(computing)](https://en.wikipedia.org/wiki/Fragmentation_(computing)).
