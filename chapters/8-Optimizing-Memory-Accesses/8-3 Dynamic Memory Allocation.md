@@ -16,6 +16,7 @@ Intel CPUs have a Data Linear Address HW feature (see [@sec:sec_PEBS_DLA]) that 
 
 [TODO]: Trim footnotes
 
+[^5]: The same applies to memory deallocation.
 [^9]: Usually, people tune for the size of the L2 cache since it is not shared between the cores.
 [^10]: Blog article "Detecting false sharing" - [https://easyperf.net/blog/2019/12/17/Detecting-false-sharing-using-perf#2-tune-the-code-for-better-utilization-of-cache-hierarchy](https://easyperf.net/blog/2019/12/17/Detecting-false-sharing-using-perf#2-tune-the-code-for-better-utilization-of-cache-hierarchy).
 [^11]: In Intel processors `CPUID` instruction is described in [@IntelOptimizationManual, Volume 2]
