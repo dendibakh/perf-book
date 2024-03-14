@@ -142,6 +142,12 @@ One of the most important areas for alignment considerations is the SIMD code. W
 __m512 * ptr = new __m512[N];
 ```
 
+[TODO]: other data structure reorganization techniques:
+* structure splitting
+* field reordering
+* pointer inlining 
+
+
 [TODO]: Trim footnotes
 
 [^5]: The same applies to memory deallocation.
