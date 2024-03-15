@@ -50,6 +50,10 @@ struct S {                                        struct S {
 };                                                };
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+[TODO]: Emphasize 12 times less space.
+
+[TODO]: Should I add images for better explanation?
+
 This greatly reduces the amount of memory transferred back and forth and saves cache space. Keep in mind that this comes with the cost of accessing every packed element. Since the bits of `a`, `b`, and `c` are packed into a single byte, compiler needs to perform additional bit manipulation operations to load and store them. For example, to load `b`, you need to shift the byte value right (`>>`) by 2 and do logical AND (`&`) with `0x3`. Similarly, shift left (`<<`) and logical OR (`|`) operations are needed to store the value back into the packed format. Data packing is beneficial in places where additional computation is cheaper than the delay caused by inefficient memory transfers.
 
 Also, a programmer can reduce the memory usage by rearranging fields in a struct or class when it avoids padding added by a compiler. The reason for a compiler to insert unused bytes of memory (pads) is to enable efficient storing and fetching of individual members of a struct. In the example in [@lst:AvoidPadding], the size of `S` can be reduced if its members are declared in the order of decreasing their sizes.
@@ -65,6 +69,8 @@ struct S {                               struct S {
 };                                       };
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+[TODO]: Should I add images for better explanation?
 
 ### Field Reordering
 
@@ -126,6 +132,8 @@ struct S {
   CACHELINE_ALIGN int b; // written by thread B
 };
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+[TODO]: What is target platform's minimum alignment requirements?
 
 When it comes to dynamic allocations via `malloc`, it is guaranteed that the returned memory address satisfies the target platform's minimum alignment requirements. Some applications might benefit from a stricter alignment. For example, dynamically allocating 16 bytes with a 64 bytes alignment instead of the default 16 bytes alignment. To leverage this, users of POSIX systems can use [`memalign`](https://linux.die.net/man/3/memalign)[^13] API. Others can roll their own like described [here](https://embeddedartistry.com/blog/2017/02/22/generating-aligned-memory/)[^14].
 
