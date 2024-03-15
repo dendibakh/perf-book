@@ -27,11 +27,13 @@ Consider a standard implementation of binary search in a large sorted array, whe
 
 ### Use Appropriate Containers. 
 
-[TODO]: Elaborate
+There is a wide variety of ready-to-use containers in almost any language. But it's important to know their underlying storage and performance implications. Keep in mind how the data will be accessed and manipulated. You should consider not only the time and space complexity of operations with a data structure, but also the HW effects associated with them.
 
-There is a wide variety of ready-to-use containers in almost any language. But it's important to know their underlying storage and performance implications. A good step-by-step guide for choosing appropriate C++ containers can be found in [@fogOptimizeCpp, Chapter 9.7 Data structures, and container classes].
+By default, stay away from data structures that rely on pointers, e.g. linked lists or trees. When traversing elements, they require additional memory accesses to follow the pointers. If the maximum number of elements is relatively small and known at compile time, C++ `std::array` might be a better option than `std::vector`. If you need associative container, but don't need to store the elements in a sorted order, `std::unordered_map` should be faster than `std::map`. A good step-by-step guide for choosing appropriate C++ containers can be found in [@fogOptimizeCpp, Chapter 9.7 Data structures, and container classes].
 
-Additionally, choose the data storage, bearing in mind what the code will do with it. Consider a situation when there is a need to choose between storing objects in the array versus storing pointers to those objects while the object size is big. An array of pointers take less amount of memory. This will benefit operations that modify the array since an array of pointers requires less memory being transferred. However, a linear scan through an array will be faster when keeping the objects themselves since it is more cache-friendly and does not require indirect memory accesses.[^8]
+Sometimes, it's more efficient to store pointers to contained objects, instead of objects themselves. Consider a situation when you need store many objects in an array while the size of each object is big. In addition, the objects are frequently shuffled, removed, and inserted. Storing objects in an array will require moving large chunks of memory every time the order of objects is changed, which is expensive. In this case, it's better to store pointers to objects in the array. This way, only the pointers are moved, which is much cheaper. However, this approach has its own drawbacks. It requires additional memory for the pointers and introduces an additional level of indirection.
+
+If your data structure is accessed by multiple threads, consider using lock-free data structures. They are designed to avoid the overhead of locks and are often faster than their lock-based counterparts. However, they are much more difficult to implement and debug.
 
 ### Packing the Data.
 
@@ -202,6 +204,5 @@ https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=ae
 
 [TODO]: Trim footnotes
 
-[^8]: Blog article "Vector of Objects vs Vector of Pointers" by B. Filipek - [https://www.bfilipek.com/2014/05/vector-of-objects-vs-vector-of-pointers.html](https://www.bfilipek.com/2014/05/vector-of-objects-vs-vector-of-pointers.html).
 [^13]: Linux manual page for `memalign` - [https://linux.die.net/man/3/memalign](https://linux.die.net/man/3/memalign).
 [^14]: Generating aligned memory - [https://embeddedartistry.com/blog/2017/02/22/generating-aligned-memory/](https://embeddedartistry.com/blog/2017/02/22/generating-aligned-memory/).
