@@ -125,8 +125,8 @@ Listing: Data padding to avoid false sharing.
 ~~~~ {#lst:PadFalseSharing .cpp}
                                                   #define CACHELINE_ALIGN alignas(64) 
 struct S {                                        struct S {
-  int a; // written by thread A        =>           int a;
-  int b; // written by thread B                     CACHELINE_ALIGN int b;
+  int a; /* modified by thread A */    =>           int a;
+  int b; /* modified by thread B */                 CACHELINE_ALIGN int b;
 };                                                };
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
