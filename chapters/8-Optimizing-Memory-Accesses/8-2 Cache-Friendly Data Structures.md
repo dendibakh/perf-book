@@ -10,18 +10,20 @@ Next, we will discuss several techniques to make data structures more cache-frie
 
 The best way to exploit the spatial locality of the caches is to make sequential memory accesses. By doing so, we enable the HW prefetching mechanism (see [@sec:HwPrefetch]) to recognize the memory access pattern and bring in the next chunk of data ahead of time. An example of Row-major versus Column-Major traversal is shown in [@lst:CacheFriend]. Notice, there is only one tiny change in the code (swapped `col` and `row` subscripts), but it has a significant impact on performance.
 
-The code on the left is not cache-friendly because it skips `NCOLS` elements on every iteration of the inner loop. This results in a very inefficient use of caches. In contrast, the code on the right accesses elements of the matrix in the order in which they are laid out in memory. Row-major traversal exploits spatial locality and is cache-friendly.
+The code on the left is not cache-friendly because it skips `NCOLS` elements on every iteration of the inner loop. This results in a very inefficient use of caches. In contrast, the code on the right accesses elements of the matrix in the order in which they are laid out in memory. Row-major traversal exploits spatial locality and is cache-friendly. Figure @fig:ColRowMajor illustrates the difference between the two traversal patterns.
 
 Listing: Cache-friendly memory accesses.
 
 ~~~~ {#lst:CacheFriend .cpp}
-// Column-major order                         // Row-major order
-for (row = 0; row < NROWS; row++)             for (row = 0; row < NROWS; row++)
-  for (col = 0; col < NCOLS; col++)             for (col = 0; col < NCOLS; col++)
-    matrix[col][row] = row + col;       =>        matrix[row][col] = row + col;
+// Column-major order                              // Row-major order
+for (row = 0; row < NROWS; row++)                  for (row = 0; row < NROWS; row++)
+  for (col = 0; col < NCOLS; col++)                  for (col = 0; col < NCOLS; col++)
+    matrix[col][row] = row + col;          =>          matrix[row][col] = row + col;
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The example presented in [@lst:CacheFriend] is classical, but usually, real-world applications are much more complicated than this. Sometimes you need to go an additional mile to write cache-friendly code. If the data is not laid out in memory in a way that is optimal for the algorithm, it may require to rearrange the data first.
+![Column-major versus Row-major traversal.](../../img/memory-access-opts/ColumnRowmajor.png){#fig:ColRowMajor width=60%}
+
+The example presented above is classical, but usually, real-world applications are much more complicated than this. Sometimes you need to go an additional mile to write cache-friendly code. If the data is not laid out in memory in a way that is optimal for the algorithm, it may require to rearrange the data first.
 
 Consider a standard implementation of binary search in a large sorted array, where on each iteration, you access the middle element, compare it with the value you're searching for and go either left or right. This algorithm does not exploit spatial locality since it tests elements in different locations that are far away from each other and do not share the same cache line. The most famous way of solving this problem is storing elements of the array using the Eytzinger layout [@EytzingerArray]. The idea of it is to maintain an implicit binary search tree packed into an array using the BFS-like layout, usually seen with binary heaps. If the code performs a large number of binary searches in the array, it may be beneficial to convert it to the Eytzinger layout. 
 
@@ -50,13 +52,9 @@ struct S {                                        struct S {
 };                                                };
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-[TODO]: Emphasize 12 times less space.
+Notice the 12 times less space required to store an object of the packed version of `S`. This greatly reduces the amount of memory transferred back and forth and saves cache space. However, using bitfields comes with additional cost. Since the bits of `a`, `b`, and `c` are packed into a single byte, compiler needs to perform additional bit manipulation operations to extract and insert them. For example, to load `b`, you need to shift the byte value right (`>>`) by 2 and do logical AND (`&`) with `0x3`. Similarly, shift left (`<<`) and logical OR (`|`) operations are needed to store the value back into the packed format. Data packing is beneficial in places where additional computation is cheaper than the delay caused by inefficient memory transfers.
 
-[TODO]: Should I add images for better explanation?
-
-This greatly reduces the amount of memory transferred back and forth and saves cache space. Keep in mind that this comes with the cost of accessing every packed element. Since the bits of `a`, `b`, and `c` are packed into a single byte, compiler needs to perform additional bit manipulation operations to load and store them. For example, to load `b`, you need to shift the byte value right (`>>`) by 2 and do logical AND (`&`) with `0x3`. Similarly, shift left (`<<`) and logical OR (`|`) operations are needed to store the value back into the packed format. Data packing is beneficial in places where additional computation is cheaper than the delay caused by inefficient memory transfers.
-
-Also, a programmer can reduce the memory usage by rearranging fields in a struct or class when it avoids padding added by a compiler. The reason for a compiler to insert unused bytes of memory (pads) is to enable efficient storing and fetching of individual members of a struct. In the example in [@lst:AvoidPadding], the size of `S` can be reduced if its members are declared in the order of decreasing their sizes.
+Also, a programmer can reduce the memory usage by rearranging fields in a struct or class when it avoids padding added by a compiler. The reason for a compiler to insert unused bytes of memory (pads) is to enable efficient storing and fetching of individual members of a struct. In the example in [@lst:AvoidPadding], the size of `S` can be reduced if its members are declared in the order of decreasing their sizes. Figure @fig:AvoidPadding illustrates the effect of rearranging the fields in struct `S`.
 
 Listing: Avoid compiler padding.
 
@@ -70,36 +68,32 @@ struct S {                               struct S {
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-[TODO]: Should I add images for better explanation?
+![Avoid compiler padding by rearranging the fields. Blank cells represent compiler padding.](../../img/memory-access-opts/AvoidPadding.png){#fig:AvoidPadding width=80%}
 
 ### Field Reordering
 
 [TODO]: include example of using data-type profiling (https://lwn.net/Articles/955709/). Find a good example for a case study using `perf mem`.
 
+
+
+
 ### Aligning and Padding. {#sec:secMemAlign}
 
-[TODO]: Cosmetics. Mention that vtune tracks it with the `Split Loads` metric.
-https://www.intel.com/content/www/us/en/docs/vtune-profiler/user-guide/2023-0/cpu-metrics-reference.html#SPLIT-LOADS
+A variable is accessed most efficiently if it is stored at a memory address, which is divisible by the size of the variable. In C++, it is called *natural alignment*, which occurs by default for fundamental data types, such as integer, float, or double. When you declare variables of these types, the compiler ensures that they are stored in memory at addresses that are multiples of their size. In contrast, arrays, structs and classes may require special alignment.
 
-[TODO]: “Aligned” here means the memory address is a multiple of a specific size. For example, the low 5 bits of a 32 byte aligned memory address will be zero. A “misaligned” access crosses an alignment boundary
+It is typical for a SIMD code to load large chunks of data using a single load operation. Sometimes, such requests load data that starts on one cache line and end in the next cache line. In this case, fetching data requires two cache line reads. It also requires using so-called *split registers*, which keep the two parts and once both parts are fetched, they are combined into a single register. In the literature, you can encounter the term a *misaligned* or a *split* load to describe such a situation. Split loads may incur performance penalties, if many split loads in a row consume all available split registers. Intel's TMA methodology tracks this with the `Memory_Bound -> L1_Bound -> Split Loads` metric.
 
-[TODO]: Update Agner Fog references. Or maybe just remove them?
+For instance, AVX2 memory operations can access up to 32 bytes. If an array starts at offset `0x30` (48 bytes), the first AVX2 load will fetch data from `0x30` to `0x4F`, the second load will fetch data from 0x50 to 0x6F, and so on. The first load crosses the cache line boundary (`0x40`). In fact, every second load will cross the cache line boundary which may slow down the execution. Figure @fig:AvoidPadding illustrates this.
 
-[TODO]: Explain why misaligned loads can be a source of perf problems?
-A “misaligned” access crosses an alignment boundary, forcing the load/store unit to make two L1D lookups to satisfy the request.
+![AVX2 loads in a misaligned array. Every second load crosses cache line boundary.](../../img/memory-access-opts/SplitLoads.png){#fig:AvoidPadding width=80%}
 
-[TODO]: Accesses that cross a 4 KB boundary:
-Accesses that cross a 4 KB boundary introduce more complications, because virtual to physical address translations are usually handled in 4 KB pages. Handling such an access would require accessing two TLB entries as well. TLBs must support multiple lookups per cycle.
-
-[TODO]: Should I add images for better explanation?
-
-Another technique to improve the utilization of the memory subsystem is to align the data. There could be a situation when an object of size 16 bytes occupies two cache lines, i.e., it starts on one cache line and ends in the next cache line. Fetching such an object requires two cache line reads, which could be avoided would the object be aligned properly. [@lst:AligningData] shows how memory objects can be aligned using C++11 `alignas` keyword.
+Once you confirm that split loads affect performance of your program in a negative way, you can get rid of them by *aligning* the data. “Aligning” here means the memory address is a multiple of a specific size. For example, when a 16-byte object is aligned on the 64-byte boundary, the low 6 bits of its address are zero. [@lst:AligningData] shows how memory objects can be aligned using C++11 `alignas` keyword.
 
 Listing: Aligning data using the "alignas" keyword.
 
 ~~~~ {#lst:AligningData .cpp}
-// Make an aligned array
-alignas(16) int16_t a[N];
+// Array of 16-bit integers aligned at 32-byte boundary
+alignas(32) int16_t a[N];
 
 // Objects of struct S are aligned at cache line boundaries
 #define CACHELINE_ALIGN alignas(64) 
@@ -112,25 +106,19 @@ A variable is accessed most efficiently if it is stored at a memory address, whi
 
 Alignment can cause holes of unused bytes, which potentially decreases memory bandwidth utilization. If, in the example above, struct `S` is only 40 bytes, the next object of `S` starts at the beginning of the next cache line, which leaves `64 - 40 = 24` unused bytes in every cache line which holds objects of struct `S`.
 
-Sometimes padding data structure members is required to avoid edge cases like cache contentions [@fogOptimizeCpp, Chapter 9.10 Cache contentions] and false sharing (see [@sec:secFalseSharing]). For example, false sharing issues might occur in multithreaded applications when two threads, `A` and `B`, access different fields of the same structure. An example of code when such a situation might happen is shown on [@lst:PadFalseSharing1]. Because `a` and `b` members of struct `S` could potentially occupy the same cache line, cache coherency issues might significantly slow down the program. To resolve the problem, one can pad `S` such that members `a` and `b` do not share the same cache line as shown in [@lst:PadFalseSharing2].
+[TODO]: Accesses that cross a 4 KB boundary:
+Accesses that cross a 4 KB boundary introduce more complications, because virtual to physical address translations are usually handled in 4 KB pages. Handling such an access would require accessing two TLB entries as well. TLBs must support multiple lookups per cycle.
 
-Listing: Padding data: baseline version.
+Sometimes padding data structure members is required to avoid edge cases like cache contentions [@fogOptimizeCpp, Chapter 9.10 Cache contentions] and false sharing (see [@sec:secFalseSharing]). The latter may occur in multithreaded applications when two threads, `A` and `B`, access different fields of the same structure. An example of code when such a situation might happen is shown in [@lst:PadFalseSharing]. In the code on the left, members `a` and `b` of struct `S` are likely to reside on the same cache line. Even though threads `A` and `B` modify distinct fields of the data structure, a processor needs to maintain cache coherency, which causes additional overhead and might significantly slow down the program. To resolve this problem, one can pad `S` such that members `a` and `b` do not share a cache line as shown on the right.
 
-~~~~ {#lst:PadFalseSharing1 .cpp}
-struct S {
-  int a; // written by thread A
-  int b; // written by thread B
-};
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Listing: Data padding to avoid false sharing.
 
-Listing: Padding data: improved version.
-
-~~~~ {#lst:PadFalseSharing2 .cpp}
-#define CACHELINE_ALIGN alignas(64) 
-struct S {
-  int a; // written by thread A
-  CACHELINE_ALIGN int b; // written by thread B
-};
+~~~~ {#lst:PadFalseSharing .cpp}
+                                                  #define CACHELINE_ALIGN alignas(64) 
+struct S {                                        struct S {
+  int a; // written by thread A        =>           int a;
+  int b; // written by thread B                     CACHELINE_ALIGN int b;
+};                                                };
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 [TODO]: What is target platform's minimum alignment requirements?

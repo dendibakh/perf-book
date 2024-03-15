@@ -40,22 +40,14 @@ One of the most important techniques for tuning is called "Data-Driven" optimiza
 Listing: SOA to AOS transformation.
 
 ~~~~ {#lst:AOStoSOA .cpp}
-struct S {
-  int a;
-  int b;
-  int c;
-  // other fields
-};
-S s[N];    // AOS
-
-<=>
-    
-struct S { // SOA
-  int a[N];
-  int b[N];
-  int c[N];
-  // other fields  
-};
+// Array of Structures (AOS)             // Structure of Arrays (SOA)
+struct S {                               struct S {
+  int a;                                   int a[N];
+  int b;                        <=>        int b[N];
+  int c;                                   int c[N];
+  // other fields                          // other arrays
+};                                       };
+S s[N];    
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The answer to the question of which layout is better depends on how the code is accessing the data. If the program iterates over the data structure and only accesses field `b`, then SOA is better because all memory accesses will be sequential. However, if a program iterates over the data structure and does *extensive* operations on all the fields of the object, then AOS may give better memory bandwidth utilization and in some cases, better performance. In the AOS scenario, members of the struct are likely to reside in the same cache line, and thus require fewer cache line reads and use less cache space. But more often, we see SOA gives better performance as it enables other important transformations, for example vectorization.
