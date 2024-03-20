@@ -18,6 +18,8 @@
 
 \textbf{CPU} Central Processing Unit
 
+\textbf{DDD} Data-Driven Development
+
 \textbf{DSB} Decoded Stream Buffer
 
 \textbf{DRAM} Dynamic Random-Access Memory

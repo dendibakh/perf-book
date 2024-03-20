@@ -2,7 +2,7 @@
 typora-root-url: ..\..\img
 ---
 
-# Optimizing Branch Prediction
+# Optimizing Branch Prediction {#sec:ChapterBadSpec}
 
 So far we've been talking about optimizing memory accesses and computations. However, there is another important category of performance bottlenecks that we haven't discussed yet. It is related to speculative execution, a feature that is present in all modern high-performance CPU cores. To refresh your memory, turn to [@sec:SpeculativeExec] where we discussed how speculative execution can be used to improve performance. In this chapter, we will explore techniques to reduce the number of branch mispredictions.
 
