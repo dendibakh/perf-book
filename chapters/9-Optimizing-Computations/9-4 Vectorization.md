@@ -36,7 +36,7 @@ The vectorizer is usually structured in three phases: legality-check, profitabil
 
 * **Transformation**: finally, after the vectorizer figures out that the transformation is legal and profitable, it transforms the code. This process also includes the insertion of guards that enable vectorization. For example, most loops use an unknown iteration count, so the compiler has to generate a scalar version of the loop, in addition to the vectorized version of the loop, to handle the last few iterations. The compiler also has to check if pointers don’t overlap, etc. All of these transformations are done using information that is collected during the legality check phase.
 
-### Discovering Vectorization Opportunities.
+### Discovering Vectorization Opportunities. {#sec:DiscoverVectOpptnt}
 
 [Amdahl's law](https://en.wikipedia.org/wiki/Amdahl's_law)[^6] teaches us that we should spend time analyzing only those parts of code that are used the most during the execution of a program. Thus, performance engineers should focus on hot parts of the code that were highlighted by a profiling tool. As mentioned earlier, vectorization is most frequently applied to loops.
 

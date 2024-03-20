@@ -58,6 +58,8 @@
 
 \textbf{LSD} Loop Stream Detector
 
+\textbf{LTO} Link-Time Optimizations
+
 \textbf{MSR} Model Specific Register
 
 \textbf{MS-ROM} Microcode Sequencer Read-Only Memory
@@ -68,7 +70,7 @@
 
 \textbf{PEBS} Processor Event-Based Sampling
 
-\textbf{PGO} Profile Guided Optimizations
+\textbf{PGO} Profile-Guided Optimizations
 
 \textbf{PMC} Performance Monitoring Counter
 
