@@ -28,6 +28,8 @@
 
 \textbf{FLOPS} FLoating-point Operations Per Second
 
+\textbf{FMA} Fused Multiply Add
+
 \textbf{FPGA} Field-Programmable Gate Array
 
 \textbf{GPU} Graphics processing unit
