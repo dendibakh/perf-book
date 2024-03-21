@@ -134,71 +134,47 @@ Alignment and padding often cause holes of unused bytes, which potentially decre
 
 ### Other Data Structure Reorganization Techniques
 
-[TODO]: to be written
+To close the topic of cache-friendly data structures, we will briefly mention two other techniques: *structure splitting* and *pointer inlining* that can be used to improve cache utilization.
 
-- **structure splitting**
+**Structure splitting**. Splitting a large structure into smaller ones can improve cache utilization. For example, if you have a structure that contains a large number of fields, but only a few of them are accessed together, you can split the structure into two or more smaller ones. This way, you can avoid loading unnecessary data into the cache. An example of structure splitting is shown in [@lst:StructureSplitting]. By splitting the `Point` structure into `PointCoords` and `PointInfo`, we can avoid loading the `PointInfo` data into caches when we only need `PointCoords`. This way, we can fit more points on a signle cache line.
 
-Simple example:
-```cpp
-struct Point {
-  int X;
-  int Y;
-  int Z;
-  /*many other fields*/
-};
-std::vector<Point> points;
+Listing: Structure Splitting.
 
-=>
+~~~~ {#lst:StructureSplitting .cpp}
+struct Point {                                   struct PointCoords {
+  int X;                                           int X;
+  int Y;                                           int Y;
+  int Z;                                           int Z;
+  /*many other fields*/              =>          };
+};                                               struct PointInfo {
+std::vector<Point> points;                         /*many other fields*/
+                                                 };
+                                                 std::vector<PointCoords> pointCoords;
+                                                 std::vector<PointInfo> pointInfos;
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-struct PointCoords {
-  int X;
-  int Y;
-  int Z;
-};
-struct PointInfo {
-  /*many other fields*/
-};
-std::vector<PointCoords> pointCoords;
-std::vector<PointInfo> pointInfos;
+**Pointer inlining**. Inlining a pointer into a structure can improve cache utilization. For example, if you have a structure that contains a pointer to another structure, you can inline the pointer into the first structure. This way, you can avoid an additional memory access to fetch the second structure. An example of pointer inlining is shown in [@lst:PointerInlining]. The `weight` parameter is used in many graph algorithms, and thus, it is frequently accessed. However, in the original version on the left, retrieving the edge weight requires an additional memory access, which can result in a cache miss. By inlining the `weight` parameter into the `GraphEdge` structure, we avoid such issues.
 
-* **pointer inlining**
+Listing: Pointer inlining in a structure.
 
-```cpp
-struct GraphEdge {
-  unsigned int from;
-  unsigned int to;
-  GraphEdgeProperties* prop;
-};
-struct GraphEdgeProperties {
-  float weight;
-  std::string label;
-  // ...
-};
+~~~~ {#lst:PointerInlining .cpp}
+struct GraphEdge {                               struct GraphEdge {
+  unsigned int from;                               unsigned int from;
+  unsigned int to;                                 unsigned int to;
+  GraphEdgeProperties* prop;                       float weight;
+};                                   =>            GraphEdgeProperties* prop;
+struct GraphEdgeProperties {                     };
+  float weight;                                  struct GraphEdgeProperties {
+  std::string label;                               std::string label;
+  // ...                                           // ...
+};                                               };
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-=>
+Data-type profiling is very effective at finding opportunities to improve cache utilization. Recent Linux kernel history contains many examples of commits that reorder structures,[^1] pad fields,[^3] or pack[^2] them to improve performance.
 
-struct GraphEdge {
-  unsigned int from;
-  unsigned int to;
-  float weight;
-  GraphEdgeProperties* prop;
-};
-struct GraphEdgeProperties {
-  std::string label;
-  // ...
-};
-```
-
-This code was in one of the open-source graph analytics codes.
-
-Use data-type profiling to find opportunities.
-
-Recent kernel history is full of examples of commits that reorder structures, pad fields, or pack them to improve performance.
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=54ff8ad69c6e93c0767451ae170b41c000e565dd
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=e5598d6ae62626d261b046a2f19347c38681ff51
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=aee79d4e5271cee4ffa89ed830189929a6272eb8
-
-[TODO]: Trim footnotes
+[^1]: Linux commit [54ff8ad69c6e93c0767451ae170b41c000e565dd](https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=54ff8ad69c6e93c0767451ae170b41c000e565dd)
+[^2]: Linux commit [e5598d6ae62626d261b046a2f19347c38681ff51](https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=e5598d6ae62626d261b046a2f19347c38681ff51)
+[^3]: Linux commit [aee79d4e5271cee4ffa89ed830189929a6272eb8](https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=aee79d4e5271cee4ffa89ed830189929a6272eb8)
 
 [^12]: aligned_alloc - [https://en.cppreference.com/w/c/memory/aligned_alloc](https://en.cppreference.com/w/c/memory/aligned_alloc)
 [^13]: Linux manual page for `memalign` - [https://linux.die.net/man/3/memalign](https://linux.die.net/man/3/memalign)
