@@ -79,7 +79,7 @@ Hardware prefetchers observe the behavior of a running application and initiate 
 
 Software memory prefetching complements prefetching done by HW. Developers can specify which memory locations are needed ahead of time via dedicated HW instruction (see [@sec:memPrefetch]). Compilers can also automatically add prefetch instructions into the code to request data before it is required. Prefetch techniques need to balance between demand and prefetch requests to guard against prefetch traffic slowing down demand traffic. 
 
-### Main Memory
+### Main Memory {#sec:UarchMainmemory}
 
 Main memory is the next level of the hierarchy, downstream from the caches. Requests to load and store data are initiated by the Memory Controller Unit (MCU). In the past, this circuit was located in the north bridge chip on the motherboard. But nowadays, most processors have this component embedded, so the CPU has a dedicated memory bus connecting it to main memory.
 
