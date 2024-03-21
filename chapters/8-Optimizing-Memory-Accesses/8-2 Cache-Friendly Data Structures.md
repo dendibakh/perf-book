@@ -70,6 +70,8 @@ struct S {                               struct S {
 
 ![Avoid compiler padding by rearranging the fields. Blank cells represent compiler padding.](../../img/memory-access-opts/AvoidPadding.png){#fig:AvoidPadding width=80%}
 
+[TODO]: maybe say a few words about Pointer tagging.
+
 ### Field Reordering
 
 [TODO]: include example of using data-type profiling (https://lwn.net/Articles/955709/). Find a good example for a case study using `perf mem`.

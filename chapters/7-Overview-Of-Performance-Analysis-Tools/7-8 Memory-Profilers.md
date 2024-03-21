@@ -34,7 +34,7 @@ When developers talk about memory consumption, they implicitly mean heap usage. 
 
 Since the heap is usually the largest consumer of memory resources, it makes sense for developers to focus on this part of memory when they analyze the memory utilization of their applications. In the following section, we will examine heap consumption and memory allocations in a popular real-world application.
 
-### Case Study: Analyzing Stockfish's Heap Allocations
+### Case Study: Analyzing Stockfish's Heap Allocations {#sec:HeaptrackCaseStudy}
 
 In this case study, we use [heaptrack](https://github.com/KDE/heaptrack)[^2], an open-sourced heap memory profiler for Linux developed by KDE. Ubuntu users can install it very easily with `apt install heaptrack heaptrack-gui`. Heaptrack can find places in the code where the largest and most frequent allocations happen among many other things. On Windows, you can use [Mtuner](https://github.com/milostosic/MTuner)[^3] which has similar capabilities as Heaptrack.
 
