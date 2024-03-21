@@ -47,10 +47,7 @@ $ perf record -a -e ibs_fetch/l3missonly=1/ -- benchmark.exe
 $ perf report
 ```
 
-where `cnt_ctl=0` counts clock cycles, `cnt_ctl=1` counts dispatched ops for an interval period; `l3missonly=1` only keeps the samples that had an L3 miss. Note that in both of the commands above, `-a` option is used to collect IBS samples for all cores, otherwise `perf` would fail to collect samples on Linux kernel 6.1. From the version 6.2 onwards, `-a` option is no longer needed unless you want to collect IBS samples for all cores. The `perf report` command will show samples attributed to functions and source code lines similar to regular PMU events but with added features that we will discuss later.
-
-[TODO]: Are these `cnt_ctl,l3missonly` IBS controls/filters the only ones that exist? Where are they documented?
-[TODO]: How do I parse IBS raw dumps in case I want to do custom analysis?
+where `cnt_ctl=0` counts clock cycles, `cnt_ctl=1` counts dispatched ops for an interval period; `l3missonly=1` only keeps the samples that had an L3 miss. These two parameters and a few other are described in more details in [@AMDUprofManual, Table 25. AMDuProfCLI Collect Command Options]. Note that in both of the commands above, `-a` option is used to collect IBS samples for all cores, otherwise `perf` would fail to collect samples on Linux kernel 6.1 or older. From the version 6.2 onwards, `-a` option is no longer needed unless you want to collect IBS samples for all cores. The `perf report` command will show samples attributed to functions and source code lines similar to regular PMU events but with added features that we will discuss later. AMD uProf command line tool can generate IBS raw data, which later can be converted to a CSV file for later postprocessing with MS Excel as described in [@AMDUprofManual, Section 7.10 ASCII Dump of IBS Samples].
 
 ### SPE on ARM Platforms
 
@@ -98,7 +95,7 @@ The profiler might tag `load3` as the instruction that causes a large number of 
 
 The problem with the skid is mitigated by having the processor itself store the instruction pointer (along with other information). With Intel PEBS, the `EventingIP` field in the PEBS record indicates the instruction that caused the event. This is typically available only for a subset of supported events, called "Precise Events". A complete list of precise events for specific microarchitecture can be found in [@IntelOptimizationManual, Volume 3B, Chapter 20 Performance Monitoring]. An example of using PEBS precise events to mitigate skid can be found on the [easyperf blog](https://easyperf.net/blog/2018/08/29/Understanding-performance-events-skid).[^2]
 
-Listed below are precise events for the Skylake Microarchitecture:
+Listed below are precise events for the Intel Skylake Microarchitecture:
 
 ```
 INST_RETIRED.*          OTHER_ASSISTS.*      BR_INST_RETIRED.*       BR_MISP_RETIRED.*
@@ -108,17 +105,15 @@ MEM_LOAD_RETIRED.*      MEM_LOAD_L3_HIT_RETIRED.*
 
 , where `.*` means that all sub-events inside a group can be configured as precise events.
 
-Users of Linux `perf` on Intel platforms should add `pp` suffix to one of the events listed above to enable precise tagging:
+With AMD IBS and ARM SPE, all the collected samples are precise by design since the HW captures the exact instruction address. In fact, they both work in a very similar fashion. Whenever an overflow occurs, the mechanism saves the instruction causing the overflow into a dedicated buffer which is then read by the interrupt handler. As the address is preserved, IBS and SPE samples attribution to the instructions are precise.
+
+Users of Linux `perf` on Intel and AMD platforms must add `pp` suffix to one of the events listed above to enable precise tagging as shown below. However, on ARM platforms, it has no effect, so users must use the `arm_spe_0` event.
 
 ```bash
 $ perf record -e cycles:pp -- ./a.exe
 ```
 
 [TODO]: For Denis: show example of regular vs. precise events?
-
-With AMD IBS and ARM SPE, all the collected samples are precise by design since the HW captures the exact instruction address. In fact, they both work in a very similar fashion. Whenever an overflow occurs, the mechanism saves the instruction causing the overflow into a dedicated buffer which is then read by the interrupt handler. As the address is preserved, IBS and SPE samples attribution to the instructions are precise.
-
-[TODO]: Does Linux perf on ARM supports `:p` suffixes? - Yes, but it makes no difference.
 
 Precise events provide a relief for performance engineers as they help to avoid misleading data that often confuses beginners and even senior developers. The TMA methodology heavily relies on precise events to locate the exact line of source code where the inefficient execution takes place.
 
