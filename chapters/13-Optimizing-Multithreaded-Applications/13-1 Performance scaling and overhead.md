@@ -8,8 +8,6 @@ When dealing with a single-threaded application, optimizing one portion of the p
 
 This effect is widely known as [Amdahl's law](https://en.wikipedia.org/wiki/Amdahl's_law),[^6] which constitutes that the speedup of a parallel program is limited by its serial part. Figure @fig:MT_AmdahlsLaw illustrates the theoretical speedup limit as a function of the number of processors. For a program, 75% of which is parallel, the speedup factor converges to 4.
 
-[TODO]: redo images + combine them
-
 <div id="fig:AmdahlUSLLaws">
 ![The theoretical speedup of the latency of the execution of a program as a function of the number of processors executing it, according to Amdahl's law.](../../img/mt-perf/AmdahlsLaw.png){#fig:MT_AmdahlsLaw width=45%}
 ![Universal Scalability Law and Amdahl's law. *© Image by Neha Bhardwaj via [Knoldus Blogs](https://blog.knoldus.com/understanding-laws-of-scalability-and-the-effects-on-a-distributed-system/).*](../../img/mt-perf/USL.png){#fig:MT_USL width=45%}
