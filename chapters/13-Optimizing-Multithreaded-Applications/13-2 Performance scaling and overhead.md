@@ -1,7 +1,3 @@
----
-typora-root-url: ..\..\img
----
-
 ## Performance Scaling in Multithreaded Programs {#sec:secAmdahl}
 
 When dealing with a single-threaded application, optimizing one portion of the program usually yields positive results on performance. However, it's not necessarily the case for multithreaded applications. There could be an application in which thread `A` executes a long-running operation, while thread `B` finishes its task early and just waits for thread `A` to finish. No matter how much we improve thread `B`,  application latency will not be reduced since it will be limited by a longer-running thread `A`. 

@@ -1,7 +1,3 @@
----
-typora-root-url: ..\..\img
----
-
 ## Cache Coherence Issues {#sec:TrueFalseSharing}
 
 ### Cache Coherency Protocols

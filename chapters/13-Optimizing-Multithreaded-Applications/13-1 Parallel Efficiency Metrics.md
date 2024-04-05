@@ -1,7 +1,3 @@
----
-typora-root-url: ..\..\img
----
-
 ## Parallel Efficiency Metrics {#sec:secMT_metrics}
 
 When dealing with multithreaded applications, engineers should be careful analyzing basic metrics like CPU utilization and IPC (see [@sec:secMetrics]). One of the threads might show high CPU utilization and high IPC, but it could turn out that the thread was just spinning on a lock. That's why, when evaluating the parallel efficiency of an application, it's recommended to use Effective CPU Utilization, which is based only on the Effective time.[^12]
