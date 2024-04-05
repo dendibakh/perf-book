@@ -1,6 +1,7 @@
 ## Data Dependencies
 
 [TODO]: One way to find loop-carry dependencies is to look at phi nodes of the loop in LLVM IR.
+[TODO]: Watch out for dependencies through memory (store -> load -> store -> ... in the same location).
 
 When a program statement refers to the data of a preceding statement, we say that there is a *data dependency* between the two statements. Sometimes people also use terms *dependency chain* or *data flow dependencies*. The example we are most familiar with is shown on Figure @fig:LinkedListChasing. To access the node `N+1`, we should first dereference the pointer `N->next`. For the loop on the right, this is a *recurrent* data dependency, meaning it spans multiple iterations of the loop. Basically, traversing a linked list is one very long dependency chain.
 
