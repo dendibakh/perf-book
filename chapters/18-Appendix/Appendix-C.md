@@ -6,7 +6,7 @@ typora-root-url: ..\..\img
 
 \markright{Appendix C}
 
-## Windows
+## Windows {.unnumbered}
 
 To utilize huge pages on Windows, one needs to enable `SeLockMemoryPrivilege` [security policy](https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/lock-pages-in-memory). This can be done programatically via the Windows API, or alternatively via the security policy GUI.
 
@@ -30,7 +30,7 @@ void* p = VirtualAlloc(NULL, size, MEM_RESERVE |
 VirtualFree(ptr, 0, MEM_RELEASE);
 ```
 
-## Linux
+## Linux {.unnumbered}
 
 On Linux OS, there are two ways of using huge pages in an application: Explicit and Transparent Huge Pages.
 
