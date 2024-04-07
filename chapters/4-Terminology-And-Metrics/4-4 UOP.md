@@ -31,7 +31,9 @@ Even though we were just talking about how instructions are split into smaller p
   ```
   There are two $\mu$ops in this instruction: 1) read the memory location `mem`, and 2) add it to `eax`. With microfusion, two $\mu$ops are fused into one at the decoding step.
   
-* **Macrofusion**: fuse $\mu$ops from different machine instructions. The decoders can fuse arithmetic or logic instruction with a subsequent conditional jump instruction into a single compute-and-branch $\mu$op in certain cases. For example:
+* **Macrofusion**: fuse $\mu$ops from different machine instructions.
+
+The decoders can fuse arithmetic or logic instruction with a subsequent conditional jump instruction into a single compute-and-branch $\mu$op in certain cases. For example:
 
   ```bash
   .loop:
@@ -39,6 +41,8 @@ Even though we were just talking about how instructions are split into smaller p
     jnz .loop
   ```
   With macrofusion, two $\mu$ops from the `DEC` and `JNZ` instructions are fused into one.
+
+The Zen4 microarchitecture also added support for DIV/IDIV and NOP fusion [^1].
 
 Both micro- and macrofusion save bandwidth in all stages of the pipeline from decoding to retirement. The fused operations share a single entry in the reorder buffer (ROB). The capacity of the ROB is utilized better when a fused $\mu$op uses only one entry. Such a fused ROB entry is later dispatched to two different execution ports but is retired again as a single unit. Readers can learn more about $\mu$op fusion in [@fogMicroarchitecture].
 
@@ -51,6 +55,7 @@ $ perf stat -e uops_issued.any,uops_executed.thread,uops_retired.slots -- ./a.ex
   2557884  uops_retired.slots
 ```
 
-The way instructions are split into micro operations may vary across CPU generations. Usually, a lower number of $\mu$ops used for an instruction means that HW has better support for it and is likely to have lower latency and higher throughput. For the latest Intel and AMD CPUs, the vast majority of instructions generate exactly one $\mu$op. Latency, throughput, port usage, and the number of $\mu$ops for x86 instructions on recent microarchitectures can be found at the [uops.info](https://uops.info/table.html)[^1] website.
+The way instructions are split into micro operations may vary across CPU generations. Usually, a lower number of $\mu$ops used for an instruction means that HW has better support for it and is likely to have lower latency and higher throughput. For the latest Intel and AMD CPUs, the vast majority of instructions generate exactly one $\mu$op. Latency, throughput, port usage, and the number of $\mu$ops for x86 instructions on recent microarchitectures can be found at the [uops.info](https://uops.info/table.html)[^2] website.
 
-[^1]: Instruction latency and Throughput - [https://uops.info/table.html](https://uops.info/table.html)
+[^1]: Software Optimization Guide for the AMD Zen4 Microarchitecture, sections 2.9.4 and 2.9.5 - [https://www.amd.com/content/dam/amd/en/documents/epyc-technical-docs/software-optimization-guides/57647.zip](https://www.amd.com/content/dam/amd/en/documents/epyc-technical-docs/software-optimization-guides/57647.zip).
+[^2]: Instruction latency and Throughput - [https://uops.info/table.html](https://uops.info/table.html).
