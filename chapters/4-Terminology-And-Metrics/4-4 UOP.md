@@ -6,6 +6,8 @@ typora-root-url: ..\..\img
 
 Microprocessors with the x86 architecture translate complex CISC-like instructions into simple RISC-like microoperations, abbreviated as $\mu$ops or $\mu$ops. A simple addition instruction such as `ADD rax, rbx` generates only one $\mu$op, while a more complex instruction like `ADD rax, [mem]` may generate two: one for reading from the `mem` memory location into a temporary (un-named) register, and one for adding it to the `rax` register. The instruction `ADD [mem], rax` generates three $\mu$ops: one for reading from memory, one for adding, and one for writing the result back to memory.
 
+Decoding to $\mu$ops is done by the frontend. To reduce decode latency, lower the power consumption of the decoder and prevent that the frontend becomes the bottleneck, there is a cache for the $\mu$ops code. This cache is called the $\mu$op cache.
+
 The main advantage of splitting instructions into micro operations is that $\mu$ops can be executed:
 
 * **Out of order**: consider the `PUSH rbx` instruction, which decrements the stack pointer by 8 bytes and then stores the source operand on the top of the stack. Suppose that `PUSH rbx` is "cracked" into two dependent micro operations after decode:
