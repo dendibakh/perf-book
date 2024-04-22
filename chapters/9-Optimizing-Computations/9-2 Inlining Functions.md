@@ -63,5 +63,83 @@ For GCC and Clang compilers, one can make a hint for inlining `foo` with the hel
 }
 ```
 
+### Tail call optimization
+
+A tail recursive function is a function that as last call (tail) does `return function(...)`. This is demonstrated in the following example:
+
+```cpp
+int sum(int n, int accumulator)
+{
+    if (n == 0)
+    {
+        return accumulator;
+    }
+    else
+    {
+        return sum(n - 1, accumulator + n);
+    }
+}
+```
+
+The sum method recursivly adds `n` to each number below `n`. To calculate the sum of 5, call `sum(5,0)` and `5+4+3+2+1` is calulated which gives 15.
+
+After compiling using GCC and without optimizations, from the generated assembly it is clear that the assembly of the sum function is recursive because it calls itself:
+
+```asm
+sum(int, int):                               # @sum(int, int)
+        push    rbp
+        mov     rbp, rsp
+        sub     rsp, 16
+        mov     dword ptr [rbp - 8], edi
+        mov     dword ptr [rbp - 12], esi
+        cmp     dword ptr [rbp - 8], 0
+        jne     .LBB0_2
+        mov     eax, dword ptr [rbp - 12]
+        mov     dword ptr [rbp - 4], eax
+        jmp     .LBB0_3
+.LBB0_2:
+        mov     edi, dword ptr [rbp - 8]
+        sub     edi, 1
+        mov     esi, dword ptr [rbp - 12]
+        add     esi, dword ptr [rbp - 8]
+        call    sum(int, int)                   ; self call
+        mov     dword ptr [rbp - 4], eax
+.LBB0_3:
+        mov     eax, dword ptr [rbp - 4]
+        add     rsp, 16
+        pop     rbp
+        ret
+```
+
+This is very inefficient due to the overhead of the function call. It also limits the number of recursive calls that can be made before exceeding the stack limit.
+
+But when applying some optimization options, the compiler could decide to apply the tail call optimization and replace the recursive version, by an iterative one. The following code is generated using GCC with O2.
+
+```asm
+sum(int, int):
+        mov     eax, esi
+        test    edi, edi
+        je      .L5
+        lea     edx, [rdi-1]
+        test    dil, 1
+        je      .L2
+        add     eax, edi
+        mov     edi, edx
+        test    edx, edx
+        je      .L17
+.L2:
+        lea     eax, [rax-1+rdi*2]
+        sub     edi, 2
+        jne     .L2
+.L5:
+        ret
+.L17:
+        ret
+```
+
+It is clear from the above assembly that function isn't recursive any longer since there is no `call    sum(int, int)`. Just like inlining, the tail call optimization provides room for further optimization.
+
+Unfortunately, one can't rely blindly on the tail call optimization and inspection of generated assembly as required. There are compiler specific extensions like `__attribute__((musttail))` from Clang. In case of doubt, it is better to use an iterative version instead of tail resursion and leave tail recursion to functional programming languagues.
+
 [^20]: See the article: [https://aras-p.info/blog/2017/10/09/Forced-Inlining-Might-Be-Slow/](https://aras-p.info/blog/2017/10/09/Forced-Inlining-Might-Be-Slow/).
 [^21]: For example, 1) when a function declaration has a hint for inlining, 2) when there is profiling data for the function, or 3) when a compiler optimizes for size (`-Os`) rather than performance (`-O2`).
