@@ -37,10 +37,10 @@ Requirements:
 
 Run:
 ```bash
-# Linux bash
+# Linux bash and Windows cmd prompt
 python export_book.py && pdflatex book.tex && bibtex book && pdflatex book.tex && pdflatex book.tex
 
-# Windows Powershell
+# Windows powershell
 function Run-Block-With-Error($block) {
     $ErrorActionPreference="Stop"
     Invoke-Command -ScriptBlock $block
