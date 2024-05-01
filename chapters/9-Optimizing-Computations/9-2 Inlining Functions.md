@@ -18,8 +18,8 @@ The primary mechanism for function inlining in many compilers relies on a cost m
 
 Also, there are situations when inlining is problematic:
 
-* A recursive function cannot be inlined into itself.
-* A function that is referred to through a pointer can be inlined in place of a direct call but the functiona has to remain in the binary, i.e., it cannot be fully inlined and eliminated. The same is true for functions with external linkage.
+* A recursive function cannot be inlined into itself, unless it's a tail-recursive function (see next section). Also, if a depth of recursion is usually small, it's possible to partially inline a recursive function, i.e., inline a body of a recursive function to itself a couple of times, and then leave a recursive call as before. This may eliminate the overhead of a function call in the common case.
+* A function that is referred to through a pointer can be inlined in place of a direct call but the function has to remain in the binary, i.e., it cannot be fully inlined and eliminated. The same is true for functions with external linkage.
 
 As we said earlier, compilers tend to use a cost model approach when making a decision about inlining a function, which typically works well in practice. In general, it is a good strategy to rely on the compiler for making all the inlining decisions and adjust if needed. The cost model cannot account for every possible situation, which leaves room for improvement. Sometimes compilers require special hints from the developer. One way to find potential candidates for inlining in a program is by looking at the profiling data, and in particular, how hot is the prologue and the epilogue of the function. Below is an example of a function profile with prologue and epilogue consuming `~50%` of the function time:
 
@@ -40,9 +40,9 @@ Overhead |  Source code & Disassembly
     1.94 :  418bfb:  push   rbx
     0.50 :  418bfc:  sub    rsp,0x8
     ...
-    #                                # function body
+    # function body
     ...
-    4.17 :  418d43:  add    rsp,0x8	 # epilogue
+    4.17 :  418d43:  add    rsp,0x8  # epilogue
     3.67 :  418d47:  pop    rbx
     0.35 :  418d48:  pop    rbp
     0.94 :  418d49:  pop    r12
@@ -50,7 +50,6 @@ Overhead |  Source code & Disassembly
     4.12 :  418d4d:  pop    r14
     0.00 :  418d4f:  pop    r15
     1.59 :  418d51:  ret
-
 ```
 
 When you see hot `PUSH` and `POP` instructions, this might be a strong indicator that the time consumed by the prologue and epilogue of the function might be saved if we inline the function. Note that even if the prologue and epilogue are hot, it doesn't necessarily mean it will be profitable to inline the function. Inlining triggers a lot of different changes, so it's hard to predict the outcome. Always measure the performance of the changed code before forcing compiler to inline a function.
@@ -63,83 +62,29 @@ For GCC and Clang compilers, one can make a hint for inlining `foo` with the hel
 }
 ```
 
-### Tail call optimization
+### Tail Call Optimization
 
-A tail recursive function is a function that as last call (tail) does `return function(...)`. This is demonstrated in the following example:
+In a tail-recursive function, the recursive call is the last operation performed by the function before it returns its result. A simple example is demonstrated [@lst:TailCall]. In the original code, the `sum` function recursively accumulates integer numbers from 0 to `n`, for example a call of `sum(5,0)` will yield `5+4+3+2+1`, which gives 15.
 
-```cpp
-int sum(int n, int accumulator)
-{
-    if (n == 0)
-    {
-        return accumulator;
-    }
-    else
-    {
-        return sum(n - 1, accumulator + n);
-    }
+If we compile the original code without optimizations (`-O0`), compilers will generate assembly code that has a recursive call. This is very inefficient due to the overhead of the function call. Moreover, if you call `sum` with a large `n`, then there is a high chance that it will result in a stack overflow, since the memory allocated for stack is limited.
+
+When you apply optimizations, e.g., `-O2`, to the example in [@lst:TailCall], compilers will recognize an opportunity for the tail call optimization. The transformation will reuse the current stack frame instead of recursively creating new frames. To do so, you need to flush the current frame, and replace the `call` instruction with `jmp` to the beginning of the function. Just like inlining, tail call optimization provides room for further optimizations. So, later, compiler is able to apply more transformations to replace the original version with an iterative version shown on right. For example, GCC 13.2 generates identical machine code for both versions.
+
+Listing: Tail Call Compiler Optimization
+		
+~~~~ {#lst:TailCall .cpp}
+// original code                                // compiler intermediate transformation
+int sum(int n, int acc) {                       int sum(int n, int acc) {
+  if (n == 0) {                                   for (int i = n; i > 0; --i) {
+    return acc;                                     acc += i;
+  } else {                             =>         }
+    return sum(n - 1, acc + n);                   return acc;
+  }                                             }
 }
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The sum method recursivly adds `n` to each number below `n`. To calculate the sum of 5, call `sum(5,0)` and `5+4+3+2+1` is calulated which gives 15.
-
-After compiling using GCC and without optimizations, from the generated assembly it is clear that the assembly of the sum function is recursive because it calls itself:
-
-```asm
-sum(int, int):                               # @sum(int, int)
-        push    rbp
-        mov     rbp, rsp
-        sub     rsp, 16
-        mov     dword ptr [rbp - 8], edi
-        mov     dword ptr [rbp - 12], esi
-        cmp     dword ptr [rbp - 8], 0
-        jne     .LBB0_2
-        mov     eax, dword ptr [rbp - 12]
-        mov     dword ptr [rbp - 4], eax
-        jmp     .LBB0_3
-.LBB0_2:
-        mov     edi, dword ptr [rbp - 8]
-        sub     edi, 1
-        mov     esi, dword ptr [rbp - 12]
-        add     esi, dword ptr [rbp - 8]
-        call    sum(int, int)                   ; self call
-        mov     dword ptr [rbp - 4], eax
-.LBB0_3:
-        mov     eax, dword ptr [rbp - 4]
-        add     rsp, 16
-        pop     rbp
-        ret
-```
-
-This is very inefficient due to the overhead of the function call. It also limits the number of recursive calls that can be made before exceeding the stack limit.
-
-But when applying some optimization options, the compiler could decide to apply the tail call optimization and replace the recursive version, by an iterative one. The following code is generated using GCC with O2.
-
-```asm
-sum(int, int):
-        mov     eax, esi
-        test    edi, edi
-        je      .L5
-        lea     edx, [rdi-1]
-        test    dil, 1
-        je      .L2
-        add     eax, edi
-        mov     edi, edx
-        test    edx, edx
-        je      .L17
-.L2:
-        lea     eax, [rax-1+rdi*2]
-        sub     edi, 2
-        jne     .L2
-.L5:
-        ret
-.L17:
-        ret
-```
-
-It is clear from the above assembly that function isn't recursive any longer since there is no `call    sum(int, int)`. Just like inlining, the tail call optimization provides room for further optimization.
-
-Unfortunately, one can't rely blindly on the tail call optimization and inspection of generated assembly as required. There are compiler specific extensions like `__attribute__((musttail))` from Clang. In case of doubt, it is better to use an iterative version instead of tail resursion and leave tail recursion to functional programming languagues.
+Like with any compiler optimization, there are cases when it cannot perform the code transformation you want. If you are using Clang compiler, and you want guaranteed tail call optimizations, you can mark a `return` statement with `__attribute__((musttail))`. This indicates that the compiler must generate a tail call for the program to be correct, even when optimizations are disabled. One example, where it is beneficial is language interpreter loops.[^22] In case of doubt, it is better to use an iterative version instead of tail resursion and leave tail recursion to functional programming languagues.
 
 [^20]: See the article: [https://aras-p.info/blog/2017/10/09/Forced-Inlining-Might-Be-Slow/](https://aras-p.info/blog/2017/10/09/Forced-Inlining-Might-Be-Slow/).
 [^21]: For example, 1) when a function declaration has a hint for inlining, 2) when there is profiling data for the function, or 3) when a compiler optimizes for size (`-Os`) rather than performance (`-O2`).
+[^22]: Josh Haberman's blog: motivation for guaranteed tail calls - [https://blog.reverberate.org/2021/04/21/musttail-efficient-interpreters.html](https://blog.reverberate.org/2021/04/21/musttail-efficient-interpreters.html).
