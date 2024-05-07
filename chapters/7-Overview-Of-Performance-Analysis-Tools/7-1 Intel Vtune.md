@@ -29,19 +29,19 @@ Windows does not require any additional configuration after you install VTune. C
 
 ### What you can do with it: {.unlisted .unnumbered}
 
-- find hotspots: functions, loops, statements.
-- monitor various CPU-specific performance events, e.g., branch mispredictions and L3 cache misses.
-- locate lines of code where these events happen.
-- characterize CPU performance bottlenecks with TMA methodology.
-- filter data for a specific function, process, time period or logical core.
-- observe the workload behavior over time (incuding CPU frequency, memory bandwidth utilization, etc).
+- Find hotspots: functions, loops, statements.
+- Monitor various CPU-specific performance events, e.g., branch mispredictions and L3 cache misses.
+- Locate lines of code where these events happen.
+- Characterize CPU performance bottlenecks with TMA methodology.
+- Filter data for a specific function, process, time period or logical core.
+- Observe the workload behavior over time (incuding CPU frequency, memory bandwidth utilization, etc).
 
 VTune can provide very rich information about a running process. It is the right tool for you if you're looking to improve the overall performance of an application. VTune always provides an aggregated data over some time period, so it can be used for finding optimization opportunities for the "average case". 
 
 ### What you cannot do with it: {.unlisted .unnumbered}
 
-- analyze very short execution anomalies.
-- observe system-wide complicated SW dynamics.
+- Analyze very short execution anomalies.
+- Observe system-wide complicated SW dynamics.
 
 Due to the sampling nature of the tool, it will eventually miss events with a very short duration (e.g., submicrosecond).
 

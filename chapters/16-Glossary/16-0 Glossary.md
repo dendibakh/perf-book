@@ -62,6 +62,8 @@
 
 \textbf{LTO} Link-Time Optimizations
 
+\textbf{MPI} Message Passing Interface
+
 \textbf{MSR} Model Specific Register
 
 \textbf{MS-ROM} Microcode Sequencer Read-Only Memory
