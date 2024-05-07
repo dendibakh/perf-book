@@ -119,5 +119,7 @@ Check clang SMT speedup on a single core.
 [DONE] Redo scaling studies with affinity - otherwise instructions on E-cores look very suspicious. And just to ensure no migration.
 [TODO]: Find a candidate with almost perfect scaling. - maybe hard to do due to thermal issue on my platform.
 
+https://realpython.com/python-parallel-processing/#use-an-alternative-runtime-environment-for-python
+
 [^1]: Huge thanks to Yann Collet, the author of Zstd, for providing us with the information about the internal workings of Zstd. [TODO]: move to the acknowledgements section.
 [^2]: VTune ITT instrumentation - [https://www.intel.com/content/www/us/en/docs/vtune-profiler/user-guide/2023-1/instrumenting-your-application.html](https://www.intel.com/content/www/us/en/docs/vtune-profiler/user-guide/2023-1/instrumenting-your-application.html)
