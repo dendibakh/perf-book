@@ -24,7 +24,7 @@ We can next jump into the source code of `x264_8_frame_cond_wait` by double-clic
 
 Another very useful feature of Intel VTune Profiler is Platform View (see Figure @fig:MT_VtunePlatform), which allows us to observe what each thread was doing in any given moment of program execution. This is very helpful for understanding the behavior of the application and finding potential performance headrooms. For example, we can see that during the time interval from 1s to 3s, only two threads were consistently utilizing ~100% of the corresponding CPU core (threads with TID 7675 and 7678). CPU utilization of other threads was bursty during that time interval. 
 
-![Vtune Platform view for [x264](https://openbenchmarking.org/test/pts/x264) benchmark.](../../img/mt-perf/VtuneThreadingPlatformView.png){#fig:MT_VtunePlatform width=90%}
+![VTune Platform view for [x264](https://openbenchmarking.org/test/pts/x264) benchmark.](../../img/mt-perf/VtuneThreadingPlatformView.png){#fig:MT_VtunePlatform width=90%}
 
 Platform View also has zooming and filtering capabilities. This allows us to understand what each thread was executing during a specified time frame. To see this, select the range on the timeline, right-click and choose Zoom In and Filter In by Selection. Intel VTune Profiler will display functions or sync objects used during this time range.
 

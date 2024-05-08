@@ -74,6 +74,8 @@
 
 \textbf{PEBS} Processor Event-Based Sampling
 
+\textbf{PDB files} Program-Debug Data Base files
+
 \textbf{PGO} Profile-Guided Optimizations
 
 \textbf{PMC} Performance Monitoring Counter

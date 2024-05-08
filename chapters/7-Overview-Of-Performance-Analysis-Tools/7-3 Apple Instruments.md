@@ -1,6 +1,6 @@
 ## Apple Xcode Instruments
 
-The most convinient way to do similar performance analisys on MacOS is to use Xcode Instruments. This is an application performance analyzer and visualizer that comes for free with Xcode. Instruments is built on top of the DTrace tracing framework that was ported to MacOS from Solaris. Instruments has many tools to inspect performance of an application and enables us to do most of the basic things that other profilers like Intel Vtune can do. The easiest way to get the profiler is to install Xcode from the Apple AppStore. The tool requires no configuration; once you install it you're ready to go.
+The most convinient way to do similar performance analisys on MacOS is to use Xcode Instruments. This is an application performance analyzer and visualizer that comes for free with Xcode. Instruments is built on top of the DTrace tracing framework that was ported to MacOS from Solaris. Instruments has many tools to inspect performance of an application and enables us to do most of the basic things that other profilers like Intel VTune can do. The easiest way to get the profiler is to install Xcode from the Apple AppStore. The tool requires no configuration; once you install it you're ready to go.
 
 In Instruments, you use specialized tools, known as instruments, to trace different aspects of your apps, processes, and devices over time. Instruments has a powerfull visualization mechanism. It collects data as it profiles, and presents the results to you in real time. You can gather different types of data and view them side by side, which enables you to see patterns in the execution, correlate system events and find very subtle performance issues. 
 
@@ -15,7 +15,7 @@ In this chapter we will only showcase the "CPU Counters" instrument, which is th
 
 ### What you cannot do with it: {.unlisted .unnumbered}
 
-[TODO]: does it has the same blind spots as Vtune and uProf?
+[TODO]: does it has the same blind spots as VTune and uProf?
 
 ### Example: Profiling Clang Compilation {.unlisted .unnumbered}
 
@@ -45,7 +45,7 @@ The second step is to set the profiling target. To do that, click and hold the n
 
 *Instruments* shows a timeline and constantly updates statistics about the running application. Once the program finishes, Instruments will display the results like those shown in Figure @fig:InstrumentsView. The compilation took 7.3 seconds and we can see how the volume of events changed over time. For example, branch mispredictions become more pronounced towards the end of the runtime. You can zoom in to that interval on the timeline to examine the functions involved.
 
-The bottom panel shows numerical statistics. To inspect the hotspots similar to Intel Vtune's bottom-up view, select *Profile* in the menu \circled{3}, then click the *Call Tree* menu \circled{4} and check the *Invert Call Tree* box. This is exactly what we did in Figure @fig:InstrumentsView.
+The bottom panel shows numerical statistics. To inspect the hotspots similar to Intel VTune's bottom-up view, select *Profile* in the menu \circled{3}, then click the *Call Tree* menu \circled{4} and check the *Invert Call Tree* box. This is exactly what we did in Figure @fig:InstrumentsView.
 
 Instruments show raw counts along with the percentages of the total, which is useful if you want to calculate secondary metrics like IPC, MPKI, etc. On the right side, we have the hottest call stack for the function `llvm::FoldingSetBase::FindNodeOrInsertPos`. If you double-click on a function, you can inspect ARM assembly instructions generated for the source code.
 

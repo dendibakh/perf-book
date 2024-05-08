@@ -1,6 +1,6 @@
 ## Chapter Summary {.unlisted .unnumbered}
 
-* We gave a quick overview of the most popular tools available on three major platforms: Linux, Windows and MacOS. Depending on a CPU vendor, the choice of a profiling tool will vary. For systems with an Intel processor we recommend using Vtune, for systems with an AMD processor use uProf, on Apple platforms use Xcode Instruments. 
+* We gave a quick overview of the most popular tools available on three major platforms: Linux, Windows and MacOS. Depending on a CPU vendor, the choice of a profiling tool will vary. For systems with an Intel processor we recommend using VTune, for systems with an AMD processor use uProf, on Apple platforms use Xcode Instruments. 
 
 * Linux perf is probably the most frequently used profiling tool on Linux. It has support for processors from all major CPU vendors. It doesn't have a graphical interface, however, there are free tools that can visualize `perf` profiling data.
 

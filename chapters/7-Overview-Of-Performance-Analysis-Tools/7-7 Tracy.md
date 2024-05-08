@@ -84,9 +84,9 @@ Tracy monitors performance of the whole system, not just the application itself.
 In the example in this section, we used manual markup of interesting areas in the code. But it's not a strict requirement to start using Tracy. You may profile an unmodified application and add instrumentation later when you know where it’s needed. Tracy provides many other features, too many to cover in this overview. Here are some of the notable ones:
 - Tracking memory allocations and locks.
 - Session comparison. This is vital to ensure a change provides the expected benefits. It's possible to load two profiling sessions and compare zone data before and after the change was made.
-- Source code and assembly view. If debug symbols are available, Tracy can also display hotspots in the source code and related assembly just like Intel Vtune and other profilers.
+- Source code and assembly view. If debug symbols are available, Tracy can also display hotspots in the source code and related assembly just like Intel VTune and other profilers.
 
-In comparison with other tools like Intel Vtune and AMD uProf, with Tracy you cannot get the same level of CPU microarchitectural insights (e.g., various performance events). This is because Tracy does not leverage the HW features specific to a particular platform.
+In comparison with other tools like Intel VTune and AMD uProf, with Tracy you cannot get the same level of CPU microarchitectural insights (e.g., various performance events). This is because Tracy does not leverage the HW features specific to a particular platform.
 
 The overhead of profiling with Tracy depends on how many zones you have activated. The author of Tracy provides some data points that he measured on a program that does image compression: an overhead of 18% and 34% with two different compression schemes. A total of 200M zones were profiled, with an average overhead of 2.25 ns per zone. This test instrumented a very hot function. In other scenarios the overhead will be much lower. While it's possible to keep the overhead small, you need to be careful about which sections of code you want to instrument, especially if you decide to use it in production.
 

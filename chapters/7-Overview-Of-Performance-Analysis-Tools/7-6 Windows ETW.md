@@ -2,27 +2,27 @@
 
 ## Event Tracing for Windows
 
-Microsoft has developed a system-wide tracing facility named Event Tracing for Windows (ETW). It was originally intended for helping device driver developers, but later found its use in analyzing general-purpose applications as well. ETW is available on all supported Windows platforms (x86, x64 and ARM) with the corresponding platform-dependent installation packages. ETW records structured events in user and kernel code with full call stack trace support which allows to observe SW dynamics in a running system and solve many challenging performance issues.
+Microsoft has developed a system-wide tracing facility named Event Tracing for Windows (ETW). It was originally intended for helping device driver developers, but later found its use in analyzing general-purpose applications as well. ETW is available on all supported Windows platforms (x86, x64 and ARM) with the corresponding platform-dependent installation packages. ETW records structured events in user and kernel code with full call stack trace support, which enables you to observe SW dynamics in a running system and solve many challenging performance issues.
 
 ### How to configure it {.unlisted .unnumbered}
 
 Recording ETW data is possible without any extra download since Windows 10 with `Wpr.exe`. But to enable system wide profiling you must be administrator and have the `SeSystemProfilePrivilege` enabled. The \underline{W}indows \underline{P}erformance \underline{R}ecorder tool supports a set of built-in recording profiles which are OK for common performance issues. You can tailor your recording needs by authoring a custom performance recorder profile xml file with the `.wprp` extension.
 
-If you want to not only record but also view the recorded ETW data you need to install the Windows Performance Toolkit (WPT). You can download the Windows Performance Toolkit from the Windows SDK[^1] or ADK[^2] download page. Windows SDK is huge, you don't necessarily need all its parts. In our case we just enabled the checkbox of the Windows Performance Toolkit. You are allowed to redistribute WPT as a part of your own application.
+If you want to not only record but also view the recorded ETW data you need to install the Windows Performance Toolkit (WPT). You can download it from the Windows SDK[^1] or ADK[^2] download page. Windows SDK is huge, you don't necessarily need all its parts. In our case we just enabled the checkbox of the Windows Performance Toolkit. You are allowed to redistribute WPT as a part of your own application.
 
 ### What you can do with it: {.unlisted .unnumbered}
 
-- Look at CPU hotspots with a configurable CPU sampling rate from 125 microseconds up to 10 seconds. Default is 1 millisecond which costs approximately 5-10% runtime overhead.
-- Who blocks a certain thread and for how long (e.g., late event signals, unnecessary thread sleeps, etc).
-- Examine how fast a disk serves read/write requests and who initiates that work.
-- Check file access performance and patterns (includes cached read/writes which lead to no disk IO).
-- Trace the TCP/IP stack how packets flow between network interfaces and computers.
+- Look at CPU hotspots with a configurable CPU sampling rate from 125 microseconds up to 10 seconds. The default is 1 millisecond which costs approximately 5-10% runtime overhead.
+- Determine what blocks a certain thread and for how long (e.g., late event signals, unnecessary thread sleeps, etc).
+- Examine how fast a disk serves read/write requests and discover what initiates that work.
+- Check file access performance and patterns (includes cached read/writes that lead to no disk IO).
+- Trace the TCP/IP stack to see how packets flow between network interfaces and computers.
 
-All the items listed above are recorded system wide for all processes with configurable call stack traces (kernel and user mode call stacks are combined). It's also possible to add your own ETW provider to correlate the system wide traces with your application behavior. You can extend the amount of data collected by instrumenting your code. For example, you can add inject enter/leave ETW tracing hooks in functions in your source code to measure how often a certain method was executed.
+All the items listed above are recorded system wide for all processes with configurable call stack traces (kernel and user mode call stacks are combined). It's also possible to add your own ETW provider to correlate the system wide traces with your application behavior. You can extend the amount of data collected by instrumenting your code. For example, you can inject enter/leave ETW tracing hooks in functions into your source code to measure how often a certain function was executed.
 
 ### What you cannot do with it: {.unlisted .unnumbered}
 
-- Examine CPU microarchitectural bottlenecks. For that, use vendor-specific tools like Intel VTune, AMD uProf, Apple Instruments, etc.
+ETW traces are not usefull for examining CPU microarchitectural bottlenecks. For that, use vendor-specific tools like Intel VTune, AMD uProf, Apple Instruments, etc.
 
 ETW traces capture dynamics of all processes at the system level which is great, but it may generate a lot of data. For example, capturing thread context switching data to observe various waits and delays can easily generate 1-2 GB per minute. That's why it is not practical to record high volume events for hours without overriding previously stored traces.
 
@@ -33,20 +33,20 @@ Here is the list of tools one can use to capture ETW traces:
 - `wpr.exe`: a command line recording tool, part of Windows 10 and Windows Performance Toolkit.
 - `WPRUI.exe`: a simple UI for recording ETW data, part of Windows Performance Toolkit
 - `xperf`: a command line predecessor of wpr, part of Windows Performance Toolkit.
-- `PerfView`:[^3] a graphical recording and analysis tool with the main focus on .NET Applications. Open-source by Microsoft.
-- `Performance HUD`:[^7] a little known but very powerful GUI tool to track UI delays, User/Handle leaks via live ETW recording all unbalanced resource allocations with a live display of leaking/blocking call stack traces.
-- `ETWController`:[^4] a recording tool with the ability to record keyboard input and screenshots along with ETW data. Supports also distributed profiling on two machines simultaneously. Open-sourced by Alois Kraus.
-- `UIForETW`:[^6] a wrapper around xperf with special options to record data for Google Chrome issues. Can also record keyboard and mouse input. Open-sourced by Bruce Dawson.
-  
+- `PerfView`:[^3] a graphical recording and analysis tool with the main focus on .NET Applications. This is an open-source application developed by Microsoft.
+- `Performance HUD`:[^7] a little known but very powerful GUI tool to track UI delays, user/handle leaks via live ETW recording all unbalanced resource allocations with a live display of leaking/blocking call stack traces.
+- `ETWController`:[^4] a recording tool with the ability to record keyboard input and screenshots along with ETW data. This open-source application, developed by Alois Kraus, also supports distributed profiling on two machines simultaneously.
+- `UIForETW`:[^6] this open-source application, developed by Bruce Dawson, is a wrapper around `xperf` with special options to record data for Google Chrome issues. It can also record keyboard and mouse input.
+
 ### Tools to View and Analyze ETW traces {.unlisted .unnumbered}
 
-- `Windows Performance Analyzer` (WPA): the most powerful UI for viewing ETW data. WPA can visualize and overlay Disk, CPU, GPU, Network, Memory, Process and many more data sources to get a holistic understanding how your system behaves and what it was doing. Although the UI is very powerful, it may also be quite complex for beginners. WPA supports plugins to process data from other sources, not just ETW traces. It's possible to import Linux/Android[^8] profiling data that was generated by tools like Linux perf, LTTNG, Perfetto and the following log file formats: dmesg, Cloud-Init, WaLinuxAgent, AndoidLogcat.
-- `ETWAnalyzer`:[^5] reads ETW data and generates aggregate summary JSON files which can be queried, filtered and sorted at command line or exported to a CSV file.
+- `Windows Performance Analyzer` (WPA): the most powerful UI for viewing ETW data. WPA can visualize and overlay disk, CPU, GPU, network, memory, process and many more data sources to get a holistic understanding how your system behaves and what it was doing. Although the UI is very powerful, it may also be quite complex for beginners. WPA supports plugins to process data from other sources, not just ETW traces. It's possible to import Linux/Android[^8] profiling data that was generated by tools like Linux perf, LTTNG, Perfetto and several log file formats: dmesg, Cloud-Init, WaLinuxAgent and AndroidLogcat.
+- `ETWAnalyzer`:[^5] reads ETW data and generates aggregate summary JSON files that can be queried, filtered and sorted at the command line or exported to a CSV file.
 - `PerfView`: mainly used to troubleshoot .NET applications. The ETW events fired for Garbage Collection and JIT compilation are parsed and easily accessible as reports or CSV data. 
 
 ### Case Study - Slow Program Start {.unlisted .unnumbered}
 
-Next, we will take a look at the example of using ETWController to capture ETW traces and WPA to visualize them.
+Now we will take a look at an example of using ETWController to capture ETW traces and WPA to visualize them.
 
 **Problem statement**: When double clicking on a downloaded executable in Windows Explorer it is started with a noticeable delay. Something seems to delay process start. What could be the reason for this? Slow disk? 
 
@@ -64,18 +64,21 @@ C:\Windows\System32\wpr.exe
 #### Capture traces {.unlisted .unnumbered}
 
 - Start ETWController.
-- Select the CSwitch profile to track thread wait times along with the other default recording settings. Keep the check boxes *"Record mouse clicks"* and *"Take cyclic screenshots"* enabled to be later able to navigate to the slow spots with the help of the screen shots. See Figure @fig:ETWController_Dialog.
- - Press *"Start Recording"*.
- - Download some executable from the internet, unpack it and double click the executable to start it. 
- - After that you can stop profiling by pressing the *"Stop Recording"* button. 
+- Select the CSwitch profile to track thread wait times along with the other default recording settings. Ensure the check boxes *Record mouse clicks* and *Take cyclic screenshots* are ticked (see Figure @fig:ETWController_Dialog) so later you will be able to navigate to the slow spots with the help of the screen shots.
+ - Download an application from the internet, unpack it if needed. It doesn't matter what program you use, the goal is to see the delay when starting it.
+ - Start profiling by pressing the *Start Recording* button.
+ - Double click the executable to start it. 
+ - Once a program has strated, stop profiling by pressing the *Stop Recording* button. 
 
-![Starting ETW collection with ETWController UI.](../../img/perf-tools/ETWController_Dialog.png){#fig:ETWController_Dialog width=75%}
+![Starting ETW collection with ETWController UI.](../../img/perf-tools/ETWController_Dialog.png){#fig:ETWController_Dialog width=85%}
 
-Stopping profiling the first time takes a bit longer because for all managed code synthetic pdbs are generated which is a one time operation. After profiling has reached the Stopped state you can press the *"Open in WPA"* button to load the ETL file into the Windows Performance Analyzer with an ETWController supplied profile. The CSwitch profile generates a large amount of data which is stored in a 4 GB ring buffer which allows you to record 1-2 minutes before the oldest events are overwritten. Sometimes it is a bit of an art to stop profiling at the right time point. If you have sporadic issues you can keep recording enabled for hours and stop it when an event like a log entry in a file shows up, which is checked by a polling script, to stop profiling when the issue has occurred.
+Stopping profiling the first time takes a bit longer because Program-Debug Data Base files (PDBs) are generated for all managed code, which is a one-time operation. After profiling has reached the Stopped state you can press the *Open in WPA* button to load the ETL file into the Windows Performance Analyzer with an ETWController supplied profile. The CSwitch profile generates a large amount of data that is stored in a 4 GB ring buffer, which allows you to record 1-2 minutes before the oldest events are overwritten. Sometimes it is a bit of an art to stop profiling at the right time point. If you have sporadic issues you can keep recording enabled for hours and stop it when an event like a log entry in a file shows up, which is checked by a polling script, to stop profiling when the issue has occurred.
 
-Windows supports Event Log and Performance Counter triggers which allow one to start a script when a performance counter reaches a threshold value or a specific event is written to an event log. If you need more sophisticated stop triggers you should take a look at PerfView which allows one to define a Performance Counter threshold which must be reached and stay there for x seconds before profiling is stopped. This way random spikes are no longer triggering false positives. 
+Windows supports Event Log and Performance Counter triggers that can start a script when a performance counter reaches a threshold value or a specific event is written to an event log. If you need more sophisticated stop triggers, you should take a look at PerfView; this enables you to define a Performance Counter threshold that must be reached and stay there for `N` seconds before profiling is stopped. This way, random spikes are no longer triggering false positives. 
 
 #### Analysis in WPA {.unlisted .unnumbered}
+
+[TODO]: start a new paragraph here
 
 Figure @fig:WPA_MainView shows the recorded ETW data opened in Windows Performance Analyzer (WPA). The WPA view is divided into three parts: *CPU Usage (Sampled)*, *Generic Events* and *CPU Usage (Precise)*. To understand the difference between them, let's dive deeper. The upper graph *CPU Usage (Sampled)* is useful for identifying where the CPU time is spent. The data is collected by sampling all the running threads at a regular time interval. Very similar to the hotspots view in other profiling tools.
 

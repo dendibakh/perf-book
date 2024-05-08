@@ -76,7 +76,7 @@ Percent | Source code & Disassembly of x264 for cycles:ppp
   ...
 ```
 
-Most profilers with a Graphical User Interface (GUI), like the Intel VTune Profiler, can show source code and associated assembly side-by-side. Also, there are tools that can visualize the output of Linux `perf` raw data with a rich graphical interface similar to Intel Vtune and other tools. You'll see all that in more details in chapter 7.
+Most profilers with a Graphical User Interface (GUI), like the Intel VTune Profiler, can show source code and associated assembly side-by-side. Also, there are tools that can visualize the output of Linux `perf` raw data with a rich graphical interface similar to Intel VTune and other tools. You'll see all that in more details in chapter 7.
 
 [TODO]: Sampling techniques squash valuable information, not allowing us to detect abnormal behaviors.
 
@@ -125,7 +125,7 @@ $ perf report -n --stdio --no-children
                                   _start
 ```
 
-When using Intel Vtune Profiler, one can collect call stacks data by checking the corresponding "Collect stacks" box while configuring analysis. When using the command-line interface, specify the `-knob enable-stack-collection=true` option.
+When using Intel VTune Profiler, one can collect call stacks data by checking the corresponding "Collect stacks" box while configuring analysis. When using the command-line interface, specify the `-knob enable-stack-collection=true` option.
 
 [^1]: Profiling(wikipedia) - [https://en.wikipedia.org/wiki/Profiling_(computer_programming)](https://en.wikipedia.org/wiki/Profiling_(computer_programming)).
 [^4]: In the past there were LLVM compiler bugs when compiling with debug info (`-g`). Code transformation passes incorrectly treated the presence of debugging intrinsics which caused different optimizations decisions. It did not affect functionality, only performance. Some of them were fixed, but it's hard to say if any of them are still there.
