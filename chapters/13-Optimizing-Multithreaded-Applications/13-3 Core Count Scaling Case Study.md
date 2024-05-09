@@ -104,16 +104,31 @@ The Zstd compression algorithm is a good example of a complex interaction betwee
 
 ### CloverLeaf {.unlisted .unnumbered}
 
+CloverLeaf is a hydrodynamics workload. We will not dig deep into the details of the underlying algorithm as it is not relevant for this case study. CloverLeaf uses OpenMP to parallelize the workload. Similar to other HPC workloads, we should expect CloverLeaf to scale well. However, on our platform performance stops growing after using 3 threads. What's going on?
 
+To determine the root case of poor scaling, we collected TMA metrics (see [@sec:TMA]) in four data points: running CloverLeaf with one, two, three, and four threads. Once we compared performance characteristics of these profiles, one thing became clear immediately. CloverLeaf performance is bound by memory bandwidth. Table @tbl:CloverLeaf_metrics shows the relevant metrics from these profiles that highlight increasing memory bandwidth demand when using multiple threads.
 
-  remeasure 9t - there was a bug in the script.
-  [DONE] redo full scalability study with affinity
-  [DONE] do HT scalability study
-  [DONE] check profile 1T vs. 2T vs. 4T vs. 16T - prove that mem BW is saturated.
-  Describe experiments with better memory speed.
-  Why there is a drop from 4T -> 5T ? Are E-cores are slow or this is a beginning of thermal issue.
+-----------------------------------------------------------------------------
+Metric                               1 thread  2 threads  3 threads 4 threads
+------------------------------------ --------- ---------  --------- ---------
+Memory Bound (% of pipeline slots)     34.6       53.7      59.0      65.4
 
-Interestingly, for CloverLeaf, TurboBoost doesn't provide any performance benefit when all 16 threads are used. That means that performance is the same regardless you enable Turbo or let the cores run on their base frequency. How is that possible? The reason is that having 16 active threads is enough to saturate two memory controllers. Since most of the time threads are just waiting for data, when you disable Turbo, they simply start to wait "slower". This is why performance is the same regardless of the frequency.
+DRAM Memory Bandwidth (% of cycles)    71.7       83.9      87.0      91.3
+
+DRAM Mem BW Use (range, GB/s)          20-22      25-28     27-30     27-30
+-----------------------------------------------------------------------------
+
+Table: Performance metrics for CloverLeaf workload. {#tbl:CloverLeaf_metrics}
+
+As you can see from those numbers, the pressure on the memory subsystem kept increasing as we added more threads. Increase in the *Memory Bound* metric indicates that threads increasingly spend more time waiting for data and do less useful work. Increase in the *DRAM Memory Bandwidth* metric further highlights that performance is hurt due to approaching bandwidth limits. The *DRAM Mem BW Use* metric indicates the range total of total memory bandwidth utilization while CloverLeaf was running. We captured these numbers by looking at the memory bandwidth utilization chart in VTune's platform view as shown in Figure @fig:CloverLeafMemBandwidth.
+
+![VTune's platform view of running CloverLeaf with 3 threads.](../../img/mt-perf/CloverLeafMemBandwidth.png){#fig:CloverLeafMemBandwidth width=100%}
+
+Let's put those numbers into perspective, the maximum theoretical memory bandwidth of our platform is `38.4 GB/s`. However, as we measured in [@sec:MemLatBw], the maximum memory bandwidth that can be achieved in practice is `35 GB/s`. Even with a single thread, the memory bandwidth utilization reaches `2/3` of the practical limit. It seems that CloverLeaf fully saturates the memory bandwidth with three threads. This also means that CloverLeaf cannot draw more than `30 GB/s` of memory bandwidth, which is `86%` of the maximum. [TODO]: check that claim.
+
+To confirm our hypothesis, we swapped two `8 GB DDR4 2400 MT/s` memory modules with two DDR4 modules of the same capacity, but faster speed: `3200 MT/s`. This brings the theoretical memory bandwidth of the system to `51.2 GB/s`, and practical maximum to `XX GB/s`. [TODO]: check that number. This provided a performance boost from 10% to 33%, that grows with increasing number of threads used. When running CloverLeaf with 16 threads, faster memory modules provide the expected 33% performance as a ratio of the memory bandwidth increase (`3200 / 2400 = 1.33`). But even with a single thread, there is 10% performance improvement. This means that there are moments when CloverLeaf fully saturates the memory bandwidth even with a single thread.
+
+Interestingly, for CloverLeaf, TurboBoost doesn't provide any performance benefit when all 16 threads are used, i.e., performance is the same regardless of whether you enable Turbo or let the cores run on their base frequency. How is that possible? The answer is: having 16 active threads is enough to saturate two memory controllers even if CPU cores run at half the frequency. Since most of the time threads are just waiting for data, when you disable Turbo, they simply start to wait "slower".
 
 ### CPython {.unlisted .unnumbered}
 
