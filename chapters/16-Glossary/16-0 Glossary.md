@@ -14,6 +14,8 @@
 
 \textbf{CFG} Control Flow Graph
 
+\textbf{CP} Continuous Profiling
+
 \textbf{CPI} Clocks Per Instruction
 
 \textbf{CPU} Central Processing Unit
