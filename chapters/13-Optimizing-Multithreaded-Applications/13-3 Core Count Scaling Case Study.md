@@ -132,14 +132,25 @@ Interestingly, for CloverLeaf, TurboBoost doesn't provide any performance benefi
 
 ### CPython {.unlisted .unnumbered}
 
-[TODO]:
-Check clang SMT speedup on a single core.
-[DONE] Build a frequency chart
-[DONE] I see perf drop with many cores -- probably because the CPU cannot sustain frequency. Redo scaling studies with Turbo turned off. 
-[DONE] Redo scaling studies with affinity - otherwise instructions on E-cores look very suspicious. And just to ensure no migration.
-[TODO]: Find a candidate with almost perfect scaling. - maybe hard to do due to thermal issue on my platform.
+The final benchmark in our case study is CPython. We wrote a simple multithreaded Python script that uses binary search to find numbers (needles) in a sorted list (haystack). Needles are divided equally between worker threads. Unfortunately, the script that we wrote doesn't scale at all. Can you guess why?
 
-https://realpython.com/python-parallel-processing/#use-an-alternative-runtime-environment-for-python
+To solve this puzzle, we have built CPython 3.12 from sources with debug information and ran Intel VTune's *Threading Analysis* collection while using two threads. Figure @fig:CPythontimeline visualizes a small portion of the timeline of the Python script execution. As you can see, the CPU time alternates between two threads. They work for 5 ms, then yeild to another thread. In fact, if you scroll left or right, you will see that they never run simultaneously.
+
+![VTune's timeline view when running our Python script with 2 worker threads (other threads are filtered out).](../../img/mt-perf/CPythontimelineNew.png){#fig:CPythontimeline width=100%}
+
+Let's try to understand why two worker threads take turns instead of running together. Once a thread finished its turn, Linux kernel scheduler switches to another thread as highlighted in Figure @fig:CPythontimeline. It also gives the reason for a context switch. If we take a look at `pthread_cond_wait.c` source code[^3] at line 652, we would land on the function `___pthread_cond_timedwait64`, which waits for a condition variable to be signaled. Many other inactive wait periods wait for the same reason. 
+
+On the *Bottom-up* page (see the left panel of Figure @fig:CPythonBottomUp), VTune reports that `___pthread_cond_timedwait64` function is responsible for the majority of *Inactive Sync Wait Time*. On the right panel, you can see the corresponding call stack. Using this call stack we can tell what is the most frequently used code path that led to the `___pthread_cond_timedwait64` function and subsequent context switch.
+
+![VTune's timeline view when running our Python script with 2 threads (other threads are filtered out).](../../img/mt-perf/CPythonBottomUpCombined.png){#fig:CPythonBottomUp width=100%}
+
+This takes us to the `take_gil` function, which is responsible for acquiring the Global Interpreter Lock (GIL). The GIL is preventing our attempts at running worker threads in parallel by allowing only one thread to run at any given time, effectively turning our multithreaded program into a single-threaded one. If you take a look at the implementation of the `take_gil` function, you will find out that it uses a version of wait on conditional variable with a timeout of 5 ms. Once the timeout is reached, the waiting thread asks the GIL-holding thread to drop it. Once another thread complies with the request, the waiting thread acquires the GIL and starts running. They keep switching roles until the very end of the execution.
+
+Experienced Python programmers would immediately unedrstand the problem, but in this example we demonstrated how to find contested locks even without an extensive knowledge of CPython internals. CPython is the default and by far the most widely-used Python interpreter. Unfortunately, it comes with GIL, which destroys performance of compute bound multithreaded Python programs. Nevertheless, there are ways to bypass GIL, for example, by using GIL-immune libraries such as `NumPy`, writing performance-critical part of the code as a C extension module, or using alternative runtime environments, such as `nogil`.[^4]
+
+### Summary {.unlisted .unnumbered}
 
 [^1]: Huge thanks to Yann Collet, the author of Zstd, for providing us with the information about the internal workings of Zstd. [TODO]: move to the acknowledgements section.
 [^2]: VTune ITT instrumentation - [https://www.intel.com/content/www/us/en/docs/vtune-profiler/user-guide/2023-1/instrumenting-your-application.html](https://www.intel.com/content/www/us/en/docs/vtune-profiler/user-guide/2023-1/instrumenting-your-application.html)
+[^3]: Glibc source code - [https://sourceware.org/git/?p=glibc.git;a=tree](https://sourceware.org/git/?p=glibc.git;a=tree)
+[^4]: Nogil - [https://github.com/colesbury/nogil](https://github.com/colesbury/nogil)
