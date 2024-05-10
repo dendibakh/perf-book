@@ -147,16 +147,16 @@ Experienced Python programmers would immediately understand the problem, but in 
 
 ### Summary {.unlisted .unnumbered}
 
-In the case study, we have analyzed several throughput-oriented applications with varying thread count scaling characteristics.
-
-Here is a quick summary of our findings:
+In the case study, we have analyzed several throughput-oriented applications with varying thread count scaling characteristics. Here is a quick summary of our findings:
 
 * Frequency throttling is a major roadblock to achieving good thread count scaling. Any application that makes use of multiple hardware threads suffers from frequency drop due to thermal limits. Platforms that have processors with higher TDP (Thermal Design Power) and advanced liquid cooling solutions are less prone to frequency throttling.
-* Thread count scaling on hybrid processors (with performant and energy efficient cores) is penalized due to the fact that E-cores are less performant than P-cores. Once E-cores start being used, performance scaling is slowing down. Sibling SMT threads also don't provide good performance scaling.
-* Worker threads in a throughput-oriented workload share the common set of resources, which may become a bottleneck. As we saw in CloverLeaf example, performance doesn't scale because of the memory bandwidth limitation. This is a common problem for many HPC and AI workloads. Once you hit that limitation, everything else becomes less important, including code optimizations and even CPU frequency. Another shared resource that often becomes a bottleneck is L3 cache.
-* Finally, performance of a concurrent application may be limited by the synchronization between threads as we saw in Zstd and CPython examples. Some programs have a very complex interaction between threads, so it is very useful to visualize worker threads on a timeline. Also, you should know how to find contested locks using performance profiling tools.
+* Thread count scaling on hybrid processors (with performant and energy-efficient cores) is penalized because E-cores are less performant than P-cores. Once E-cores start being used, performance scaling is slowing down. Sibling SMT threads also don't provide good performance scaling.
+* Worker threads in a throughput-oriented workload share a common set of resources, which may become a bottleneck. As we saw in the CloverLeaf example, performance doesn't scale because of the memory bandwidth limitation. This is a common problem for many HPC and AI workloads. Once you hit that limitation, everything else becomes less important, including code optimizations and even CPU frequency. Another shared resource that often becomes a bottleneck is the L3 cache.
+* Finally, performance of a concurrent application may be limited by the synchronization between threads as we saw in Zstd and CPython examples. Some programs have very complex interactions between threads, so it is very useful to visualize worker threads on a timeline. Also, you should know how to find contested locks using performance profiling tools.
 
-In a latency-oriented application, you typically have a few performance-critical threads and the rest do background work that doesn't necessarily have to be fast. Many issues that we've discussed apply for latency-oriented applications as well. We covered some low-latency tuning techniques in [@sec:LowLatency].
+To confirm that suboptimal scaling is a common case, rather than an exception, let's look at the SPEC CPU 2017 suite of benchmarks. According to [@MICRO23DebbieMarr], benchmarks that have integer code (regular general-purpose programs) have a thread count scaling in the range of `40% - 70%`, while benchmarks that have floating-point code (scientific, media, and engineering programs) have a scaling in the range of `20% - 65%`.
+
+In a latency-oriented application, you typically have a few performance-critical threads and the rest do background work that doesn't necessarily have to be fast. Many issues that we've discussed apply to latency-oriented applications as well. We covered some low-latency tuning techniques in [@sec:LowLatency].
 
 [^1]: Huge thanks to Yann Collet, the author of Zstd, for providing us with the information about the internal workings of Zstd. [TODO]: move to the acknowledgments section.
 [^2]: VTune ITT instrumentation - [https://www.intel.com/content/www/us/en/docs/vtune-profiler/user-guide/2023-1/instrumenting-your-application.html](https://www.intel.com/content/www/us/en/docs/vtune-profiler/user-guide/2023-1/instrumenting-your-application.html)
