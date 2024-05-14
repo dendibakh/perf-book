@@ -39,7 +39,7 @@ If your data structure is accessed by multiple threads, consider using lock-free
 
 ### Packing the Data.
 
-Utilization of data caches can be also improved by making data more compact. There are many ways to pack data. One of the classic examples is to use bitfields. An example of code when packing data might be profitable is shown in [@lst:DataPacking]. If we know that `a`, `b`, and `c` represent enum values which take a certain number of bits to encode, we can reduce the storage of the struct `S`.
+Utilization of data caches can be also improved by making data more compact. There are many ways to pack data. One of the classic examples is to use bitfields. An example of code when packing data might be profitable is shown in [@lst:DataPacking]. If we know that `a`, `b`, and `c` represent enum values that take a certain number of bits to encode, we can reduce the storage of the struct `S`.
 
 Listing: Data Packing
 
@@ -52,9 +52,9 @@ struct S {                                        struct S {
 };                                                };
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Notice the 12 times less space required to store an object of the packed version of `S`. This greatly reduces the amount of memory transferred back and forth and saves cache space. However, using bitfields comes with additional cost. Since the bits of `a`, `b`, and `c` are packed into a single byte, compiler needs to perform additional bit manipulation operations to extract and insert them. For example, to load `b`, you need to shift the byte value right (`>>`) by 2 and do logical AND (`&`) with `0x3`. Similarly, shift left (`<<`) and logical OR (`|`) operations are needed to store the value back into the packed format. Data packing is beneficial in places where additional computation is cheaper than the delay caused by inefficient memory transfers.
+Notice the 12 times less space required to store an object of the packed version of `S`. This greatly reduces the amount of memory transferred back and forth and saves cache space. However, using bitfields comes with additional cost. Since the bits of `a`, `b`, and `c` are packed into a single byte, the compiler needs to perform additional bit manipulation operations to extract and insert them. For example, to load `b`, you need to shift the byte value right (`>>`) by 2 and do logical AND (`&`) with `0x3`. Similarly, shift left (`<<`) and logical OR (`|`) operations are needed to store the updated value back into the packed format. Data packing is beneficial in places where additional computation is cheaper than the delay caused by inefficient memory transfers.
 
-Also, a programmer can reduce the memory usage by rearranging fields in a struct or class when it avoids padding added by a compiler. The reason for a compiler to insert unused bytes of memory (pads) is to enable efficient storing and fetching of individual members of a struct. In the example in [@lst:AvoidPadding], the size of `S` can be reduced if its members are declared in the order of decreasing their sizes. Figure @fig:AvoidPadding illustrates the effect of rearranging the fields in struct `S`.
+Also, a programmer can reduce memory usage by rearranging fields in a struct or class when it avoids padding added by a compiler. The reason for a compiler to insert unused bytes of memory (pads) is to enable efficient storing and fetching of individual members of a struct. In the example in [@lst:AvoidPadding], the size of `S` can be reduced if its members are declared in the order of decreasing size. Figure @fig:AvoidPadding illustrates the effect of rearranging the fields in struct `S`.
 
 Listing: Avoid compiler padding.
 
@@ -78,7 +78,7 @@ struct S {                               struct S {
 
 ### Aligning and Padding. {#sec:secMemAlign}
 
-A variable is accessed most efficiently if it is stored at a memory address, which is divisible by the size of the variable. In C++, it is called *natural alignment*, which occurs by default for fundamental data types, such as integer, float, or double. When you declare variables of these types, the compiler ensures that they are stored in memory at addresses that are multiples of their size. In contrast, arrays, structs and classes may require special alignment.
+A variable is accessed most efficiently if it is stored at a memory address that is divisible by the size of the variable. In C++, it is called *natural alignment*, which occurs by default for fundamental data types, such as integer, float, or double. When you declare variables of these types, the compiler ensures that they are stored in memory at addresses that are multiples of their size. In contrast, arrays, structs and classes may require special alignment.
 
 It is typical for a SIMD code to load large chunks of data using a single load operation. Sometimes, such requests load data that starts on one cache line and end in the next cache line. In this case, fetching data requires two cache line reads. It also requires using so-called *split registers*, which keep the two parts and once both parts are fetched, they are combined into a single register. In the literature, you can encounter the term a *misaligned* or a *split* load to describe such a situation. Split loads may incur performance penalties, if many split loads in a row consume all available split registers. Intel's TMA methodology tracks this with the `Memory_Bound -> L1_Bound -> Split Loads` metric.
 
