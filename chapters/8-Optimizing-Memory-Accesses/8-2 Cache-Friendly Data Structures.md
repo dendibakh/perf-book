@@ -1,8 +1,8 @@
 ## Cache-Friendly Data Structures {#sec:secCacheFriendly}
 
-Writing cache-friendly algorithms and data structures, is one of the key items in the recipe for a well-performing application. The key pillar of cache-friendly code is the principles of temporal and spatial locality that we described in [@sec:MemHierar]. The goal here is to have a predictable memory access patern and store data efficiently. 
+Writing cache-friendly algorithms and data structures is one of the key items in the recipe for a well-performing application. The key pillars of cache-friendly code are the principles of temporal and spatial locality that we introduced in [@sec:MemHierar]. The goal here is to have a predictable memory access patern and store data efficiently.
 
-The cache line is the smallest unit of data that can be transferred between the cache and the main memory. When designing cache-friendly code, it's helpful to think in terms of cache lines, not only individual variables and their location in memory.
+The cache line is the smallest unit of data that can be transferred between the cache and the main memory. When designing cache-friendly code, it's helpful to think not only of individual variables and their locations in memory, but also of cache lines.
 
 Next, we will discuss several techniques to make data structures more cache-friendly.
 
@@ -39,7 +39,7 @@ If your data structure is accessed by multiple threads, consider using lock-free
 
 ### Packing the Data.
 
-Utilization of data caches can be also improved by making the data more compact. There are many ways to pack data. One of the classic examples is to use bitfields. An example of code when packing data might be profitable is shown on [@lst:DataPacking]. If we know that `a`, `b`, and `c` represent enum values which take a certain number of bits to encode, we can reduce the storage of the struct `S`.
+Utilization of data caches can be also improved by making data more compact. There are many ways to pack data. One of the classic examples is to use bitfields. An example of code when packing data might be profitable is shown in [@lst:DataPacking]. If we know that `a`, `b`, and `c` represent enum values which take a certain number of bits to encode, we can reduce the storage of the struct `S`.
 
 Listing: Data Packing
 
