@@ -15,7 +15,7 @@ The main advantage of splitting instructions into micro operations is that $\mu$
   ```
   Often, a function prologue saves multiple registers by using multiple `PUSH` instructions. In our case, the next `PUSH` instruction can start executing after the `SUB` $\mu$op of the previous `PUSH` instruction finishes, and doesn't have to wait for the `STORE` $\mu$op, which can now execute asynchronously.
 
-* **In parallel**: consider `HADDPD xmm1, xmm2` instruction, which will sum up (reduce) two double precision floating point values in both `xmm1` and `xmm2` and store two results in `xmm1` as follows: 
+* **In parallel**: consider `HADDPD xmm1, xmm2` instruction, which will sum up (reduce) two double precision floating-point values in both `xmm1` and `xmm2` and store two results in `xmm1` as follows: 
   ```
   xmm1[63:0] = xmm2[127:64] + xmm2[63:0]
   xmm1[127:64] = xmm1[127:64] + xmm1[63:0]
