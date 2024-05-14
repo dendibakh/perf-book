@@ -4,7 +4,7 @@ typora-root-url: ..\..\img
 
 ## Replace Branches with Predication {#sec:BranchlessPredication}
 
-Some branches could be effectively eliminated by executing both parts of the branch and then selecting the right result (*predication*). Example of code when such transformation might be profitable is shown on [@lst:PredicatingBranchesCode]. If TMA suggests that the `if (cond)` branch has a very high number of mispredictions, you can try to eliminate the branch by doing the transformation shown on the right.
+Some branches could be effectively eliminated by executing both parts of the branch and then selecting the right result (*predication*). Example of code when such transformation might be profitable is shown in [@lst:PredicatingBranchesCode]. If TMA suggests that the `if (cond)` branch has a very high number of mispredictions, you can try to eliminate the branch by doing the transformation shown on the right.
 
 Listing: Predicating branches.
 

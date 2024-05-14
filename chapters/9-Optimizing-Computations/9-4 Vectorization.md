@@ -116,7 +116,7 @@ By their nature, compilers are static tools: they only reason based on the code 
 
 #### Vectorization Is not Beneficial.
 
-In some cases, the compiler can vectorize the loop but figures that doing so is not profitable. In the code presented on [@lst:VectNotProfit], the compiler could vectorize the memory access to array `A` but would need to split the access to array `B` into multiple scalar loads. The scatter/gather pattern is relatively expensive, and compilers that can simulate the cost of operations often decide to avoid vectorizing code with such patterns. 
+In some cases, the compiler can vectorize the loop but figures that doing so is not profitable. In the code presented in [@lst:VectNotProfit], the compiler could vectorize the memory access to array `A` but would need to split the access to array `B` into multiple scalar loads. The scatter/gather pattern is relatively expensive, and compilers that can simulate the cost of operations often decide to avoid vectorizing code with such patterns. 
 
 Listing: Vectorization: not beneficial.
 
