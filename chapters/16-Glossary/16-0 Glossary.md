@@ -72,6 +72,8 @@
 
 \textbf{NUMA} Non-Uniform Memory Access
 
+\textbf{OOO Execution} Out-of-Order Execution
+
 \textbf{OS} Operating System
 
 \textbf{PEBS} Processor Event-Based Sampling
