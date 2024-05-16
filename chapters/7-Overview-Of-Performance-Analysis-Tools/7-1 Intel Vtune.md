@@ -1,4 +1,4 @@
-## Intel VTune Profiler
+## Intel VTune Profiler {#sec:IntelVtuneOverview}
 
 VTune Profiler (formerly VTune Amplifier) is a performance analysis tool for x86-based machines with a rich GUI interface. It can be run on Linux or Windows operating systems. We skip discussion about MacOS support for VTune since it doesn't work on Apple's chips (e.g., M1 and M2), and Intel-based Macbooks are quickly becoming obsolete.
 
