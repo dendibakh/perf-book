@@ -36,13 +36,13 @@ On Linux OS, there are two ways of using huge pages in an application: Explicit 
 
 ### Explicit hugepages {.unnumbered .unlisted}
 
-Explicit huge pages can be reserved at boot time or at run time. To make a permanent change to force the Linux kernel to allocate 128 huge pages at the boot time, run the following command:
+Explicit huge pages can be reserved at system boot time or before an application starts. To make a permanent change to force the Linux kernel to allocate 128 huge pages at the boot time, run the following command:
 
 ```bash
 $ echo "vm.nr_hugepages = 128" >> /etc/sysctl.conf
 ```
 
-To explicitly allocate a fixed number of huge pages, one can use [libhugetlbfs](https://github.com/libhugetlbfs/libhugetlbfs). The following command preallocates 128 huge pages.
+To explicitly allocate a fixed number of huge pages after the system has booted, one can use [libhugetlbfs](https://github.com/libhugetlbfs/libhugetlbfs). The following command preallocates 128 huge pages.
 
 ```bash
 $ sudo apt install libhugetlbfs-bin
@@ -50,7 +50,7 @@ $ sudo hugeadm --create-global-mounts
 $ sudo hugeadm --pool-pages-min 2M:128
 ```
 
-This is roughly the equivalent of executing the following commands which do not require libhugetlbfs (see the [kernel docs](https://www.kernel.org/doc/Documentation/vm/hugetlbpage.txt)):
+This is roughly the equivalent of executing the following commands which do not require `libhugetlbfs` (see the [kernel docs](https://www.kernel.org/doc/Documentation/vm/hugetlbpage.txt)):
 
 ```bash
 $ echo 128 > /proc/sys/vm/nr_hugepages

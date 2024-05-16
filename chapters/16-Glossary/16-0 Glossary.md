@@ -30,6 +30,8 @@
 
 \textbf{EBS} Event-Based Sampling
 
+\textbf{EHP} Explicit Hugepages
+
 \textbf{FLOPS} FLoating-point Operations Per Second
 
 \textbf{FMA} Fused Multiply Add
