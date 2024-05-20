@@ -1,4 +1,4 @@
-### Task Scheduling
+## Task Scheduling
 
 With the emergence of hybrid processors, task scheduling becomes very challenging. For example, recent Intel's Meteor Lake chips have three types of cores; all with different performance characteristics. As you will see in this section, it is very easy to pessimize the performance of a multithreaded application by using a suboptimal scheduling policy. Implementing a generic task scheduling policy is tricky because it greatly depends on the nature of the running tasks. Here are some examples:
 
@@ -33,7 +33,7 @@ Our second piece of advice is to avoid static partitioning on systems with asymm
 
 In the final example, we switch to using dynamic partitioning. With dynamic partitioning, chunks are distributed to threads dynamically. Each thread processes a chunk of elements, then requests another chunk, until no chunks remain to be distributed. Figure @fig:OmpDynamic shows the result of using dynamic partitioning by dividing the array into 16 chunks. With this scheme, each task becomes more granular, which enables OpenMP runtime to balance the work even when P-cores run two times faster than E-cores. However, notice that there is still some idle time on E-cores. 
 
-Performance can be slightly improved if we partition the work into 128 chunks instead of 16. But don't make the jobs too small, otherwise it will result in increased management overhead. The result summary of our experiments is shown in [@tbl:TaskSchedulingResults]. Partitioning the work into 128 chunks turns out to be the sweet spot for our example. Even though our example is very simple, learning from it can be applied to production-grade multithreaded software.
+Performance can be slightly improved if we partition the work into 128 chunks instead of 16. But don't make the jobs too small, otherwise it will result in increased management overhead. The result summary of our experiments is shown in Table [@tbl:TaskSchedulingResults]. Partitioning the work into 128 chunks turns out to be the sweet spot for our example. Even though our example is very simple, learning from it can be applied to production-grade multithreaded software.
 
 ------------------------------------------------------------------------------------------------
                                Affinity  Static   Dynamic,    Dynamic,   Dynamic,    Dynamic,

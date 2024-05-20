@@ -1,4 +1,4 @@
-## Thread Count Scaling Case Study
+### Thread Count Scaling Case Study
 
 [TODO]: The traces in your graphs can be hard to distinguish from each other, especially blender and clang. Consider trying other forms of visual contrast than trace width and line style : other options include data point markers of different shape, trace color.
 
