@@ -112,7 +112,7 @@ $ rdmsr -p 1 0xC0010201
 
 where `-p 1` refers to the hardware thread 1, `0xC0010200` is the MSR for the control of counter 0 (`PERF_CTL[0]`), and `0x5100C0` specifies the identifier of the event to be measured (retired instructions, `PMCx0C0`) and how it will be measured (user events). Once the configuration with `wrmsr` is done, the `rdmsr` command can be used to read the counter 0 that collects the number of retired instructions.
 
-Similarly, access to a L3 cache event is done by writing to a L3 control register (MSR `0xC001023[0,2,4,6,8,A]`) and reading its associated counter (MSR `0xC001023[1,3,5,7,9,B]`). Finally, access to a data fabric event is performed by writing to a `DF_PERF_CTL[0-3]` control register (MSR `0xC001024[0,2,4,6]`) and reading its associated `DF_PERF_CTR[0-3]` register (MSR `0xC001024[1,3,5,7]`)[^10]. 
+Similarly, access to a L3 cache event is done by writing to a L3 control register (MSR `0xC001023[0,2,4,6,8,A]`) and reading its associated counter (MSR `0xC001023[1,3,5,7,9,B]`). Finally, access to a data fabric event is performed by writing to a `DF_PERF_CTL[0-3]` control register (MSR `0xC001024[0,2,4,6]`) and reading its associated `DF_PERF_CTR[0-3]` register (MSR `0xC001024[1,3,5,7]`).[^10]
 
 The methodology used in this case study is described in more detail in [@Balancer2023]. The code and the information necessary to reproduce the experiments can be found in the following public repository: [https://github.com/agusnt/BALANCER](https://github.com/agusnt/BALANCER).
 
