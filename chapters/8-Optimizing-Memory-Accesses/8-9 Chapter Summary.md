@@ -1,9 +1,7 @@
-[TODO]: update
-
 ## Chapter Summary {.unlisted .unnumbered}
 
-* Most real-world applications experience memory-related performance bottlenecks.
-* Performance of the memory subsystem is not growing as fast as CPU performance. Yet, memory accesses are a frequent source of performance problems in many applications. Speeding up such programs requires revising the way they access memory.
-* In [@sec:MemBound], we discussed some of the popular recipes for cache-friendly data structures, data reorganization techniques, how to utilize large memory pages to improve DTLB performance, and explicit memory prefetching.
+* Most real-world applications experience memory-related performance bottlenecks. Emerging application domains, such as machine learning and big data, are particularly demanding in terms of memory bandwidth and latency.
+* Performance of the memory subsystem is not growing as fast as the CPU performance. Yet, memory accesses are a frequent source of performance problems in many applications. Speeding up such programs requires revising the way they access memory.
+* In [@sec:MemBound], we discussed frequently used recipes for developing cache-friendly data structures, explored data reorganization techniques, learned how to utilize large memory pages to improve DTLB performance, and how to use explicit memory prefetching to reduce the number of cache misses.
 
 \sectionbreak
