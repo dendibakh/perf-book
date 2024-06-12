@@ -1,16 +1,8 @@
-## Architecture-Specific Optimizations {.unlisted .unnumbered}
+## CPU-Specific Optimizations {.unlisted .unnumbered}
 
-[TODO]: improve intro
+Optimizing software for a specific CPU microarchitecture involves tailoring your code to leverage the strengths and mitigate the weaknesses of that microarchitecture. It is easier to do when you know the exact target CPU for your application. However, most application run on a wide range of CPUs. Optimizing performance of a cross-platform application with a very high speed requirements can be challenging since platforms from different vendors have different designs and implementations. Nevertheless, it is possible to write code that performs reasonably well on CPUs from different vendors, while providing a fine-tuned version for a specific microarchitecture. 
 
-Optimizing software for a specific CPU microarchitecture involves tailoring your code and compilation process to leverage the strengths and mitigate the weaknesses of that microarchitecture. Here's a step-by-step guide to using knowledge of a target CPU microarchitecture to optimize your software:
-
-Progressive Enhancement:
-Default to Generic: Write code to perform well on a baseline architecture.
-Add Optimizations: Introduce specific optimizations progressively, ensuring there is a fallback for architectures that do not support them.
-
-When developing cross-platform applications where the exact target CPU configuration is unknown, you can still apply microarchitecture-specific optimizations in a general and adaptable way.
-
-Developing a cross-platform application with a very high performance requirements can be challenging since platforms from different vendors have different implementations. The major difference between x86 (considered as CISC) and RISC ISAs, such as ARM and RISC-V, are summarized below:
+The major differences between x86 (considered as CISC) and RISC ISAs, such as ARM and RISC-V, are summarized below:
 
 * x86 instructions are variable-length, while ARM and RISC-V instructions are fixed-length. This makes decoding x86 instructions more complex.
 * x86 ISA has many addressing modes, while ARM and RISC-V have few addressing modes. Operands in ARM and RISC-V instructions are either registers or immediate values, while x86 instruction inputs can also come from memory. This bloats the number of x86 instructions, but also allows for more powerful single instructions. For instance, ARM requires to load a memory location first, then perform the operation; x86 can do both in one instruction.
@@ -24,28 +16,38 @@ Although ISA differences *may* have a tangible impact on performance of a specif
 * CISC code is not denser than RISC code. [@CodeDensityCISCvsRISC]
 * ISA overheads can be effectively mitigated by microarchitecture implementation. For example, $\mu$op cache minimizes decoding overheads; instruction cache minimizes code density impact. [@RISCvsCISC2013] [@ChipsAndCheesex86]
 
-Nevertheless, this doesn't remove the value of architecture-specific optimizations. 
-[TODO] Outline what we will be talking about: ISA Extensions, Instruction latencies and throughput, Microarchitecture-specific issues.
+Nevertheless, this doesn't remove the value of architecture-specific optimizations. In this section, we will discuss how to optimize for a particular platform. We will cover ISA extensions, instruction latencies and throughput, and discuss some common microarchitecture-specific issues.
 
 ### ISA Extensions {.unlisted .unnumbered}
 
-[TODO]: list the most important ISA extensions
+ISA evolution has been continuous, it has focused on accelerating specialized workloads, such as cryptography, AI, multimedia, and others. Utilizing ISA extensions often results in lucrative performance improvements. Developers keep finding smart ways to leverage these extensions in general-purpose applications. So, even if you're outside of one of these highly specialized domains, you might still benefit from using ISA extensions. That's why we suggest you to familiarize yourself with the ISA extensions available on your target platform.
 
-ISA evolution has been continuous, it has focused on enabling specialization
+It's not possible to learn about all specific instructions. But we suggest you to familiarize yourself with major ISA extensions and their capabilities. For example, if you are developing an AI application that uses `fp16` data types, and you target one of the modern ARM processors, make sure that your program's machine code contains corresponding `fp16` ISA extensions. If you're developing encyption/decryption software, check if it utilizes crypto extensions of your target ISA. And so on.
 
-Instruction Set Extensions: Familiarize yourself with available SIMD, cryptographic, and other specialized instructions.
+Here is a list of some notable x86 ISA extensions:
 
-It's not possible to learn about all specific instructions. But we suggest you to familiarize yourself with major ISA extensions and their capabilities. For example, if you are developing an AI application that uses `fp16` data types, and you target one of the modern ARM processors, make sure that your program's machine code contains corresponding `fp16` ISA extensions. If you're developing encyption/decryption software, check if it utilizes crypto extensions of your target ISA.
-Provide a list of these extensions?
-(e.g. AES, VNNI, AVX512FP16 and AVX512BF16, AMX, ARM fp16, DOT, SVE, SME)
-Use compiler flags that generate code optimized for your target CPU. 
-GCC/Clang: -march=native or -march=[architecture] (e.g., -march=skylake)
-Intel Compiler: -xHost or -x[architecture] (e.g., -xCORE-AVX512)
-MSVC: /arch:[architecture] (e.g., /arch:AVX2)
+* SSE/AVX/AVX2: provide SIMD instructions for floating-point and integer operations.
+* AVX512: extends AVX2 with 512-bit registers and many new instructions.
+* AVX512_FP16/AVX512_BF16: adds support for 16-bit half-precision and `Bfloat16` floating-point values.
+* AES/SHA: provide instructions for AES encryption, decryption, and SHA hashing.
+* BMI/BMI2: provide instructions for bit manipulation.
+* AVX_VNNI/AVX512_VNNI: Vector Neural Network Instructions for accelerating deep learning workloads.
+* AMX: Advanced Matrix Extensions for accelerating matrix multiplication.
 
-These advice are mostly about compute-bound loops
+Here is a list of some notable ARM ISA extensions:
+
+* asimd: also known as neon, provides SIMD instructions for floating-point and integer operations.
+* aes/sha1/sha2/sha3/sha512/crc32: provide instructions for encryption, hashing, and checksumming.
+* fp16/bf16: provides 16-bit half-precision floating-point instructions.
+* dotprod: support for dot product instructions for accelerating machine learning workloads.
+* sve: enables scalable vector length instructions.
+* sme: Scalable Matrix Extension for accelerating matrix multiplication.
+
+When compiling your applications, make sure to enable the necessary compiler flags to activate required ISA extensions. On GCC and Clang compilers use `-march` option. For example, `-march=native` will activate ISA features of your host system, i.e., on which you run the compilation. Or you can include specific version of ISA, e.g., `-march=armv8.6-a`. On MSVC compiler, use `/arch` option, e.g., `/arch:AVX2`.
 
 #### CPU dispatch
+
+These advice are mostly about compute-bound loops
 
 Use compile-time or runtime checks to introduce platform-specific optimizations. This technique is called CPU dispatching. It allows you to write a single codebase that can be optimized for different microarchitectures. For example, you can write a generic implementation of a function and then provide microarchitecture-specific implementations that are used when the target CPU supports certain instructions. For example:
 
@@ -58,6 +60,8 @@ if (__builtin_cpu_supports ("avx512f")) {
 ```
 
 https://johnnysswlab.com/cpu-dispatching-make-your-code-both-portable-and-fast/
+
+As a rule of thumb, it is better to start with a generic implementation and then introduce microarchitecture-specific optimizations progressively, ensuring there is a fallback for architectures that do not have required features.
 
 ### Instruction latencies and throughput {.unlisted .unnumbered}
 
