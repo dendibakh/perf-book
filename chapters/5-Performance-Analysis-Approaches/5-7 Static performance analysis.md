@@ -57,7 +57,7 @@ To increase the utilization of FMA execution units from 50% to 100%, we need to 
 
 ```
 # ran on Intel Core i7-1260P (Alderlake)
-$ sudo ./kernel-nanoBench.sh -f -unroll 10   │ $ sudo ./kernel-nanoBench.sh -f -unroll 10 
+$ sudo ./kernel-nanoBench.sh -f -unroll 1000 │ $ sudo ./kernel-nanoBench.sh -f -unroll 1000
  -loop 100 -basic -warm_up_count 10 -asm "   │  -loop 100 -basic -warm_up_count 10 -asm "
 VFMADD231PS YMM0, YMM1, ymmword [R14];       │ VFMADD231PS YMM0, YMM1, ymmword [R14];
 VFMADD231PS YMM2, YMM1, ymmword [R14+32];    │ VFMADD231PS YMM2, YMM1, ymmword [R14+32];
@@ -65,12 +65,12 @@ VFMADD231PS YMM3, YMM1, ymmword [R14+64];    │ VFMADD231PS YMM3, YMM1, ymmword
 VFMADD231PS YMM4, YMM1, ymmword [R14+96];"   │ VFMADD231PS YMM4, YMM1, ymmword [R14+96];
 -asm_init "<not shown>"                      │ VFMADD231PS YMM5, YMM1, ymmword [R14+128];
                                              │ VFMADD231PS YMM6, YMM1, ymmword [R14+160];
-Instructions retired: 4.20                   │ VFMADD231PS YMM7, YMM1, ymmword [R14+192];
-Core cycles: 4.02                            │ VFMADD231PS YMM8, YMM1, ymmword [R14+224]"
+Instructions retired: 4.00                   │ VFMADD231PS YMM7, YMM1, ymmword [R14+192];
+Core cycles: 4.00                            │ VFMADD231PS YMM8, YMM1, ymmword [R14+224]"
                                              │ -asm_init "<not shown>"
                                              │
-                                             │ Instructions retired: 8.20
-                                             │ Core cycles: 4.02
+                                             │ Instructions retired: 8.00
+                                             │ Core cycles: 4.00
 ```
 
 As a rule of thumb, in such situations, the loop must be unrolled by a factor `T * L`, where `T` is the throughput of an instruction, and `L` is its latency. In our case, we should have unrolled it by `2 * 4 = 8` to achieve maximum FMA port utilization since the throughput of FMA on Alderlake is 2 and latency of FMA is 4 cycles. This creates 8 separate data flow chains that can be executed independently.
