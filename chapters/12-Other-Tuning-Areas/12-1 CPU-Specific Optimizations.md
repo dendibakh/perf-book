@@ -1,4 +1,4 @@
-## CPU-Specific Optimizations {.unlisted .unnumbered}
+## CPU-Specific Optimizations
 
 Optimizing software for a specific CPU microarchitecture involves tailoring your code to leverage the strengths and mitigate the weaknesses of that microarchitecture. It is easier to do when you know the exact target CPU for your application. However, most application run on a wide range of CPUs. Optimizing performance of a cross-platform application with a very high speed requirements can be challenging since platforms from different vendors have different designs and implementations. Nevertheless, it is possible to write code that performs reasonably well on CPUs from different vendors, while providing a fine-tuned version for a specific microarchitecture. 
 
@@ -18,7 +18,7 @@ Although ISA differences *may* have a tangible impact on performance of a specif
 
 Nevertheless, this doesn't remove the value of architecture-specific optimizations. In this section, we will discuss how to optimize for a particular platform. We will cover ISA extensions, instruction latencies and throughput, and discuss some common microarchitecture-specific issues.
 
-### ISA Extensions {.unlisted .unnumbered}
+### ISA Extensions
 
 ISA evolution has been continuous, it has focused on accelerating specialized workloads, such as cryptography, AI, multimedia, and others. Utilizing ISA extensions often results in lucrative performance improvements. Developers keep finding smart ways to leverage these extensions in general-purpose applications. So, even if you're outside of one of these highly specialized domains, you might still benefit from using ISA extensions. That's why we suggest you to familiarize yourself with the ISA extensions available on your target platform.
 
@@ -28,7 +28,7 @@ Here is a list of some notable x86 ISA extensions:
 
 * SSE/AVX/AVX2: provide SIMD instructions for floating-point and integer operations.
 * AVX512: extends AVX2 with 512-bit registers and many new instructions.
-* AVX512_FP16/AVX512_BF16: adds support for 16-bit half-precision and `Bfloat16` floating-point values.
+* AVX512_FP16/AVX512_BF16: add support for 16-bit half-precision and `Bfloat16` floating-point values.
 * AES/SHA: provide instructions for AES encryption, decryption, and SHA hashing.
 * BMI/BMI2: provide instructions for bit manipulation.
 * AVX_VNNI/AVX512_VNNI: Vector Neural Network Instructions for accelerating deep learning workloads.
@@ -38,18 +38,16 @@ Here is a list of some notable ARM ISA extensions:
 
 * asimd: also known as neon, provides SIMD instructions for floating-point and integer operations.
 * aes/sha1/sha2/sha3/sha512/crc32: provide instructions for encryption, hashing, and checksumming.
-* fp16/bf16: provides 16-bit half-precision floating-point instructions.
+* fp16/bf16: provide 16-bit half-precision and `Bfloat16` floating-point instructions.
 * dotprod: support for dot product instructions for accelerating machine learning workloads.
 * sve: enables scalable vector length instructions.
 * sme: Scalable Matrix Extension for accelerating matrix multiplication.
 
 When compiling your applications, make sure to enable the necessary compiler flags to activate required ISA extensions. On GCC and Clang compilers use `-march` option. For example, `-march=native` will activate ISA features of your host system, i.e., on which you run the compilation. Or you can include specific version of ISA, e.g., `-march=armv8.6-a`. On MSVC compiler, use `/arch` option, e.g., `/arch:AVX2`.
 
-#### CPU dispatch
+### CPU dispatch
 
-These advice are mostly about compute-bound loops
-
-Use compile-time or runtime checks to introduce platform-specific optimizations. This technique is called CPU dispatching. It allows you to write a single codebase that can be optimized for different microarchitectures. For example, you can write a generic implementation of a function and then provide microarchitecture-specific implementations that are used when the target CPU supports certain instructions. For example:
+When you want to provide a fast-path for a specific microarchitecture while keeping a generic implementation for other platforms, you can use *CPU dispatching*. It is a technique that allows your program to detect which features your processor has, and based on that decide which version of code to execute. It enables you to introduce platform-specific optimizations in a single codebase. As a rule of thumb, it is better to start with a generic implementation and then introduce microarchitecture-specific optimizations progressively, ensuring there is a fallback for architectures that do not have required features. For example:
 
 ```cpp
 if (__builtin_cpu_supports ("avx512f")) {
@@ -59,11 +57,11 @@ if (__builtin_cpu_supports ("avx512f")) {
 }
 ```
 
-https://johnnysswlab.com/cpu-dispatching-make-your-code-both-portable-and-fast/
+This example demonstrates use of built-in function that are available in GCC and Clang compilers. Besided detecting supported ISA extensions, there is `__builtin_cpu_is` function to detect an exact processor model. A compiler-agnostic way of writing CPU dispatch is to use `CPUID` instruction (x86-only), `getauxval(AT_HWCAP)` Linux system call, or `sysctlbyname` on macOS.
 
-As a rule of thumb, it is better to start with a generic implementation and then introduce microarchitecture-specific optimizations progressively, ensuring there is a fallback for architectures that do not have required features.
+You would typically see CPU dispatching constructs used to optimize only specific parts of the code, e.g., hot function or loop. And very often, these platform-specific implementations are written with compiler intrinsics [@sec:secIntrinsics] to generate desired instructions.
 
-### Instruction latencies and throughput {.unlisted .unnumbered}
+### Instruction latencies and throughput
 
 Execution Units: Identify the types and numbers of execution units (e.g., ALUs, FPUs).
 [MOVE] Cache Hierarchy: Understand the levels of cache, their sizes, and their latencies.
@@ -80,7 +78,7 @@ In contrast, if you have a loop that performs a lot of independent operations, y
 
 Port contention: you'll find a lot of stuff *has* to go to p5. So one of the challenges is to find ways of substituting things that aren't p5. If you're heavily bottlenecked enough of p5, then you may find that 2 ops on p0 are better than 1 op on p5.
 
-### Microarchitecture-specific issues {.unlisted .unnumbered}
+### Microarchitecture-specific issues
 
 #### Memory ordering {.unlisted .unnumbered}
 example with histogram
