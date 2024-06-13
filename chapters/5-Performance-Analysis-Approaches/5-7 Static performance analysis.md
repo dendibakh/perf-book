@@ -20,7 +20,7 @@ The output of static performance analyzers is fairly low-level and sometimes bre
 
 A bigger collection of tools both for static and dynamic microarchitectural performance analysis is available [here](https://github.com/MattPD/cpplinks/blob/master/performance.tools.md#microarchitecture).[^7]
 
-### Case Study: Using UICA to Optimize FMA Throughput
+### Case Study: Using UICA to Optimize FMA Throughput {#sec:FMAThroughput}
 
 One of the questions developers often ask is: "Latest processors have 10+ execution units; How do I write my code to keep them busy all the time?" This is indeed one the hardest questions to tackle. Sometimes it requires looking under the microscope at how the program is running. One such microscope is the UICA simulator that helps you to gain insights into how your code could be flowing through a modern processor.
 

@@ -45,7 +45,7 @@ Here is a list of some notable ARM ISA extensions:
 
 When compiling your applications, make sure to enable the necessary compiler flags to activate required ISA extensions. On GCC and Clang compilers use `-march` option. For example, `-march=native` will activate ISA features of your host system, i.e., on which you run the compilation. Or you can include specific version of ISA, e.g., `-march=armv8.6-a`. On MSVC compiler, use `/arch` option, e.g., `/arch:AVX2`.
 
-### CPU dispatch
+### CPU Dispatch
 
 When you want to provide a fast-path for a specific microarchitecture while keeping a generic implementation for other platforms, you can use *CPU dispatching*. It is a technique that allows your program to detect which features your processor has, and based on that decide which version of code to execute. It enables you to introduce platform-specific optimizations in a single codebase. As a rule of thumb, it is better to start with a generic implementation and then introduce microarchitecture-specific optimizations progressively, ensuring there is a fallback for architectures that do not have required features. For example:
 
@@ -61,24 +61,21 @@ This example demonstrates use of built-in function that are available in GCC and
 
 You would typically see CPU dispatching constructs used to optimize only specific parts of the code, e.g., hot function or loop. And very often, these platform-specific implementations are written with compiler intrinsics [@sec:secIntrinsics] to generate desired instructions.
 
-### Instruction latencies and throughput
+### Instruction Latencies and Throughput
 
-Execution Units: Identify the types and numbers of execution units (e.g., ALUs, FPUs).
-[MOVE] Cache Hierarchy: Understand the levels of cache, their sizes, and their latencies.
+Besides ISA extensions, it's worth to learn about the number and type of execution units in your processor. For instance, how many loads, stores, divisions and multiplications a processor can issue every cycle. For most processors, this information is published by CPU vendors in corresponding technical manuals. However, information about latencies and throughput of specific instructions is not usually disclosed. Nevertheless, people have benchmarked individual instructions, which can be accessed online. For the latest Intel and AMD CPUs, latency, throughput, port usage, and the number of $\mu$ops for an instruction can be found at the [uops.info](https://uops.info/table.html)[^2] website. For Apple silicon, similar data is accessible here: [https://dougallj.github.io/applecpu/firestorm-simd.html](https://dougallj.github.io/applecpu/firestorm-simd.html). Along with instructions latencies and throughput, developers have reverse-engineered other aspects of a microarchitecture such as size of branch prediction history buffers, reorder buffer capacity, size of load/store buffers, and others. Since this is unofficial source of data, you should take it with a grain of salt.
 
-These aspects are often publicly accessible in the CPU's datasheet or technical reference manual.
+Be very careful about making conclusions just on the instruction latency and throughput numbers. In many cases, instruction latencies are hidden by the out-of-order execution engine, and it may not matter if an instruction has latency of 4 or 8 cycles. If it doesn't block forward progress, such instruction will be handled "in the background" without harming performance. However, latency of an instuction becomes important when it stands on a critical dependency chain because it delays execution of dependant operations.
 
-Other details of a microarchitecture might not be public, such as sizes of branch prediction history buffers, branch misprediction penalty, instructions latencies and throughput. While this information is not disclosed by CPU vendors, people have reverse-engineered some of it, which can be found online.
+In contrast, if you have a loop that performs a lot of _independent_ operations, you should focus on instruction throughput rather than latency. When operations are independent, they can be processed in parallel. In such scenario, the critical factor is how many operations of a certain type can be executed per cycle, or *execution throughput*. There are also "in between" scenarios, where both instruction latency and throughput may affect performance.
 
-How to reason about instruction latencies and throughput?
+When you analyze machine code for one of your hot loops, you may find that multiple instructions are assigned to the same execution port. This situation is known as _execution port contention_. So the challenge is to find ways of substituting some of these instructions with the ones that are not assigned to the same port. For example on Intel processors, if you're heavily bottlenecked on `port5`, then you may find that two instructions on `port0` are better than one instruction on `port5`. Often it is not an easy task and it requires deep ISA and microarchitecture knowledge. When in struggle, seek help on specialized forums. Also, keep in mind that some of these things may change in future CPU generations, so consider using CPU dispatch to isolate the effect of your code changes.
 
-Be very careful about making conclusions just on the numbers. In many cases, instruction latencies are hidden by the out-of-order execution engine, and it may not matter if an instruction has latency of 4 or 8 cycles. If it doesn't block forward progress, this instruction will be handled "in the background" without harming performance. However, latency of an instuction becomes important when it stands on a critical dependency chain of instructions because it delays execution of dependant operations.
+In [@sec:FMAThroughput], we looked at one example, when throughput of FMA instructions becomes critical. Now let's take a look at another example, involving FMA latency.
 
-In contrast, if you have a loop that performs a lot of independent operations, you should focus on instruction throughput rather than latency. When operations are independent, they can be processed in parallel. In such scenario, the critical factor is how many operations of a certain type can be executed per cycle, or *execution throughput*. Even if an instruction has a high latency, the out-of-order execution engine can hide it. Keep in mind, there are also "in between" scenarios, where both instruction latency and throughput may affect performance.
+[TODO]: FMA latency
 
-Port contention: you'll find a lot of stuff *has* to go to p5. So one of the challenges is to find ways of substituting things that aren't p5. If you're heavily bottlenecked enough of p5, then you may find that 2 ops on p0 are better than 1 op on p5.
-
-### Microarchitecture-specific issues
+### Microarchitecture-Specific Issues
 
 #### Memory ordering {.unlisted .unnumbered}
 example with histogram
@@ -101,3 +98,4 @@ just describe
 remove?
 
 [^1]: Intel APX - [https://www.intel.com/content/www/us/en/developer/articles/technical/advanced-performance-extensions-apx.html](https://www.intel.com/content/www/us/en/developer/articles/technical/advanced-performance-extensions-apx.html)
+[^2]: x86 instruction latency and throughput - [https://uops.info/table.html](https://uops.info/table.html)
