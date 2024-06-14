@@ -61,6 +61,16 @@ This example demonstrates use of built-in function that are available in GCC and
 
 You would typically see CPU dispatching constructs used to optimize only specific parts of the code, e.g., hot function or loop. And very often, these platform-specific implementations are written with compiler intrinsics [@sec:secIntrinsics] to generate desired instructions.
 
+[TODO]:
+https://www.agner.org/optimize/optimizing_cpp.pdf#page=135&zoom=100,116,161
+Underestimating the cost of keeping a CPU dispatcher updated. It is tempting to finetune the code to a specific CPU model and then think that you can make an update
+when the next new model comes on the market. But the cost of fine-tuning, testing,
+verifying and maintaining a new branch of code is so high that it is unrealistic that
+you can do this every time a new processor enters the market for years to come.
+Even big software companies often fail to keep their CPU dispatchers up to date. A
+more realistic goal is to make a new branch only when a new instruction set opens
+the possibility for significant improvements.
+
 ### Instruction Latencies and Throughput
 
 Besides ISA extensions, it's worth to learn about the number and type of execution units in your processor. For instance, how many loads, stores, divisions and multiplications a processor can issue every cycle. For most processors, this information is published by CPU vendors in corresponding technical manuals. However, information about latencies and throughput of specific instructions is not usually disclosed. Nevertheless, people have benchmarked individual instructions, which can be accessed online. For the latest Intel and AMD CPUs, latency, throughput, port usage, and the number of $\mu$ops for an instruction can be found at the [uops.info](https://uops.info/table.html)[^2] website. For the Apple M1 processor, similar data is accessible here: [https://dougallj.github.io/applecpu/firestorm-simd.html](https://dougallj.github.io/applecpu/firestorm-simd.html). Along with instructions latencies and throughput, developers have reverse-engineered other aspects of a microarchitecture such as size of branch prediction history buffers, reorder buffer capacity, size of load/store buffers, and others. Since this is unofficial source of data, you should take it with a grain of salt.
@@ -101,31 +111,9 @@ Core cycles: 4.00                            │ Instructions retired: 3.00
                                              │ Core cycles: 2.00
 ```
 
-The version on the left runs in 4 cycles per iteration, which corresponds to the FMA latency. However on the right hand side, `vmulss` instructions do not depend on each other, so they can be run in parallel. Still, there is a loop carry dependency over `xmm0` in the `vaddss` instruction (`FADD`). But latency of FADD is only two cycles, this is why the version on the right runs in just 4 cycles per iteration.
+The version on the left runs in four cycles per iteration, which corresponds to the FMA latency. However on the right hand side, `vmulss` instructions do not depend on each other, so they can be run in parallel. Still, there is a loop carry dependency over `xmm0` in the `vaddss` instruction (`FADD`). But latency of FADD is only two cycles, this is why the version on the right runs in just four cycles per iteration. The latency and throughput characteristics for other processors may vary.
 
 From this experiment we know that if the compiler would not have decided to fuse multiplication and addition into a single instruction, it would result in two times better performance for this loop. This only became clear once we examined the loop dependencies and compared latencies of FMA and FADD instructions. Since Clang18, you can prevent generating FMA instructions within a scope by using `#pragma clang fp contract(off)`.[^4]
-
-### Microarchitecture-Specific Issues
-
-#### Memory ordering {.unlisted .unnumbered}
-example with histogram
-Once memory operations are in their respective queues, the load/store unit has to make sure memory ordering is preserved.
-When load is executing it has to be checked against all older stores for potential store forwarding. But some stores might still have their address unknown. The LSU has to apply memory disambiguation prediction to decide if load can proceed ahead of unknown stores or not. And clearly load cannot forward from a store which address is still unknown.
-#### when FMA contraction hurts performance
-example with nanobench
-#### Memory alignment {.unlisted .unnumbered}
-example with split loads in matmul
-#### 4K aliasing {.unlisted .unnumbered}
-just describe
-https://richardstartin.github.io/posts/4k-aliasing
-#### Cache trashing {.unlisted .unnumbered}
-just describe
-Avoid Cache Thrashing: Minimize cache conflicts by ensuring data structures do not excessively map to the same cache lines.
-https://github.com/ibogosavljevic/hardware-efficiency/blob/main/cache-conflicts/cache_conflicts.c
-#### AVX-SSE Transitions {.unlisted .unnumbered}
-just describe
-#### Non-temporal stores {.unlisted .unnumbered}
-remove?
 
 [^1]: Intel APX - [https://www.intel.com/content/www/us/en/developer/articles/technical/advanced-performance-extensions-apx.html](https://www.intel.com/content/www/us/en/developer/articles/technical/advanced-performance-extensions-apx.html)
 [^2]: x86 instruction latency and throughput - [https://uops.info/table.html](https://uops.info/table.html)
