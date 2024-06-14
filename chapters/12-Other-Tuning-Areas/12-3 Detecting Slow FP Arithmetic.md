@@ -1,4 +1,6 @@
-### Slow Floating-Point Arithmetic {#sec:SlowFPArith}
+#### Slow Floating-Point Arithmetic
+
+[TODO]: maybe move to the appendix?
 
 Some applications that do extensive computations with floating-point values, are prone to one very subtle issue that can cause performance slowdown. This issue arises when an application hit *subnormal* FP value, which we will discuss in this section. You can also find a term *denormal* FP value, which refers to the same thing. According to the IEEE Standard 754,[^2] a subnormal is a non-zero number with exponent smaller than the smallest normal number.[^1] [@lst:Subnormals] shows a very simple instantiation of a subnormal value. 
 
