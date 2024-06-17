@@ -94,6 +94,8 @@
 
 \textbf{RAT} Register Alias Table
 
+\textbf{RNG} Random Number Generator
+
 \textbf{ROB} ReOrder Buffer
 
 \textbf{SIMD} Single Instruction Multiple Data
