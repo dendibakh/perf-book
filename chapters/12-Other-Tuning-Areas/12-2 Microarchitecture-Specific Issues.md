@@ -1,6 +1,10 @@
 ### Microarchitecture-Specific Performance Issues {#sec:UarchSpecificIssues}
 
+In this section we will discuss some common microarchitecture-specific issues that can be attributed to majority of modern processors. Note that the impact of a particular problem can be more/less pronounced on one platform than another.
+
 #### Memory Order Violations {.unlisted .unnumbered}
+
+\hfill \break
 
 We introduced the concept of memory ordering in [@sec:uarchLSU]. Memory reordering is a crucial aspect of modern CPUs, as it allows to execute memory requests in parallel and out-of-order. The key element in load/store reordering is memory disambiguation, which predicts if it is safe to let loads go ahead of earlier stores. Since the memory disambiguation is speculative, it can lead to performance issues if not handled properly.
 
@@ -36,6 +40,8 @@ A cure for the memory order violation problem is shown in [@lst:MemOrderViolatio
 
 #### Memory alignment {.unlisted .unnumbered}
 
+\hfill \break
+
 The cores support unaligned accesses to normal, cacheable memory for all available
 data sizes. When executed sporadically, unaligned accesses generally complete without
 any observable performance impact to overall execution. Some accesses will suffer
@@ -44,6 +50,8 @@ delays, however, and the impact is often greater for stores than loads
 example with split loads in matmul
 
 #### 4K aliasing {.unlisted .unnumbered}
+
+\hfill \break
 
 just describe
 https://richardstartin.github.io/posts/4k-aliasing
@@ -54,11 +62,15 @@ libraries tend to be aligned to page boundaries when they are loaded.
 
 #### Cache trashing {.unlisted .unnumbered}
 
+\hfill \break
+
 just describe
 Avoid Cache Thrashing: Minimize cache conflicts by ensuring data structures do not excessively map to the same cache lines.
 https://github.com/ibogosavljevic/hardware-efficiency/blob/main/cache-conflicts/cache_conflicts.c
 
 #### Non-Temporal Loads and Stores {.unlisted .unnumbered}
+
+\hfill \break
 
 Caches naturally store data close to the processor under the assumption that the data in
 the cache line will be used again in the near term. Data that benefits from caching is said
@@ -74,7 +86,11 @@ https://www.agner.org/optimize/optimizing_cpp.pdf#page=108&zoom=100,116,716
 
 #### Store-to-Load Forwarding Delays {.unlisted .unnumbered}
 
+\hfill \break
+
 #### Minimize Moves Between Integer and Floating-Point Registers {.unlisted .unnumbered}
+
+\hfill \break
 
 DUP(general), FMOV(general), INS(general), MOV(from general), SCVTF(scalar), UCVTF(scalar)
 Movement of data between integer and vector registers requires several cycles. Load
@@ -92,7 +108,11 @@ float circleLength(float r) {
 
 #### Slow Floating-Point Arithmetic {.unlisted .unnumbered}
 
+\hfill \break
+
 #### AVX-SSE Transitions {.unlisted .unnumbered}
+
+\hfill \break
 
 remove?
 https://www.agner.org/optimize/microarchitecture.pdf#page=167&zoom=100,116,904
