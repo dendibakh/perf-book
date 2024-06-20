@@ -1,12 +1,44 @@
-### Microarchitecture-Specific Performance Issues
+### Microarchitecture-Specific Performance Issues {#sec:UarchSpecificIssues}
 
-#### Memory ordering {.unlisted .unnumbered}
+#### Memory Order Violations {.unlisted .unnumbered}
 
-example with histogram
-Once memory operations are in their respective queues, the load/store unit has to make sure memory ordering is preserved.
-When load is executing it has to be checked against all older stores for potential store forwarding. But some stores might still have their address unknown. The LSU has to apply memory disambiguation prediction to decide if load can proceed ahead of unknown stores or not. And clearly load cannot forward from a store which address is still unknown.
+We introduced the concept of memory ordering in [@sec:uarchLSU]. Memory reordering is a crucial aspect of modern CPUs, as it allows to execute memory requests in parallel and out-of-order. The key element in load/store reordering is memory disambiguation, which predicts if it is safe to let loads go ahead of earlier stores. Since the memory disambiguation is speculative, it can lead to performance issues if not handled properly.
 
-4.6.10 Memory Dependence  (https://developer.apple.com/documentation/apple-silicon/cpu-optimization-guide)
+Consider an example in [@lst:MemOrderViolation], on the left. This code snippet calculates a histogram of an 8-bit grayscale image, i.e., calculate how many times a certain color appears in the image. Besides countless other places, this code can be found in Otsu's thresholding algorithm[^1] that is used to convert a grayscale image to a binary image. Since the input image is 8-bit grayscale, there are only 256 different colors. 
+
+For each pixel on an image, you need to read the current histogram count of the color of the pixel, increment it and store it back. This is a classic read-modify-write dependency through the memory. Imagine we have the following consequtive pixels in the image: `0xFF 0xFF 0x00 0xFF 0xFF ...` and so on. The loaded value of the histogram count for pixel 1 comes from the result of the previous iteration. But the histogram count for pixel 2 comes from memory; it is independent and can be reordered. But then again, the histogram count for pixel 3 is dependent on the result of processing pixel 1, and so on. 
+
+Listing: Memory Order Violation Example.
+
+~~~~ {#lst:MemOrderViolation .cpp}
+std::array<uint32_t, 256> hist;                    std::array<uint32_t, 256> hist1;
+hist.fill(0);                                      std::array<uint32_t, 256> hist2;
+for (int i = 0; i < width * height; ++i)     =>    hist1.fill(0);
+  hist[image[i]]++;                                hist2.fill(0);
+                                                   int i = 0;
+                                                   for (; i + 1 < width * height; i += 2) {
+                                                     hist1[image[i+0]]++;
+                                                     hist2[image[i+1]]++;
+                                                   }
+                                                   for (; i < width * height; ++i)
+                                                     hist1[image[i]]++;
+
+                                                   for (int i = 0; i < hist1.size(); ++i)
+                                                     hist1[i] += hist2[i];
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Recall from [@sec:uarchLSU], the processor doesn't necessarily knows about a potential store-to-load forwarding, so it has to predict. If it correctly predicts a memory order violation between two updates of color `0xFF`, then these accesses will be serialized. The performance will not be great, but it is the best outcome we could hope for with the initial code. On the contrary, if the processor predicts that there is no memory order violation, it will speculatively make the two updates in parallel. Later it will recognize the mistake, flush the pipeline, and re-execute the later of the two updates. This is a performance worst-case scenario.
+
+
+When updates of the same color in the histogram occur at relatively high rates, the processor may not have completed updating pixel i prior to beginning pixel i+1. In such cases, a processor predicts whether the value loaded for the i+1 update will come from memory or from the i's store. If from memory, the two updates can be performed in parallel, otherwise the processor must serialize the updates.
+
+If repeated accesses to particular elements in the data structure sometimes (but not always) occur "close" to each other, temporally, then memory ordering violations and subsequent pipeline flushes can occur as a result of these accesses. 
+
+Note that “close” in this context means within the core’s out-of-order instruction window: repeated readmodify-writes of the same element may trigger ordering violations if they occur within a few loop iterations of each other, but not if they occur hundreds or thousands of loop iterations apart.
+Here are several types of data structures from real algorithm
+
+[TODO]: add a link to the lab
+https://github.com/dendibakh/perf-ninja/tree/main/labs/memory_bound/mem_order_violation_1
 
 #### Memory alignment {.unlisted .unnumbered}
 
@@ -70,3 +102,5 @@ float circleLength(float r) {
 
 remove?
 https://www.agner.org/optimize/microarchitecture.pdf#page=167&zoom=100,116,904
+
+[^1]: Otsu's thresholding method - [https://en.wikipedia.org/wiki/Otsu%27s_method](https://en.wikipedia.org/wiki/Otsu%27s_method)
