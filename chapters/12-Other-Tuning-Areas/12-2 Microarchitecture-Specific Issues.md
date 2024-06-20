@@ -48,17 +48,6 @@ However, when a load or store crosses cache line boundary, such access requires 
 
 [TODO]: example with split loads in matmul?
 
-#### 4K Aliasing {.unlisted .unnumbered}
-
-\hfill \break
-
-just describe
-https://richardstartin.github.io/posts/4k-aliasing
-While unlikely to be a significant
-problem, L1I Cache misses may result from set conflicts. Apple silicon uses 16KB
-memory pages that may make this even more likely to occur, since independent
-libraries tend to be aligned to page boundaries when they are loaded.
-
 #### Cache Trashing {.unlisted .unnumbered}
 
 \hfill \break
@@ -108,13 +97,6 @@ float circleLength(float r) {
 #### Slow Floating-Point Arithmetic {.unlisted .unnumbered}
 
 \hfill \break
-
-#### AVX-SSE Transitions {.unlisted .unnumbered}
-
-\hfill \break
-
-remove?
-https://www.agner.org/optimize/microarchitecture.pdf#page=167&zoom=100,116,904
 
 [^1]: Otsu's thresholding method - [https://en.wikipedia.org/wiki/Otsu%27s_method](https://en.wikipedia.org/wiki/Otsu%27s_method)
 [^2]: Performance Ninja lab assignment: Memory Order Violation - [https://github.com/dendibakh/perf-ninja/tree/main/labs/memory_bound/mem_order_violation_1](https://github.com/dendibakh/perf-ninja/tree/main/labs/memory_bound/mem_order_violation_1)
