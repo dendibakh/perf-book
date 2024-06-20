@@ -80,7 +80,23 @@ Finally, if we happen to read data before overwriting it, the cache line typical
 
 During a typical program execution, there could be dozens of memory accesses in flight. In most high-performance processors, the order of load and store operations is not necessarily required to be the same as the program order, which is known as _weakly ordered memory model_. For optimizations purposes, the processor can reorder memory read and write operations. Consider a situation when a load runs into a cache miss and has to wait until the data comes from memory. The processor allows subsequent loads to proceed ahead of the load that is waiting for the data. This allows later loads to finish before the earlier load and doesn't unnecessary block the execution. Such load/store reordering enables the memory units to process multiple memory accesses in parallel, which translates directly into higher performance.
 
-An interesting situation happens when a load consumes data from an earlier store. Just like with dependencies through regular arithmetic instructions, there are memory dependencies through loads and stores. In other words, a load can depend on an earlier store. If a load consumes data from a store that hasn't yet finished, we should not allow the load to proceed. But what if we don't yet know the address of the store? In this case, the processor predicts whether there will be any potential data forwarding between loads and stores and if reordering is safe. This is known as _memory disambiguation_. When a load starts executing, it has to be checked against all older stores for potential store forwarding. There are four possible scenarios:
+There are a few exceptions. Just like with dependencies through regular arithmetic instructions, there are memory dependencies through loads and stores. In other words, a load can depend on an earlier store and vice-versa. First of all, stores cannot be reordered with older loads:
+
+```
+Load R1, MEM_LOC_X
+Store MEM_LOC_X, 0
+```
+
+If we allow the store go before the load, then the `R1` register may read the wrong value from memory location `MEM_LOC_X`.
+
+Another interesting situation happens when a load consumes data from an earlier store:
+
+```
+Store MEM_LOC_X, 0
+Load R1, MEM_LOC_X
+```
+
+If a load consumes data from a store that hasn't yet finished, we should not allow the load to proceed. But what if we don't yet know the address of the store? In this case, the processor predicts whether there will be any potential data forwarding between loads and stores and if reordering is safe. This is known as _memory disambiguation_. When a load starts executing, it has to be checked against all older stores for potential store forwarding. There are four possible scenarios:
 
 * Prediction: Not dependent; Outcome: Not dependent. This a case of a successful memory disambiguation, which yields optimal performance.
 * Prediction: Dependent; Outcome: Not dependent. In this case, the processor was overly conservative and did not let the load go ahead of the store. This is a missed opportunity for performance optimization.
