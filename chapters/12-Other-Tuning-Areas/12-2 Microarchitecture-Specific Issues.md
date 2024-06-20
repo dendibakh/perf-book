@@ -38,18 +38,17 @@ Performance will greatly depend on the color patterns of the input image. Images
 
 A cure for the memory order violation problem is shown in [@lst:MemOrderViolation], on the right. As you can see, we duplicated the histogram and now alternate processing of pixels between two partial histograms. In the end, we combine the two partial histograms to get a final result. This new version with two partial histograms is still prone to potentially problematic patterns, such as `0xFF 0x00 0xFF 0x00 0xFF ...`. However, with this change, the worst-case scenario, e.g., `0xFF 0xFF 0xFF ...`  will run twice as fast as before. It may be beneficial to create four or eight partial histograms depending on the color pattern of input images. This exact code is featured in the [mem_order_violation_1](https://github.com/dendibakh/perf-ninja/tree/main/labs/memory_bound/mem_order_violation_1)[^2] lab assignment of Performance Ninja course, so feel free to experiment. On a small set of input images we observed from 10% to 50% speedup on various platforms. It is worth to mention that the version on the left consumes 1 KB of additional memory, which may not be huge in this case, but is something to watch out for.
 
-#### Memory alignment {.unlisted .unnumbered}
+#### Misaligned Memory Accesses {.unlisted .unnumbered}
 
 \hfill \break
 
-The cores support unaligned accesses to normal, cacheable memory for all available
-data sizes. When executed sporadically, unaligned accesses generally complete without
-any observable performance impact to overall execution. Some accesses will suffer
-delays, however, and the impact is often greater for stores than loads
+We already discussed how to align objects in {#sec:secMemAlign}. In most processors, the L1 cache is designed to be able to read data at any alignment. Generally, even if a load/store is misaligned but does not cross the cache line boundary, it won't have any performance penalty.
 
-example with split loads in matmul
+However, when a load or store crosses cache line boundary, such access requires two cache line reads (*split load/store*). It requires using a *split register*, which keeps the two parts and once both parts are fetched, they are combined into a single register. The number of split registers is limited. When executed sporadically, split accesses generally complete without any observable performance impact to overall execution. However, if that happens frequently, misaligned memory accesses will suffer delays.
 
-#### 4K aliasing {.unlisted .unnumbered}
+[TODO]: example with split loads in matmul?
+
+#### 4K Aliasing {.unlisted .unnumbered}
 
 \hfill \break
 
@@ -60,7 +59,7 @@ problem, L1I Cache misses may result from set conflicts. Apple silicon uses 16KB
 memory pages that may make this even more likely to occur, since independent
 libraries tend to be aligned to page boundaries when they are loaded.
 
-#### Cache trashing {.unlisted .unnumbered}
+#### Cache Trashing {.unlisted .unnumbered}
 
 \hfill \break
 
