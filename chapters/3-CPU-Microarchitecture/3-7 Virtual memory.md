@@ -28,7 +28,7 @@ To lower memory access latency, the L1 cache lookup can be partially overlapped 
 
 The TLB hierarchy keep translations for a relatively large memory space. Still, misses in the TLB can be very costly. To speed up handling of TLB misses, CPUs have a mechanism called a *HW page walker*. Such a unit can perform a page walk directly in HW by issuing the required instructions to traverse the page table, all without interrupting the kernel. This is the reason why the format of the page table is dictated by the CPU, to which OS’es have to comply. High-end processors have several HW page walkers that can handle multiple TLB misses simultaneously. However, even with all the acceleration offered by modern CPUs, TLB misses still cause performance bottlenecks for many applications.
 
-### Huge Pages
+### Huge Pages {#sec:ArchHugePages}
 
 Having a small page size makes it possible to manage the available memory more efficiently and reduce fragmentation. The drawback though is that it requires having more page table entries to cover the same memory region. Consider two page sizes: 4KB, which is a default on x86, and 2MB *huge page* size. For an application that operates on 10MB data, we need 2560 entries in first case, and just 5 entries if we would map the address space onto huge pages. Those are named *Huge Pages* on Linux, *Super Pages* on FreeBSD, and *Large Pages* on Windows, but they all mean the same thing. Through the rest of this book we will refer to them as Huge Pages.
 

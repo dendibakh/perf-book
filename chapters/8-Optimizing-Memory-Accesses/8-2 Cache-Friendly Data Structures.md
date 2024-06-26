@@ -155,6 +155,9 @@ struct S {                                        struct S {
 };                                                };
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+[TODO]: Apple L2 cache operates on 128B cache lines, they required more padding. 4.6.6 Improving Cache Hierarchy Performance. https://developer.apple.com/documentation/apple-silicon/cpu-optimization-guide
+Also mention it in chapter 3.
+
 Alignment and padding often cause holes of unused bytes, which potentially decreases memory bandwidth utilization. In the example above, original struct `S` (on the left) is only 8 bytes, while after the change (on the right) it becomes 128 bytes in size, which leaves a lot of unused bytes in every cache line. Use these techniques with care.
 
 ### Other Data Structure Reorganization Techniques

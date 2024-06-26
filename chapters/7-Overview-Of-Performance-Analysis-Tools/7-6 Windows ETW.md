@@ -78,7 +78,7 @@ Windows supports Event Log and Performance Counter triggers that can start a scr
 
 #### Analysis in WPA {.unlisted .unnumbered}
 
-[TODO]: start a new paragraph here
+\hfill \break
 
 Figure @fig:WPA_MainView shows the recorded ETW data opened in Windows Performance Analyzer (WPA). The WPA view is divided into three vertically layered parts: *CPU Usage (Sampled)*, *Generic Events* and *CPU Usage (Precise)*. To understand the difference between them, let's dive deeper. The upper graph *CPU Usage (Sampled)* is useful for identifying where the CPU time is spent. The data is collected by sampling all the running threads at a regular time interval. This *CPU Usage (Sampled)* graph is very similar to the *Hotspots* view in other profiling tools.
 
