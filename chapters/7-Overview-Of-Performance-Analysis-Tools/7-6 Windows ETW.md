@@ -22,7 +22,7 @@ All the items listed above are recorded system wide for all processes with confi
 
 ### What you cannot do with it: {.unlisted .unnumbered}
 
-ETW traces are not usefull for examining CPU microarchitectural bottlenecks. For that, use vendor-specific tools like Intel VTune, AMD uProf, Apple Instruments, etc.
+ETW traces are not useful for examining CPU microarchitectural bottlenecks. For that, use vendor-specific tools like Intel VTune, AMD uProf, Apple Instruments, etc.
 
 ETW traces capture dynamics of all processes at the system level which is great, but it may generate a lot of data. For example, capturing thread context switching data to observe various waits and delays can easily generate 1-2 GB per minute. That's why it is not practical to record high volume events for hours without overriding previously stored traces.
 
@@ -68,7 +68,7 @@ C:\Windows\System32\wpr.exe
  - Download an application from the internet, unpack it if needed. It doesn't matter what program you use, the goal is to see the delay when starting it.
  - Start profiling by pressing the *Start Recording* button.
  - Double click the executable to start it. 
- - Once a program has strated, stop profiling by pressing the *Stop Recording* button. 
+ - Once a program has started, stop profiling by pressing the *Stop Recording* button. 
 
 ![Starting ETW collection with ETWController UI.](../../img/perf-tools/ETWController_Dialog.png){#fig:ETWController_Dialog width=85%}
 

@@ -12,7 +12,7 @@ Mispredicting a branch can add a significant speed penalty when it happens regul
 
 Branch predictors use caches and history registers and therefore are susceptible to the issues pertaining to caches, namely three C's:
 
-- **Compulsory misses**: mispredictions may happen on the first dynamic occurence of the branch when static prediction is employed and no dynamic history is available.
+- **Compulsory misses**: mispredictions may happen on the first dynamic occurrence of the branch when static prediction is employed and no dynamic history is available.
 - **Capacity misses**: mispredictions arising from the loss of dynamic history due to very high number of branches in the program or exceedingly long dynamic pattern.
 - **Conflict misses**: branches are mapped into cache buckets (associative sets) using a combination of their virtual and/or physical addresses. If too many active branches are mapped to the same set, the loss of history can occur. Another instance of a conflict miss is false sharing when two independent branches are mapped to the same cache entry and interfere with each other potentially degrading the prediction history.
 

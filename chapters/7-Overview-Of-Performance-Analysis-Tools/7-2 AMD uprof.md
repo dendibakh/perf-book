@@ -4,7 +4,7 @@ The [uProf](https://www.amd.com/en/developer/uprof.html) profiler is a tool deve
 
 ### How to configure it {.unlisted .unnumbered}
 
-On Linux, uProf uses Linux perf for data collection. On Windows, uProf uses its own sampling driver that gets installed when you install uProf, no additional configuration is required. AMD uProf supports both command-line interface (CLI) and graphical interface (GUI). The CLI interface requires two separte steps - collect and report, similar to Linux perf.
+On Linux, uProf uses Linux perf for data collection. On Windows, uProf uses its own sampling driver that gets installed when you install uProf, no additional configuration is required. AMD uProf supports both command-line interface (CLI) and graphical interface (GUI). The CLI interface requires two separate steps - collect and report, similar to Linux perf.
 
 ### What you can do with it: {.unlisted .unnumbered}
 
@@ -32,7 +32,7 @@ Figure @fig:uProfHotspots shows *Function Hotpots* analysis (selected in the men
 
 Below the timeline graph, you can see a list of hot functions, along with corresponding sampled performance events and calculated metrics. Event counts can be viewed as: sample count, raw event count, and percentage. There are many interesting numbers to look at, but we will not dive deep into the analysis. Instead, readers are encouraged to figure out the performance impact of branch mispredictions and find their source.
 
-Below the functions table, you can see a bottom-up callstack view for the selected funtion in the functions table. As we can see, the selected `LU_factor` function is called from `kernel_measureLU`, which in turn is called from `main`. In the Scimark2 benchmark, this is the only call stack for `LU_factor`, even though it shows `Call Stacks [5]`. This is an artifact of collection that can be ignored. But in other applications, a hot function can be called from many different places, so you would want to examine other call stacks as well. 
+Below the functions table, you can see a bottom-up callstack view for the selected function in the functions table. As we can see, the selected `LU_factor` function is called from `kernel_measureLU`, which in turn is called from `main`. In the Scimark2 benchmark, this is the only call stack for `LU_factor`, even though it shows `Call Stacks [5]`. This is an artifact of collection that can be ignored. But in other applications, a hot function can be called from many different places, so you would want to examine other call stacks as well. 
 
 If you double-click on any function, uProf will open the source/assembly view for that function. We don't show this view for brevity. On the left panel, there are other views available, like Metrics, Flame Graph, Call Graph view, and Thread Concurrency. They are useful for analysis as well, however we decided to skip them. Readers can experiment and look at those views on their own.
 

@@ -8,9 +8,9 @@ Workload characterization is a process of describing a workload by means of quan
 
 This is a book about low-level performance, remember? So, we will focus on extracting features related to the CPU and memory performance. The best example of a workload characterization from a CPU perspective is Top-down Microarchitecture Analysis (TMA) methodology, which we will closely look at in [@sec:TMA]. TMA attempts to characterize an application by putting it into one of 4 buckets: CPU Front End, CPU Back End, Retiring, and Bad Speculation, depending on what is causing the most significant performance bottleneck. TMA uses Performance Monitoring Counters (PMCs) to collect the needed information and identify the inefficient use of CPU microarchitecture.
 
-But even without a fully-fledged characterization methodology, collecting total number of certain performance events can be helpful. We hope that the case studies in the previous chapter that examined performance metrics of four different benchmarks, proved that. PMCs are a very important instrument of low-level performance analysis. They can provide unique information about the execution of a program. PMCs are generally used in two modes: "Counting" and "Sampling". Counting mode is used for workload characterization, while sampling mode is used for finding hotspots, which we will discuss soon. 
+But even without a fully fledged characterization methodology, collecting total number of certain performance events can be helpful. We hope that the case studies in the previous chapter that examined performance metrics of four different benchmarks, proved that. PMCs are a very important instrument of low-level performance analysis. They can provide unique information about the execution of a program. PMCs are generally used in two modes: "Counting" and "Sampling". Counting mode is used for workload characterization, while sampling mode is used for finding hotspots, which we will discuss soon. 
 
-[TODO]: create an abbreviation PME = performance monitoring event and use it accross the chapter
+[TODO]: create an abbreviation PME = performance monitoring event and use it across the chapter
 
 ### Counting Performance Monitoring Events
 
@@ -67,7 +67,7 @@ However, Linux `perf` does not necessarily provide mappings for all performance 
 $ perf stat -e cpu/event=0xc4,umask=0x0,name=BR_INST_RETIRED.ALL_BRANCHES/ -- ./a.exe
 ```
 
-Performance events are not available in every environment since accessing PMCs requires root access, which applications running in a virtualized environment typically do not have. For programs executing in a public cloud, running a PMU-based profiler directly in a guest container does not result in useful output if a virtual machine (VM) manager does not expose the PMU programming interfaces properly to a guest. Thus profilers based on CPU performance monitoring counters do not work well in a virtualized and cloud environment [@PMC_virtual], although the situation is improving. VmWare® was one of the first VM managers to enable[^4] virtual Performance Monitoring Counters (vPMC). AWS EC2 cloud enabled[^5] PMCs for dedicated hosts.
+Performance events are not available in every environment since accessing PMCs requires root access, which applications running in a virtualized environment typically do not have. For programs executing in a public cloud, running a PMU-based profiler directly in a guest container does not result in useful output if a virtual machine (VM) manager does not expose the PMU programming interfaces properly to a guest. Thus profilers based on CPU performance monitoring counters do not work well in a virtualized and cloud environment [@PMC_virtual], although the situation is improving. VMware® was one of the first VM managers to enable[^4] virtual Performance Monitoring Counters (vPMC). AWS EC2 cloud enabled[^5] PMCs for dedicated hosts.
 
 ### Multiplexing and Scaling Events {#sec:secMultiplex}
 
@@ -93,5 +93,5 @@ final~count = 10'000 \times ( 500ms / ( 100ms \times 3) ) = 16'666
 $$
 This provides an estimate of what the count would have been had the event been measured during the entire run. It is very important to understand that this is still an estimate, not an actual count. Multiplexing and scaling can be used safely on steady workloads that execute the same code during long time intervals. However, if the program regularly jumps between different hotspots, i.e., has different phases, there will be blind spots that can introduce errors during scaling. To avoid scaling, one can try to reduce the number of events to be not bigger than the number of physical PMCs available. However, this will require running the benchmark multiple times to measure all the counters one is interested in.
 
-[^4]: VMWare PMCs - [https://www.vladan.fr/what-are-vmware-virtual-cpu-performance-monitoring-counters-vpmcs/](https://www.vladan.fr/what-are-vmware-virtual-cpu-performance-monitoring-counters-vpmcs/)
+[^4]: VMware PMCs - [https://www.vladan.fr/what-are-vmware-virtual-cpu-performance-monitoring-counters-vpmcs/](https://www.vladan.fr/what-are-vmware-virtual-cpu-performance-monitoring-counters-vpmcs/)
 [^5]: Amazon EC2 PMCs - [http://www.brendangregg.com/blog/2017-05-04/the-pmcs-of-ec2.html](http://www.brendangregg.com/blog/2017-05-04/the-pmcs-of-ec2.html)

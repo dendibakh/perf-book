@@ -53,7 +53,7 @@ Table: List of the recent AMD microarchitectures. {#tbl:AMDUarchs}
                  release         (latest)            uarchs
 ------------  ---------------  --------------   ------------------
   ARMv8-A          2011          Cortex-A73        Apple A7-A10;
-                                                  Quallcomm Kryo;
+                                                  Qualcomm Kryo;
                                                  Samsung M1/M2/M3
 
  ARMv8.2-A         2016         Neoverse N1;         Apple A11;
