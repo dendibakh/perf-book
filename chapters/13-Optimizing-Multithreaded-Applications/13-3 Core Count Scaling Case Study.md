@@ -139,7 +139,7 @@ The final benchmark in our case study is CPython. We wrote a simple multithreade
 
 To solve this puzzle, we have built CPython 3.12 from sources with debug information and ran Intel VTune's *Threading Analysis* collection while using two threads. Figure @fig:CPythontimeline visualizes a small portion of the timeline of the Python script execution. As you can see, the CPU time alternates between two threads. They work for 5 ms, then yield to another thread. In fact, if you scroll left or right, you will see that they never run simultaneously.
 
-![VTune's timeline view when running our Python script with 2 worker threads (other threads are filtered out).](../../img/mt-perf/CPythontimelineNew.png){#fig:CPythontimeline width=100%}
+![VTune's timeline view when running our Python script with 2 worker threads (other threads are filtered out).](../../img/mt-perf/CPythonTimelineNew.png){#fig:CPythontimeline width=100%}
 
 Let's try to understand why two worker threads take turns instead of running together. Once a thread finishes its turn, the Linux kernel scheduler switches to another thread as highlighted in Figure @fig:CPythontimeline. It also gives the reason for a context switch. If we take a look at `pthread_cond_wait.c` source code[^3] at line 652, we would land on the function `___pthread_cond_timedwait64`, which waits for a condition variable to be signaled. Many other inactive wait periods wait for the same reason. 
 

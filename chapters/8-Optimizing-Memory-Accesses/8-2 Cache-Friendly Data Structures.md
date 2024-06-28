@@ -21,7 +21,7 @@ for (row = 0; row < NROWS; row++)                  for (row = 0; row < NROWS; ro
     matrix[col][row] = row + col;          =>          matrix[row][col] = row + col;
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-![Column-major versus Row-major traversal.](../../img/memory-access-opts/ColumnRowmajor.png){#fig:ColRowMajor width=60%}
+![Column-major versus Row-major traversal.](../../img/memory-access-opts/ColumnRowMajor.png){#fig:ColRowMajor width=60%}
 
 The example presented above is classical, but usually, real-world applications are much more complicated than this. Sometimes you need to go an additional mile to write cache-friendly code. If the data is not laid out in memory in a way that is optimal for the algorithm, it may require to rearrange the data first.
 
