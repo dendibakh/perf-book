@@ -1,8 +1,8 @@
 ## Apple Xcode Instruments
 
-The most convinient way to do similar performance analisys on MacOS is to use Xcode Instruments. This is an application performance analyzer and visualizer that comes for free with Xcode. Instruments is built on top of the DTrace tracing framework that was ported to MacOS from Solaris. Instruments has many tools to inspect performance of an application and enables us to do most of the basic things that other profilers like Intel VTune can do. The easiest way to get the profiler is to install Xcode from the Apple AppStore. The tool requires no configuration; once you install it you're ready to go.
+The most convenient way to do similar performance analysis on MacOS is to use Xcode Instruments. This is an application performance analyzer and visualizer that comes for free with Xcode. Instruments is built on top of the DTrace tracing framework that was ported to MacOS from Solaris. Instruments has many tools to inspect performance of an application and enables us to do most of the basic things that other profilers like Intel VTune can do. The easiest way to get the profiler is to install Xcode from the Apple AppStore. The tool requires no configuration; once you install it you're ready to go.
 
-In Instruments, you use specialized tools, known as instruments, to trace different aspects of your apps, processes, and devices over time. Instruments has a powerfull visualization mechanism. It collects data as it profiles, and presents the results to you in real time. You can gather different types of data and view them side by side, which enables you to see patterns in the execution, correlate system events and find very subtle performance issues. 
+In Instruments, you use specialized tools, known as instruments, to trace different aspects of your apps, processes, and devices over time. Instruments has a powerful visualization mechanism. It collects data as it profiles, and presents the results to you in real time. You can gather different types of data and view them side by side, which enables you to see patterns in the execution, correlate system events and find very subtle performance issues. 
 
 In this chapter we will only showcase the "CPU Counters" instrument, which is the most relevant for this book. Instruments can also visualize GPU, network and disk activity, track memory allocations and releases, capture user events, such as mouse clicks, provide insights into power efficiency, and more. You can read more about those use cases in the Instruments [documentation](https://help.apple.com/instruments/mac/current).[^1]
 
@@ -33,7 +33,7 @@ To begin, open *Instruments* and choose *CPU Counters* analysis type. First step
 
 ![Xcode Instruments: CPU Counters options.](../../img/perf-tools/XcodeInstrumentsDialog.png){#fig:InstrumentsDialog width=50% }
 
-To the best of our knowledge, Apple doesn't document online their HW performance monitoring events, but they provide a list of events with some minimal description in `/usr/share/kpep`. There are `plist` files that you can convert into json. For example, for the M1 processor, one can run:
+To the best of our knowledge, Apple doesn't document online their HW performance monitoring events, but they provide a list of events with some minimal description in `/usr/share/kpep`. There are `plist` files that you can convert into JSON. For example, for the M1 processor, one can run:
 
 ```bash
 $ plutil -convert json /usr/share/kpep/a14.plist -o a14.json

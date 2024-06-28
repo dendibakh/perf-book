@@ -35,7 +35,7 @@ Initially SIMD was driven by multimedia applications and scientific computations
 - Hashing,[^4] random generation,[^5] cryptography(AES);
 - Columnar databases (bit packing, filtering, joins);
 - Sorting built-in types (VQSort,[^6] QuickSelect);
-- Machine Learning and Artificial Inteligence (speeding up PyTorch, Tensorflow).
+- Machine Learning and Artificial Intelligence (speeding up PyTorch, TensorFlow).
 
 [^1]: UTF-8 validation - [https://github.com/rusticstuff/simdutf8](https://github.com/rusticstuff/simdutf8)
 [^2]: Parsing JSON - [https://github.com/simdjson/simdjson](https://github.com/simdjson/simdjson).

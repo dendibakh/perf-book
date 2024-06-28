@@ -8,7 +8,7 @@ This metric represents how efficiently an application utilizes the available CPU
 
 For a specified time interval `T`, *Effective CPU Utilization* can be calculated as
 $$
-\textrm{Effective CPU Utilization} = \frac{\sum_{i=1}^{\textrm{ThreadCount}}\textrm{Effective Cpu Time(T,i)}}{\textrm{T}~\times~\textrm{ThreadCount}}
+\textrm{Effective CPU Utilization} = \frac{\sum_{i=1}^{\textrm{ThreadCount}}\textrm{Effective CPU Time(T,i)}}{\textrm{T}~\times~\textrm{ThreadCount}}
 $$
 
 ### Thread Count {.unlisted .unnumbered}

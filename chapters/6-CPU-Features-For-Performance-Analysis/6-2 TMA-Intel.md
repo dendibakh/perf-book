@@ -118,7 +118,7 @@ $ perf report -n --stdio
      0.00%        1   [kernel]        [k] free_pcppages_bulk
 ```
 
-Almost all L3 misses are caused by memory accesses in function `foo` inside executable `benchmark.exe`. Now it's time to look at the source code of the benchmark, which can be found on [Github](https://github.com/dendibakh/dendibakh.github.io/tree/master/_posts/code/TMAM).[^8]
+Almost all L3 misses are caused by memory accesses in function `foo` inside executable `benchmark.exe`. Now it's time to look at the source code of the benchmark, which can be found on [GitHub](https://github.com/dendibakh/dendibakh.github.io/tree/master/_posts/code/TMAM).[^8]
 
 To avoid compiler optimizations, function `foo` is implemented in assembly language, which is presented in [@lst:TMA_asm]. The “driver” portion of the benchmark is implemented in the `main` function, as shown in [@lst:TMA_cpp]. We allocate a big enough array `a` to make it not fit in the 6MB L3 cache. The benchmark generates a random index into array `a` and passes this index to the `foo` function along with the address of array `a`. Later the `foo` function reads this random memory location.[^11]
 

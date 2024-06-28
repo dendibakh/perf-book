@@ -16,7 +16,7 @@ placement  hot code          cheaper;      branches
                              utilization
 
 Basic      shift the hot     better cache  hot loops             compiler
-block      code using NOPS   utilization 
+block      code using NOPs   utilization 
 alignment
 
 Function   split cold        better cache  functions with        compiler
