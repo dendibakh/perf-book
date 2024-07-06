@@ -30,7 +30,7 @@ The Instruction Decode Queue (IDQ) provides the interface between the in-order f
 
 ### CPU Back-End {#sec:uarchBE}
 
-The CPU Back-End employs an OOO engine that executes instructions and stores results. The heart of the CPU backend is the 512 entry ReOrder buffer (ROB). This unit is reffered as "Allocate / Rename" on the diagram. It serves a few purposes. First, it provides register renaming. There are only 16 general-purpose integer and 32 vector/SIMD architectural registers, however, the number of physical registers is much higher.[^1] Physical registers are located in a structure called the physical register file (PRF). The mappings from architecture-visible registers to the physical registers are kept in the register alias table (RAT).
+The CPU Back-End employs an OOO engine that executes instructions and stores results. The heart of the CPU backend is the 512 entry ReOrder buffer (ROB). This unit is referred as "Allocate / Rename" on the diagram. It serves a few purposes. First, it provides register renaming. There are only 16 general-purpose integer and 32 vector/SIMD architectural registers, however, the number of physical registers is much higher.[^1] Physical registers are located in a structure called the physical register file (PRF). The mappings from architecture-visible registers to the physical registers are kept in the register alias table (RAT).
 
 Second, the ROB allocates execution resources. When an instruction enters the ROB, a new entry is allocated and resources are assigned to it, mainly an execution unit and the destination physical register. The ROB can allocate up to 6 $\mu$ops per cycle.
 
@@ -84,7 +84,7 @@ Recall from [@sec:TLBs] that translations from virtual to physical addresses are
 
 ![TLB hierarchy of Golden Cove.](../../img/uarch/GLC_TLB_hierarchy.png){#fig:GLC_TLB width=50%}
 
-The second level of the hierarchy (STLB) caches translations for both instructions and data. It is a larger storage for serving requests that miss in the L1 TLBs. L2 STLB can accomdate 2048 most recent data and instruction page address translations, which covers a total of 8MB of memory space. There are fewer entries available for 2MB huge pages: L1 ITLB has 32 entries, L1 DTLB has 32 entries, and L2 STLB can only use 1024 entries that are also shared regular 4KB pages.
+The second level of the hierarchy (STLB) caches translations for both instructions and data. It is a larger storage for serving requests that miss in the L1 TLBs. L2 STLB can accommodate 2048 most recent data and instruction page address translations, which covers a total of 8MB of memory space. There are fewer entries available for 2MB huge pages: L1 ITLB has 32 entries, L1 DTLB has 32 entries, and L2 STLB can only use 1024 entries that are also shared regular 4KB pages.
 
 In case a translation was not found in the TLB hierarchy, it has to be retrieved from the DRAM by "walking" the kernel page tables. There is a mechanism for speeding up such scenarios, called HW page walker. Recall that the page table is built as a radix tree of sub-tables, with each entry of the sub-table holding a pointer to the next level of the tree. 
 

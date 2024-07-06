@@ -28,7 +28,7 @@ Listing: Example of logging branches.
  ---- 4eda2d:  jne   4eda10              <== (1)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Below is one of the possibile branch histories that can be logged with a branch recording mechanism. It shows the last 7 branch outcomes (many more not shown) at the moment we executed the `CALL` instruction. Because on the latest iteration of the loop the `JNS` branch (`4eda14` -> `4eda1e`) was not taken, it is not logged and thus does not appear in the history.
+Below is one of the possible branch histories that can be logged with a branch recording mechanism. It shows the last 7 branch outcomes (many more not shown) at the moment we executed the `CALL` instruction. Because on the latest iteration of the loop the `JNS` branch (`4eda14` -> `4eda1e`) was not taken, it is not logged and thus does not appear in the history.
 
 ```
     Source Address    Destination Address
@@ -130,7 +130,7 @@ At the time of writing, there were no commercially available machines that imple
 
 There is a number of important use cases that become possible thanks to branch recording. In this and a few later sections, we will cover the most important ones.
 
-One of the most popular use cases for branch recording is capturing call stacks. We already covered why we need to collect them in [@sec:secCollectCallStacks]. Branch recording can be used as a light-weight substituion for collecting call-graph information even if you compiled a program without frame pointers or debug information.
+One of the most popular use cases for branch recording is capturing call stacks. We already covered why we need to collect them in [@sec:secCollectCallStacks]. Branch recording can be used as a light-weight substitution for collecting call-graph information even if you compiled a program without frame pointers or debug information.
 
 At the time of writing (2023), AMD's LBR and ARM's BRBE doesn't support call stack collection, but Intel's LBR does. Here is how you can do it with Intel LBR:
 
@@ -225,7 +225,7 @@ Suppose we have two entries in the LBR stack:
 
 Given that information, we know that there was one occurrence when the basic block that starts at offset `400618` was executed in 5 cycles. If we collect enough samples, we could plot a probability density chart of latency for that basic block. 
 
-The example of such chart is shown in Figure @fig:LBR_timing_BB. It was compiled by analyzing all LBR entries that satisfy the rule described above. The way to read this chart is as follows: it tells what was the rate of occurence of a given latency value. For example, the basic block latency was measured to be exactly 100 cycles roughly 2% of the time, 14% of the time we measured 280 cycles and never did we see anything between 150 and 200 cycles. Another way to read is: based on the collected data, what is the probability to see a certain basic block latency if you were to measure it.
+The example of such chart is shown in Figure @fig:LBR_timing_BB. It was compiled by analyzing all LBR entries that satisfy the rule described above. The way to read this chart is as follows: it tells what was the rate of occurrence of a given latency value. For example, the basic block latency was measured to be exactly 100 cycles roughly 2% of the time, 14% of the time we measured 280 cycles and never did we see anything between 150 and 200 cycles. Another way to read is: based on the collected data, what is the probability to see a certain basic block latency if you were to measure it.
 
 ![Probability density chart for latency of the basic block that starts at address `0x400618`.](../../img/pmu-features/LBR_timing_BB.png){#fig:LBR_timing_BB width=90%}
 

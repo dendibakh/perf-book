@@ -58,7 +58,7 @@ And of course, most valuable for us is the list of hotspots sorted by the number
 
 There are two main uses cases for the debug information: debugging a functional issue (a bug) and performance analysis. For functional debugging we need as much information as possible, which is the default when you pass `-g` compiler flag. However, if a user doesn't need full debug experience, having line numbers is enough for performance profiling. You can reduce the amount of generated debug information to just line numbers of symbols as they appear in the source code by using the `-gline-tables-only` option.[^4]
 
-Linux `perf` doesn't have rich graphic support, so viewing hot parts of source code is not very convinient, but doable. Linux `perf` intermixes source code with the generated assembly, as shown below:
+Linux `perf` doesn't have rich graphic support, so viewing hot parts of source code is not very convenient, but doable. Linux `perf` intermixes source code with the generated assembly, as shown below:
 
 ```bash
 # snippet of annotating source code of 'x264_8_me_search_ref' function

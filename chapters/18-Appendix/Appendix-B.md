@@ -151,7 +151,7 @@ The LLVM Loop Vectorizer uses a cost model to decide when it is profitable to un
 
 ## SLP vectorization {.unnumbered .unlisted}
 
-SLP (Superword-Level Parallelism) vectorizer tries to glue multiple scalar operations together into vector operations.  It processes the code bottom-up, across basic blocks, in search of scalars to combine. The goal of SLP vectorization is to combine similar independent instructions into vector instructions. Memory accesses, arithmetic operations, comparison operations can all be vectorized using this technique. For example, the following function performs very similar operations on its inputs (a1, b1) and (a2, b2). The basic-block vectorizer may combine the following function into vector operations.
+SLP (Superword-Level Parallelism) vectorizer tries to glue multiple scalar operations together into vector operations. It processes the code bottom-up, across basic blocks, in search of scalars to combine. The goal of SLP vectorization is to combine similar independent instructions into vector instructions. Memory accesses, arithmetic operations, comparison operations can all be vectorized using this technique. For example, the following function performs very similar operations on its inputs (a1, b1) and (a2, b2). The basic-block vectorizer may combine the following function into vector operations.
 
 ```
 void foo(int a1, int a2, int b1, int b2, int *A) {

@@ -1,6 +1,6 @@
 ## Cache-Friendly Data Structures {#sec:secCacheFriendly}
 
-Writing cache-friendly algorithms and data structures is one of the key items in the recipe for a well-performing application. The key pillars of cache-friendly code are the principles of temporal and spatial locality that we introduced in [@sec:MemHierar]. The goal here is to have a predictable memory access patern and store data efficiently.
+Writing cache-friendly algorithms and data structures is one of the key items in the recipe for a well-performing application. The key pillars of cache-friendly code are the principles of temporal and spatial locality that we introduced in [@sec:MemHierar]. The goal here is to have a predictable memory access pattern and store data efficiently.
 
 The cache line is the smallest unit of data that can be transferred between the cache and the main memory. When designing cache-friendly code, it's helpful to think not only of individual variables and their locations in memory, but also of cache lines.
 
@@ -161,7 +161,7 @@ Alignment and padding often cause holes of unused bytes, which potentially decre
 
 To close the topic of cache-friendly data structures, we will briefly mention two other techniques: *structure splitting* and *pointer inlining* that can be used to improve cache utilization.
 
-**Structure splitting**. Splitting a large structure into smaller ones can improve cache utilization. For example, if you have a structure that contains a large number of fields, but only a few of them are accessed together, you can split the structure into two or more smaller ones. This way, you can avoid loading unnecessary data into the cache. An example of structure splitting is shown in [@lst:StructureSplitting]. By splitting the `Point` structure into `PointCoords` and `PointInfo`, we can avoid loading the `PointInfo` data into caches when we only need `PointCoords`. This way, we can fit more points on a signle cache line.
+**Structure splitting**. Splitting a large structure into smaller ones can improve cache utilization. For example, if you have a structure that contains a large number of fields, but only a few of them are accessed together, you can split the structure into two or more smaller ones. This way, you can avoid loading unnecessary data into the cache. An example of structure splitting is shown in [@lst:StructureSplitting]. By splitting the `Point` structure into `PointCoords` and `PointInfo`, we can avoid loading the `PointInfo` data into caches when we only need `PointCoords`. This way, we can fit more points on a single cache line.
 
 Listing: Structure Splitting.
 

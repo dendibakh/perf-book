@@ -8,7 +8,7 @@ typora-root-url: ..\..\img
 
 ## Windows {.unnumbered}
 
-To utilize huge pages on Windows, one needs to enable `SeLockMemoryPrivilege` [security policy](https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/lock-pages-in-memory). This can be done programatically via the Windows API, or alternatively via the security policy GUI.
+To utilize huge pages on Windows, one needs to enable `SeLockMemoryPrivilege` [security policy](https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/lock-pages-in-memory). This can be done programmatically via the Windows API, or alternatively via the security policy GUI.
 
 1. Hit start -> search "secpol.msc", launch it.
 2. On the left select "Local Policies" -> "User Rights Assignment", then double-click on "Lock pages in memory".
@@ -85,8 +85,8 @@ munmap(ptr, size);
 
 Other alternatives include:
 
-* `mmap` using a file from a mounted `hugetlbfs` filesystem ([exampe code](https://github.com/torvalds/linux/blob/master/tools/testing/selftests/vm/hugepage-mmap.c)[^26]).
-* `shmget` using the `SHM_HUGETLB` flag ([exampe code](https://github.com/torvalds/linux/blob/master/tools/testing/selftests/vm/hugepage-shm.c)[^27]).
+* `mmap` using a file from a mounted `hugetlbfs` filesystem ([example code](https://github.com/torvalds/linux/blob/master/tools/testing/selftests/vm/hugepage-mmap.c)[^26]).
+* `shmget` using the `SHM_HUGETLB` flag ([example code](https://github.com/torvalds/linux/blob/master/tools/testing/selftests/vm/hugepage-shm.c)[^27]).
 
 ### Transparent hugepages {.unnumbered .unlisted}
 
