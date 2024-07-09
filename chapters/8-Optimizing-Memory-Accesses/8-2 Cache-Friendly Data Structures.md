@@ -99,67 +99,6 @@ struct Soldier {                                   struct Soldier {
 
 Since Linux kernel 6.8, there is a new functionality in the `perf` tool that allows you to find data structure reordering opportunities. The `perf mem record` command can now be used to profile data structure access patterns. The `perf annotate --data-type` command will show you the data structure layout along with profiling samples attributed to each field of the data structure. Using this information you can identify fields that are accessed together.[^5]
 
-### Aligning and Padding. {#sec:secMemAlign}
-
-A variable is accessed most efficiently if it is stored at a memory address that is divisible by the size of the variable. In C++, it is called *natural alignment*, which occurs by default for fundamental data types, such as integer, float, or double. When you declare variables of these types, the compiler ensures that they are stored in memory at addresses that are multiples of their size. In contrast, arrays, structs and classes may require special alignment. In this section we will discuss two typical cases where alignment and padding are important: SIMD code and false sharing.
-
-It is typical for SIMD code to load large chunks of data using a single load operation. Sometimes, such requests load data that starts on one cache line and end in the next cache line. In this case, fetching data requires two cache line reads. It also requires using so-called *split registers*, which keep the two parts and once both parts are fetched, they are combined into a single register. In the literature, you can encounter the term a *misaligned* or a *split* load to describe such a situation. Split loads may incur performance penalties, if many split loads in a row consume all available split registers. Intel's TMA methodology tracks this with the `Memory_Bound -> L1_Bound -> Split Loads` metric.
-
-For instance, AVX2 memory operations can access up to 32 bytes. If an array starts at offset `0x30` (48 bytes), the first AVX2 load will fetch data from `0x30` to `0x4F`, the second load will fetch data from 0x50 to 0x6F, and so on. The first load crosses the cache line boundary (`0x40`). In fact, every second load will cross the cache line boundary which may slow down the execution. Figure @fig:SplitLoads illustrates this. Pushing the data forward by 16 bytes would align the array to the cache line boundary and eliminate the split loads.
-
-![AVX2 loads in a misaligned array. Every second load crosses cache line boundary.](../../img/memory-access-opts/SplitLoads.png){#fig:SplitLoads width=50%}
-
-Once you confirm that split loads affect performance of your program in a negative way, you can get rid of them by *aligning* the data. “Aligning” here means the memory address is a multiple of a specific size. For example, when a 16-byte object is aligned on the 64-byte boundary, the low 6 bits of its address are zero. [@lst:AligningData] shows how to fix the example above using the C++11 `alignas` keyword.
-
-Listing: Aligning data using the "alignas" keyword.
-
-~~~~ {#lst:AligningData .cpp}
-// Array of 16-bit integers aligned at 64-byte boundary
-#define CACHELINE_ALIGN alignas(64) 
-CACHELINE_ALIGN int16_t a[N];
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Accesses that cross a 4 KB boundary introduce more complications, because virtual to physical address translations are usually handled in 4 KB pages. Handling such an access would require accessing two TLB entries as well. Unless a TLB supports multiple lookups per cycle, such loads can cause significant slowdown.
-
-When it comes to dynamic allocations, C++17 made it much easier. Operator `new` now takes additional argument, which users can use to control alignment of dynamically allocated memory. [@lst:AlignedStdVector] shows a minimal example of defining a custom allocator for `std::vector` that aligns it at the cache line boundary. Other options include C11's standard [aligned_alloc](https://en.cppreference.com/w/c/memory/aligned_alloc)[^12], OS-specific functions like POSIX's [`memalign`](https://linux.die.net/man/3/memalign)[^13], or rolling your own allocation routine like described [here](https://embeddedartistry.com/blog/2017/02/22/generating-aligned-memory/)[^14].
-
-Listing: Defining std::vector aligned at the cache line boundary.
-
-~~~~ {#lst:AlignedStdVector .cpp}
-// Returns aligned pointers when allocations are requested. 
-template <typename T>
-class CacheLineAlignedAllocator {
-public:
-  using value_type = T;
-  static std::align_val_t constexpr ALIGNMENT{64};
-  [[nodiscard]] T* allocate(std::size_t N) {
-    return reinterpret_cast<T*>(::operator new[](N * sizeof(T), ALIGNMENT));
-  }
-  void deallocate(T* allocPtr, [[maybe_unused]] std::size_t N) {
-    ::operator delete[](allocPtr, ALIGNMENT);
-  }
-};
-template<typename T> 
-using AlignedVector = std::vector<T, CacheLineAlignedAllocator<T> >;
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Sometimes padding members of a data structure is required to avoid edge cases like cache contentions [@fogOptimizeCpp, Section 9.10 Cache contentions] and false sharing (see [@sec:secFalseSharing]). The latter may occur in multithreaded applications when two threads, `A` and `B`, access different fields of the same structure. An example a data structure in which such a situation might happen is shown in [@lst:PadFalseSharing]. In the code on the left, members `a` and `b` of struct `S` are likely to reside on the same cache line. Even though threads `A` and `B` modify distinct fields of the data structure, a processor needs to maintain cache coherency, which causes additional overhead and might significantly slow down the program. To resolve this problem, one can pad `S` such that members `a` and `b` do not share a cache line as shown on the right.
-
-Listing: Data padding to avoid false sharing.
-
-~~~~ {#lst:PadFalseSharing .cpp}
-                                                  #define CACHELINE_ALIGN alignas(64) 
-struct S {                                        struct S {
-  int a; /* modified by thread A */    =>           int a;
-  int b; /* modified by thread B */                 CACHELINE_ALIGN int b;
-};                                                };
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-[TODO]: Apple L2 cache operates on 128B cache lines, they required more padding. 4.6.6 Improving Cache Hierarchy Performance. https://developer.apple.com/documentation/apple-silicon/cpu-optimization-guide
-Also mention it in chapter 3.
-
-Alignment and padding often cause holes of unused bytes, which potentially decreases memory bandwidth utilization. In the example above, original struct `S` (on the left) is only 8 bytes, while after the change (on the right) it becomes 128 bytes in size, which leaves a lot of unused bytes in every cache line. Use these techniques with care.
-
 ### Other Data Structure Reorganization Techniques
 
 To close the topic of cache-friendly data structures, we will briefly mention two other techniques: *structure splitting* and *pointer inlining* that can be used to improve cache utilization.

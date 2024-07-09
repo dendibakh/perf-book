@@ -11,7 +11,7 @@ This section provides a summary of the key attributes of memory hierarchy system
 
 A cache is the first level of the memory hierarchy for any request (for code or data) issued from the CPU pipeline. Ideally, the pipeline performs best with an infinite cache with the smallest access latency. In reality, the access time for any cache increases as a function of the size. Therefore, the cache is organized as a hierarchy of small, fast storage blocks closest to the execution units, backed up by larger, slower blocks. A particular level of the cache hierarchy can be used exclusively for code (instruction cache, i-cache) or for data (data cache, d-cache), or shared between code and data (unified cache). Furthermore, some levels of the hierarchy can be private to a particular core, while other levels can be shared among cores.
 
-Caches are organized as blocks with a defined block size (**cache line**). The typical cache line size in modern CPUs is 64 bytes. Caches closest to the execution pipeline typically range in size from 8KiB to 32KiB. Caches further out in the hierarchy can be 64KiB to 16MiB in modern CPUs. The architecture for any level of a cache is defined by the following four attributes.
+Caches are organized as blocks with a defined block size (**cache line**). The typical cache line size in modern CPUs is 64 bytes. Although the notable exception here is the L2 cache in Apple processors (such as M1, M2 and later), which operates on 128B cache lines. Caches closest to the execution pipeline typically range in size from 32KB to 128KB. Mid-level caches tend to have 1MB and above. Last level caches in modern CPUs can be tens or even hundreds of megabytes.
 
 #### Placement of Data within the Cache. 
 

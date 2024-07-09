@@ -46,6 +46,50 @@ We already discussed how to align objects in [@sec:secMemAlign]. In most process
 
 However, when a load or store crosses cache line boundary, such access requires two cache line reads (*split load/store*). It requires using a *split register*, which keeps the two parts and once both parts are fetched, they are combined into a single register. The number of split registers is limited. When executed sporadically, split accesses generally complete without any observable performance impact to overall execution. However, if that happens frequently, misaligned memory accesses will suffer delays.
 
+A variable is accessed most efficiently if it is stored at a memory address that is divisible by the size of the variable. In C++, it is called *natural alignment*, which occurs by default for fundamental data types, such as integer, float, or double. When you declare variables of these types, the compiler ensures that they are stored in memory at addresses that are multiples of their size. In contrast, arrays, structs and classes may require special alignment. In this section we will discuss two typical cases where alignment and padding are important: SIMD code and false sharing.
+
+It is typical for SIMD code to load large chunks of data using a single load operation. Sometimes, such requests load data that starts on one cache line and end in the next cache line. In this case, fetching data requires two cache line reads. It also requires using so-called *split registers*, which keep the two parts and once both parts are fetched, they are combined into a single register. In the literature, you can encounter the term a *misaligned* or a *split* load to describe such a situation. Split loads may incur performance penalties, if many split loads in a row consume all available split registers. Intel's TMA methodology tracks this with the `Memory_Bound -> L1_Bound -> Split Loads` metric.
+
+For instance, AVX2 memory operations can access up to 32 bytes. If an array starts at offset `0x30` (48 bytes), the first AVX2 load will fetch data from `0x30` to `0x4F`, the second load will fetch data from 0x50 to 0x6F, and so on. The first load crosses the cache line boundary (`0x40`). In fact, every second load will cross the cache line boundary which may slow down the execution. Figure @fig:SplitLoads illustrates this. Pushing the data forward by 16 bytes would align the array to the cache line boundary and eliminate the split loads.
+
+![AVX2 loads in a misaligned array. Every second load crosses cache line boundary.](../../img/memory-access-opts/SplitLoads.png){#fig:SplitLoads width=50%}
+
+Once you confirm that split loads affect performance of your program in a negative way, you can get rid of them by *aligning* the data. “Aligning” here means the memory address is a multiple of a specific size. For example, when a 16-byte object is aligned on the 64-byte boundary, the low 6 bits of its address are zero. [@lst:AligningData] shows how to fix the example above using the C++11 `alignas` keyword.
+
+Listing: Aligning data using the "alignas" keyword.
+
+~~~~ {#lst:AligningData .cpp}
+// Array of 16-bit integers aligned at 64-byte boundary
+#define CACHELINE_ALIGN alignas(64) 
+CACHELINE_ALIGN int16_t a[N];
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Accesses that cross a 4 KB boundary introduce more complications, because virtual to physical address translations are usually handled in 4 KB pages. Handling such an access would require accessing two TLB entries as well. Unless a TLB supports multiple lookups per cycle, such loads can cause significant slowdown.
+
+When it comes to dynamic allocations, C++17 made it much easier. Operator `new` now takes additional argument, which users can use to control alignment of dynamically allocated memory. [@lst:AlignedStdVector] shows a minimal example of defining a custom allocator for `std::vector` that aligns it at the cache line boundary. Other options include C11's standard [aligned_alloc](https://en.cppreference.com/w/c/memory/aligned_alloc)[^12], OS-specific functions like POSIX's [`memalign`](https://linux.die.net/man/3/memalign)[^13], or rolling your own allocation routine like described [here](https://embeddedartistry.com/blog/2017/02/22/generating-aligned-memory/)[^14].
+
+Listing: Defining std::vector aligned at the cache line boundary.
+
+~~~~ {#lst:AlignedStdVector .cpp}
+// Returns aligned pointers when allocations are requested. 
+template <typename T>
+class CacheLineAlignedAllocator {
+public:
+  using value_type = T;
+  static std::align_val_t constexpr ALIGNMENT{64};
+  [[nodiscard]] T* allocate(std::size_t N) {
+    return reinterpret_cast<T*>(::operator new[](N * sizeof(T), ALIGNMENT));
+  }
+  void deallocate(T* allocPtr, [[maybe_unused]] std::size_t N) {
+    ::operator delete[](allocPtr, ALIGNMENT);
+  }
+};
+template<typename T> 
+using AlignedVector = std::vector<T, CacheLineAlignedAllocator<T> >;
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Alignment and padding often cause holes of unused bytes, which potentially decreases memory bandwidth utilization. In the example above, original struct `S` (on the left) is only 8 bytes, while after the change (on the right) it becomes 128 bytes in size, which leaves a lot of unused bytes in every cache line. Use these techniques with care.
+
 [TODO]: example with split loads in matmul?
 
 #### Cache Trashing {.unlisted .unnumbered}

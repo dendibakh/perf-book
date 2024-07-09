@@ -62,9 +62,18 @@ When using Intel VTune Profiler, we recommend running two types of analysis to f
 
 Linux `perf` has support for finding false sharing as well. As with the Intel VTune profiler, run TMA first (see [@sec:secTMA_Intel]) to find out if the program experiences false/true sharing issues. If that's the case, use the `perf c2c` tool to detect memory accesses with high cache coherency costs. `perf c2c` matches store/load addresses for different threads and checks if the hit in a modified cache line occurred. Readers can find a detailed explanation of the process and how to use the tool in a dedicated [blog post](https://joemario.github.io/blog/2016/09/01/c2c-blog/).[^21]
 
-It is possible to eliminate false sharing with the help of aligning/padding memory objects. Example in [@sec:secTrueSharing] can be fixed by ensuring `sumA` and `sumB` do not share the same cache line (see details in [@sec:secMemAlign]). False sharing can not only be observed in low-level languages, like C and C++, but also in higher-level ones, like Java and C#.
+It is possible to eliminate false sharing with the help of aligning/padding memory objects. Example in [@sec:secTrueSharing] can be fixed by ensuring `sumA` and `sumB` do not share the same cache line as shown in [@lst:PadFalseSharing].[^32]
 
-From a general performance perspective, the most important thing to consider is the cost of the possible state transitions. Of all cache states, the only ones that do not involve a costly cross-cache subsystem communication and data transfer during CPU read/write operations are the Modified (M) and Exclusive (E) states. Thus, the longer the cache line maintains the `M` or `E` states (i.e., the less sharing of data across caches), the lower the coherence cost incurred by a multithreaded application. An example demonstrating how this property has been employed can be found in Nitsan Wakart's blog post "[Diving Deeper into Cache Coherency](http://psy-lob-saw.blogspot.com/2013/09/diving-deeper-into-cache-coherency.html)".[^28]
+Listing: Data padding to avoid false sharing.
+~~~~ {#lst:PadFalseSharing .cpp}
+                              #define CACHELINE_ALIGN alignas(64) 
+struct S {                    struct S {
+  int sumA;        =>           int sumA; 
+  int sumB;                     CACHELINE_ALIGN int sumB;
+};                            };
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+False sharing can not only be observed in low-level languages, like C and C++, but also in higher-level ones, like Java and C#. From a general performance perspective, the most important thing to consider is the cost of the possible state transitions. Of all cache states, the only ones that do not involve a costly cross-cache subsystem communication and data transfer during CPU read/write operations are the Modified (M) and Exclusive (E) states. Thus, the longer the cache line maintains the `M` or `E` states (i.e., the less sharing of data across caches), the lower the coherence cost incurred by a multithreaded application. An example demonstrating how this property has been employed can be found in Nitsan Wakart's blog post "[Diving Deeper into Cache Coherency](http://psy-lob-saw.blogspot.com/2013/09/diving-deeper-into-cache-coherency.html)".[^28]
 
 [^18]: See the Intel VTune user guide for a description of the *Contested Accesses* metric.
 [^20]: VTune cookbook: false-sharing - [https://software.intel.com/en-us/vtune-cookbook-false-sharing](https://software.intel.com/en-us/vtune-cookbook-false-sharing).
@@ -75,3 +84,4 @@ From a general performance perspective, the most important thing to consider is 
 [^28]: Blog post "Diving Deeper into Cache Coherency" - [http://psy-lob-saw.blogspot.com/2013/09/diving-deeper-into-cache-coherency.html](http://psy-lob-saw.blogspot.com/2013/09/diving-deeper-into-cache-coherency.html)
 [^30]: Clang's thread sanitizer tool: [https://clang.llvm.org/docs/ThreadSanitizer.html](https://clang.llvm.org/docs/ThreadSanitizer.html).
 [^31]: Helgrind, a thread error detector tool: [https://www.valgrind.org/docs/manual/hg-manual.html](https://www.valgrind.org/docs/manual/hg-manual.html).
+[^32]: Do not take the size of a cache line as a constant value. For example, in Apple processors such as M1, M2 and later, the L2 cache operates on 128B cache lines.
