@@ -7,7 +7,7 @@ To effectively utilize all the hardware resources provisioned in the CPU, the ma
 
 This section provides a summary of the key attributes of memory hierarchy systems supported on modern CPUs.
 
-### Cache Hierarchy
+### Cache Hierarchy {#sec:CacheHierarchy}
 
 A cache is the first level of the memory hierarchy for any request (for code or data) issued from the CPU pipeline. Ideally, the pipeline performs best with an infinite cache with the smallest access latency. In reality, the access time for any cache increases as a function of the size. Therefore, the cache is organized as a hierarchy of small, fast storage blocks closest to the execution units, backed up by larger, slower blocks. A particular level of the cache hierarchy can be used exclusively for code (instruction cache, i-cache) or for data (data cache, d-cache), or shared between code and data (unified cache). Furthermore, some levels of the hierarchy can be private to a particular core, while other levels can be shared among cores.
 
@@ -32,6 +32,8 @@ $$
 $$
 \textrm{Set (m-way) associative location} = \textrm{(block address)  mod  (Number of Sets in the Cache)}
 $$
+
+Consider an example of an L1 cache, which size is 32 KB with 64 bytes cache lines, 64 sets and 8 ways. The total number of cache lines in such a cache is `32 KB / 64 bytes = 512 lines`. A new line can be inserted only in one of the 64 sets. In the most simple way, set selection can be done with just the 6 lower address bits (address modulo 64). Sometimes a more advanced hash function is used that uses other bits of the address as well. Once the set is determined, a new line can go to one of the 8 ways in this set. Similarly, when you later search for this cache line, you determine the set first, and then you only need to examine up to 8 ways in the set.
 
 #### Finding Data in the Cache.
 

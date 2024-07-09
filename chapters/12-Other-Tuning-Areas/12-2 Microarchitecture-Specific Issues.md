@@ -42,7 +42,7 @@ A cure for the memory order violation problem is shown in [@lst:MemOrderViolatio
 
 \hfill \break
 
-We already discussed how to align objects in {#sec:secMemAlign}. In most processors, the L1 cache is designed to be able to read data at any alignment. Generally, even if a load/store is misaligned but does not cross the cache line boundary, it won't have any performance penalty.
+We already discussed how to align objects in [@sec:secMemAlign]. In most processors, the L1 cache is designed to be able to read data at any alignment. Generally, even if a load/store is misaligned but does not cross the cache line boundary, it won't have any performance penalty.
 
 However, when a load or store crosses cache line boundary, such access requires two cache line reads (*split load/store*). It requires using a *split register*, which keeps the two parts and once both parts are fetched, they are combined into a single register. The number of split registers is limited. When executed sporadically, split accesses generally complete without any observable performance impact to overall execution. However, if that happens frequently, misaligned memory accesses will suffer delays.
 
@@ -52,6 +52,29 @@ However, when a load or store crosses cache line boundary, such access requires 
 
 \hfill \break
 
+[TODO]: write a microbenchmark. Is it still a problem on modern processors?
+
+There are specific data access patterns that may cause *cache trashing*, also frequently called *cache contention* or *cache conflicts*. These corner cases depend on the cache organization, e.g., the number of set and ways in the cache (we explored it in [@sec:CacheHierarchy]). There is a very simple example of matrix transposition in [@fogOptimizeCpp, section 9.10]:
+
+```cpp
+double a[N][N];
+for (r = 1; r < N; r++)
+  for (c = 0; c < r; c++)
+    swapd(a[r][c], a[c][r]);
+```
+
+To transpose a square matrix, you need to reflect every element along the diagonal. In this code, `a[r][c]` does sequential accesses, however, `a[c][r]` does column-wise accesses. Suppose we run this code on a processor with an L1-data cache of 8 KB, 64 bytes cache lines, 32 sets 8-way associative. In such a cache every line can go to one of the 8 ways in a set. When `N` equals 64, each row has `64 elements * 8 bytes (size of double) = 512 bytes`, that span 8 cache lines. That means that when accessing elements in a column, each access will be 8 cache lines away from the previous one. The first cache line in row 0 will go to `[set0 ; way0]`, the second will go to `[set1 ; way0]`, and so on.
+
+Since we have 32 sets in the cache, after processing first 4 rows, we will have one out of eight ways in each set filled up.
+
+9.10 Cache contentions in large data structures
+https://www.agner.org/optimize/optimizing_cpp.pdf#page=108&zoom=100,116,716
+
+https://stackoverflow.com/questions/7905760/matrix-multiplication-small-difference-in-matrix-size-large-difference-in-timi
+https://stackoverflow.com/questions/12264970/why-is-my-program-slow-when-looping-over-exactly-8192-elements?noredirect=1&lq=1
+https://stackoverflow.com/questions/6060985/why-is-there-huge-performance-hit-in-2048x2048-versus-2047x2047-array-multiplica?noredirect=1&lq=1
+https://stackoverflow.com/questions/76235372/why-is-multiplying-a-62x62-matrix-slower-than-multiplying-a-64x64-matrix?noredirect=1&lq=1
+
 just describe
 Avoid Cache Thrashing: Minimize cache conflicts by ensuring data structures do not excessively map to the same cache lines.
 https://github.com/ibogosavljevic/hardware-efficiency/blob/main/cache-conflicts/cache_conflicts.c
@@ -59,6 +82,8 @@ https://github.com/ibogosavljevic/hardware-efficiency/blob/main/cache-conflicts/
 #### Non-Temporal Loads and Stores {.unlisted .unnumbered}
 
 \hfill \break
+
+[TODO]: drop? - Yes
 
 Caches naturally store data close to the processor under the assumption that the data in
 the cache line will be used again in the near term. Data that benefits from caching is said
