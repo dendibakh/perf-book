@@ -1,12 +1,8 @@
-[TODO]: promote this section one level up. Give references to inner sections.
-
-### Microarchitecture-Specific Performance Issues {#sec:UarchSpecificIssues}
+## Microarchitecture-Specific Performance Issues {#sec:UarchSpecificIssues}
 
 In this section we will discuss some common microarchitecture-specific issues that can be attributed to majority of modern processors. Note that the impact of a particular problem can be more/less pronounced on one platform than another.
 
-#### Memory Order Violations {.unlisted .unnumbered}
-
-\hfill \break
+### Memory Order Violations {sec:MemoryOrderViolations}
 
 We introduced the concept of memory ordering in [@sec:uarchLSU]. Memory reordering is a crucial aspect of modern CPUs, as it allows to execute memory requests in parallel and out-of-order. The key element in load/store reordering is memory disambiguation, which predicts if it is safe to let loads go ahead of earlier stores. Since the memory disambiguation is speculative, it can lead to performance issues if not handled properly.
 
@@ -40,9 +36,7 @@ Performance will greatly depend on the color patterns of the input image. Images
 
 A cure for the memory order violation problem is shown in [@lst:MemOrderViolation], on the right. As you can see, we duplicated the histogram and now alternate processing of pixels between two partial histograms. In the end, we combine the two partial histograms to get a final result. This new version with two partial histograms is still prone to potentially problematic patterns, such as `0xFF 0x00 0xFF 0x00 0xFF ...`. However, with this change, the worst-case scenario, e.g., `0xFF 0xFF 0xFF ...`  will run twice as fast as before. It may be beneficial to create four or eight partial histograms depending on the color pattern of input images. This exact code is featured in the [mem_order_violation_1](https://github.com/dendibakh/perf-ninja/tree/main/labs/memory_bound/mem_order_violation_1)[^2] lab assignment of Performance Ninja course, so feel free to experiment. On a small set of input images we observed from 10% to 50% speedup on various platforms. It is worth to mention that the version on the left consumes 1 KB of additional memory, which may not be huge in this case, but is something to watch out for.
 
-#### Misaligned Memory Accesses {.unlisted .unnumbered}
-
-\hfill \break
+### Misaligned Memory Accesses {sec:MisalignedMemoryAccesses}
 
 A variable is accessed most efficiently if it is stored at a memory address that is divisible by the size of the variable. For example, an `int` requires 4-byte alignment, meaning its address should be a multiple of 4. In C++, it is called *natural alignment*, which occurs by default for fundamental data types, such as integer, float, or double. When you declare variables of these types, the compiler ensures that they are stored in memory at addresses that are multiples of their size. In contrast, arrays, structs and classes may require special alignment as you'll learn in this section.
 
@@ -90,7 +84,7 @@ The first step to mitigate split loads/stores in this assignment is to align the
 
 However, it's not enough to only align the starting offset of a matrix. Consider an example of a `9x9` matrix of `float` values shown in @fig:MemAlignment. If a cache line is 64 bytes, it can store 16 `float` values. When using AVX2 instructions, the program will load/store 8 elements (256 bits) at a time. In each row, the first eight elements will be processed in a SIMD way, while the last element will be processed in a scalar way by the loop remainder. The second vector load/store (elements 10-17) crosses the cache line boundary as many other subsequent vector loads/stores. The problem highlighted in @fig:MemAlignment affects any matrix with a number of columns that is not a multiple of 8 (for AVX2 vectorization). The SSE and ARM Neon vectorization requires 16-byte alignment; AVX-512 requires 64-byte alignment.
 
-![Split loads/stores inside a 9x9 matrix when using AVX2 vectorization. Split memory access is highlighted in gray.](../../img/memory-access-opts/MemAlignment.png){#fig:MemAlignment width=80%}
+![Split loads/stores inside a 9x9 matrix when using AVX2 vectorization. The split memory access is highlighted in gray.](../../img/memory-access-opts/MemAlignment.png){#fig:MemAlignment width=80%}
 
 So, in addition to aligning the starting offset, each row of the matrix should be aligned as well. For example in @fig:MemAlignment, it can be achieved by inserting seven dummy columns into the matrix, effectively making it a `9x16` matrix. This will align the second row (elements 10-18) at the offset `0x40`. In a similar manner we need to align all other rows. The dummy columns will not be processed by the algorithm, but they will ensure that the actual data is aligned to the cache line boundary. In our testing, performance impact of this change was up to 30%,
 depending on the matrix size and the platform configuration.
@@ -99,9 +93,7 @@ Alignment and padding often cause holes of unused bytes, which potentially decre
 
 Accesses that cross a 4 KB boundary introduce more complications, because virtual to physical address translations are usually handled in 4 KB pages. Handling such an access would require accessing two TLB entries as well. Unless a TLB supports multiple lookups per cycle, such loads can cause significant slowdown.
 
-#### Cache Trashing {.unlisted .unnumbered}
-
-\hfill \break
+### Cache Trashing {sec:CacheTrashing}
 
 [TODO]: write a microbenchmark. Is it still a problem on modern processors?
 
@@ -130,9 +122,7 @@ just describe
 Avoid Cache Thrashing: Minimize cache conflicts by ensuring data structures do not excessively map to the same cache lines.
 https://github.com/ibogosavljevic/hardware-efficiency/blob/main/cache-conflicts/cache_conflicts.c
 
-#### Non-Temporal Loads and Stores {.unlisted .unnumbered}
-
-\hfill \break
+### Non-Temporal Loads and Stores {sec:NonTemporalLoadsStores}
 
 [TODO]: drop? - Yes
 
@@ -148,13 +138,11 @@ These special assembly instructions usually have "NT" suffix.
 
 https://www.agner.org/optimize/optimizing_cpp.pdf#page=108&zoom=100,116,716
 
-#### Store-to-Load Forwarding Delays {.unlisted .unnumbered}
+### Store-to-Load Forwarding Delays {sec:StoreLoadForwardingDelays}
 
-\hfill \break
+[TODO]: drop?
 
-#### Minimize Moves Between Integer and Floating-Point Registers {.unlisted .unnumbered}
-
-\hfill \break
+### Minimize Moves Between Integer and Floating-Point Registers
 
 DUP(general), FMOV(general), INS(general), MOV(from general), SCVTF(scalar), UCVTF(scalar)
 Movement of data between integer and vector registers requires several cycles. Load
@@ -170,9 +158,7 @@ float circleLength(float r) {
 }
 ```
 
-#### Slow Floating-Point Arithmetic {.unlisted .unnumbered}
-
-\hfill \break
+### Slow Floating-Point Arithmetic {sec:SlowFloatingPointArithmetic}
 
 [TODO]: maybe make it shorter or move to the appendix?
 

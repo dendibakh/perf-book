@@ -16,7 +16,7 @@ Although ISA differences *may* have a tangible impact on the performance of a sp
 * CISC code is not denser than RISC code. [@CodeDensityCISCvsRISC]
 * ISA overheads can be effectively mitigated by microarchitecture implementation. For example, $\mu$op cache minimizes decoding overheads; instruction cache minimizes code density impact. [@RISCvsCISC2013] [@ChipsAndCheesex86]
 
-Nevertheless, this doesn't remove the value of architecture-specific optimizations. In this section, we will discuss how to optimize for a particular platform. We will cover ISA extensions, instruction latencies and throughput, and discuss some common microarchitecture-specific issues.
+Nevertheless, this doesn't remove the value of architecture-specific optimizations. In this section, we will discuss how to optimize for a particular platform. We will cover ISA extensions, CPU dispatch and discuss how to reason about instruction latencies and throughput.
 
 ### ISA Extensions
 
