@@ -2,7 +2,7 @@
 
 In this section we will discuss some common microarchitecture-specific issues that can be attributed to majority of modern processors. Note that the impact of a particular problem can be more/less pronounced on one platform than another.
 
-### Memory Order Violations {sec:MemoryOrderViolations}
+### Memory Order Violations {#sec:MemoryOrderViolations}
 
 We introduced the concept of memory ordering in [@sec:uarchLSU]. Memory reordering is a crucial aspect of modern CPUs, as it allows to execute memory requests in parallel and out-of-order. The key element in load/store reordering is memory disambiguation, which predicts if it is safe to let loads go ahead of earlier stores. Since the memory disambiguation is speculative, it can lead to performance issues if not handled properly.
 
@@ -36,7 +36,7 @@ Performance will greatly depend on the color patterns of the input image. Images
 
 A cure for the memory order violation problem is shown in [@lst:MemOrderViolation], on the right. As you can see, we duplicated the histogram and now alternate processing of pixels between two partial histograms. In the end, we combine the two partial histograms to get a final result. This new version with two partial histograms is still prone to potentially problematic patterns, such as `0xFF 0x00 0xFF 0x00 0xFF ...`. However, with this change, the worst-case scenario, e.g., `0xFF 0xFF 0xFF ...`  will run twice as fast as before. It may be beneficial to create four or eight partial histograms depending on the color pattern of input images. This exact code is featured in the [mem_order_violation_1](https://github.com/dendibakh/perf-ninja/tree/main/labs/memory_bound/mem_order_violation_1)[^2] lab assignment of Performance Ninja course, so feel free to experiment. On a small set of input images we observed from 10% to 50% speedup on various platforms. It is worth to mention that the version on the left consumes 1 KB of additional memory, which may not be huge in this case, but is something to watch out for.
 
-### Misaligned Memory Accesses {sec:MisalignedMemoryAccesses}
+### Misaligned Memory Accesses {#sec:MisalignedMemoryAccesses}
 
 A variable is accessed most efficiently if it is stored at a memory address that is divisible by the size of the variable. For example, an `int` requires 4-byte alignment, meaning its address should be a multiple of 4. In C++, it is called *natural alignment*, which occurs by default for fundamental data types, such as integer, float, or double. When you declare variables of these types, the compiler ensures that they are stored in memory at addresses that are multiples of their size. In contrast, arrays, structs and classes may require special alignment as you'll learn in this section.
 
@@ -93,7 +93,7 @@ Alignment and padding often cause holes of unused bytes, which potentially decre
 
 Accesses that cross a 4 KB boundary introduce more complications, because virtual to physical address translations are usually handled in 4 KB pages. Handling such an access would require accessing two TLB entries as well. Unless a TLB supports multiple lookups per cycle, such loads can cause significant slowdown.
 
-### Cache Trashing {sec:CacheTrashing}
+### Cache Trashing {#sec:CacheTrashing}
 
 [TODO]: write a microbenchmark. Is it still a problem on modern processors?
 
@@ -122,7 +122,7 @@ just describe
 Avoid Cache Thrashing: Minimize cache conflicts by ensuring data structures do not excessively map to the same cache lines.
 https://github.com/ibogosavljevic/hardware-efficiency/blob/main/cache-conflicts/cache_conflicts.c
 
-### Non-Temporal Loads and Stores {sec:NonTemporalLoadsStores}
+### Non-Temporal Loads and Stores {#sec:NonTemporalLoadsStores}
 
 [TODO]: drop? - Yes
 
@@ -138,7 +138,7 @@ These special assembly instructions usually have "NT" suffix.
 
 https://www.agner.org/optimize/optimizing_cpp.pdf#page=108&zoom=100,116,716
 
-### Store-to-Load Forwarding Delays {sec:StoreLoadForwardingDelays}
+### Store-to-Load Forwarding Delays {#sec:StoreLoadForwardingDelays}
 
 [TODO]: drop?
 
@@ -158,7 +158,7 @@ float circleLength(float r) {
 }
 ```
 
-### Slow Floating-Point Arithmetic {sec:SlowFloatingPointArithmetic}
+### Slow Floating-Point Arithmetic {#sec:SlowFloatingPointArithmetic}
 
 [TODO]: maybe make it shorter or move to the appendix?
 
