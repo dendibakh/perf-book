@@ -82,43 +82,28 @@ To demonstrate the effect of misaligned memory accesses, we created the [mem_ali
 
 The first step to mitigate split loads/stores in this assignment is to align the starting offset of a matrix. The OS might allocate memory for the matrix in a way that it is already aligned to the cache line boundary. However, you should not rely on this behavior, as it is not guaranteed. A simple way to fix this is to use `AlignedVector` from [@lst:AlignedStdVector] to allocate memory for the matrices. 
 
-However, it's not enough to only align the starting offset of a matrix. Consider an example of a `9x9` matrix of `float` values shown in @fig:MemAlignment. If a cache line is 64 bytes, it can store 16 `float` values. When using AVX2 instructions, the program will load/store 8 elements (256 bits) at a time. In each row, the first eight elements will be processed in a SIMD way, while the last element will be processed in a scalar way by the loop remainder. The second vector load/store (elements 10-17) crosses the cache line boundary as many other subsequent vector loads/stores. The problem highlighted in @fig:MemAlignment affects any matrix with a number of columns that is not a multiple of 8 (for AVX2 vectorization). The SSE and ARM Neon vectorization requires 16-byte alignment; AVX-512 requires 64-byte alignment.
+However, it's not enough to only align the starting offset of a matrix. Consider an example of a `9x9` matrix of `float` values shown in Figure @fig:MemAlignment. If a cache line is 64 bytes, it can store 16 `float` values. When using AVX2 instructions, the program will load/store 8 elements (256 bits) at a time. In each row, the first eight elements will be processed in a SIMD way, while the last element will be processed in a scalar way by the loop remainder. The second vector load/store (elements 10-17) crosses the cache line boundary as many other subsequent vector loads/stores. The problem highlighted in Figure @fig:MemAlignment affects any matrix with a number of columns that is not a multiple of 8 (for AVX2 vectorization). The SSE and ARM Neon vectorization requires 16-byte alignment; AVX-512 requires 64-byte alignment.
 
 ![Split loads/stores inside a 9x9 matrix when using AVX2 vectorization. The split memory access is highlighted in gray.](../../img/memory-access-opts/MemAlignment.png){#fig:MemAlignment width=80%}
 
-So, in addition to aligning the starting offset, each row of the matrix should be aligned as well. For example in @fig:MemAlignment, it can be achieved by inserting seven dummy columns into the matrix, effectively making it a `9x16` matrix. This will align the second row (elements 10-18) at the offset `0x40`. Similarly, we need to align all other rows. The dummy columns will not be processed by the algorithm, but they will ensure that the actual data is aligned to the cache line boundary. In our testing, the performance impact of this change was up to 30%,
+So, in addition to aligning the starting offset, each row of the matrix should be aligned as well. For example in Figure @fig:MemAlignment, it can be achieved by inserting seven dummy columns into the matrix, effectively making it a `9x16` matrix. This will align the second row (elements 10-18) at the offset `0x40`. Similarly, we need to align all other rows. The dummy columns will not be processed by the algorithm, but they will ensure that the actual data is aligned to the cache line boundary. In our testing, the performance impact of this change was up to 30%,
 depending on the matrix size and the platform configuration.
 
 Alignment and padding often cause holes with unused bytes, which potentially decreases memory bandwidth utilization. For small matrices, like our 9x9 matrix, padding will cause almost half of each line to be unused. However, for large matrices, like 1025x1025 the impact of padding is not that big. Nevertheless, for some algorithms, like AI, memory bandwidth can be a bigger concern. Use these techniques with care and always measure to see if the performance gain from alignment is worth the cost of unused bytes.
 
 Accesses that cross a 4 KB boundary introduce more complications because virtual to physical address translations are usually handled in 4 KB pages. Handling such access would require accessing two TLB entries as well. Unless a TLB supports multiple lookups per cycle, such loads can cause a significant slowdown.
 
-### Cache Trashing {#sec:CacheTrashing}
+### Cache Aliasing {#sec:CacheTrashing}
 
-[TODO]: write a microbenchmark. Is it still a problem on modern processors?
+There are specific data access patterns that may cause unpleasant performance issues. These corner cases are tightly connected with cache organization, e.g., the number of sets and ways in the cache. We described cache organization in [@sec:CacheHierarchy], in case you want to revisit it. The placement of a memory location in the cache is determined by its address. Based on the address bits, the cache controller does set selection, i.e., it determines the set to which a cache line with the fetched memory location will go. If two memory locations map to the same set, they will compete for the limited number of available slots (ways) in the set. When a program repeatedly accesses memory locations that map to the same set, they will be constantly evicting each other. This may cause saturation of one set in the cache and underutilization of the other sets. This effect is known as *cache aliasing*, though you may find people use the terms *cache contention*, *cache conflicts*, or *cache trashing* to describe the same thing.
 
-There are specific data access patterns that may cause *cache trashing*, also frequently called *cache contention* or *cache conflicts*. These corner cases depend on the cache organization, e.g., the number of sets and ways in the cache (we explored it in [@sec:CacheHierarchy]). There is a very simple example of matrix transposition in [@fogOptimizeCpp, section 9.10]:
+A simple example of cache aliasing is matrix transposition, presented and explained in detail in [@fogOptimizeCpp, section 9.10 Cache contentions in large data structures]. We encourage readers to study Agner's manual. We repeated the experiment on a few modern processors and confirmed that it remains a relevant issue. Figure @fig:CacheAliasing shows the chart of the matrix transposition performance on Intel's 12th-gen core i7-1260P processor. There are several spikes in the chart, which correspond to the matrix sizes that cause cache aliasing. The performance drops significantly when the matrix size is a multiple of 128, e.g., 256, 384, 512, etc. Also, there are a few spikes at the sizes 341, 683 and 819, which also suffer from the same problem.
 
-```cpp
-double a[N][N];
-for (r = 1; r < N; r++)
-  for (c = 0; c < r; c++)
-    swapd(a[r][c], a[c][r]);
-```
+![Cache aliasing effects. TODO.](../../img/memory-access-opts/CacheAliasing.png){#fig:CacheAliasing width=100%}
 
-To transpose a square matrix, you need to reflect every element along the diagonal. In this code, `a[r][c]` does sequential accesses, however, `a[c][r]` does column-wise accesses. Suppose we run this code on a processor with an L1-data cache of 8 KB, 64 bytes cache lines, 32 sets 8-way associative. In such a cache every line can go to one of the 8 ways in a set. When `N` equals 64, each row has `64 elements * 8 bytes (size of double) = 512 bytes`, that span 8 cache lines. That means that when accessing elements in a column, each access will be 8 cache lines away from the previous one. The first cache line in row 0 will go to `[set0 ; way0]`, the second will go to `[set1 ; way0]`, and so on.
+On Intel's processors, this issue can be diagnosed with the help of the `L1D.REPLACEMENT` performance event, which counts L1 cache line replacements. For instance, there are 17 times more cache line replacements for the matrix size `256x256` than for the size `255x255`. 
 
-Since we have 32 sets in the cache, after processing first 4 rows, we will have one out of eight ways in each set filled up.
-
-[TODO]: write about l1d.replacements.
-
-9.10 Cache contentions in large data structures
-https://www.agner.org/optimize/optimizing_cpp.pdf#page=108&zoom=100,116,716
-
-https://stackoverflow.com/questions/7905760/matrix-multiplication-small-difference-in-matrix-size-large-difference-in-timi
-https://stackoverflow.com/questions/12264970/why-is-my-program-slow-when-looping-over-exactly-8192-elements?noredirect=1&lq=1
-https://stackoverflow.com/questions/6060985/why-is-there-huge-performance-hit-in-2048x2048-versus-2047x2047-array-multiplica?noredirect=1&lq=1
-https://stackoverflow.com/questions/76235372/why-is-multiplying-a-62x62-matrix-slower-than-multiplying-a-64x64-matrix?noredirect=1&lq=1
+We tested all sizes from `64x64` up to `10000x10000` and found that the pattern repeats very consistently. Cache aliasing also affects Intel's earlier processors as well as the Apple-based M1 chip.
 
 just describe
 Avoid Cache Thrashing: Minimize cache conflicts by ensuring data structures do not excessively map to the same cache lines.

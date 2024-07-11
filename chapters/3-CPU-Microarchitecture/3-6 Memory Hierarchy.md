@@ -33,7 +33,7 @@ $$
 \textrm{Set (m-way) associative location} = \textrm{(block address)  mod  (Number of Sets in the Cache)}
 $$
 
-Consider an example of an L1 cache, which size is 32 KB with 64 bytes cache lines, 64 sets and 8 ways. The total number of cache lines in such a cache is `32 KB / 64 bytes = 512 lines`. A new line can be inserted only in one of the 64 sets. In the most simple way, set selection can be done with just the 6 lower address bits (address modulo 64). Sometimes a more advanced hash function is used that uses other bits of the address as well. Once the set is determined, a new line can go to one of the 8 ways in this set. Similarly, when you later search for this cache line, you determine the set first, and then you only need to examine up to 8 ways in the set.
+Consider an example of an L1 cache, which size is 32 KB with 64 bytes cache lines, 64 sets and 8 ways. The total number of cache lines in such a cache is `32 KB / 64 bytes = 512 lines`. A new line can be inserted only in one of the 64 sets. Once the set is determined, a new line can go to one of the 8 ways in this set. Similarly, when you later search for this cache line, you determine the set first, and then you only need to examine up to 8 ways in the set.
 
 #### Finding Data in the Cache.
 
