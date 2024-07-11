@@ -122,22 +122,6 @@ just describe
 Avoid Cache Thrashing: Minimize cache conflicts by ensuring data structures do not excessively map to the same cache lines.
 https://github.com/ibogosavljevic/hardware-efficiency/blob/main/cache-conflicts/cache_conflicts.c
 
-### Non-Temporal Loads and Stores {#sec:NonTemporalLoadsStores}
-
-[TODO]: drop? - Yes
-
-Caches naturally store data close to the processor under the assumption that the data in
-the cache line will be used again in the near term. Data that benefits from caching is said
-to have temporal locality. However, some algorithms stream (read and/or write) through
-large quantities of data with little temporal reuse. In these cases, storing the data in the
-cache is counterproductive because it floods (or "pollutes") the cache with unneeded
-data, forcing out potentially useful data.
-When using Non-Temporal Loads and Stores, the processor will optimize cache allocation
-policies for particular cache lines to minimize pollution.
-These special assembly instructions usually have "NT" suffix.
-
-https://www.agner.org/optimize/optimizing_cpp.pdf#page=108&zoom=100,116,716
-
 ### Store-to-Load Forwarding Delays {#sec:StoreLoadForwardingDelays}
 
 [TODO]: drop?
