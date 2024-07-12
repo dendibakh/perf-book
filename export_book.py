@@ -41,13 +41,13 @@ if verbose:
 
 pandoc_cmd = 'pandoc -N --file-scope --pdf-engine=xelatex --listings --include-in-header header.tex '
 if args.paperback:
-  # use -V papersize:paperwidth=170.00mm and -V papersize:paperheight=240.00mm
-  pandoc_cmd = pandoc_cmd + "-V papersize:a5 "
-  pandoc_cmd = pandoc_cmd + "-V geometry:left=2.2cm "
-  pandoc_cmd = pandoc_cmd + "-V geometry:right=1.5cm "
-  pandoc_cmd = pandoc_cmd + "-V geometry:top=1.6cm "
-  pandoc_cmd = pandoc_cmd + "-V geometry:bottom=1.6cm "
-  pandoc_cmd = pandoc_cmd + "-V fontsize:9pt "
+  pandoc_cmd = pandoc_cmd + "-V geometry:paperwidth=169.90mm "
+  pandoc_cmd = pandoc_cmd + "-V geometry:paperheight=244.10mm "
+  pandoc_cmd = pandoc_cmd + "-V geometry:left=2cm "
+  pandoc_cmd = pandoc_cmd + "-V geometry:right=2cm "
+  pandoc_cmd = pandoc_cmd + "-V geometry:top=2cm "
+  pandoc_cmd = pandoc_cmd + "-V geometry:bottom=2cm "
+  pandoc_cmd = pandoc_cmd + "-V fontsize:8pt "
 else:
   pandoc_cmd = pandoc_cmd + "--include-before-body cover.tex "
   pandoc_cmd = pandoc_cmd + "-V geometry:left=2cm "
@@ -89,8 +89,11 @@ with open(editTexFile, 'w') as g:
     addTabularnewlineTableCPUFESummary = False
     addTabularnewlineTableARMsChip = False
     for line in lines:
+        # change font size in listings for paperback
+        if args.paperback and "basicstyle=\\ttfamily," in line:
+            g.write(line.replace("basicstyle=\\ttfamily,", "basicstyle=\\footnotesize\\ttfamily,"))
         # workaround for citations and bibliography
-        if "\\usepackage[]{natbib}" in line:
+        elif "\\usepackage[]{natbib}" in line:
             g.write(line.replace("\\usepackage[]{natbib}", ''))
         elif "\\bibliographystyle{plainnat}" in line:
             g.write(line.replace("\\bibliographystyle{plainnat}", '\\bibliographystyle{apalike-ejor}'))
