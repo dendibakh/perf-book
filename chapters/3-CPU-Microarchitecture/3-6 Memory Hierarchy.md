@@ -35,6 +35,8 @@ $$
 
 Consider an example of an L1 cache, which size is 32 KB with 64 bytes cache lines, 64 sets and 8 ways. The total number of cache lines in such a cache is `32 KB / 64 bytes = 512 lines`. A new line can be inserted only in one of the 64 sets. Once the set is determined, a new line can go to one of the 8 ways in this set. Similarly, when you later search for this cache line, you determine the set first, and then you only need to examine up to 8 ways in the set.
 
+[TODO]: Add example of cache organization from Table 4.18. L1D Cache Organization and Table 4.20. Shared L2 Cache Organization from Apple Silicon Optimization Guide.
+
 #### Finding Data in the Cache.
 
 Every block in the m-way set-associative cache has an address tag associated with it. In addition, the tag also contains state bits such as valid bits to indicate whether the data is valid. Tags can also contain additional bits to indicate access information, sharing information, etc., that will be described in later sections of this chapter. 
