@@ -10,6 +10,8 @@ Such a hybrid approach combines benefits of instrumentation and performance even
 
 Below we provide a very basic example of using [libpfm4](https://sourceforge.net/p/perfmon2/libpfm4/ci/master/tree/),[^1] one of the popular Linux libraries for collecting performance monitoring events. It is built on top of the Linux `perf_events` subsystem, which lets you access performance event counters directly. The `perf_events` subsystem is rather low-level, so the `libfm4` package is useful here, as it adds both a discovery tool for identifying available events on your CPU, and a wrapper library around the raw `perf_event_open` system call. [@lst:LibpfmMarkerAPI] shows how one can use `libpfm4` to instrument the `render` function of the [C-Ray](https://openbenchmarking.org/test/pts/c-ray)[^2] benchmark.
 
+[TODO]: this listing is too long.
+
 Listing: Using libpfm4 marker API on the C-Ray benchmark
 
 ~~~~ {#lst:LibpfmMarkerAPI .cpp}

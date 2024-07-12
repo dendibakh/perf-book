@@ -30,6 +30,8 @@ We compiled the code using the Clang-17 C++ compiler and run it on a Mac mini (A
 
 We compiled the code using the Clang-17 C++ compiler and ran it on a Mac mini (Apple M1, 2020). You expect this code to "fly", however, there is one very nasty performance problem that slows down the program. Without looking ahead in the text, can you find a recurrent dependency chain in the code?
 
+[TODO]: this listing is too wide and doesn't fit the page.
+
 Listing: Random Particle Motion on a 2D Surface
 
 ~~~~ {#lst:DepChain .cpp .numberLines}
