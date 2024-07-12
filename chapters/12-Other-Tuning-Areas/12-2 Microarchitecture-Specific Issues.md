@@ -107,29 +107,7 @@ On Intel's processors, this issue can be diagnosed with the help of the `L1D.REP
 
 To mitigate cache aliasing, you can use cache blocking that we discussed in [@sec:LoopOptsHighLevel]. The idea is to process the matrix in smaller blocks that fit into the cache. That way you will avoid cache line eviction since there will be enough space in the cache. Another way to solve this is to pad the matrix with extra columns, e.g., instead of a `256x256` matrix, you would allocate a `256x264` matrix; in a similar way we did in the previous section. But be careful not to run into misaligned memory access issues.
 
-### Store-to-Load Forwarding Delays {#sec:StoreLoadForwardingDelays}
-
-[TODO]: drop?
-
-### Minimize Moves Between Integer and Floating-Point Registers
-
-DUP(general), FMOV(general), INS(general), MOV(from general), SCVTF(scalar), UCVTF(scalar)
-Movement of data between integer and vector registers requires several cycles. Load
-directly into vector registers
-In most of the cases it is compiler's job to ensure, but in case you're writing compiler intrinsics or inline assembly routines, this advice may become handy.
-When you need to load a `uint32_t` value from memory and then convert it to `float`, do not load the value in a general-purpose register (e.g. `EAX`) and then convert it to `XMM0`; load straight into `XMM0`.
-
-Also, avoid mixing single and double precision values. For example:
-```cpp
-float circleLength(float r) {
-    //return 2.0 * 3.14 * r; // 
-    return 2.0f * 3.14f * r;
-}
-```
-
 ### Slow Floating-Point Arithmetic {#sec:SlowFloatingPointArithmetic}
-
-[TODO]: maybe make it shorter or move to the appendix?
 
 Some applications that do extensive computations with floating-point values are prone to one very subtle issue that can cause performance slowdown. This issue arises when an application hits a _subnormal_ FP value, which we will discuss in this section. You can also find a term *denormal* FP value, which refers to the same thing. According to the IEEE Standard 754,[^4] a subnormal is a non-zero number with an exponent smaller than the smallest normal number.[^3] [@lst:Subnormals] shows a very simple instantiation of a subnormal value. 
 

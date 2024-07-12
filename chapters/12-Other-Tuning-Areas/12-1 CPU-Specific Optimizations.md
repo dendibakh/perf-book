@@ -61,15 +61,7 @@ This example demonstrates the use of built-in functions that are available in GC
 
 You would typically see CPU dispatching constructs used to optimize only specific parts of the code, e.g., hot function or loop. Very often, these platform-specific implementations are written with compiler intrinsics [@sec:secIntrinsics] to generate desired instructions.
 
-[TODO]:
-https://www.agner.org/optimize/optimizing_cpp.pdf#page=135&zoom=100,116,161
-Underestimating the cost of keeping a CPU dispatcher updated. It is tempting to finetune the code to a specific CPU model and then think that you can make an update
-when the next new model comes on the market. But the cost of fine-tuning, testing,
-verifying and maintaining a new branch of code is so high that it is unrealistic that
-you can do this every time a new processor enters the market for years to come.
-Even big software companies often fail to keep their CPU dispatchers up to date. A
-more realistic goal is to make a new branch only when a new instruction set opens
-the possibility for significant improvements.
+Even though CPU dispatching is a runtime check, its overhead is not high. Developers usually identify hardware capabilities at startup once and save it in some variable, so at runtime it becomes just a single branch, which is well-predicted. Perhaps a bigger concern about CPU dispatching is the maintenance cost. Every new specialized branch requires fine-tuning and validation.
 
 ### Instruction Latencies and Throughput
 
