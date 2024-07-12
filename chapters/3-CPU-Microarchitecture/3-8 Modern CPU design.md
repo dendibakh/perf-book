@@ -58,7 +58,7 @@ As shown in Figure @fig:Goldencove_diag, there are 12 execution ports:
 
 A dispatched arithmetic operation can go to either INT or VEC/FP execution port. Integer and Vector/FP register stacks are located separately. Operations that move values from the INT stack to VEC/FP and vice-versa (e.g., convert, extract or insert) incur additional penalty.
 
-### Load-Store Unit
+### Load-Store Unit {#sec:uarchLSU}
 
 The Goldencove core can execute up to three loads and up to two stores per cycle. Once a load or a store leaves the scheduler, the load-store (LS) unit is responsible for accessing the data and saving it in a register. The LS unit has a load queue (LDQ, labeled as "Load Buffer") and a store queue (STQ, labeled as "Store Buffer"), their sizes are not disclosed.[^2] Both LDQ and STQ receive operations at dispatch from the scheduler.
 
@@ -77,6 +77,33 @@ Of course, there are a few optimizations done for store operations as well. Firs
 Second, write combining enables multiple stores to be assembled and written further out in the cache hierarchy as a unit. So, if multiple stores modify the same cache line, only one memory write will be issued to the memory subsystem. Modern processors have a data structure called a *store buffer* that tries to combine stores. A store instruction copies the data that will be written from a register into the store buffer. From there it may be written to the L1 cache or it may be combined with other stores to the same cache line. The store buffer capacity is limited, so it can hold requests for partial writing to a cache line only for some time. However, while the data sits in the store buffer waiting to be written, other load instructions can read the data straight from the store buffers (store-to-load forwarding).
 
 Finally, if we happen to read data before overwriting it, the cache line typically stays in the cache, displacing some other line. This behavior can be altered with the help of a *non-temporal* store, a special CPU instruction that will not keep the modified line in the cache. It is useful in situations when we know we will not need the data once we have changed it. Non-temporal stores help to utilize cache space more efficiently by not evicting other data that might be needed soon.
+
+During a typical program execution, there could be dozens of memory accesses in flight. In most high-performance processors, the order of load and store operations is not necessarily required to be the same as the program order, which is known as _weakly ordered memory model_. For optimizations purposes, the processor can reorder memory read and write operations. Consider a situation when a load runs into a cache miss and has to wait until the data comes from memory. The processor allows subsequent loads to proceed ahead of the load that is waiting for the data. This allows later loads to finish before the earlier load and doesn't unnecessary block the execution. Such load/store reordering enables the memory units to process multiple memory accesses in parallel, which translates directly into higher performance.
+
+There are a few exceptions. Just like with dependencies through regular arithmetic instructions, there are memory dependencies through loads and stores. In other words, a load can depend on an earlier store and vice-versa. First of all, stores cannot be reordered with older loads:
+
+```
+Load R1, MEM_LOC_X
+Store MEM_LOC_X, 0
+```
+
+If we allow the store go before the load, then the `R1` register may read the wrong value from memory location `MEM_LOC_X`.
+
+Another interesting situation happens when a load consumes data from an earlier store:
+
+```
+Store MEM_LOC_X, 0
+Load R1, MEM_LOC_X
+```
+
+If a load consumes data from a store that hasn't yet finished, we should not allow the load to proceed. But what if we don't yet know the address of the store? In this case, the processor predicts whether there will be any potential data forwarding between loads and stores and if reordering is safe. This is known as _memory disambiguation_. When a load starts executing, it has to be checked against all older stores for potential store forwarding. There are four possible scenarios:
+
+* Prediction: Not dependent; Outcome: Not dependent. This a case of a successful memory disambiguation, which yields optimal performance.
+* Prediction: Dependent; Outcome: Not dependent. In this case, the processor was overly conservative and did not let the load go ahead of the store. This is a missed opportunity for performance optimization.
+* Prediction: Not dependent; Outcome: Dependent. This is a _memory order violation_. Similar to the case of a branch misprediction, the processor has to flush the pipeline, roll back the execution and start over. It is very costly.
+* Prediction: Dependent; Outcome: Dependent. There is a memory dependency between a load and store, and the processor predicted it correctly. No missed opportunities.
+
+It's worth to mention that forwarding from a store to a load occurs in real code quite often. In particular, any code that uses read-modify-write accesses to its data structures is likely to trigger these sorts of problems. Due to the large out-of-order window, the CPU can easily attempt to process multiple read-modify-write sequences at once, so the read of one sequence can occur before the write of the previous sequence is complete. One such example is presented in [@sec:UarchSpecificIssues].
 
 ### TLB Hierarchy
 
