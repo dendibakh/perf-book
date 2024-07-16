@@ -1,6 +1,6 @@
 ## Microarchitecture-Specific Performance Issues {#sec:UarchSpecificIssues}
 
-In this section, we will discuss some common microarchitecture-specific issues that can be attributed to the majority of modern processors. Note that the impact of a particular problem can be more/less pronounced on one platform than another.
+In this section, we will discuss some common microarchitecture-specific issues that can be attributed to the majority of modern processors. We call them microarchitecture-specific because they are caused by the way a particular microarchitecture feature is implemented. These issues are very specific and do not frequently appear as a major performance bottleneck. Typically, they are diluted among other more significant performance problems. Thus, these microarchitecture-specific performance issues are considered corner cases and are less known than the other issues that we discussed in the book. Nevertheless, they can cause very undesirable performance penalties. Note that the impact of a particular problem can be more/less pronounced on one platform than another. Also, keep in mind, that there are other microarchitecture-specific issues that we don't cover in this book.
 
 ### Memory Order Violations {#sec:MemoryOrderViolations}
 
