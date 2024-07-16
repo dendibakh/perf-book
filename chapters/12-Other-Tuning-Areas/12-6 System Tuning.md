@@ -12,7 +12,7 @@ Most out-of-the-box platforms are configured for optimal throughput while saving
 
 A more extreme shot at boosting performance is to overclock the CPU. Overclocking is a process of running the CPU at a higher frequency than it was designed for. It is a risky operation, as it can void the warranty and potentially damage the CPU. Overclocking is not suited for production environments and is usually done by enthusiasts who are willing to take the risk for the sake of performance. To overclock a CPU, you need to have the right parts, mainly a motherboard that supports overclocking, a CPU that is unlocked, and a cooling system that can handle the increased heat output. At the beginning of 2024, overclocking experts crossed the 9 GHz barrier on a widely available CPU.[^9]
 
-[TODO]: Make a connection to the next case study about LLC sensitivity.
+[TODO]: Make a connection to the next case study about LLC sensitivity. Or move to the appendix.
 
 [^5]: Red Hat low latency tuning guidelines - [https://access.redhat.com/sites/default/files/attachments/201501-perf-brief-low-latency-tuning-rhel7-v2.1.pdf](https://access.redhat.com/sites/default/files/attachments/201501-perf-brief-low-latency-tuning-rhel7-v2.1.pdf)
 [^6]: I.e., when sibling threads execute differing instruction patterns.
