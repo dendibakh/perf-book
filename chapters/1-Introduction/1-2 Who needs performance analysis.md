@@ -1,7 +1,3 @@
----
-typora-root-url: ..\..\img
----
-
 ## Who Needs Performance Tuning?
 
 Performance engineering does not need to be justified much in industries like High-Performance Computing (HPC), Cloud Services, High-Frequency Trading (HFT), Game Development, and other performance-critical areas. For instance, Google reported that a 2% slower search caused [2% fewer searches](https://assets.en.oreilly.com/1/event/29/Keynote Presentation 2.pdf) per user.[^3] For Yahoo! 400 milliseconds faster page load caused [5-9% more traffic](https://www.slideshare.net/stoyan/dont-make-me-wait-or-building-highperformance-web-applications).[^4] In the game of big numbers, small improvements can make a significant impact. Such examples prove that the slower the service works, the fewer people will use it. 

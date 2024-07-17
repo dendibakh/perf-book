@@ -1,7 +1,3 @@
----
-typora-root-url: ..\..\img
----
-
 ## Chapter Summary {.unlisted .unnumbered}
 
 * The single-threaded performance of CPUs is not increasing as rapidly as it used to a few decades ago. That is why performance tuning is becoming more important than it has been for the last 40 years. The computing industry is changing now much more heavily than at any time since the 90s.

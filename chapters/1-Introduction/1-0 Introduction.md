@@ -1,8 +1,4 @@
----
-typora-root-url: ..\..\img
----
-
-# Introduction {#sec:sec1}
+# Introduction {#sec:chapter1}
 
 [TODO]: update the intro. It is the most important part of the book. :) Update that we are now in the beginning of a new era. PC -> mobile -> cloud -> AI?
 
@@ -12,13 +8,11 @@ In the PC era,[^2] developers usually were programming directly on top of the op
 
 Software programmers have had an "easy ride" for decades, thanks to Moore’s law. It used to be the case that some SW vendors preferred to wait for a new generation of HW to speed up their application and did not spend human resources on making improvements in their code. By looking at Figure @fig:50YearsProcessorTrend, we can see that single-threaded performance growth is slowing down. Single-threaded performance is a performance of a single HW thread inside a CPU core when measured in isolation.
 
-![50 Years of Microprocessor Trend Data. *© Image by K. Rupp via karlrupp.net*](../../img/intro/50-years-processor-trend.png){#fig:50YearsProcessorTrend width=90%}
+![50 Years of Microprocessor Trend Data. *© Image by K. Rupp via karlrupp.net*. Original data up to the year 2010 collected and plotted by M. Horowitz, F. Labonte, O. Shacham, K. Olukotun, L. Hammond, and C. Batten. New plot and data collected for 2010-2021 by K. Rupp.](../../img/intro/50-years-processor-trend.png){#fig:50YearsProcessorTrend width=100%}
 
 When it's no longer the case that each HW generation provides a significant performance boost [@Leisersoneaam9744], we must start paying more attention to how fast our code runs. When seeking ways to improve performance, developers should not rely on HW. Instead, they should start optimizing the code of their applications.
 
 > “Software today is massively inefficient; it’s become prime time again for software programmers to get really good at optimization.” - Marc Andreessen, the US entrepreneur and investor (a16z Podcast, 2020)
-
-\personal{While working at Intel, I hear the same story from time to time: when Intel clients experience slowness in their application, they immediately and unconsciously start blaming Intel for having slow CPUs. But when Intel sends one of our performance ninjas to work with them and help them improve their application, it is not unusual that they help speed it up by a factor of 2x, sometimes even 10x.}
 
 Reaching high-level performance is challenging and usually requires substantial efforts, but hopefully, this book will give you the tools to help you achieve it.
 
