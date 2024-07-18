@@ -1,7 +1,3 @@
----
-typora-root-url: ..\..\img
----
-
 ## Acknowledgments {.unlisted .unnumbered}
 
 Huge thanks to Mark E. Dawson, Jr. for his help writing several sections of this book: "Optimizing For DTLB" ([@sec:secDTLB]), "Optimizing for ITLB" ([@sec:FeTLB]), "Cache Warming" ([@sec:CacheWarm]), System Tuning ([@sec:SysTune]), [@sec:secAmdahl] about performance scaling and overhead of multithreaded applications, [@sec:COZ] about using COZ profiler, [@sec:secEBPF] about eBPF, "Detecting Coherence Issues" ([@sec:TrueFalseSharing]). Mark is a recognized expert in the High-Frequency Trading industry. Mark was kind enough to share his expertise and feedback at different stages of this book's writing.
