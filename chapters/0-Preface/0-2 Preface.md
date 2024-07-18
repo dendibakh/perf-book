@@ -31,3 +31,5 @@ This book will be primarily useful for software developers who work with perform
 Readers are expected to have a minimal background in C/C++ programming languages to understand the book's examples. The ability to read basic x86 assembly is desired but is not a strict requirement. The author also expects familiarity with basic concepts of computer architecture and operating systems like central processor, memory, process, thread, virtual and physical memory, context switch, etc. If any of the mentioned terms are new to you, I suggest studying this material first.
 
 [TODO]: errata
+
+\sectionbreak
