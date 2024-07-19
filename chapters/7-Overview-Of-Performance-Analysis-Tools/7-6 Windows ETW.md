@@ -1,6 +1,6 @@
 [TODO]: possible candidate for Appendix
 
-## Event Tracing for Windows
+## Event Tracing for Windows {#sec:ETW}
 
 Microsoft has developed a system-wide tracing facility named Event Tracing for Windows (ETW). It was originally intended for helping device driver developers, but later found its use in analyzing general-purpose applications as well. ETW is available on all supported Windows platforms (x86, x64 and ARM) with the corresponding platform-dependent installation packages. ETW records structured events in user and kernel code with full call stack trace support, which enables you to observe SW dynamics in a running system and solve many challenging performance issues.
 
