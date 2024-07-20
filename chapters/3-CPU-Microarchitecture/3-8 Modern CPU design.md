@@ -109,7 +109,7 @@ It's worth to mention that forwarding from a store to a load occurs in real code
 
 Recall from [@sec:TLBs] that translations from virtual to physical addresses are cached in the TLB. Golden Cove's TLB hierarchy is presented in Figure @fig:GLC_TLB. Similar to a regular data cache, it has two levels, where level 1 has separate instances for instructions (ITLB) and data (DTLB). L1 ITLB has 256 entries for regular 4K pages and covers the memory space of 256 * 4KB equals 1MB, while L1 DTLB has 96 entries that covers 384 KB. 
 
-![TLB hierarchy of Golden Cove.](../../img/uarch/GLC_TLB_hierarchy.png){#fig:GLC_TLB width=50%}
+![TLB hierarchy of Intel's GoldenCove microarchitecture.](../../img/uarch/GLC_TLB_hierarchy.png){#fig:GLC_TLB width=60%}
 
 The second level of the hierarchy (STLB) caches translations for both instructions and data. It is a larger storage for serving requests that miss in the L1 TLBs. L2 STLB can accommodate 2048 most recent data and instruction page address translations, which covers a total of 8MB of memory space. There are fewer entries available for 2MB huge pages: L1 ITLB has 32 entries, L1 DTLB has 32 entries, and L2 STLB can only use 1024 entries that are also shared regular 4KB pages.
 

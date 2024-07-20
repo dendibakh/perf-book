@@ -8,7 +8,7 @@ Every modern CPU provides facilities to monitor performance, which are combined 
 
 [TODO]: The font size used in this diagram is too small for comfortable reading.
 
-![Performance Monitoring Unit of a modern Intel CPU.](../../img/uarch/PMU.png){#fig:PMU width=70%}
+![Performance Monitoring Unit of a modern Intel CPU.](../../img/uarch/PMU.png){#fig:PMU width=90%}
 
 As CPU design evolves with every new generation, so do their PMUs. On Linux, it is possible to determine the version of the PMU in your CPU using the `cpuid` command, as shown in [@lst:QueryPMU]. A similar information can be extracted from the kernel message buffer by checking the output of `dmesg` command. Characteristics of each Intel PMU version, as well as changes from the previous version, can be found in [@IntelOptimizationManual, Volume 3B, Chapter 20].
 
@@ -30,7 +30,7 @@ Architecture Performance Monitoring Features (0xa/edx):
 
 ### Performance Monitoring Counters {#sec:PMC}
 
-If we imagine a simplified view of the processor, it may look something like what is shown in Figure @fig:PMC. As we discussed earlier in this chapter, a modern CPU has caches, a branch predictor, an execution pipeline, and other units. When connected to multiple units, a PMC can collect interesting statistics from them. For example, it can count how many clock cycles have passed, how many instructions were executed, how many cache misses or branch mispredictions happened during that time, and other performance events.
+If we imagine a simplified view of a processor, it may look something like what is shown in Figure @fig:PMC. As we discussed earlier in this chapter, a modern CPU has caches, a branch predictor, an execution pipeline, and other units. When connected to multiple units, a PMC can collect interesting statistics from them. For example, it can count how many clock cycles have passed, how many instructions were executed, how many cache misses or branch mispredictions happened during that time, and other performance events.
 
 ![Simplified view of a CPU with a performance monitoring counter.](../../img/uarch/PMC.png){#fig:PMC width=60%}
 

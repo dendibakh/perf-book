@@ -8,7 +8,7 @@ typora-root-url: ..\..\img
 
 The Roofline performance model is a throughput-oriented performance model that is heavily used in the HPC world. It was developed at the University of California, Berkeley, in 2009. The "roofline" in this model expresses the fact that the performance of an application cannot exceed the machine's capabilities. Every function and every loop in a program is limited by either compute or memory capacity of a machine. This concept is represented in Figure @fig:RooflineIntro. The performance of an application will always be limited by a certain "roofline" function.
 
-![Roofline model. *© Image taken from [NERSC Documentation](https://docs.nersc.gov/development/performance-debugging-tools/roofline/#arithmetic-intensity-ai-and-achieved-performance-flops-for-application-characterization).*](../../img/perf-analysis/Roofline-intro.png){#fig:RooflineIntro width=80%}
+![The Roofline Performance Model. *© Image taken from [NERSC Documentation](https://docs.nersc.gov/development/performance-debugging-tools/roofline/#arithmetic-intensity-ai-and-achieved-performance-flops-for-application-characterization).*](../../img/perf-analysis/Roofline-intro.png){#fig:RooflineIntro width=80%}
 
 Hardware has two main limitations: how fast it can make calculations (peak compute performance, FLOPS) and how fast it can move the data (peak memory bandwidth, GB/s). The maximum performance of an application is limited by the minimum between peak FLOPS (horizontal line) and the platform bandwidth multiplied by arithmetic intensity (diagonal line). The roofline chart in Figure @fig:RooflineIntro plots the performance of two applications `A` and `B` against hardware limitations. Application `A` has lower arithmetic intensity and its performance is bound by the memory bandwidth, while application `B` is more compute intensive and doesn't suffer as much from memory bottlenecks. Similar to this, `A` and `B` could represent two different functions within a program and have different performance characteristics. The Roofline performance model accounts for that and can display multiple functions and loops of an application on the same chart.
 
@@ -30,6 +30,8 @@ void matmul(int N, float a[][2048], float b[][2048], float c[][2048]) {
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Traditional ways to speed up an application's performance is to fully utilize the SIMD and multicore capabilities of a machine. Often times, we need to optimize for many aspects: vectorization, memory, threading. Roofline methodology can assist in assessing these characteristics of your application. On a roofline chart, we can plot theoretical maximums for scalar single-core, SIMD single-core, and SIMD multicore performance (see Figure @fig:RooflineIntro2). This will give us an understanding of the scope for improving the performance of an application. If we found that our application is compute-bound (i.e., has high arithmetic intensity) and is below the peak scalar single-core performance, we should consider forcing vectorization (see [@sec:Vectorization]) and distributing the work among multiple threads. Conversely, if an application has low arithmetic intensity, we should seek ways to improve memory accesses (see [@sec:MemBound]). The ultimate goal of optimizing performance using the Roofline model is to move the points up. Vectorization and threading move the dot up while optimizing memory accesses by increasing arithmetic intensity will move the dot to the right and also likely improve performance.
+
+[TODO] improve caption of the image
 
 ![Roofline model.](../../img/perf-analysis/Roofline-intro2.jpg){#fig:RooflineIntro2 width=70%}
 
@@ -59,7 +61,7 @@ Roofline methodology enables tracking optimization progress by printing "before"
 * Interchange the two innermost loops (swap lines 4 and 5). This enables cache-friendly memory accesses (see [@sec:MemBound]).
 * Enable autovectorization of the innermost loop using AVX2 instructions.
 
-![Roofline analysis for matrix multiplication on Intel NUC Kit NUC8i5BEH with 8GB RAM using the Clang 10 compiler.](../../img/perf-analysis/roofline_matrix.png){#fig:RooflineMatrix width=90%}
+![Roofline analysis for "before" and "after" versions of matrix multiplication on Intel NUC Kit NUC8i5BEH with 8GB RAM using the Clang 10 compiler.](../../img/perf-analysis/roofline_matrix.png){#fig:RooflineMatrix width=90%}
 
 In summary, the Roofline performance model can help to:
 

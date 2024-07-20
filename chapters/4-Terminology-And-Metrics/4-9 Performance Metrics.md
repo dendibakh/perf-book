@@ -2,6 +2,8 @@
 
 In addition to the performance events that we discussed earlier in this chapter, performance engineers frequently use metrics, which are built on top of raw events. Table {@tbl:perf_metrics} shows a list of metrics for Intel's 12th-gen Goldencove architecture along with descriptions and formulas. The list is not exhaustive, but it shows the most important metrics. A complete list of metrics for Intel CPUs and their formulas can be found in [TMA_metrics.xlsx](https://github.com/intel/perfmon/blob/main/TMA_Metrics.xlsx).[^1] [@sec:PerfMetricsCaseStudy] shows how performance metrics can be used in practice.
 
+\small
+
 --------------------------------------------------------------------------
 Metric  Description                   Formula
 Name           
@@ -28,21 +30,21 @@ MPKI    kilo instruction (misses
         of any page-size that 
         complete the page walk)
 
-Load    STLB data load             1000 * DTLB_LOAD_MISSES.WALK_COMPLETED 
+Load    STLB data load             1000 * DTLB_LD_MISSES.WALK_COMPLETED 
 STLB    speculative misses         / INST_RETIRED.ANY
 MPKI    per kilo instruction
 
-Store   STLB data store            1000 * DTLB_STORE_MISSES.WALK_COMPLETED 
+Store   STLB data store            1000 * DTLB_ST_MISSES.WALK_COMPLETED 
 STLB    speculative misses         / INST_RETIRED.ANY
 MPKI    per kilo instruction
 
 Load    Actual Average Latency for L1D_PEND_MISS.PENDING / 
-Miss    L1 data-cache miss demand  MEM_LOAD_COMPLETED.L1_MISS_ANY
+Miss    L1 data-cache miss demand  MEM_LD_COMPLETED.L1_MISS_ANY
 Real    load operations 
 Latency (in core cycles)
 
 ILP     Instr.-Level-Parallelism   UOPS_EXECUTED.THREAD / 
-        per-core (average number   UOPS_EXECUTED.CORE_CYCLES_GE_1,
+        per-core (average number   UOPS_EXECUTED.CORE_CYCLES_GE1,
         of $\mu$ops executed when      divide by 2 if SMT is enabled
         there is execution) 
 
@@ -80,20 +82,20 @@ IpArith Instructions per FP        See TMA_metrics.xlsx
         Arithmetic instruction
                 
 IpArith Instructions per FP Arith. INST_RETIRED.ANY / 
-Scalar  Scalar Single-Precision    FP_ARITH_INST_RETIRED.SCALAR_SINGLE
+Scalar  Scalar Single-Precision    FP_ARITH_INST.SCALAR_SINGLE
 SP      instruction 
 
 IpArith Instructions per FP Arith. INST_RETIRED.ANY / 
-Scalar  Scalar Double-Precision    FP_ARITH_INST_RETIRED.SCALAR_DOUBLE
+Scalar  Scalar Double-Precision    FP_ARITH_INST.SCALAR_DOUBLE
 DP      instruction 
 
 Ip      Instructions per FP        INST_RETIRED.ANY / (
-Arith   Arithmetic AVX/SSE         FP_ARITH_INST_RETIRED.128B_PACKED_DOUBLE+
-AVX128  128-bit instruction        FP_ARITH_INST_RETIRED.128B_PACKED_SINGLE)
+Arith   Arithmetic AVX/SSE         FP_ARITH_INST.128B_PACKED_DOUBLE+
+AVX128  128-bit instruction        FP_ARITH_INST.128B_PACKED_SINGLE)
 
 Ip      Instructions per FP        INST_RETIRED.ANY / ( 
-Arith   Arithmetic AVX*            FP_ARITH_INST_RETIRED.256B_PACKED_DOUBLE+
-AVX256  256-bit instruction        FP_ARITH_INST_RETIRED.256B_PACKED_SINGLE)
+Arith   Arithmetic AVX*            FP_ARITH_INST.256B_PACKED_DOUBLE+
+AVX256  256-bit instruction        FP_ARITH_INST.256B_PACKED_SINGLE)
 
 Ip      Instructions per SW        INST_RETIRED.ANY / 
 SWPF    prefetch instruction       SW_PREFETCH_ACCESS.T0:u0xF
@@ -101,6 +103,8 @@ SWPF    prefetch instruction       SW_PREFETCH_ACCESS.T0:u0xF
 --------------------------------------------------------------------------
 
 Table: A list (not exhaustive) of secondary metrics along with descriptions and formulas for the Intel Goldencove architecture. {#tbl:perf_metrics}
+
+\normalsize
 
 A few notes on those metrics. First, the ILP and MLP metrics do not represent theoretical maximums for an application; rather they measure the actual ILP and MLP of an application on a given machine. On an ideal machine with infinite resources, these numbers would be higher. Second, all metrics besides "DRAM BW Use" and "Load Miss Real Latency" are fractions; we can apply fairly straightforward reasoning to each of them to tell whether a specific metric is high or low. But to make sense of "DRAM BW Use" and "Load Miss Real Latency" metrics, we need to put it in a context. For the former, we would like to know if a program saturates the memory bandwidth or not. The latter gives you an idea for the average cost of a cache miss, which is useless by itself unless you know the latencies of each component in the cache hierarchy. We will discuss how to find out cache latencies and peak memory bandwidth in the next section.
 

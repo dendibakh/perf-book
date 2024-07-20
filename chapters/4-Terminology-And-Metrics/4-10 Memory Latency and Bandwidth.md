@@ -23,7 +23,7 @@ The option `--idle_latency` measures read latency without loading the system. ML
 
 Figure @fig:MemoryLatenciesCharts shows the read latencies of L1, L2, and L3 caches. There are four different regions on the chart. The first region on the left from 1KB to 48KB buffer size corresponds to L1d cache, which is private to each physical core. We can observe 0.9ns latency for E-core and a slightly higher 1.1ns for P-core. Also, we can use this chart to confirm the cache sizes. Notice how E-core latency starts climbing after a buffer size goes above 32KB but E-core latency stays constant up to 48KB. That confirms that L1d cache size in E-core is 32KB, and in P-core it is 48KB.
 
-![L1/L2/L3 cache read latencies on Intel Core i7-1260P, measured with the mlc tool, large pages enabled.](../../img/terms-and-metrics/MemLatencies.png){#fig:MemoryLatenciesCharts width=100% }
+![L1/L2/L3 cache read latencies (lower better) on Intel Core i7-1260P, measured with the mlc tool, large pages enabled.](../../img/terms-and-metrics/MemLatencies.png){#fig:MemoryLatenciesCharts width=100% }
 
 The second region shows the L2 cache latencies, which for E-core is almost twice higher than for P-core (5.9ns vs. 3.2ns). For P-core the latency increases after we cross 1.25MB buffer size, which is expected. But we expect E-core latency to stay the same until 2MB, which is not happening in our measurements.
 

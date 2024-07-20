@@ -16,7 +16,7 @@ But even without a fully fledged characterization methodology, collecting total 
 
 The idea behind counting is very simple: we want to count the total number of certain performance monitoring events while our program is running. Figure @fig:Counting illustrates the process of counting performance events from the start to the end of a program.
 
-![Counting performance events.](../../img/perf-analysis/CountingFlow.png){#fig:Counting width=60%}
+![Counting performance events.](../../img/perf-analysis/CountingFlow.png){#fig:Counting width=70%}
 
 The steps outlined in Figure @fig:Counting roughly represent what a typical analysis tool will do to count performance events. This process is implemented in the `perf stat` tool, which can be used to count various HW events, like the number of instructions, cycles, cache-misses, etc. Below is an example of the output from `perf stat`:
 
@@ -48,6 +48,8 @@ C4H     00H  BR_INST_RETIRED.      Branch instructions that retired.
 Table: Example of encoding Skylake performance events. {#tbl:perf_count}
 
 Linux `perf` provides mappings for commonly used performance events. They can be accessed via pseudo names instead of specifying `Event` and `Umask` hexadecimal values. For example, `branches` is just a synonym for `BR_INST_RETIRED.ALL_BRANCHES` and will measure the same thing. A list of available mapping names can be viewed with `perf list`:
+
+[TODO]: add more interesting events
 
 ```bash
 $ perf list
