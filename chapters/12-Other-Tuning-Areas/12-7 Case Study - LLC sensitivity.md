@@ -122,7 +122,7 @@ We run a set of SPEC CPU2017 benchmarks *alone* in the system using only one ins
 
 For the DMPKI and MPKI charts, the lower the value on the Y-axis, the better. Three lines that correspond to `503.bwaves` (solid), `520.omnetpp` (dotted), and `554.roms` (dashed), represent the three main trends observed in all applications. We do not show the rest of the benchmarks.
 
-![CPI, DMPKI, and MPKI for increasing LLC allocation limits (2 MiB steps).](../../img/other-tuning/llc-bw.png){#fig:characterization_llc width=95%}
+![CPI, DMPKI, and MPKI for increasing LLC allocation limits (2 MiB steps).](../../img/other-tuning/llc-bw.png){#fig:characterization_llc width=100%}
 
 Two behaviors can be distinguished in the CPI and DMPKI graphs. On one hand, `520.omnetpp` takes advantage of its available space in the LLC: both CPI and DMPKI decrease significantly as the space allocated in the LLC increases. We can say that the behavior of `520.omnetpp` is sensitive to the size available in the LLC. Increasing the allocated LLC space improves performance because it avoids evicting cache lines that will be used in the future.
 

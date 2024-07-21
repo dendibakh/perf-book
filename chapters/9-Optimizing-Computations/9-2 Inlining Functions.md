@@ -17,9 +17,11 @@ Also, there are situations when inlining is problematic:
 * A recursive function cannot be inlined into itself unless it's a tail-recursive function (see next section). Also, if the depth of recursion is usually small, it's possible to partially inline a recursive function, i.e., inline a body of a recursive function to itself a couple of times, and then leave a recursive call as before. This may eliminate the overhead of a function call in the common case.
 * A function that is referred to through a pointer can be inlined in place of a direct call but the function has to remain in the binary, i.e., it cannot be fully inlined and eliminated. The same is true for functions with external linkage.
 
-As we said earlier, compilers tend to use a cost model approach when deciding about inlining a function, which typically works well in practice. In general, it is a good strategy to rely on the compiler for making all the inlining decisions and adjusting if needed. The cost model cannot account for every possible situation, which leaves room for improvement. Sometimes compilers require special hints from the developer. One way to find potential candidates for inlining in a program is by looking at the profiling data, and in particular, how hot is the prologue and the epilogue of the function. Below is an example of a function profile with a prologue and epilogue consuming `~50%` of the function time:
+As we said earlier, compilers tend to use a cost model approach when deciding about inlining a function, which typically works well in practice. In general, it is a good strategy to rely on the compiler for making all the inlining decisions and adjusting if needed. The cost model cannot account for every possible situation, which leaves room for improvement. Sometimes compilers require special hints from the developer. One way to find potential candidates for inlining in a program is by looking at the profiling data, and in particular, how hot is the prologue and the epilogue of the function. [@lst:FuncInlining] is an example of a function profile with a prologue and epilogue consuming `~50%` of the function time:
 
-```bash
+Listing: A profile of function `foo` which has a hot prologue and epilogue
+
+~~~~ {#lst:FuncInlining .cpp}
 Overhead |  Source code & Disassembly
    (%)   |  of function `foo`
 --------------------------------------------
@@ -46,7 +48,7 @@ Overhead |  Source code & Disassembly
     4.12 :  418d4d:  pop    r14
     0.00 :  418d4f:  pop    r15
     1.59 :  418d51:  ret
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 When you see hot `PUSH` and `POP` instructions, this might be a strong indicator that the time consumed by the prologue and epilogue of the function might be saved if we inline the function. Note that even if the prologue and epilogue are hot, it doesn't necessarily mean it will be profitable to inline the function. Inlining triggers a lot of different changes, so it's hard to predict the outcome. Always measure the performance of the changed code before forcing a compiler to inline a function.
 
@@ -69,13 +71,13 @@ When you apply optimizations, e.g., `-O2`, to the example in [@lst:TailCall], co
 Listing: Tail Call Compiler Optimization
 		
 ~~~~ {#lst:TailCall .cpp}
-// original code                                // compiler intermediate transformation
-int sum(int n, int acc) {                       int sum(int n, int acc) {
-  if (n == 0) {                                   for (int i = n; i > 0; --i) {
-    return acc;                                     acc += i;
-  } else {                             =>         }
-    return sum(n - 1, acc + n);                   return acc;
-  }                                             }
+// original code                         // compiler intermediate transformation
+int sum(int n, int acc) {                int sum(int n, int acc) {
+  if (n == 0) {                            for (int i = n; i > 0; --i) {
+    return acc;                    =>        acc += i;
+  } else {                                 }
+    return sum(n - 1, acc + n);            return acc;
+  }                                      }
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

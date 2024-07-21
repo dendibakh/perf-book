@@ -54,7 +54,7 @@ S s;
 }                                  │     }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-![False Sharing: two threads access the same cache line.](../../img/mt-perf/FalseSharing.jpg){#fig:FalseSharing width=50%}
+![False Sharing: two threads access the same cache line.](../../img/mt-perf/FalseSharing.jpg){#fig:FalseSharing width=60%}
 
 False sharing is a frequent source of performance issues for multithreaded applications. Because of that, modern analysis tools have built-in support for detecting such cases. TMA characterizes applications that experience true/false sharing as `Memory Bound`. Typically, in such cases, you would see a high value for the `Contested Accesses` metric.[^18]
 
@@ -65,6 +65,7 @@ Linux `perf` has support for finding false sharing as well. As with the Intel VT
 It is possible to eliminate false sharing with the help of aligning/padding memory objects. Example in [@sec:secTrueSharing] can be fixed by ensuring `sumA` and `sumB` do not share the same cache line as shown in [@lst:PadFalseSharing].[^32]
 
 Listing: Data padding to avoid false sharing.
+
 ~~~~ {#lst:PadFalseSharing .cpp}
                               #define CACHELINE_ALIGN alignas(64) 
 struct S {                    struct S {

@@ -14,11 +14,11 @@ Below we show a few typical pitfalls of task scheduling in asymmetric systems. W
 Figure @fig:OmpScheduling shows three strategies, which highlight common problems that we regularly see in practice. These screenshots were captured with Intel VTune; with some modifications applied. The bars on the timeline indicate CPU time, i.e., periods when a thread was running. For each software thread, there is one or two corresponding CPU cores. Using this view, we can see on which core each thread was running at any given time.
 
 <div id="fig:OmpScheduling">
-![Static partitioning with pinning threads to the cores: `#pragma omp for schedule(static)` with `OMP_PROC_BIND=true`.](../../img/mt-perf/OmpAffinity.png){#fig:OmpAffinity width=70%}
+![Static partitioning with pinning threads to the cores: `#pragma omp for schedule(static)` with `OMP_PROC_BIND=true`.](../../img/mt-perf/OmpAffinity.png){#fig:OmpAffinity width=80%}
 
-![Static partitioning, no thread affinity: `#pragma omp for schedule(static)`.](../../img/mt-perf/OmpStatic.png){#fig:OmpStatic width=70%}
+![Static partitioning, no thread affinity: `#pragma omp for schedule(static)`.](../../img/mt-perf/OmpStatic.png){#fig:OmpStatic width=80%}
 
-![Dynamic partitioning with 16 chunks: `#pragma omp for schedule(dynamic, N/16)`.](../../img/mt-perf/OmpDynamic.png){#fig:OmpDynamic width=70%}
+![Dynamic partitioning with 16 chunks: `#pragma omp for schedule(dynamic, N/16)`.](../../img/mt-perf/OmpDynamic.png){#fig:OmpDynamic width=80%}
 
 Typical task scheduling pitfalls: core affinity blocks thread migration, partitioning jobs with large granularity fails to maximize CPU utilization.
 </div>

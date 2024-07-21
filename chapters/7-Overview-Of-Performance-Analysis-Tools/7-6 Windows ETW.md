@@ -70,7 +70,7 @@ C:\Windows\System32\wpr.exe
  - Double click the executable to start it. 
  - Once a program has started, stop profiling by pressing the *Stop Recording* button. 
 
-![Starting ETW collection with ETWController UI.](../../img/perf-tools/ETWController_Dialog.png){#fig:ETWController_Dialog width=85%}
+![Starting ETW collection with ETWController UI.](../../img/perf-tools/ETWController_Dialog.png){#fig:ETWController_Dialog width=100%}
 
 Stopping profiling the first time takes a bit longer because Program-Debug Data Base files (PDBs) are generated for all managed code, which is a one-time operation. After profiling has reached the Stopped state you can press the *Open in WPA* button to load the ETL file into the Windows Performance Analyzer with an ETWController supplied profile. The CSwitch profile generates a large amount of data that is stored in a 4 GB ring buffer, which allows you to record 1-2 minutes before the oldest events are overwritten. Sometimes it is a bit of an art to stop profiling at the right time point. If you have sporadic issues you can keep recording enabled for hours and stop it when an event like a log entry in a file shows up, which is checked by a polling script, to stop profiling when the issue has occurred.
 
@@ -82,6 +82,8 @@ Windows supports Event Log and Performance Counter triggers that can start a scr
 
 Figure @fig:WPA_MainView shows the recorded ETW data opened in Windows Performance Analyzer (WPA). The WPA view is divided into three vertically layered parts: *CPU Usage (Sampled)*, *Generic Events* and *CPU Usage (Precise)*. To understand the difference between them, let's dive deeper. The upper graph *CPU Usage (Sampled)* is useful for identifying where the CPU time is spent. The data is collected by sampling all the running threads at a regular time interval. This *CPU Usage (Sampled)* graph is very similar to the *Hotspots* view in other profiling tools.
 
+[TODO]: improve caption of the image
+
 ![Windows Performance Analyzer overview of a slow start of an application.](../../img/perf-tools/WPA_MainView.png){#fig:WPA_MainView width=100% }
 
 Next comes the *Generic Events* view, which displays such events like mouse clicks and captured screenshots. Remember that we enabled interception of those events in the ETWController window. Because events are placed on the timeline, it is easy to correlate UI interactions with how the system reacts to them.
@@ -90,7 +92,7 @@ The bottom Graph *CPU Usage (Precise)* uses different source of data than *Sampl
 
 Now that we have familiarized ourselves with the WPA interface, let's observe the charts. First, we can find the `MouseButton` events 63 and 64 on the timeline. ETWController saves all the screenshots taken during collection in a newly created folder. The profiling data itself is saved in the file named `SlowProcessStart.etl` and there is a new folder named `SlowProcessStart.etl.Screenshots`. This folder contains the screenshots and a `Report.html` file that you can view in a web browser. Every recorded keyboard/mouse interaction is saved in a file with the event number in its name, e.g., `Screenshot_63.jpg`. Figure @fig:ETWController_ClickScreenshot (cropped) displays the mouse double-click (events 63 and 64). The mouse pointer position is marked as a green square, except if a click event did occur, then it is red. This makes it easy to spot when and where a mouse click was performed.
 
-![A mouse click screenshot captured with ETWController.](../../img/perf-tools/ETWController_ClickScreenshot.png){#fig:ETWController_ClickScreenshot width=60% }
+![A mouse click screenshot captured with ETWController.](../../img/perf-tools/ETWController_ClickScreenshot.png){#fig:ETWController_ClickScreenshot width=70% }
 
 The double click marks the beginning of a 1.2 seconds delay when our application was waiting for something. At timestamp `35.1`, `explorer.exe` is active as it attempts to launch the new application. But then it wasn't doing much work and the application didn't start. Instead, `MsMpEng.exe` takes over the execution up until the time `35.7`. So far, it looks like an antivirus scan before the downloaded executable is allowed to start. But we are not 100% sure that `MsMpEng.exe` is blocking the start of a new application.
 

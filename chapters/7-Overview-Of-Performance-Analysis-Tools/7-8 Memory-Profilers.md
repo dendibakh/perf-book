@@ -21,7 +21,7 @@ RSS: 100K + 400K + 1000K = 1500K
 
 Developers can observe both RSS and VSZ on Linux with a standard `top` utility, however, both metrics can change very rapidly. Luckily, some tools can record and visualize memory usage over time. Figure @fig:MemoryUsageAIBench shows the memory usage of the PSPNet image segmentation algorithm, which is a part of the [AI Benchmark Alpha](https://ai-benchmark.com/alpha.html).[^5] This chart was created based on the output of a tool called [memory_profiler](https://github.com/pythonprofilers/memory_profiler)[^6], a Python library built on top of the cross-platform [psutil](https://github.com/giampaolo/psutil)[^7] package.
 
-![RSS and VSZ memory utilization of AI_bench PSPNet image segmentation.](../../img/memory-access-opts/MemoryUsageAIBench.png){#fig:MemoryUsageAIBench width=90%}
+![RSS and VSZ memory utilization of AI_bench PSPNet image segmentation.](../../img/memory-access-opts/MemoryUsageAIBench.png){#fig:MemoryUsageAIBench width=100%}
 
 In addition to standard RSS and VSZ metrics, people have developed a few more sophisticated metrics. Since RSS includes both the memory that is unique to the process and the memory shared with other processes, it's not clear how much memory a process has for itself. The USS (Unique Set Size) is the memory that is unique to a process and which would be freed if the process was terminated right now. The PSS (Proportional Set Size) represents unique memory plus the amount of shared memory, evenly divided between the processes that share it. E.g. if a process has 10 MB all to itself (USS) and 10 MBs shared with another process, its PSS will be 15 MBs. The `psutil` library supports measuring these metrics (Linux-only), which can be visualized by `memory_profiler`. 
 
@@ -53,17 +53,17 @@ Figure @fig:StockfishSummary shows us a summary view of the Stockfish memory pro
 - Almost half of all the allocation calls come from `operator new`, which are all temporary allocations. Can we get rid of temporary allocations?
 - Leaked memory is not a concern for this case study.
 
-![Stockfish memory profile with Heaptrack, summary view.](../../img/memory-access-opts/StockfishSummary.png){#fig:StockfishSummary width=90%}
+![Stockfish memory profile with Heaptrack, summary view.](../../img/memory-access-opts/StockfishSummary.png){#fig:StockfishSummary width=100%}
 
 Notice, that there are many tabs on the top of the image; next, we will explore some of them. Figure @fig:StockfishMemUsage shows the memory usage of the Stockfish built-in benchmark. The memory usage stays constant at 200 MB throughout the entire run of the program. Total consumed memory is broken into slices, e.g., regions 1 and 2 on the image. Each slice corresponds to a particular allocation. Interestingly, it was not a single big 182 MB allocation that was done through `Stockfish::std_aligned_alloc` as we thought earlier. Instead, there are two: slice \circled{1} 134.2 MB and slice \circled{2} 48.4 MB. Though both allocations stay alive until the very end of the benchmark. 
 
-![Stockfish memory profile with Heaptrack, memory usage over time stays constant.](../../img/memory-access-opts/Stockfish_consumed.png){#fig:StockfishMemUsage width=80%}
+![Stockfish memory profile with Heaptrack, memory usage over time stays constant.](../../img/memory-access-opts/Stockfish_consumed.png){#fig:StockfishMemUsage width=90%}
 
 Does it mean that there are no memory allocations after the startup phase? Let's find out. Figure @fig:StockfishAllocations shows the accumulated number of allocations over time. Similar to the consumed memory chart (Figure @fig:StockfishMemUsage), allocations are sliced according to the accumulated number of memory allocations attributed to each function. As we can see, new allocations keep coming from not just a single place, but many. The most frequent allocations are done through `operator new` that corresponds to region \circled{1} on the image.
 
 Notice, there are new allocations at a steady pace throughout the life of the program. However, as we just saw, memory consumption doesn't change; how is that possible? Well, it can be possible if we deallocate previously allocated buffers and allocate new ones of the same size (also known as *temporary allocations*).
 
-![Stockfish memory profile with Heaptrack, the number of allocations is growing.](../../img/memory-access-opts/Stockfish_allocations.png){#fig:StockfishAllocations width=80%}
+![Stockfish memory profile with Heaptrack, the number of allocations is growing.](../../img/memory-access-opts/Stockfish_allocations.png){#fig:StockfishAllocations width=90%}
 
 Since the number of allocations is growing but the total consumed memory doesn't change, we are dealing with temporary allocations. Let's find out where in the code they are coming from. It is easy to do with the help of a flame graph shown in Figure @fig:StockfishFlamegraph. There are 4800 temporary allocations in total with 90.8% of those coming from `operator new`. Thanks to the flame graph we know the entire call stack that leads to 4360 temporary allocations. Interestingly, those temporary allocations are initiated by `std::stable_sort` which allocates a temporary buffer to do the sorting. One way to get rid of those temporary allocations would be to use an in-place stable sorting algorithm. However, by doing so we observed an 8% drop in performance, so we discarded this change.
 

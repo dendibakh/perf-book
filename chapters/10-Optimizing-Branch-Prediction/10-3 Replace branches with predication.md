@@ -22,14 +22,14 @@ For the code on the right, the compiler can replace the branch that comes from t
 Listing: Predicating branches - x86 assembly code.
 
 ~~~~ {#lst:PredicatingBranchesAsm .bash}
-# original version                  # branchless version
-400504: test edi,edi                400537: mov eax,0x0
-400506: je 400514                   40053c: call <computeX> # compute x; a = x
-400508: mov eax,0x0                 400541: mov ebp,eax     # ebp = x
-40050d: call <computeX>      =>     400543: mov eax,0x0
-400512: jmp 40051e                  400548: call <computeY> # compute y; a = y
-400514: mov eax,0x0                 40054d: test ebx,ebx    # test cond
-400519: call <computeY>             40054f: cmovne eax,ebp  # override a with x if needed
+# original version              # branchless version
+400504: test edi,edi            400537: mov eax,0x0
+400506: je 400514               40053c: call <computeX> # compute x; a = x
+400508: mov eax,0x0             400541: mov ebp,eax     # ebp = x
+40050d: call <computeX>    =>   400543: mov eax,0x0
+400512: jmp 40051e              400548: call <computeY> # compute y; a = y
+400514: mov eax,0x0             40054d: test ebx,ebx    # test cond
+400519: call <computeY>         40054f: cmovne eax,ebp  # override a with x if needed
 40051e: mov edi,eax
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

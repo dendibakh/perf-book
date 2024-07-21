@@ -11,8 +11,8 @@ Figure @fig:FunctionGrouping gives a graphical representation of reordering hot 
 We can rearrange the order of the functions such that hot functions are placed close to each other (see Figure @fig:FuncGroup_better). In the improved version, the code of `foo`, `bar` and `zoo` functions fits in three cache lines. Also, notice that function `zoo` now is placed between `foo` and `bar` according to the order in which function calls are being made. When we call `zoo` from `foo`, the beginning of `zoo` is already in the I-cache.
 
 <div id="fig:FunctionGrouping">
-![default layout](../../img/cpu_fe_opts/FunctionGrouping_Default.png){#fig:FuncGroup_default width=40%}
-![improved layout](../../img/cpu_fe_opts/FunctionGrouping_Better.png){#fig:FuncGroup_better width=40%}
+![default layout](../../img/cpu_fe_opts/FunctionGrouping_Default.png){#fig:FuncGroup_default width=50%}
+![improved layout](../../img/cpu_fe_opts/FunctionGrouping_Better.png){#fig:FuncGroup_better width=50%}
 
 Reordering hot functions.
 </div>

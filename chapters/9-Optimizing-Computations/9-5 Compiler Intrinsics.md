@@ -8,6 +8,8 @@ There are types of applications that have hotspots worth tuning heavily. However
 
 Hopefully, it's possible to force the compiler to generate particular assembly instructions without writing in low-level assembly language. To achieve that, one can use compiler intrinsics, which in turn are translated into specific assembly instructions. Intrinsics provide the same benefit as using inline assembly, but also they improve code readability, allow compiler type checking, assist instruction scheduling, and help reduce debugging. Example in [@lst:Intrinsics] shows how the same loop in function `foo` can be coded via compiler intrinsics (function `bar`).
 
+[TODO]: This is not a reduction, but a summing of elements. Rewrite this example. Change caption to "Summing elements of an array using compiler intrinsics."
+
 Listing: Compiler Intrinsics
 		
 ~~~~ {#lst:Intrinsics .cpp .numberLines}

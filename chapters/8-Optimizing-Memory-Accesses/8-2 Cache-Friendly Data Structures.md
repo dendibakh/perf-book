@@ -68,7 +68,7 @@ struct S {                               struct S {
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-![Avoid compiler padding by rearranging the fields. Blank cells represent compiler padding.](../../img/memory-access-opts/AvoidPadding.png){#fig:AvoidPadding width=80%}
+![Avoid compiler padding by rearranging the fields. Blank cells represent compiler padding.](../../img/memory-access-opts/AvoidPadding.png){#fig:AvoidPadding width=90%}
 
 [TODO]: maybe say a few words about Pointer tagging.
 
@@ -85,16 +85,15 @@ We can make the `Soldier` struct more cache-friendly by reordering the fields as
 Listing: Field Reordering.
 
 ~~~~ {#lst:FieldReordering .cpp}
-struct Soldier {                                   struct Soldier {
-  2DCoords coords;   /*  8 bytes */                  unsigned attack;  // 1. battle
-  unsigned attack;                                   unsigned defense; // 1. battle
-  unsigned defense;                     =>           unsigned health;  // 1. battle
-  /* other fields */ /* 64 bytes */                  2DCoords coords;  // 2. move
-  unsigned speed;                                    unsigned speed;   // 2. move
-  unsigned money;                                    // other fields
-  unsigned health;                                   unsigned money;   // 3. trade
-};                                                  };
-
+struct Soldier {                                 struct Soldier {
+  2DCoords coords;   /*  8 bytes */                unsigned attack;  // 1. battle
+  unsigned attack;                                 unsigned defense; // 1. battle
+  unsigned defense;                     =>         unsigned health;  // 1. battle
+  /* other fields */ /* 64 bytes */                2DCoords coords;  // 2. move
+  unsigned speed;                                  unsigned speed;   // 2. move
+  unsigned money;                                  // other fields
+  unsigned health;                                 unsigned money;   // 3. trade
+};                                                };
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Since Linux kernel 6.8, there is a new functionality in the `perf` tool that allows you to find data structure reordering opportunities. The `perf mem record` command can now be used to profile data structure access patterns. The `perf annotate --data-type` command will show you the data structure layout along with profiling samples attributed to each field of the data structure. Using this information you can identify fields that are accessed together.[^5]
@@ -108,16 +107,16 @@ To close the topic of cache-friendly data structures, we will briefly mention tw
 Listing: Structure Splitting.
 
 ~~~~ {#lst:StructureSplitting .cpp}
-struct Point {                                   struct PointCoords {
-  int X;                                           int X;
-  int Y;                                           int Y;
-  int Z;                                           int Z;
-  /*many other fields*/              =>          };
-};                                               struct PointInfo {
-std::vector<Point> points;                         /*many other fields*/
-                                                 };
-                                                 std::vector<PointCoords> pointCoords;
-                                                 std::vector<PointInfo> pointInfos;
+struct Point {                                struct PointCoords {
+  int X;                                        int X;
+  int Y;                                        int Y;
+  int Z;                                        int Z;
+  /*many other fields*/            =>         };
+};                                            struct PointInfo {
+std::vector<Point> points;                      /*many other fields*/
+                                              };
+                                              std::vector<PointCoords> pointCoords;
+                                              std::vector<PointInfo> pointInfos;
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 **Pointer inlining**. Inlining a pointer into a structure can improve cache utilization. For example, if you have a structure that contains a pointer to another structure, you can inline the pointer into the first structure. This way, you can avoid an additional memory access to fetch the second structure. An example of pointer inlining is shown in [@lst:PointerInlining]. The `weight` parameter is used in many graph algorithms, and thus, it is frequently accessed. However, in the original version on the left, retrieving the edge weight requires an additional memory access, which can result in a cache miss. By inlining the `weight` parameter into the `GraphEdge` structure, we avoid such issues.
@@ -125,16 +124,16 @@ std::vector<Point> points;                         /*many other fields*/
 Listing: Pointer inlining in a structure.
 
 ~~~~ {#lst:PointerInlining .cpp}
-struct GraphEdge {                               struct GraphEdge {
-  unsigned int from;                               unsigned int from;
-  unsigned int to;                                 unsigned int to;
-  GraphEdgeProperties* prop;                       float weight;
-};                                   =>            GraphEdgeProperties* prop;
-struct GraphEdgeProperties {                     };
-  float weight;                                  struct GraphEdgeProperties {
-  std::string label;                               std::string label;
-  // ...                                           // ...
-};                                               };
+struct GraphEdge {                            struct GraphEdge {
+  unsigned int from;                            unsigned int from;
+  unsigned int to;                              unsigned int to;
+  GraphEdgeProperties* prop;                    float weight;
+};                                 =>           GraphEdgeProperties* prop;
+struct GraphEdgeProperties {                  };
+  float weight;                               struct GraphEdgeProperties {
+  std::string label;                            std::string label;
+  // ...                                        // ...
+};                                            };
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Data-type profiling is very effective at finding opportunities to improve cache utilization. Recent Linux kernel history contains many examples of commits that reorder structures,[^1] pad fields,[^3] or pack[^2] them to improve performance.

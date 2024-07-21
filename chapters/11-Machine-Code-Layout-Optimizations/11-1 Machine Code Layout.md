@@ -1,9 +1,3 @@
----
-typora-root-url: ..\..\img
----
-
-[TODO]: Describe how to measure code footprint
-
 # Machine Code Layout Optimizations {#sec:secFEOpt}
 
 The CPU Front-End (FE) is responsible for fetching and decoding instructions and delivering them to the out-of-order Back-End. As the newer processors get more execution "horsepower", CPU FE needs to be as powerful to keep the machine balanced. If the FE cannot keep up with supplying instructions, the BE will be underutilized, and the overall performance will suffer. That's why the FE is designed to always run well ahead of the actual execution to smooth out any hiccups that may occur and always have instructions ready to be executed. For example, Intel Skylake, released in 2016, can fetch up to 16 instructions per cycle.
@@ -21,18 +15,18 @@ When a compiler translates source code into machine code, it generates a linear 
 Listing: Example of machine code layout
 
 ~~~~ {#lst:MachineCodeLayout .cpp}
-  C++ Code        Assembly Listing      Disassembled Machine Code
-  ........        ................      ......................... 
-if (a <= b)   │    ; a is in edi     │  401125 cmp esi, edi
-  bar();      │    ; b is in esi     │  401128 jb 401131
-else          │    cmp esi, edi      │  40112a call bar
-  baz();      │    jb .label1        │  40112f jmp 401136
-              │    call bar()        │  401131 call baz
-              │    jmp .label2       │  401136 ...
-              │  .label1:            │
-              │    call baz()        │
-              │  .label2:            │
-              │    ...               │
+  C++ Code      │    Assembly Listing     │    Disassembled Machine Code
+  ........      │    ................     │    ......................... 
+if (a <= b)     │     ; a is in edi       │    401125 cmp esi, edi
+  bar();        │     ; b is in esi       │    401128 jb 401131
+else            │     cmp esi, edi        │    40112a call bar
+  baz();        │     jb .label1          │    40112f jmp 401136
+                │     call bar()          │    401131 call baz
+                │     jmp .label2         │    401136 ...
+                │   .label1:              │
+                │     call baz()          │
+                │   .label2:              │
+                │     ...                 │
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The way code is placed in a binary is called *machine code layout*. Note that for the same program, it's possible to lay out the code in many different ways. For the code in [@lst:MachineCodeLayout], compiler may decide to reverse the branch in such a way that a call to `baz` will come first. Also, bodies of the functions `bar` and `baz` can be placed in two different orders: we can place `bar` first in the binary and then `baz` or reverse the order. This affects offsets at which instructions will be placed in memory, which in turn may affect the performance of the generated binary as you will see later. In the following sections of this chapter, we will take a look at some typical optimizations for the machine code layout.

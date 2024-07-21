@@ -13,11 +13,11 @@ void benchmark_func(int* a) {    │ 00000000004046a0 <_Z14benchmark_funcPi>:
   for (int i = 0; i < 32; ++i)   │ 4046a0: mov rax,0xffffffffffffff80
     a[i] += 1;                   │ 4046a7: vpcmpeqd ymm0,ymm0,ymm0
 }                                │ 4046ab: nop DWORD [rax+rax+0x0]
-                                 │ 4046b0: vmovdqu ymm1,YMMWORD [rdi+rax+0x80] # loop begins
+                                 │ 4046b0: vmovdqu ymm1,[rdi+rax+0x80] # loop begins
                                  │ 4046b9: vpsubd ymm1,ymm1,ymm0
-                                 │ 4046bd: vmovdqu YMMWORD [rdi+rax+0x80],ymm1
+                                 │ 4046bd: vmovdqu [rdi+rax+0x80],ymm1
                                  │ 4046c6: add rax,0x20
-                                 │ 4046ca: jne 4046b0                          # loop ends
+                                 │ 4046ca: jne 4046b0                  # loop ends
                                  │ 4046cc: vzeroupper 
                                  │ 4046cf: ret 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -27,9 +27,9 @@ The code itself is pretty reasonable, but its layout is not perfect (see Figure 
 To fix this, we can shift the loop instructions forward by 16 bytes using NOPs so that the whole loop will reside in one cache line. Figure @fig:Loop_better shows the effect of doing this with NOP instructions highlighted in blue. Interestingly, the performance impact is visible even you run nothing but this hot loop in a microbenchmark. It is somewhat puzzling since the amount of code is tiny and it shouldn't saturate the L1I-cache size on any modern CPU. The reason for the better performance of the layout in Figure @fig:Loop_better is not trivial to explain and will involve a fair amount of microarchitectural details, which we don't discuss in this book. Interested readers can find more information in the article "[Code alignment issues](https://easyperf.net/blog/2018/01/18/Code_alignment_issues)" on the easyperf blog.[^1]
 
 <div id="fig:LoopLayout">
-![default layout](../../img/cpu_fe_opts/LoopAlignment_Default.png){#fig:Loop_default width=82%}
+![default layout](../../img/cpu_fe_opts/LoopAlignment_Default.png){#fig:Loop_default width=90%}
 
-![improved layout](../../img/cpu_fe_opts/LoopAlignment_Better.png){#fig:Loop_better width=82%}
+![improved layout](../../img/cpu_fe_opts/LoopAlignment_Better.png){#fig:Loop_better width=90%}
 
 Two different code layouts for the loop in [@lst:LoopAlignment].
 </div>

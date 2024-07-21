@@ -10,7 +10,7 @@ Major CPU vendors provide a set of additional features to enhance performance an
 
 Similar to Last Branch Record, PEBS is used while profiling the program to capture additional data with every collected sample. When a performance counter is configured for PEBS, the processor saves the set of additional data, which has a defined format and is called the PEBS record. The format of a PEBS record for Intel Skylake CPU is shown in Figure @fig:PEBS_record. The record contains the state of general-purpose registers (`EAX`, `EBX`, `ESP`, etc.), `EventingIP`, `Data Linear Address`, and `Latency value`, which will discuss later. The content layout of a PEBS record varies across different microarchitectures, see [@IntelOptimizationManual, Volume 3B, Chapter 20 Performance Monitoring].
 
-![PEBS Record Format for 6th Generation, 7th Generation and 8th Generation Intel Core Processor Families. *© Image from [@IntelOptimizationManual, Volume 3B, Chapter 20].*](../../img/pmu-features/PEBS_record.png){#fig:PEBS_record width=90%}
+![PEBS Record Format for 6th Generation, 7th Generation and 8th Generation Intel Core Processor Families. *© Image from [@IntelOptimizationManual, Volume 3B, Chapter 20].*](../../img/pmu-features/PEBS_record.png){#fig:PEBS_record width=100%}
 
 Since Skylake, the PEBS record has been enhanced to collect XMM registers and LBR records. The format has been restructured where fields are grouped into Basic group, Memory group, GPR group, XMM group, and LBR group. Performance profiling tools have the option to select data groups of interest and thus reduce the record size in memory and record generation latency. By default, the PEBS record will only contain the Basic group.
 
@@ -99,9 +99,9 @@ The problem with the skid is mitigated by having the processor itself store the 
 Listed below are precise events for the Intel Skylake Microarchitecture:
 
 ```
-INST_RETIRED.*          OTHER_ASSISTS.*      BR_INST_RETIRED.*       BR_MISP_RETIRED.*
-FRONTEND_RETIRED.*      HLE_RETIRED.*        RTM_RETIRED.*           MEM_INST_RETIRED.*
-MEM_LOAD_RETIRED.*      MEM_LOAD_L3_HIT_RETIRED.*
+INST_RETIRED.*        OTHER_ASSISTS.*    BR_INST_RETIRED.*     BR_MISP_RETIRED.*
+FRONTEND_RETIRED.*    HLE_RETIRED.*      RTM_RETIRED.*         MEM_INST_RETIRED.*
+MEM_LOAD_RETIRED.*    MEM_LOAD_L3_HIT_RETIRED.*
 ```
 
 , where `.*` means that all sub-events inside a group can be configured as precise events.

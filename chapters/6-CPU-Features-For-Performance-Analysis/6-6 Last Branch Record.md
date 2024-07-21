@@ -229,7 +229,7 @@ The example of such chart is shown in Figure @fig:LBR_timing_BB. It was compiled
 
 ![Probability density chart for latency of the basic block that starts at address `0x400618`.](../../img/pmu-features/LBR_timing_BB.png){#fig:LBR_timing_BB width=90%}
 
-We could clearly see two humps: a small one around 80 cycles \circled{1} and two bigger ones at 280 and 305 cycles \circled{2}. The block has a non-sequential load from a large array that doesn’t fit in CPU L3 cache, so the latency of the basic block largely depends on this load. Based on the chart we can conclude that the first spike \circled{1} corresponds to the L3 cache hit and the second spike \circled{2} corresponds to L3 cache miss where the load request goes all the way down to the main memory.
+We could clearly see two humps: a small one around 80 cycles \circled{1} and two bigger ones at 280 and 305 cycles \circled{2}. The block has a random load from a large array that doesn’t fit in CPU L3 cache, so the latency of the basic block largely depends on this load. Based on the chart we can conclude that the first spike \circled{1} corresponds to the L3 cache hit and the second spike \circled{2} corresponds to L3 cache miss where the load request goes all the way down to the main memory.
 
 This information can be used for a fine-grained tuning of this basic block. This example might benefit from memory prefetching, which we will discuss in [@sec:memPrefetch]. Also, cycle count information can be used for timing loop iterations, where every loop iteration ends with a taken branch (back edge).
 

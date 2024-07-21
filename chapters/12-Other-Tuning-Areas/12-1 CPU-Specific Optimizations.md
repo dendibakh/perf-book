@@ -94,15 +94,16 @@ You may think: "But wait, multiplications do not depend on each other." Yes, you
 
 ```
 # ran on Intel Core i7-1260P (Alderlake)
-$ sudo ./kernel-nanoBench.sh -f -unroll 1000 │ $ sudo ./kernel-nanoBench.sh -f -unroll 1000
- -loop 100 -basic -warm_up_count 10 -asm "   │  -loop 100 -basic -warm_up_count 10 -asm "
-vmovss xmm1, dword ptr [R14];                │ vmovss xmm1, dword ptr [R14];
-vfmadd231ss xmm0, xmm1, xmm1;"               │ vmulss xmm1, xmm1, xmm1;
--asm_init "<not shown>"                      │ vaddss xmm0, xmm0, xmm1;"
-                                             │ -asm_init "<not shown>"
-Instructions retired: 2.00                   │ 
-Core cycles: 4.00                            │ Instructions retired: 3.00
-                                             │ Core cycles: 2.00
+$ sudo ./kernel-nanoBench.sh -f -basic │ $ sudo ./kernel-nanoBench.sh -f -basic
+ -loop 100 -unroll 1000                │  -loop 100 -unroll 1000 
+ -warm_up_count 10 -asm "              |  -warm_up_count 10 -asm "
+vmovss xmm1, dword ptr [R14];          │ vmovss xmm1, dword ptr [R14];
+vfmadd231ss xmm0, xmm1, xmm1;"         │ vmulss xmm1, xmm1, xmm1;
+-asm_init "<not shown>"                │ vaddss xmm0, xmm0, xmm1;"
+                                       │ -asm_init "<not shown>"
+Instructions retired: 2.00             │ 
+Core cycles: 4.00                      │ Instructions retired: 3.00
+                                       │ Core cycles: 2.00
 ```
 
 The version on the left runs in four cycles per iteration, which corresponds to the FMA latency. However, on the right-hand side, `vmulss` instructions do not depend on each other, so they can be run in parallel. Still, there is a loop carry dependency over `xmm0` in the `vaddss` instruction (`FADD`). But the latency of FADD is only two cycles, this is why the version on the right runs in just four cycles per iteration. The latency and throughput characteristics for other processors may vary.

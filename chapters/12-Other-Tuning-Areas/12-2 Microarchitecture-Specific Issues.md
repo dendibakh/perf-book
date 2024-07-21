@@ -13,21 +13,22 @@ For each pixel on an image, you need to read the current histogram count of the 
 Listing: Memory Order Violation Example.
 
 ~~~~ {#lst:MemOrderViolation .cpp}
-std::array<uint32_t, 256> hist;                    std::array<uint32_t, 256> hist1;
-hist.fill(0);                                      std::array<uint32_t, 256> hist2;
-for (int i = 0; i < width * height; ++i)     =>    hist1.fill(0);
-  hist[image[i]]++;                                hist2.fill(0);
-                                                   int i = 0;
-                                                   for (; i + 1 < width * height; i += 2) {
-                                                     hist1[image[i+0]]++;
-                                                     hist2[image[i+1]]++;
-                                                   }
-                                                   // remainder
-                                                   for (; i < width * height; ++i)
-                                                     hist1[image[i]]++;
-                                                   // combine partial histograms
-                                                   for (int i = 0; i < hist1.size(); ++i)
-                                                     hist1[i] += hist2[i];
+std::array<uint32_t, 256> hist;           std::array<uint32_t, 256> hist1;
+hist.fill(0);                             std::array<uint32_t, 256> hist2;
+int N = width * height;                   hist1.fill(0);         
+for (int i = 0; i < N; ++i)       =>      hist2.fill(0);
+  hist[image[i]]++;                       int N = width * height;         
+                                          int i = 0;
+                                          for (; i + 1 < N; i += 2) {
+                                            hist1[image[i+0]]++;
+                                            hist2[image[i+1]]++;
+                                          }
+                                          // remainder
+                                          for (; i < N; ++i)
+                                            hist1[image[i]]++;
+                                          // combine partial histograms
+                                          for (int i = 0; i < hist1.size(); ++i)
+                                            hist1[i] += hist2[i];
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Recall from [@sec:uarchLSU], the processor doesn't necessarily knows about a potential store-to-load forwarding, so it has to make a prediction. If it correctly predicts a memory order violation between two updates of color `0xFF`, then these accesses will be serialized. The performance will not be great, but it is the best we could hope for with the initial code. On the contrary, if the processor predicts that there is no memory order violation, it will speculatively let the two updates run in parallel. Later it will recognize the mistake, flush the pipeline, and re-execute the youngest of the two updates. This is very hurtful for performance.

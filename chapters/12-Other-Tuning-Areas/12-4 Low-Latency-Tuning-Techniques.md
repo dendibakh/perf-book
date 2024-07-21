@@ -106,7 +106,7 @@ How do you detect TLB shootdowns in your multithreaded application? One simple w
 
 Listing: A dump of /proc/interrupts that shows a large number of TLB shootdowns on CPU2
 
-~~~~ {#lst:ProcInterrupts .bash}
+~~~~ {#lst:ProcInterrupts .cpp}
            CPU0       CPU1       CPU2       CPU3       
 ...
 NMI:          0          0          0          0   Non-maskable interrupts
