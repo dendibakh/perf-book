@@ -46,8 +46,6 @@ The value shown in brackets is the current setting. If this value is `always` (s
 
 When THP is enabled system-wide, huge pages are used automatically for normal memory allocations, without an explicit request from applications. Basically, to observe the effect of huge pages on their application, a user just need to enable system-wide THPs with `echo "always" | sudo tee /sys/kernel/mm/transparent_hugepage/enabled`. It will automatically launch a daemon process named `khugepaged` which starts scanning application’s memory space to promote regular pages to huge pages. Though sometimes the kernel may fail to promote regular pages into huge pages in case it cannot find a contiguous 2MB chunk of memory.
 
-[TODO]: on my system it looks like `khugepaged` doesn't do the work and a different behavior is in place: my application stalls on allocation failure and directly reclaim regular pages and promotes them into a THP immediately.
-
 System-wide THPs mode is good for quick experiments to check if huge pages can improve performance. It works automatically, even for applications that are not aware of THPs, so developers don't have to change the code to see the benefit of huge pages for their application.
 
 When hugepages are enabled system wide, applications may end up allocating much more memory resources. An application may mmap a large region but only touch 1 byte of it, in that case a 2M page might be allocated instead of a 4K page for no benefit. This is why it's possible to disable hugepages system-wide and to only have them inside MADV_HUGEPAGE madvise regions, which we will discuss next. Don't forget to disable system-wide THPs after you've finished your experiments as it may not benefit every application running on the system.

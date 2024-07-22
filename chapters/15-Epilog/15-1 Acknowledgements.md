@@ -42,6 +42,9 @@ Lally Singh
 
 \hfill \break
 
+Huge thanks to Yann Collet, the author of Zstd, for providing us with the information about the internal workings of Zstd for [@sec:ThreadCountScalingStudy].
+
+
 Also, I would like to thank the whole performance community for countless blog articles and papers. I was able to learn a lot from reading blogs by Travis Downs, Daniel Lemire, Andi Kleen, Agner Fog, Bruce Dawson, Brendan Gregg, and many others. I stand on the shoulders of giants, and the success of this book should not be attributed only to myself. This book is my way to thank and give back to the whole community.
 
 Last but not least, thanks to my family, who were patient enough to tolerate me missing weekend trips and evening walks. Without their support, I wouldn't have finished this book.

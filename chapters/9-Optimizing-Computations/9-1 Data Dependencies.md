@@ -1,6 +1,5 @@
 ## Data Dependencies
 
-[TODO]: One way to find loop-carry dependencies is to look at phi nodes of the loop in LLVM IR.
 [TODO]: Watch out for dependencies through memory (store -> load -> store -> ... in the same location).
 
 When a program statement refers to the data of a preceding statement, we say that there is a *data dependency* between the two statements. Sometimes people also use the terms _dependency chain_ or *data flow dependencies*. The example we are most familiar with is shown in Figure @fig:LinkedListChasing. To access node `N+1`, we should first dereference the pointer `N->next`. For the loop on the right, this is a *recurrent* data dependency, meaning it spans multiple iterations of the loop. Basically, traversing a linked list is one very long dependency chain.
@@ -13,9 +12,7 @@ When long data dependencies do come up, processors are forced to execute code se
 
 You cannot eliminate data dependencies, they are a fundamental property of programs. Any program takes an input to compute something. In fact, people have developed techniques to discover data dependencies among statements and build data flow graphs. This is called *dependence analysis* and is more appropriate for compiler developers, rather than performance engineers. We are not interested in building data flow graphs for the whole program. Instead, we want to find a critical dependency chain in a hot piece of code, such as a loop or function.
 
-You may wonder: "If you cannot get rid of dependency chains, what *can* you do?". Well, sometimes this will be a limiting factor for performance, and unfortunately, you will have to live with it. But there are cases where you can break unnecessary data dependency chains or overlap their execution. One such example is shown in [@lst:DepChain]. Similar to a few other cases, we present the source code on the left along with the corresponding ARM assembly on the right. Also, this code example is included in the Performance Ninja repository on GitHub, so you can try it yourself.
-
-[TODO]: add perf-ninja URL of the lab assignment
+You may wonder: "If you cannot get rid of dependency chains, what *can* you do?". Well, sometimes this will be a limiting factor for performance, and unfortunately, you will have to live with it. But there are cases where you can break unnecessary data dependency chains or overlap their execution. One such example is shown in [@lst:DepChain]. Similar to a few other cases, we present the source code on the left along with the corresponding ARM assembly on the right. Also, this code example is included in the `dep_chains_2`[^] lab assignment of the Performance Ninja online course, so you can try it yourself.
 
 This small program simulates random particle movement. We have 1000 particles moving on a 2D surface without constraints, which means they can go as far from their starting position as they want. Each particle is defined by its x and y coordinates on a 2D surface and speed. The initial x and y coordinates are in the range [-1000;1000] and the speed is in the range [0;1], which doesn't change. The program simulates 1000 movement steps for each particle. For each step, we use a random number generator (RNG) to produce an angle, which sets the movement direction for a particle. Then we adjust the coordinates of a particle accordingly.
 
@@ -29,8 +26,6 @@ We compiled the code using the Clang-17 C++ compiler and run it on a Mac mini (A
 * Finally, we have one more pair of `fmadd` instructions to calculate x and y respectively, and an `stp` instruction to store the pair of coordinates.
 
 We compiled the code using the Clang-17 C++ compiler and ran it on a Mac mini (Apple M1, 2020). You expect this code to "fly", however, there is one very nasty performance problem that slows down the program. Without looking ahead in the text, can you find a recurrent dependency chain in the code?
-
-[TODO]: this listing is too wide and doesn't fit the page.
 
 Listing: Random Particle Motion on a 2D Surface
 
@@ -122,3 +117,4 @@ The problem here is that the CPU simply cannot "see" the second dependency chain
 As a closing thought, we would like to emphasize the importance of finding that critical dependency chain. It is not always easy, but it is crucial to know what stands on the critical path in your loop, function, or other block of code. Otherwise, you may find yourself fixing secondary issues that barely make a difference.
 
 [^1]: Apple doesn't publish instruction latency and throughput for their products, but there are experiments that shed some light on it, one such study is here: [https://dougallj.github.io/applecpu/firestorm-simd.html](https://dougallj.github.io/applecpu/firestorm-simd.html). Since this is an unofficial source of data, you should take it with a grain of salt.
+[^2]: Performance Ninja: Dependency Chains 2 - [https://github.com/dendibakh/perf-ninja/tree/main/labs/core_bound/dep_chains_2](https://github.com/dendibakh/perf-ninja/tree/main/labs/core_bound/dep_chains_2)

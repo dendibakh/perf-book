@@ -57,11 +57,7 @@ The SPE sampling process is built in as part of the instruction execution pipeli
 
 Similar to Intel PEBS and AMD IBS, ARM SPE helps to reduce the sampling overhead and enables longer collections. In addition to that, it supports post-filtering of sample records, which helps to reduce the memory required for storage. 
 
-[TODO]: Linux perf driver for arm_spe should be installed first
-https://developer.arm.com/documentation/ka005362/latest/
-On Amazon Linux 2 and 2023, the SPE PMU is available by default on Graviton metal instances, you can check for its existence by verifying:
-https://github.com/aws/aws-graviton-getting-started/blob/main/perfrunbook/debug_hw_perf.md#capturing-statistical-profiling-extension-spe-hardware-events-on-graviton-metal-instances
-```$ sudo apt install linux-modules-extra-$(uname -r)```
+[TODO]: Linux perf driver for arm_spe should be installed first https://developer.arm.com/documentation/ka005362/latest/ On Amazon Linux 2 and 2023, the SPE PMU is available by default on Graviton metal instances, you can check for its existence by verifying: https://github.com/aws/aws-graviton-getting-started/blob/main/perfrunbook/debug_hw_perf.md#capturing-statistical-profiling-extension-spe-hardware-events-on-graviton-metal-instances `$ sudo apt install linux-modules-extra-$(uname -r)`
 
 SPE profiling is enabled in the Linux `perf` tool and can be used as follows:
 
@@ -73,8 +69,7 @@ $ spe-parser perf.data -t csv
 
 , where `<controls>` lets you optionally specify various controls and filters for the collection. `perf report` will give the usual output according to what user asked for with `<controls>` options. `spe-parser`[^5] is a tool developed by ARM engineers to parse the captured perf record data and save all the SPE records into a CSV file.
 
-[TODO]: Is it possible to use SPE on Windows on ARM? Can `WindowsPerf` collect SPE data that can be parsed by `spe-parser`?
-Not yet. ETA: September 2024
+[TODO]: Is it possible to use SPE on Windows on ARM? Can `WindowsPerf` collect SPE data that can be parsed by `spe-parser`? - Not yet. ETA: September 2024
 
 ### Precise Events
 
@@ -123,8 +118,6 @@ Memory accesses are a critical factor for the performance of many applications. 
 In PEBS, the feature that allows this to happen is called Data Address Profiling (DLA). To provide additional information about sampled loads and stores, it uses the `Data Linear Address` and `Latency Value` fields inside the PEBS facility (see Figure @fig:PEBS_record). If the performance event supports the DLA facility, and DLA is enabled, the processor will dump the memory address and latency of the sampled memory access. You can also filter memory accesses that have latency higher than a certain threshold. This is useful for finding long-latency memory accesses, which can be a performance bottleneck for many applications.
 
 With the IBS Execute and ARM SPE sampling, you can also do in-depth analysis of memory accesses performed by an application. One approach is to dump collected samples and process them manually. IBS saves the exact linear address, its latency, where the access was served from (cache or DRAM), and whether it hit or missed in the DTLB. SPE can be used to estimate latency and bandwidth of the memory subsystem components, estimate memory latencies of individual loads/stores, and more.
-
-[TODO]: refer to section that shows using `perf mem` in Chapter 8 as an example of using PEBS/IBS/SPE features.
 
 One of the most important use cases for these extensions is detecting True and False Sharing, which we will discuss in [@sec:TrueFalseSharing]. The Linux `perf c2c` tool heavily relies on all three mechanisms (PEBS, IBS and SPE) to find contested memory accesses, which could experience True/False sharing: it matches load/store addresses for different threads and checks if the hit occurs in a cache line modified by other threads.
 

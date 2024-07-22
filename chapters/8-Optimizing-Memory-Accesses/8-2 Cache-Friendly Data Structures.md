@@ -70,11 +70,7 @@ struct S {                               struct S {
 
 ![Avoid compiler padding by rearranging the fields. Blank cells represent compiler padding.](../../img/memory-access-opts/AvoidPadding.png){#fig:AvoidPadding width=90%}
 
-[TODO]: maybe say a few words about Pointer tagging.
-
 ### Field Reordering
-
-[TODO]: Search for a good example for a case study using `perf mem record && perf annotate --data-type`. 
 
 Reordering fields in a data structure can also be beneficial for another reason. Consider an example in [@lst:FieldReordering]. Suppose that the `Soldier` structure is used to track thousands of units on the battlefield of a game. The game has three phases: battle, movement, and trade. During the battle phase, the `attack`, `defense`, and `health` fields are accessed together. During the movement phase, the `coords`, and `speed` fields are accessed. During the trade phase, only the `money` field is accessed. 
 

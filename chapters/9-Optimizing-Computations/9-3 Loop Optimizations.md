@@ -29,15 +29,19 @@ for (int i = 0; i < N; ++i)             for (int i = 0; i < N; ++i) {
 Listing: Loop Unrolling
 
 ~~~~ {#lst:Unrol .cpp}
-for (int i = 0; i < N; ++i)             for (int i = 0; i+1 < N; i+=2) {
+                                        int i = 0;
+for (int i = 0; i < N; ++i)             for (; i+1 < N; i+=2) {
   a[i] = b[i] * c[i];          =>         a[i]   = b[i]   * c[i];
                                           a[i+1] = b[i+1] * c[i+1];
                                         }
+                                        // remainder (when N is odd)
+                                        for (; i < N; ++i)
+                                          a[i] = b[i] * c[i];
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The primary benefit of loop unrolling is to perform more computations per iteration. At the end of each iteration, the index value must be incremented, and tested, and the control is branched back to the top of the loop if it has more iterations to process. This work is commonly referred to as "loop overhead" or "loop tax", and it can be reduced. For example, by unrolling the loop in [@lst:Unrol] by a factor of 2, we reduce the number of executed compare and branch instructions by half.
 
-[TODO]: loop remainder
+[TODO]: describe loop remainder
 [TODO]: unrolling too much could have negative consequences due to code bloat
 
 Loop unrolling is a well-known optimization; still, many people are confused about it and try to unroll loops manually. We suggest that developers should not unroll any loop by hand except in cases when you need to break loop-carry dependencies as in [@lst:DepChain]. First, because compilers are very good at doing this and usually do loop unrolling quite optimally. The second reason is that processors have an "embedded unroller" thanks to their out-of-order speculative execution engine (see [@sec:uarch]). While the processor is waiting for long-latency instructions from the first iteration to finish (e.g. loads, divisions, microcoded instructions, long dependency chains), it will speculatively start executing instructions from the second iteration and only wait on loop-carried dependencies. This spans multiple iterations ahead, effectively unrolling the loop in the instruction Reorder Buffer (ROB).
@@ -99,6 +103,7 @@ for (int i = 0; i < N; i++)             for (int ii = 0; ii < N; ii+=8)
     a[i][j] += b[j][i];                   for (int i = ii; i < ii+8; i++)
                                            for (int j = jj; j < jj+8; j++)
                                             a[i][j] += b[j][i];
+                                        // remainder
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Loop Blocking is a widely known method of optimizing GEneral Matrix Multiplication (GEMM) algorithms. It enhances the cache reuse of memory accesses and improves both the memory bandwidth and memory latency of an algorithm.
@@ -132,6 +137,7 @@ for (int i = 0; i < N; i++)           for (int i = 0; i+1 < N; i+=2)
                                           diffs2 += a[i+1][j] - b[i+1][j];
                                         }
                                       diffs = diffs1 + diffs2;
+                                      // remainder
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Loop Unroll and Jam can be performed as long as there are no cross-iteration dependencies on the outer loops, in other words, two iterations of the inner loop can be executed in parallel. Also, this transformation makes sense if the inner loop has memory accesses that are strided on the outer loop index (`i` in this case), otherwise, other transformations likely apply better. Unroll and Jam is especially useful when the trip count of the inner loop is low, e.g., less than 4. By doing the transformation, we pack more independent operations into the inner loop, which increases the ILP.

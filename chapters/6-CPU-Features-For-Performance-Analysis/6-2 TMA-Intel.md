@@ -188,5 +188,4 @@ TMA is an iterative process, so once we fixed one problem, we need to repeat the
 [^7]: PMU tools - [https://github.com/andikleen/pmu-tools](https://github.com/andikleen/pmu-tools).
 [^8]: Case study example - [https://github.com/dendibakh/dendibakh.github.io/tree/master/_posts/code/TMAM](https://github.com/dendibakh/dendibakh.github.io/tree/master/_posts/code/TMAM).
 [^11]: According to x86 calling conventions ([https://en.wikipedia.org/wiki/X86_calling_conventions](https://en.wikipedia.org/wiki/X86_calling_conventions)), first 2 arguments land in `rdi` and `rsi` registers respectively.
-[TODO]: this line is outside of the page margins.
 [^17]: Alternatively, we could use `-l2 --nodes L1_Bound,L2_Bound,L3_Bound,DRAM_Bound,Store_Bound` option instead of `-l3` to limit the collection since we know the application is bound by memory.

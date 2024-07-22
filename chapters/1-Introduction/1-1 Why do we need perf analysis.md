@@ -42,9 +42,6 @@ Limitations described above leave the room for tuning the performance of our SW 
 
 Another important piece of SW that we will touch on a lot is a compiler. It's possible to obtain attractive speedups by making the compiler generate the desired machine code through various hints. You will find many such examples throughout the book. Luckily, most of the time, you don't have to be a compiler expert to drive performance improvements in your application. Majority of optimizations can be done at a source code level without the need to dig down into compiler sources. Although, understanding how the compiler works and how you can force it to do what you want is always advantageous in performance-related work.
 
-[TODO]: what value does this paragraph bring? Remove it?
-Also, nowadays, it's essential to enable applications to scale up by distributing them across many cores since single-threaded performance tends to reach a plateau. Such enabling calls for efficient communication between the threads of application, eliminating unnecessary consumption of resources and other issues typical for multi-threaded programs.
-
 It is important to mention that performance gains will not only come from tuning SW. According to [@Leisersoneaam9744], two other major sources of potential speedups in the future are algorithms (especially for new problem domains like machine learning) and streamlined hardware design. Algorithms obviously play a big role in the performance of an application, but we will not cover this topic in this book. We will not be discussing the topic of new hardware designs either since, most of the time, SW developers have to deal with existing HW. However, understanding modern CPU design is important for optimizing applications.
 
 > "During the post-Moore era, it will become ever more important to make code run fast and, in particular, to tailor it to the hardware on which it runs." [@Leisersoneaam9744]

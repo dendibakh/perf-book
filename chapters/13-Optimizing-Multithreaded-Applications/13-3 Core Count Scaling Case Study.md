@@ -1,10 +1,4 @@
-### Thread Count Scaling Case Study
-
-[TODO]: The traces in your graphs can be hard to distinguish from each other, especially blender and clang. Consider trying other forms of visual contrast than trace width and line style : other options include data point markers of different shape, trace color.
-
-[TODO]: (Maybe) Would be interesting to measure on a machine with something like 64 cores. It's often the case that code that scales nicely on a few cores hits contention bottleneck on 32+ cores.
-
-[TODO]: It'd be cool if the following pages graphed thread count vs *throughput* so the diagnostic ability of USL can be demo-ed.
+### Thread Count Scaling Case Study {#sec:ThreadCountScalingStudy}
 
 Thread count scaling is perhaps the most valuable analysis you can perform on a multithreaded application. It shows how well the application can utilize modern multicore systems. As you will see, there is a ton of information you can learn along the way. Without further introduction, let's get started. In this case study, we will analyze the thread count scaling of the following benchmarks, some of which should be already familiar to you from the previous chapters:
 
@@ -65,7 +59,7 @@ Next on our list is the Zstandard compression algorithm, or Zstd for short. When
 
 First of all, performance of Zstd depends on the compression level. The higher the compression level, the more compact the result. Lower compression levels provide faster compression, while higher levels yield better compression ratios. In our case study, we used compression level 3 (which is also the default level) since it provides a good trade-off between speed and compression ratio.
 
-Here is the high-level algorithm of Zstd compression:[^1]
+Here is the high-level algorithm of Zstd compression:
 
 * The input file is divided into blocks, whose size depends on the compression level. Each job is responsible for compressing a block of data. When Zstd receives some data to compress, it copies a small chunk into one of its internal buffers and posts a new compression job, which is picked up by one of the worker threads. The main thread fills all input buffers for all its workers and sends them to work in order.
 * Jobs are always started in order, but they can be finished in any order. Compression speed can be variable and depends on the data to compress. Some blocks are easier to compress than others.
@@ -164,7 +158,6 @@ To confirm that suboptimal scaling is a common case, rather than an exception, l
 
 In a latency-oriented application, you typically have a few performance-critical threads and the rest do background work that doesn't necessarily have to be fast. Many issues that we've discussed apply to latency-oriented applications as well. We covered some low-latency tuning techniques in [@sec:LowLatency].
 
-[^1]: Huge thanks to Yann Collet, the author of Zstd, for providing us with the information about the internal workings of Zstd. [TODO]: move to the acknowledgments section.
 [^2]: VTune ITT instrumentation - [https://www.intel.com/content/www/us/en/docs/vtune-profiler/user-guide/2023-1/instrumenting-your-application.html](https://www.intel.com/content/www/us/en/docs/vtune-profiler/user-guide/2023-1/instrumenting-your-application.html)
 [^3]: Glibc source code - [https://sourceware.org/git/?p=glibc.git;a=tree](https://sourceware.org/git/?p=glibc.git;a=tree)
 [^4]: Nogil - [https://github.com/colesbury/nogil](https://github.com/colesbury/nogil)

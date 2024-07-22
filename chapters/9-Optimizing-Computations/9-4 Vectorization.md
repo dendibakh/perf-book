@@ -2,8 +2,6 @@
 
 ## Vectorization {#sec:Vectorization}
 
-[TODO]: If you're hitting memory bandwidth, vectorization doesn't help you much.
-
 On modern processors, the use of SIMD instructions can result in a great speedup over regular un-vectorized (scalar) code. When doing performance analysis, one of the top priorities of the software engineer is to ensure that the hot parts of the code are vectorized. This section guides engineers toward discovering vectorization opportunities. For a recap on the SIMD capabilities of modern CPUs, readers can take a look at [@sec:SIMD].
 
 Often vectorization happens automatically without any user intervention, this is called autovectorization. In such a situation, a compiler automatically recognizes the opportunity to produce SIMD machine code from the source code. Autovectorization could be a convenient solution because modern compilers generate fast vectorized code for a wide variety of programs.

@@ -2,10 +2,10 @@
 
 1. Solve the following lab assignments using techniques we discussed in this chapter:
 - `perf-ninja::function_inlining_1` 
-- `perf-ninja::vectorization` 1 & 2
-- `perf-ninja::dep_chains` 1 & 2
-- `perf-ninja::compiler_intrinsics` 1 & 2
-- `perf-ninja::loop_interchange` 1 & 2
+- `perf-ninja::vectorization` 1 and 2
+- `perf-ninja::dep_chains` 1 and 2
+- `perf-ninja::compiler_intrinsics` 1 and 2
+- `perf-ninja::loop_interchange` 1 and 2
 - `perf-ninja::loop_tiling_1`
 2. Describe the steps you will take to find out if an application is using all the opportunities for utilizing SIMD code?
 3. Practice doing loop optimizations manually on a real code (but don't commit it). Make sure that all the tests are still passing.
