@@ -1,6 +1,4 @@
----
-typora-root-url: ..\..\img
----
+
 
 ## Function Splitting 
 

@@ -1,6 +1,4 @@
----
-typora-root-url: ..\..\img
----
+
 
 ## Measuring Performance in Production
 

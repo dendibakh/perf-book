@@ -1,6 +1,4 @@
----
-typora-root-url: ..\..\img
----
+
 
 ## Compiler Optimization Reports {#sec:compilerOptReports}
 

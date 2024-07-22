@@ -1,6 +1,4 @@
----
-typora-root-url: ..\..\img
----
+
 
 # Optimizing Branch Prediction {#sec:ChapterBadSpec}
 

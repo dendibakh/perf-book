@@ -1,6 +1,4 @@
----
-typora-root-url: ..\..\img
----
+
 
 # Performance Analysis Approaches {#sec:sec_PerfApproaches}
 

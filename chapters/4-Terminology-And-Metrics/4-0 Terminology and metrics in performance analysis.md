@@ -1,6 +1,4 @@
----
-typora-root-url: ..\..\img
----
+
 
 # Terminology and Metrics in Performance Analysis {#sec:secMetrics}
 

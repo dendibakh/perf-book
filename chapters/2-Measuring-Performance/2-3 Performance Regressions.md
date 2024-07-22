@@ -1,6 +1,4 @@
----
-typora-root-url: ..\..\img
----
+
 
 ## Automated Detection of Performance Regressions
 

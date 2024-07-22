@@ -1,6 +1,4 @@
----
-typora-root-url: ..\..\img
----
+
 
 ## Noise in Modern Systems {#sec:secFairExperiments}
 

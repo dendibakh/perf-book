@@ -1,6 +1,4 @@
----
-typora-root-url: ..\..\img
----
+
 
 ## The Roofline Performance Model {#sec:roofline}
 

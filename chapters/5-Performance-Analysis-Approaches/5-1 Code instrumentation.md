@@ -1,6 +1,4 @@
----
-typora-root-url: ..\..\img
----
+
 
 ## Code Instrumentation {#sec:secInstrumentation}
 

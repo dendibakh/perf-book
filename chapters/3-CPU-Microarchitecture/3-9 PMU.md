@@ -1,6 +1,4 @@
----
-typora-root-url: ..\..\img
----
+
 
 ## Performance Monitoring Unit {#sec:PMU}
 

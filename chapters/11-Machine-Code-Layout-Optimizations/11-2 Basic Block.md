@@ -1,6 +1,4 @@
----
-typora-root-url: ..\..\img
----
+
 
 ## Basic Block {#sec:BasicBlock}
 

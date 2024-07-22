@@ -1,6 +1,4 @@
----
-typora-root-url: ..\..\img
----
+
 
 ## Micro-ops {#sec:sec_UOP}
 

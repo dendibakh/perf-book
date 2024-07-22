@@ -1,6 +1,4 @@
----
-typora-root-url: ..\..\img
----
+
 
 ## Software and Hardware Timers {#sec:timers}
 

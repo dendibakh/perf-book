@@ -1,6 +1,4 @@
----
-typora-root-url: ..\..\img
----
+
 
 # Optimizing Memory Accesses {#sec:MemBound}
 

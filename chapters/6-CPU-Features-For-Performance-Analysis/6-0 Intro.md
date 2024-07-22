@@ -1,6 +1,4 @@
----
-typora-root-url: ..\..\img
----
+
 
 # CPU Features for Performance Analysis {#sec:PmuChapter}
 

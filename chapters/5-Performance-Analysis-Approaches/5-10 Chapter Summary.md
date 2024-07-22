@@ -1,6 +1,4 @@
----
-typora-root-url: ..\..\img
----
+
 
 ## Chapter Summary {#sec:secApproachesSummary .unlisted .unnumbered}
 

@@ -1,6 +1,4 @@
----
-typora-root-url: ..\..\img
----
+
 
 ## CPI and IPC {#sec:IPC}
 

@@ -1,6 +1,4 @@
----
-typora-root-url: ..\..\img
----
+
 
 ## Explicit Memory Prefetching {#sec:memPrefetch}
 

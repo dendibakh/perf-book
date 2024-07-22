@@ -1,6 +1,4 @@
----
-typora-root-url: ..\..\img
----
+
 
 # Part 1. Performance Analysis on a Modern CPU {.unnumbered}
 

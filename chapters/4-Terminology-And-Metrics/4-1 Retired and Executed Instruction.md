@@ -1,6 +1,4 @@
----
-typora-root-url: ..\..\img
----
+
 
 ## Retired vs. Executed Instruction
 

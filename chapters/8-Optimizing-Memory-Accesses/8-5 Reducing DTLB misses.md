@@ -1,6 +1,4 @@
----
-typora-root-url: ..\..\img
----
+
 
 ## Reducing DTLB Misses {#sec:secDTLB}
 

@@ -1,6 +1,4 @@
----
-typora-root-url: ..\..\img
----
+
 
 ## Workload Characterization {#sec:counting}
 

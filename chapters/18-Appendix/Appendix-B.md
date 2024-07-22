@@ -1,6 +1,4 @@
----
-typora-root-url: ..\..\img
----
+
 
 # Appendix B. The LLVM Vectorizer {.unnumbered}
 

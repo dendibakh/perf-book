@@ -1,6 +1,4 @@
----
-typora-root-url: ..\..\img
----
+
 
 ## Reducing ITLB Misses {#sec:FeTLB}
 

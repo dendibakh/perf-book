@@ -1,6 +1,4 @@
----
-typora-root-url: ..\..\img
----
+
 
 ## Pipeline Slot {#sec:PipelineSlot}
 

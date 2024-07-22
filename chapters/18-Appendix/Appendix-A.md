@@ -1,6 +1,4 @@
----
-typora-root-url: ..\..\img
----
+
 
 # Appendix A. Reducing Measurement Noise {.unnumbered}
 

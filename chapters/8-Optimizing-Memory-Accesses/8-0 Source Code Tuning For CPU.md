@@ -1,6 +1,4 @@
----
-typora-root-url: ..\..\img
----
+
 
 # Part 2. Source Code Tuning {.unnumbered}
 
