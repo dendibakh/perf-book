@@ -41,10 +41,13 @@ if verbose:
 
 pandoc_cmd = 'pandoc -N --file-scope --pdf-engine=xelatex --listings --include-in-header header.tex '
 if args.paperback:
+  pandoc_cmd = pandoc_cmd + "-V classoption=twoside "
   pandoc_cmd = pandoc_cmd + "-V geometry:paperwidth=169.90mm "
   pandoc_cmd = pandoc_cmd + "-V geometry:paperheight=244.10mm "
-  pandoc_cmd = pandoc_cmd + "-V geometry:left=2cm "
-  pandoc_cmd = pandoc_cmd + "-V geometry:right=2cm "
+  #pandoc_cmd = pandoc_cmd + "-V geometry:left=2cm "
+  #pandoc_cmd = pandoc_cmd + "-V geometry:right=2cm "
+  pandoc_cmd = pandoc_cmd + "-V geometry:inner=2.5cm "
+  pandoc_cmd = pandoc_cmd + "-V geometry:outer=1.5cm "  
   pandoc_cmd = pandoc_cmd + "-V geometry:top=2cm "
   pandoc_cmd = pandoc_cmd + "-V geometry:bottom=2cm "
   pandoc_cmd = pandoc_cmd + "-V fontsize:8pt "
