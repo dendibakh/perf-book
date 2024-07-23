@@ -36,7 +36,7 @@ When compiled for the SSE target, both `foo` and `bar` will generate similar ass
 
 When writing code using non-portable platform-specific intrinsics, developers should also provide a fallback option for other architectures. A list of all available intrinsics for the Intel platform can be found in this [reference](https://software.intel.com/sites/landingpage/IntrinsicsGuide/)[^11].
 
-### Wrapper Libraries for Intrinsics
+### Wrapper Libraries for Intrinsics {#sec:secIntrinsicLibraries}
 
 The write-once, target-many model of ISPC is appealing. However, we may wish for tighter integration into C++ programs, for example, interoperability with templates, or avoiding a separate build step and using the same compiler. Conversely, intrinsics offer more control, but at a higher development cost.
 
