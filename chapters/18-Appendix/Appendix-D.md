@@ -93,14 +93,13 @@ Decoding PT traces can take a long time. On an Intel Core i5-8259U machine, for 
 
 ## Intel PT References and links {.unnumbered .unlisted}
 
+[TODO]: include magic trace
+
 * Intel® 64 and IA-32 Architectures Software Developer Manuals [@IntelOptimizationManual, Volume 3C, Chapter 36].
 * Whitepaper "Hardware-assisted instruction profiling and latency detection" [@IntelPTPaper].
 * Andi Kleen article on LWN, URL: [https://lwn.net/Articles/648154](https://lwn.net/Articles/648154).
 * Intel PT Micro Tutorial, URL: [https://sites.google.com/site/intelptmicrotutorial/](https://sites.google.com/site/intelptmicrotutorial/).
-* simple_pt: Simple Intel CPU processor tracing on Linux, URL:
-  [https://github.com/andikleen/simple-pt/](https://github.com/andikleen/simple-pt).
-* Intel PT documentation in the Linux kernel, URL:
-  [https://github.com/torvalds/linux/blob/master/tools/perf/Documentation/intel-pt.txt](https://github.com/torvalds/linux/blob/master/tools/perf/Documentation/intel-pt.txt).
+* Intel PT documentation in the Linux kernel, URL: [https://github.com/torvalds/linux/blob/master/tools/perf/Documentation/intel-pt.txt](https://github.com/torvalds/linux/blob/master/tools/perf/Documentation/intel-pt.txt).
 * Cheatsheet for Intel Processor Trace, URL: [http://halobates.de/blog/p/410](http://halobates.de/blog/p/410).
 
 [^1]: See more information about Intel PT overhead in [@IntelPTPaper].

@@ -18,7 +18,7 @@ The throughput of a pipelined CPU is defined as the number of instructions that 
 
 In an ideal pipeline that is perfectly balanced and doesn’t incur any stalls, the time per instruction in the pipelined machine is given by 
 $$
-\textrm{Time per instruction on pipelined machine} = \frac{\textrm{Time per instruction on nonpipelined machine}}{\textrm{Number of pipe stages}}
+\textrm{Time per instruction on pipelined machine} = \frac{\textrm{Time per instr. on nonpipelined machine}}{\textrm{Number of pipe stages}}
 $$
 In real implementations, pipelining introduces several constraints that limit the ideal model shown above. Pipeline hazards prevent the ideal pipeline behavior, resulting in stalls. The three classes of hazards are structural hazards, data hazards, and control hazards. Luckily for the programmer, in modern CPUs, all classes of hazards are handled by the hardware.
 
