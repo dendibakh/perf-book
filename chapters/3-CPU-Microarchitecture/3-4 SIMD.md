@@ -21,9 +21,9 @@ Most of the popular CPU architectures feature vector instructions, including x86
 
 As the new instruction sets became available, work began to make them usable to software engineers. The software changes required to exploit SIMD instructions are known as *code vectorization*. Initially, SIMD instructions were programmed in assembly. Later, special compiler intrinsics, which are small functions providing a one-to-one mapping to SIMD instructions, were introduced. Today all the major compilers support autovectorization for the popular processors, i.e., they can generate SIMD instructions straight from high-level code written in C/C++, Java, Rust and other languages.
 
-[TODO]: explain the term "loop remainder"
-[TODO]: Maybe explain/introduce masking concept
-[TODO]: explain the term "SIMD lane"
+[TODO][FIX_BEFORE_REVIEW]: explain the term "loop remainder"
+[TODO][FIX_BEFORE_REVIEW]: Maybe explain/introduce masking concept
+[TODO][FIX_BEFORE_REVIEW]: explain the term "SIMD lane"
 
 To enable code to run on systems that support different vector lengths, Arm introduced the SVE instruction set. Its defining characteristic is the concept of *scalable vectors*: their length is unknown at compile time. With SVE, there is no need to port software to every possible vector length. Users don't have to recompile the source code of their applications to leverage wider vectors when they become available in newer CPU generations. Another example of scalable vectors is the RISC-V V extension (RVV), which was ratified in late 2021. Some implementations support quite wide (2048-bit) vectors, and up to eight can be grouped together to yield `16,384`-bit vectors, which greatly reduces the number of instructions executed. At each loop iteration, user code typically does `ptr += number_of_lanes`, where `number_of_lanes` is not known at compile time. ARM SVE provides special instructions for such length-dependent operations, while RVV enables a programmer to query/set the `number_of_lanes`.
 

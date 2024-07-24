@@ -29,7 +29,7 @@ void matmul(int N, float a[][2048], float b[][2048], float c[][2048]) {
 
 Traditional ways to speed up an application's performance is to fully utilize the SIMD and multicore capabilities of a machine. Often times, we need to optimize for many aspects: vectorization, memory, threading. Roofline methodology can assist in assessing these characteristics of your application. On a roofline chart, we can plot theoretical maximums for scalar single-core, SIMD single-core, and SIMD multicore performance (see Figure @fig:RooflineIntro2). This will give us an understanding of the scope for improving the performance of an application. If we found that our application is compute-bound (i.e., has high arithmetic intensity) and is below the peak scalar single-core performance, we should consider forcing vectorization (see [@sec:Vectorization]) and distributing the work among multiple threads. Conversely, if an application has low arithmetic intensity, we should seek ways to improve memory accesses (see [@sec:MemBound]). The ultimate goal of optimizing performance using the Roofline model is to move the points up. Vectorization and threading move the dot up while optimizing memory accesses by increasing arithmetic intensity will move the dot to the right and also likely improve performance.
 
-[TODO] improve caption of the image
+[TODO][FIX_BEFORE_REVIEW]: improve caption of the image
 
 ![Roofline model.](../../img/perf-analysis/Roofline-intro2.jpg){#fig:RooflineIntro2 width=70%}
 

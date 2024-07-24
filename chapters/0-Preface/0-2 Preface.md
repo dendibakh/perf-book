@@ -19,9 +19,9 @@ I remember the days when I was starting with performance analysis. I was staring
 
 Developers who consider themselves beginners in performance analysis can start from the beginning of the book and read sequentially, chapter by chapter. Chapters 2-4 give developers a minimal set of knowledge required by later chapters. Readers already familiar with these concepts may choose to skip those. Additionally, this book can be used as a reference or a checklist for optimizing SW applications. Developers can use chapters 7-11 as a source of ideas for tuning their code.
 
-[TODO]: what has changed from the first edition?
+[TODO][FIX_BEFORE_REVIEW]: what has changed from the first edition?
 
-[TODO]: add
+[TODO][FIX_BEFORE_REVIEW]: add
 \personal{While working at Intel, I hear the same story from time to time: when Intel clients experience slowness in their application, they immediately and unconsciously start blaming Intel for having slow CPUs. But when Intel sends one of our performance ninjas to work with them and help them improve their application, it is not unusual that they help speed it up by a factor of 2x, sometimes even 10x.}
 
 ## Target Audience {.unlisted .unnumbered}
@@ -30,6 +30,6 @@ This book will be primarily useful for software developers who work with perform
 
 Readers are expected to have a minimal background in C/C++ programming languages to understand the book's examples. The ability to read basic x86 assembly is desired but is not a strict requirement. The author also expects familiarity with basic concepts of computer architecture and operating systems like central processor, memory, process, thread, virtual and physical memory, context switch, etc. If any of the mentioned terms are new to you, I suggest studying this material first.
 
-[TODO]: errata
+[TODO]: put a link to an errata webpage 
 
 \sectionbreak

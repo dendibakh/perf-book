@@ -6,7 +6,7 @@ Another important metric which some performance tools use is the concept of a *p
 
 ![Pipeline diagram of a 4-wide CPU.](../../img/terms-and-metrics/PipelineSlot.jpg){#fig:PipelineSlot width=40% }
 
-[TODO]: update. Apple published that M1 has 8-wide allocation and M3 is 9-wide, see Table 4.10. μop Execution Bandwidth.
+[TODO][FIX_BEFORE_REVIEW]: update. Apple published that M1 has 8-wide allocation and M3 is 9-wide, see Table 4.10. μop Execution Bandwidth.
 
 Intel's Skylake and AMD Zen3 cores have 4-wide allocation. Intel's SunnyCove microarchitecture was a 5-wide design. As of 2023, most recent Goldencove and Zen4 architectures both have 6-wide allocation. Apple M1 design is not officially disclosed but is measured to be 8-wide.[^1]
 

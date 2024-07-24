@@ -41,8 +41,8 @@ for (int i = 0; i < N; ++i)             for (; i+1 < N; i+=2) {
 
 The primary benefit of loop unrolling is to perform more computations per iteration. At the end of each iteration, the index value must be incremented, and tested, and the control is branched back to the top of the loop if it has more iterations to process. This work is commonly referred to as "loop overhead" or "loop tax", and it can be reduced. For example, by unrolling the loop in [@lst:Unrol] by a factor of 2, we reduce the number of executed compare and branch instructions by half.
 
-[TODO]: describe loop remainder
-[TODO]: unrolling too much could have negative consequences due to code bloat
+[TODO][FIX_BEFORE_REVIEW]: describe loop remainder
+[TODO][FIX_BEFORE_REVIEW]: unrolling too much could have negative consequences due to code bloat
 
 Loop unrolling is a well-known optimization; still, many people are confused about it and try to unroll loops manually. We suggest that developers should not unroll any loop by hand except in cases when you need to break loop-carry dependencies as in [@lst:DepChain]. First, because compilers are very good at doing this and usually do loop unrolling quite optimally. The second reason is that processors have an "embedded unroller" thanks to their out-of-order speculative execution engine (see [@sec:uarch]). While the processor is waiting for long-latency instructions from the first iteration to finish (e.g. loads, divisions, microcoded instructions, long dependency chains), it will speculatively start executing instructions from the second iteration and only wait on loop-carried dependencies. This spans multiple iterations ahead, effectively unrolling the loop in the instruction Reorder Buffer (ROB).
 

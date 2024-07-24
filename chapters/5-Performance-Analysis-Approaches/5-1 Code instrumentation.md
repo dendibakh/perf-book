@@ -108,7 +108,7 @@ When talking about instrumentation, it's important to mention binary instrumenta
 
 Binary instrumentation is very useful in performance analysis and debugging. One of the most popular tools for binary instrumentation is the Intel [Pin](https://software.intel.com/en-us/articles/pin-a-dynamic-binary-instrumentation-tool)[^1] tool. Pin intercepts the execution of a program at the occurrence of an interesting event and generates new instrumented code starting at this point in the program. This enables the collecting of various runtime information, for example: 
 
-[TODO]: add discussion on SDE?
+[TODO][FIX_BEFORE_REVIEW]: add discussion on SDE?
 
 * instruction count and function call counts. 
 * intercepting function calls and execution of any instruction in an application.

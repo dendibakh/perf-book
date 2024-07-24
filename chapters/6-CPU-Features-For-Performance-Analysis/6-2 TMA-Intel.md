@@ -24,7 +24,7 @@ We ran the experiments on the machine equipped with Intel Core i5-8259U CPU (Sky
 
 As a first step, we run our microbenchmark and collect a limited set of events that will help us to calculate Level 1 metrics. Here, we try to identify high-level performance bottlenecks of our application by attributing them to the four L1 buckets: `Front End Bound`, `Back End Bound`, `Retiring`, `Bad Speculation`. It is possible to collect Level 1 metrics using Linux `perf` tool. As of Linux kernel 4.8, `perf` has an option `--topdown` used in `perf stat` command that prints TMA Level 1 metrics. Below is the breakdown for our benchmark. Command outputs in this section are trimmed to save space.
 
-[TODO]: on Alderlake, `perf stat --topdown` doesn't work on kernel 4.8, newer version is required. Also now it can print L1 and L2 TMA metrics. (see https://github.com/dendibakh/perf-book/issues/42)
+[TODO][FIX_BEFORE_REVIEW]: on Alderlake, `perf stat --topdown` doesn't work on kernel 4.8, newer version is required. Also now it can print L1 and L2 TMA metrics. (see https://github.com/dendibakh/perf-book/issues/42)
 
 ```bash
 $ perf stat --topdown -a -- taskset -c 0 ./benchmark.exe

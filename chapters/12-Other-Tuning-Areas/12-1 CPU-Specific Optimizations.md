@@ -65,7 +65,7 @@ Even though CPU dispatching is a runtime check, its overhead is not high. Develo
 
 ### Instruction Latencies and Throughput
 
-[TODO]: now Apple has published inst lat tput numbers in their manual.
+[TODO][FIX_BEFORE_REVIEW]: now Apple has published inst lat tput numbers in their manual.
 
 Besides ISA extensions, it's worth learning about the number and type of execution units in your processor. For instance, the number of loads, stores, divisions and multiplications a processor can issue every cycle. For most processors, this information is published by CPU vendors in corresponding technical manuals. However, information about latencies and throughput of specific instructions is not usually disclosed. Nevertheless, people have benchmarked individual instructions, which can be accessed online. For the latest Intel and AMD CPUs, latency, throughput, port usage, and the number of $\mu$ops for an instruction can be found at the [uops.info](https://uops.info/table.html)[^2] website. For the Apple M1 processor, similar data is accessible here: [https://dougallj.github.io/applecpu/firestorm-simd.html](https://dougallj.github.io/applecpu/firestorm-simd.html). Along with instructions latencies and throughput, developers have reverse-engineered other aspects of a microarchitecture such as the size of branch prediction history buffers, reorder buffer capacity, size of load/store buffers, and others. Since this is an unofficial source of data, you should take it with a grain of salt.
 

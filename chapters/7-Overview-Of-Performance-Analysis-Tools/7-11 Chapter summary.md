@@ -8,7 +8,7 @@
 
 * There are hybrid profilers that combine techniques like code instrumentation, sampling and tracing. This takes the best out of these approaches and allows user to get a very detailed information on a specific piece of code. In this chapter we looked at Tracy, which is quite popular among game developers.
 
-* [TODO] Add a bullet point about memory profilers.
+* [TODO][FIX_BEFORE_REVIEW]: Add a bullet point about memory profilers.
 
 * Continuous profiling tools have already become an essential part of monitoring performance in production environments. They collect system-wide performance metrics with call stacks for days, weeks or even months. Such tools make it easier to spot the point in time of when a performance change occurred and determine the root cause of an issue.
 

@@ -8,7 +8,7 @@ On the flame graph, each rectangle (horizontal bar) represents a function call, 
 
 Flame graphs are interactive, you can click on any bar on the image and it will zoom into that particular code path. You can keep zooming until you find a place that doesn't look according to your expectations or you reach a leaf/tail function - now you have actionable information you can use in your analysis. Another strategy is to figure our what is the hottest function in the program (not immediately clear from this flame graph) and go bottom-up through the flame graph, trying to understand from where this hottest function gets called.
 
-[TODO]: mention icicle graphs, refer to section with continuous profiling
+[TODO][FIX_BEFORE_REVIEW]: mention icicle graphs, refer to section with continuous profiling
 
 [^1]: Flame graphs by Brendan Gregg - [https://github.com/brendangregg/FlameGraph](https://github.com/brendangregg/FlameGraph)
 [^2]: x264 video encoding benchmark - [https://openbenchmarking.org/test/pts/x264](https://openbenchmarking.org/test/pts/x264)

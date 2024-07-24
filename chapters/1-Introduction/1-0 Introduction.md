@@ -1,6 +1,6 @@
 # Introduction {#sec:chapter1}
 
-[TODO]: update the intro. It is the most important part of the book. :) Update that we are now in the beginning of a new era. PC -> mobile -> cloud -> AI?
+[TODO][FIX_BEFORE_REVIEW]: update the intro. It is the most important part of the book. :) Update that we are now in the beginning of a new era. PC -> mobile -> cloud -> AI?
 
 They say, "performance is king". It was true a decade ago, and it certainly is now. According to [@Domo2017], in 2017, the world has been creating 2.5 quintillions[^1] bytes of data every day, and as predicted in [@Statista2018], this number is growing 25% per year. In our increasingly data-centric world, the growth of information exchange fuels the need for both faster software (SW) and faster hardware (HW). Fair to say, the data growth puts demand not only on computing power but also on storage and network systems. 
 

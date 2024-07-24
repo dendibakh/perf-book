@@ -72,6 +72,6 @@ The next four chapters are organized according to the TMA classification (see [@
 
 The idea behind this classification is to offer a checklist for developers when they are using TMA methodology in their performance engineering work. Whenever TMA attributes a performance bottleneck to one of the categories mentioned above, feel free to consult one of the corresponding chapters to learn about your options.
 
-[TODO]: update with preview of other chapter
+[TODO][FIX_BEFORE_REVIEW]: update with preview of other chapter
 
 [@sec:ChapterOtherTuning] covers other optimization areas that do not belong to any of the categories above. [@sec:secOptMTApps] addresses some common problems in optimizing multithreaded applications.

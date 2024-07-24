@@ -14,7 +14,7 @@ Thanks for reading through the whole book. I hope you enjoyed it and found it us
 * If the benefit of the modification is negligible, you should keep the code in its most simple and clean form.
 * Sometimes modifications that improve performance on one system slow down execution on another system. Make sure you test your changes on all the platforms that you care about.
 
-[TODO]: Performance metrics: be careful about drawing conclusions just by looking at the aggregate numbers. Don't fall in the trap of "excel performance engineering", i.e., only collect performance metrics and never look at the code. Always seek for a second source of data (e.g., performance profiles, discussed later) that will confirm your hypothesis.
+[TODO][FIX_BEFORE_REVIEW]: Performance metrics: be careful about drawing conclusions just by looking at the aggregate numbers. Don't fall in the trap of "excel performance engineering", i.e., only collect performance metrics and never look at the code. Always seek for a second source of data (e.g., performance profiles, discussed later) that will confirm your hypothesis.
 
 I hope this book will help you better understand your application's performance and CPU performance in general. Of course, it doesn't cover every possible scenario you may encounter while working on performance optimization. My goal was to give you a starting point and to show you potential options and strategies for dealing with performance analysis and tuning on modern CPUs. 
 

@@ -1,6 +1,6 @@
 ## Data Dependencies
 
-[TODO]: Watch out for dependencies through memory (store -> load -> store -> ... in the same location).
+[TODO][FIX_BEFORE_REVIEW]: Watch out for dependencies through memory (store -> load -> store -> ... in the same location).
 
 When a program statement refers to the data of a preceding statement, we say that there is a *data dependency* between the two statements. Sometimes people also use the terms _dependency chain_ or *data flow dependencies*. The example we are most familiar with is shown in Figure @fig:LinkedListChasing. To access node `N+1`, we should first dereference the pointer `N->next`. For the loop on the right, this is a *recurrent* data dependency, meaning it spans multiple iterations of the loop. Basically, traversing a linked list is one very long dependency chain.
 

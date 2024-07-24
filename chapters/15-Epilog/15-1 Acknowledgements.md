@@ -6,8 +6,6 @@ I write this section with profound gratitude to all the people mentioned below. 
 
 \setlength\intextsep{0pt}
 
-[TODO]: make round pictures
-
 \begin{wrapfigure}{r}{2.5cm}
 \includegraphics[width=2.5cm]{../../img/contributors/MarkDawson_circle.png}
 \end{wrapfigure} 

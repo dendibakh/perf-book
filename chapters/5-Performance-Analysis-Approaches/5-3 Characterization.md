@@ -8,7 +8,7 @@ This is a book about low-level performance, remember? So, we will focus on extra
 
 But even without a fully fledged characterization methodology, collecting total number of certain performance events can be helpful. We hope that the case studies in the previous chapter that examined performance metrics of four different benchmarks, proved that. PMCs are a very important instrument of low-level performance analysis. They can provide unique information about the execution of a program. PMCs are generally used in two modes: "Counting" and "Sampling". Counting mode is used for workload characterization, while sampling mode is used for finding hotspots, which we will discuss soon. 
 
-[TODO]: create an abbreviation PME = performance monitoring event and use it across the chapter
+[TODO][FIX_BEFORE_REVIEW]: create an abbreviation PME = performance monitoring event and use it across the chapter
 
 ### Counting Performance Monitoring Events
 
@@ -47,7 +47,7 @@ Table: Example of encoding Skylake performance events. {#tbl:perf_count}
 
 Linux `perf` provides mappings for commonly used performance events. They can be accessed via pseudo names instead of specifying `Event` and `Umask` hexadecimal values. For example, `branches` is just a synonym for `BR_INST_RETIRED.ALL_BRANCHES` and will measure the same thing. A list of available mapping names can be viewed with `perf list`:
 
-[TODO]: add more interesting events
+[TODO][FIX_BEFORE_REVIEW]: add more interesting events
 
 ```bash
 $ perf list

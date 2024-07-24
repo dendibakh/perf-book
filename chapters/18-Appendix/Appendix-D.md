@@ -89,11 +89,11 @@ Users can limit collection even further in several ways. They can limit collecti
 
 Decoding PT traces can take a long time. On an Intel Core i5-8259U machine, for a workload that runs for 7 milliseconds, encoded PT trace consumes around 1MB of disk space. Decoding this trace using `perf script` takes ~20 seconds. The decoded output from `perf script -F time,ip,sym,symoff,insn` takes ~1.3GB of disk space. As of February 2020, decoding traces with `perf script -F` with `+srcline` or `+srccode` gets extremely slow and is not practical for daily usage. The implementation of Linux perf should be improved. 
 
-[TODO]: Feb 2020: Intel VTune Profiler support for PT is still experimental. But today there is a dedicated analysis type that uses Intel PT.
+[TODO][FIX_BEFORE_REVIEW]: Feb 2020: Intel VTune Profiler support for PT is still experimental. But today there is a dedicated analysis type that uses Intel PT.
 
 ## Intel PT References and links {.unnumbered .unlisted}
 
-[TODO]: include magic trace
+[TODO][FIX_BEFORE_REVIEW]: include magic trace
 
 * Intel® 64 and IA-32 Architectures Software Developer Manuals [@IntelOptimizationManual, Volume 3C, Chapter 36].
 * Whitepaper "Hardware-assisted instruction profiling and latency detection" [@IntelPTPaper].

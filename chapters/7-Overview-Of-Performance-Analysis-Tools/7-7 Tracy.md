@@ -1,4 +1,4 @@
-[TODO]: possible candidate for Appendix
+[TODO][FIX_BEFORE_REVIEW]: possible candidate for Appendix
 
 ## Specialized and Hybrid profilers {#sec:Tracy}
 
@@ -56,7 +56,7 @@ Tracy has two operation modes: it can store all the timing data until the profil
 
 We used Tracy to debug the program and find the reason why some frames are slower than others. The data was captured on a Windows 11 machine, equipped with a Ryzen 7 5800X processor. The program was compiled with MSVC 19.36.32532. Tracy's graphical interface is quite rich, but unfortunately contains too much detail to fit on a single screenshot, so we break it down into pieces. At the top, there is a timeline view as shown in Figure @fig:Tracy_Main_View, cropped to fit onto the page. It shows only a portion of frame 76, which took 44.1 ms to render. On that diagram, we see the `Main thread` and five `WorkerThread`s that were active during that frame. All threads, including the main thread, are performing work to advance progress in rendering the final image. As we said earlier, each thread processes a row of pixels inside the `TraceRowJob` zone. Each `TraceRowJob` zone instance contains many smaller zones, that are not visible. Tracy collapses inner zones and only shows the number of collapsed instances. This is what, for example, number `4,109` means under the first `TraceRowJob` in the Main Thread. Notice the instances of `DoExtraWork` zones, nested under `TraceRowJob` zones. This observation already can lead to a discovery, but in the real application it may not be so obvious. Let's leave this for now.
 
-[TODO]: improve captions of images
+[TODO][FIX_BEFORE_REVIEW]: improve captions of images
 
 ![Tracy main timeline view.](../../img/perf-tools/tracy/tracy_main_timeline.png){#fig:Tracy_Main_View width=100%}
 

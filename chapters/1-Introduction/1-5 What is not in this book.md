@@ -1,6 +1,6 @@
 ## What Is not Discussed in this Book?
 
-[TODO]: second edition talks much more about system performance, especially memory subsystem. Also, we talk about compilers.
+[TODO][FIX_BEFORE_REVIEW]: second edition talks much more about system performance, especially memory subsystem. Also, we talk about compilers.
 
 System performance depends on different components: CPU, OS, memory, I/O  devices, etc. Applications could benefit from tuning various components of the system. In general, engineers should analyze the performance of the whole system. However, the biggest factor in systems performance is its heart, the CPU. This is why this book primarily focuses on performance analysis from a CPU perspective, occasionally touching on OS and memory subsystems.
 
