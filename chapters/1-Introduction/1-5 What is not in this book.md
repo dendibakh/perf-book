@@ -12,3 +12,4 @@ All the code snippets in this book are written in C, C++, or x86 assembly langua
 
 Finally, the author assumes that readers have full control over the software that they develop, including the choice of libraries and compiler they use. Hence, this book is not about tuning purchased commercial packages, e.g., tuning SQL database queries.
 
+[TODO][FIX_BEFORE_REVIEW]: Say that in some people's view, "benchmark" is something that is synthesized, contrived and does poor job of representing real-world scenarios. Some people are offended when their application is called a benchmark. 

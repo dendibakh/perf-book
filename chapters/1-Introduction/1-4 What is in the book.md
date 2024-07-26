@@ -1,5 +1,7 @@
 ## What Is Discussed in this Book?
 
+[TODO][FIX_BEFORE_REVIEW]: explain what do I mean by low-level performance analysis and tuning.
+
 This book is written to help developers better understand the performance of their application, learn to find inefficiencies, and eliminate them. 
 
 * Why my hand-written compression algorithm performs two times slower than the conventional one? 
