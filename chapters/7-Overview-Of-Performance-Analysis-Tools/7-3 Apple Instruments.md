@@ -31,7 +31,7 @@ Figure @fig:InstrumentsView shows the main timeline view of Xcode Instruments. T
 
 To begin, open *Instruments* and choose *CPU Counters* analysis type. First step you need to do is configure the collection. Click and hold the red target icon (see \circled{1} in Figure @fig:InstrumentsView), then select *Recording Options...* from the menu. It will display the dialog window shown in Figure @fig:InstrumentsDialog. This is where you can add HW performance monitoring events for collection.
 
-![Xcode Instruments: CPU Counters options.](../../img/perf-tools/XcodeInstrumentsDialog.png){#fig:InstrumentsDialog width=60% }
+![Xcode Instruments: CPU Counters options.](../../img/perf-tools/XcodeInstrumentsDialog.png){#fig:InstrumentsDialog width=70% }
 
 To the best of our knowledge, Apple doesn't document online their HW performance monitoring events, but they provide a list of events with some minimal description in `/usr/share/kpep`. There are `plist` files that you can convert into JSON. For example, for the M1 processor, one can run:
 

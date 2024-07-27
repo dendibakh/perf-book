@@ -14,7 +14,7 @@ But even without a fully fledged characterization methodology, collecting total 
 
 The idea behind counting is very simple: we want to count the total number of certain performance monitoring events while our program is running. Figure @fig:Counting illustrates the process of counting performance events from the start to the end of a program.
 
-![Counting performance events.](../../img/perf-analysis/CountingFlow.png){#fig:Counting width=70%}
+![Counting performance events.](../../img/perf-analysis/CountingFlow.png){#fig:Counting width=80%}
 
 The steps outlined in Figure @fig:Counting roughly represent what a typical analysis tool will do to count performance events. This process is implemented in the `perf stat` tool, which can be used to count various HW events, like the number of instructions, cycles, cache-misses, etc. Below is an example of the output from `perf stat`:
 
@@ -76,9 +76,9 @@ There are situations when we want to count many different events at the same tim
 If you need to collect more events than the number of available PMCs, the analysis tool uses time multiplexing to give each event a chance to access the monitoring hardware. Figure @fig:Multiplexing1 shows an example of multiplexing between 8 performance events with only 4 counters available.
 
 <div id="fig:Multiplexing">
-![](../../img/perf-analysis/Multiplexing1.png){#fig:Multiplexing1 width=50%}
+![](../../img/perf-analysis/Multiplexing1.png){#fig:Multiplexing1 width=70%}
 
-![](../../img/perf-analysis/Multiplexing2.png){#fig:Multiplexing2 width=60%}
+![](../../img/perf-analysis/Multiplexing2.png){#fig:Multiplexing2 width=80%}
 
 Multiplexing between 8 performance events with only 4 PMCs available.
 </div>

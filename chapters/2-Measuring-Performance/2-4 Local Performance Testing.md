@@ -10,7 +10,7 @@ It is highly recommended to get not just a single measurement but to run the ben
 
 Consider two distributions of performance measurements collected for two versions of a program in Figure @fig:CompDist. This chart displays the probability we get a particular timing for a given version of a program. For example, there is a ~32% chance the version `A` will finish in ~102 seconds. It's tempting to say that `A` is faster than `B`. However, it is true only with some probability `P`. This is because there are some measurements of `B` that are faster than `A`. Even in the situation when all the measurements of `B` are slower than every measurement of `A` probability `P` is not equal to `100%`. This is because we can always produce one additional sample for `B`, which may be faster than some samples of `A`.
 
-![Comparing 2 performance measurement distributions. It's hard to say decisively which version of the program is faster.](../../img/measurements/CompDist2.png){#fig:CompDist width=80%}
+![Comparing 2 performance measurement distributions. It's hard to say decisively which version of the program is faster.](../../img/measurements/CompDist2.png){#fig:CompDist width=90%}
 
 An interesting advantage of using distribution plots is that it allows you to spot unwanted behavior of the benchmark.[^3] If the distribution is bimodal, the benchmark likely experiences two different types of behavior. A common cause of bimodally distributed measurements is code that has both a fast and a slow path, such as accessing a cache (cache hit vs. cache miss) and acquiring a lock (contended lock vs. uncontended lock). To "fix" this, different functional patterns should be isolated and benchmarked separately.
 

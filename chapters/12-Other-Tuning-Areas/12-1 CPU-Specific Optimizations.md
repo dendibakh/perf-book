@@ -96,7 +96,7 @@ You may think: "But wait, multiplications do not depend on each other." Yes, you
 # ran on Intel Core i7-1260P (Alderlake)
 $ sudo ./kernel-nanoBench.sh -f -basic │ $ sudo ./kernel-nanoBench.sh -f -basic
  -loop 100 -unroll 1000                │  -loop 100 -unroll 1000 
- -warm_up_count 10 -asm "              |  -warm_up_count 10 -asm "
+ -warm_up_count 10 -asm "              │  -warm_up_count 10 -asm "
 vmovss xmm1, dword ptr [R14];          │ vmovss xmm1, dword ptr [R14];
 vfmadd231ss xmm0, xmm1, xmm1;"         │ vmulss xmm1, xmm1, xmm1;
 -asm_init "<not shown>"                │ vaddss xmm0, xmm0, xmm1;"

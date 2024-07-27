@@ -63,7 +63,7 @@ Does it mean that there are no memory allocations after the startup phase? Let's
 
 Notice, there are new allocations at a steady pace throughout the life of the program. However, as we just saw, memory consumption doesn't change; how is that possible? Well, it can be possible if we deallocate previously allocated buffers and allocate new ones of the same size (also known as *temporary allocations*).
 
-![Stockfish memory profile with Heaptrack, the number of allocations is growing.](../../img/memory-access-opts/Stockfish_allocations.png){#fig:StockfishAllocations width=90%}
+![Stockfish memory profile with Heaptrack, the number of allocations is growing.](../../img/memory-access-opts/Stockfish_allocations.png){#fig:StockfishAllocations width=100%}
 
 Since the number of allocations is growing but the total consumed memory doesn't change, we are dealing with temporary allocations. Let's find out where in the code they are coming from. It is easy to do with the help of a flame graph shown in Figure @fig:StockfishFlamegraph. There are 4800 temporary allocations in total with 90.8% of those coming from `operator new`. Thanks to the flame graph we know the entire call stack that leads to 4360 temporary allocations. Interestingly, those temporary allocations are initiated by `std::stable_sort` which allocates a temporary buffer to do the sorting. One way to get rid of those temporary allocations would be to use an in-place stable sorting algorithm. However, by doing so we observed an 8% drop in performance, so we discarded this change.
 

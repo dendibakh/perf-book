@@ -73,7 +73,7 @@ void particleMotion(vector<Particle> &particles,     │   fmadd  s3, s3, s4, s5
 
 Congratulations if you've found it. There is a recurrent loop dependency on `XorShift32::val`. To generate the next random number, the generator has to produce the previous number first. The next call of method `XorShift32::gen` will generate the number based on the previous one. Figure @fig:DepChain visualizes the problematic loop-carry dependency. Notice, that the code for calculating particle coordinates (convert the angle to radians, sine, cosine, multiple results by velocity) starts executing as soon as the corresponding random number is ready, but not sooner.
 
-![Visualization of dependent execution in [@lst:DepChain]](../../img/computation-opts/DepChain.png){#fig:DepChain width=80%}
+![Visualization of dependent execution in [@lst:DepChain]](../../img/computation-opts/DepChain.png){#fig:DepChain width=90%}
 
 The code that calculates the coordinates of particle `N` is not dependent on particle `N-1`, so it could be beneficial to pull them left to overlap their execution even more. You probably want to ask: "But how can those three (or six) instructions drag down the performance of the whole loop?". Indeed, there are many other "heavy" instructions in the loop, like `fmul` and `fmadd`. However, they are not on the critical path, so they can be executed in parallel with other instructions. And because modern CPUs are very wide, they will execute instructions from multiple iterations at the same time. This allows the OOO engine to effectively find parallelism (independent instructions) within different iterations of the loop. 
 

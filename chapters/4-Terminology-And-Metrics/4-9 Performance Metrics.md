@@ -102,7 +102,7 @@ SWPF    prefetch instruction       SW_PREFETCH_ACCESS.T0:u0xF
         (of any type)
 --------------------------------------------------------------------------
 
-Table: A list (not exhaustive) of secondary metrics along with descriptions and formulas for the Intel Goldencove architecture. {#tbl:perf_metrics}
+Table: A list (not exhaustive) of performance metrics along with descriptions and formulas for the Intel Goldencove architecture. {#tbl:perf_metrics}
 
 \normalsize
 

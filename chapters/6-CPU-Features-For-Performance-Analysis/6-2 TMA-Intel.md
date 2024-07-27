@@ -104,7 +104,6 @@ A recommended way to find such an event is to run `toplev` tool with the `--show
 
 ```bash
 $ perf record -e cpu/event=0xd1,umask=0x20,name=MEM_LOAD_RETIRED.L3_MISS/ppp ./benchmark.exe
-
 $ perf report -n --stdio
 ...
 # Samples: 33K of event ‘MEM_LOAD_RETIRED.L3_MISS’

@@ -57,7 +57,7 @@ To increase the utilization of FMA execution units from 50% to 100%, we need to 
 # ran on Intel Core i7-1260P (Alderlake)
 $ sudo ./kernel-nanoBench.sh -f    │  $ sudo ./kernel-nanoBench.sh -f 
  -basic -loop 100 -unroll 1000     │   -basic -loop 100 -unroll 1000 
- -warm_up_count 10 -asm "          |   -warm_up_count 10  -asm "
+ -warm_up_count 10 -asm "          │   -warm_up_count 10  -asm "
 VFMADD231PS YMM0, YMM1, [R14];     │  VFMADD231PS YMM0, YMM1, [R14];
 VFMADD231PS YMM2, YMM1, [R14+32];  │  VFMADD231PS YMM2, YMM1, [R14+32];
 VFMADD231PS YMM3, YMM1, [R14+64];  │  VFMADD231PS YMM3, YMM1, [R14+64];
