@@ -39,22 +39,3 @@ So, let's talk about what prevent systems from achieving optimal performance by 
 [TODO][FIX_BEFORE_REVIEW]: include discussion on "Clean code, horrible performance"?
 
 Limitations described above leave the room for tuning the performance of our SW to reach its full potential. 
-
-## Why Care about Performance?
-
-In addition to the slowing trend of hardware single-threaded performance growth, there are a couple of other business reasons to care about performance. During the PC era,[^3] the costs of slow software were paid by the users, as inefficient software was running on user computers. With the advent of SaaS (software as a service) and cloud computing, the costs of slow software are put back on the software providers, not their users. If you're a SaaS company like Meta or Netflix,[^4] it doesn't matter if you run your service on-premise hardware or you use public cloud, you pay for the electricity your servers consume. Inefficient software cuts right into your margins and market evaluation. According to Synergy Research Group,[^5] worldwide spending on cloud services topped $100 billion in 2020, and according to Gartner,[^6] it will surpass $675 billion in 2024.
-
-For many years performance engineering was a nerdy niche, but now it's becoming mainstream. Many companies have already realized the importance of performance engineering and are willing to pay well for this work.
-
-It is fairly easy to reach performance level 4 in Table @tbl:PlentyOfRoom. In fact, you don't need this book to get there. Write your program in one of the native programming languages, distribute work among multiple threads, pick a good optimizing compiler and you'll get there. Unfortunately, this will only put you halfway to the desired efficiency target.
-
-The methodologies in this book focus on squeezing out the last bit of performance from your application. Such transformations can be attributed along rows 6 and 7 in Table @tbl:PlentyOfRoom. The types of improvements that will be discussed are usually not big and often do not exceed 10%. However, do not underestimate the importance of a 10% speedup. SQLite is commonplace today not because its developers sat one day and decided to make it 50% faster. But because they meticulously made hundreds of 0.1% improvements over the years. The cumulative effect of these small improvements is what makes the difference.
-
-The impact of small improvements is very relevant for large distributed applications running in the cloud. According to [@HennessyGoogleIO], in the year 2018, Google spent roughly the same amount of money on actual computing servers that run the cloud as it spent on power and cooling infrastructure. Energy efficiency is a very important problem, which can be improved by optimizing software.
-
->  "At such [Google] scale, understanding performance characteristics becomes critical – even small improvements in performance or utilization can translate into immense cost savings." [@GoogleProfiling]
-
-[^3]: From the late 1990s to the late 2000s where personal computers where dominating the market of computing devices.
-[^4]: In 2024, Meta uses mostly on-premise cloud, while Netflix uses AWS public cloud.
-[^5]: Worldwide spending on cloud services in 2020 - [https://www.srgresearch.com/articles/2020-the-year-that-cloud-service-revenues-finally-dwarfed-enterprise-spending-on-data-centers](https://www.srgresearch.com/articles/2020-the-year-that-cloud-service-revenues-finally-dwarfed-enterprise-spending-on-data-centers)
-[^6]: Worldwide spending on cloud services in 2024 - [https://www.gartner.com/en/newsroom/press-releases/2024-05-20-gartner-forecasts-worldwide-public-cloud-end-user-spending-to-surpass-675-billion-in-2024](https://www.gartner.com/en/newsroom/press-releases/2024-05-20-gartner-forecasts-worldwide-public-cloud-end-user-spending-to-surpass-675-billion-in-2024)

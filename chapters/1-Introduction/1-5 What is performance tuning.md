@@ -1,13 +1,3 @@
-## What Is Performance Analysis?
-
-Ever found yourself debating with a coworker about the performance of a certain piece of code? Then you probably know how hard it is to predict which code is going to work the best. With so many moving parts inside modern processors, even a small tweak to the code can trigger significant performance change. That’s why the first advice in this book is: *Always Measure*. Many people rely on intuition when they try to optimize their application. And usually, it ends up with random fixes here and there without making any real impact on the performance of the application.
-
-Inexperienced developers often make changes in the source code and hope it will make it faster. One such example is replacing `i++` (pre-increment) with `++i` (post-increment) all over the code base, assuming that the previous value of `i` is not used. In the general case, this change will make no difference to the generated code because every decent optimizing compiler will recognize that the previous value of `i` is not used and will eliminate redundant copies anyway. 
-
-Many micro-optimization tricks that circulate around the world were valid in the past, but current compilers have already learned them. Additionally, some people tend to overuse legacy bit-twiddling tricks. One of such examples is using [XOR-based swap idiom](https://en.wikipedia.org/wiki/XOR_swap_algorithm),[^2] while in reality, simple `std::swap` produces faster code. Such accidental changes likely won’t improve the performance of the application. Finding the right place to fix should be a result of careful performance analysis, not intuition or guessing.
-
-There are many performance analysis methodologies that may or may not lead you to a discovery. Approaches presented in this book have one thing in common: they are based on collecting certain information about how a program executes. Any change that ends up being made in the source code of a program is driven by analyzing and interpreting collected data.
-
 ## What Is Performance Tuning?
 
 Locating a performance bottleneck is only half of the engineer’s job. The second half is to fix it properly. Sometimes changing one line in the program source code can yield a drastic performance boost. Performance analysis and tuning are all about how to find and fix this line. Missing such opportunities can be a big waste.
@@ -31,5 +21,3 @@ Broadly speaking, the SW stack includes many layers, e.g., firmware, BIOS, OS, l
 Another important piece of SW that we will touch on a lot is a compiler. It's possible to obtain attractive speedups by making the compiler generate the desired machine code through various hints. You will find many such examples throughout the book. Luckily, most of the time, you don't have to be a compiler expert to drive performance improvements in your application. Majority of optimizations can be done at a source code level without the need to dig down into compiler sources. Although, understanding how the compiler works and how you can force it to do what you want is always advantageous in performance-related work.
 
 There is a famous quote: "Premature optimization is the root of all evil". But the opposite is often true as well. Postponed performance engineering work may be too late and cause as much evil as premature optimization. For developers working with performance-critical projects, it is crucial to know how underlying HW works. In such industries, it is a fail-from-the-start when a program is being developed without HW focus. Performance characteristics of a software must be a first-class-citizen along with correctness and security starting from day 1. ClickHouse DB is an example of a successful software product that was built around a small but very efficient kernel.
-
-[^2]: XOR-based swap idiom - [https://en.wikipedia.org/wiki/XOR_swap_algorithm](https://en.wikipedia.org/wiki/XOR_swap_algorithm)
