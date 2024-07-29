@@ -28,7 +28,7 @@ Sometimes fast tools find use in the areas they were not initially designed for.
 
 Before starting performance-related work, make sure you have a strong reason to do so. Optimization just for optimization’s sake is useless if it doesn’t add value to your product. Mindful performance engineering starts with clearly defined performance goals, stating what you are trying to achieve and why you are doing it. Also, you should pick the metrics that you will use to measure whether you reach the goal or not.
 
-Performance engineering is important and rewarding work, but it may be very time-consuming. In fact, performance optimization is a never-ending game. There will always be something to optimize. Inevitably, the developer will reach the point of diminishing returns at which further improvement comes at a very high engineering cost and likely will not be worth the efforts. Knowing when to stop optimizing is a critical aspect of performance work. 
+Now that we've talked about the value of performance engineering, let's uncover what it consist of. When you trying to improve performance of a program, you need to find what to improve (performance analysis) and then improve it (tuning), which is very similar to a regular debugging activity. This is what we will discuss next.
 
 [^3]: From the late 1990s to the late 2000s where personal computers where dominating the market of computing devices.
 [^4]: In 2024, Meta uses mostly on-premise cloud, while Netflix uses AWS public cloud.
