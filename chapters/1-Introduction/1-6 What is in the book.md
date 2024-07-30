@@ -1,7 +1,5 @@
 ## What Is Discussed in this Book?
 
-[TODO][FIX_BEFORE_REVIEW]: explain what do I mean by low-level performance analysis and tuning.
-
 This book is written to help developers better understand the performance of their application, learn to find inefficiencies, and eliminate them. 
 
 * Why my hand-written compression algorithm performs two times slower than the conventional one? 
@@ -11,7 +9,7 @@ This book is written to help developers better understand the performance of the
 * What performance analysis tools are available on my platform? 
 * What are the techniques to reduce the number of cache misses and branch mispredictions?
 
-Hopefully, by the end of this book, you will have the answers to those questions.
+Hopefully, by the end of this book, you will be able to answers those questions.
 
 The book is split into two parts: performance analysis and performance optimization. The first part (chapters 2-7) teaches you how to find performance problems, the second part (chapters 8-13) teaches you how to fix them. Here is the outline of book chapters:
 
@@ -29,10 +27,6 @@ The book is split into two parts: performance analysis and performance optimizat
 * Chapter 12 contains optimization topics not specifically related to any of the categories covered in the previous four chapters, but are still important enough to find their place in this book. In this chapter we will discuss CPU-specific optimizations, examine several microarchitecture-related performance problems, explore techniques used for optimizing low-latency applications, and give you advice on tuning your system for the best performance.
 * Chapter 13 discusses techniques for analyzing multithreaded applications. It digs into some of the most important challenges of optimizing the performance of multithreaded applications. We provide a case study of five real-world multithreaded applications, where we explain why their performance doesn't scale with the increasing number of CPU threads. We also discuss cache coherency issues, such as "False Sharing" and a few tools that are designed to analyze multithreaded applications.
 
-Examples provided in this book are primarily based on open-source software: Linux as the operating system, the LLVM-based Clang compiler for C and C++ languages, and Linux `perf` as the profiling tool. The reason for such a choice is not only the popularity of the mentioned technologies but also the fact that their source code is open, which allows us to better understand the underlying mechanism of how they work. This is especially useful for learning the concepts presented in this book. We will also sometimes showcase proprietary tools that are "big players" in their areas, for example, Intel® VTune™ Profiler.
+Examples provided in this book are primarily based on open-source software: Linux as the operating system, the LLVM-based Clang compiler for C and C++ languages, and various open-source applications and benchmarks that you can build and run. The reason is not only the popularity of the projects but also the fact that their source code is open, which enables us to better understand the underlying mechanism of how they work. This is especially useful for learning the concepts presented in this book. This doesn't mean that we will never showcase proprietary tools. For example, we extensively use Intel® VTune™ Profiler.
 
-Reaching high-level performance is challenging and usually requires substantial efforts, but hopefully, this book will give you the tools to help you achieve it.
-
-Leftover:
-
-Another important piece of SW that we will touch on a lot is a compiler. It's possible to obtain attractive speedups by making the compiler generate the desired machine code through various hints. You will find many such examples throughout the book. Luckily, most of the time, you don't have to be a compiler expert to drive performance improvements in your application. Majority of optimizations can be done at a source code level without the need to dig down into compiler sources. Although, understanding how the compiler works and how you can force it to do what you want is always advantageous in performance-related work.
+Prior compiler experience helps a lot in performance-related work. Sometimes it's possible to obtain attractive speedups by forcing the compiler generate desired machine code through various hints. You will find many such examples throughout the book. Luckily, most of the time, you don't have to be a compiler expert to drive performance improvements in your application. Majority of optimizations can be done at a source code level without the need to dig down into compiler sources. 
