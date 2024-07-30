@@ -1,15 +1,14 @@
 ## What Is not Discussed in this Book?
 
-[TODO][FIX_BEFORE_REVIEW]: second edition talks much more about system performance, especially memory subsystem. Also, we talk about compilers.
+System performance depends on different components: CPU, DRAM, I/O and network devices, etc. Applications may benefit from tuning various components of the system, depending on where a bottleneck is. In general, engineers should analyze the performance of the whole system. However, the biggest factor in systems performance is its heart, the CPU. This is why this book primarily focuses on performance analysis from a CPU perspective. We also discuss memory subsystem quite extensively, but we don't exlore I/O and network performance.
 
-System performance depends on different components: CPU, OS, memory, I/O  devices, etc. Applications could benefit from tuning various components of the system. In general, engineers should analyze the performance of the whole system. However, the biggest factor in systems performance is its heart, the CPU. This is why this book primarily focuses on performance analysis from a CPU perspective, occasionally touching on OS and memory subsystems.
+Likewise, the software stack includes many layers, e.g., firmware, BIOS, OS, libraries, and the source code of an application. But since most of the lower layers are not under our direct control, the primary focus will be made on the source code level.
 
 The scope of the book does not go beyond a single CPU socket, so we will not discuss optimization techniques for distributed, NUMA, and heterogeneous systems. Offloading computations to accelerators (GPU, FPGA, etc.) using solutions like OpenCL and openMP is not discussed in this book. 
 
-This book centers around the Intel x86-64 CPU architecture and does not provide specific tuning recipes for AMD, ARM, or RISC-V chips. Nonetheless, many of the principles discussed in this book apply well to those processors. Also, Linux is the OS of choice for this book, but again, for most of the examples we provide, it doesn't matter since the same techniques benefit applications that run on Windows and macOS operating systems.
+I tried to make this book to be applicable to most modern CPUs, including Intel, AMD, Apple, and other ARM-based processors. I'm very sorry if it doesn't cover your favorite architecture. Nevertheless, many of the principles discussed in this book apply well to other processors. Similarly, most examples in this book were run on Linux, but again, most of the time it doesn't matter since the same techniques benefit applications that run on Windows and macOS operating systems.
 
-All the code snippets in this book are written in C, C++, or x86 assembly languages, but to a large degree, ideas from this book can be applied to other languages that are compiled to native code like Rust, Go, and even Fortran. Since this book targets user-mode applications that run close to the hardware, we will not discuss managed environments, e.g., Java. 
+Code snippets in this book are written in C, C++, or x86 assembly languages, but to a large degree, ideas from this book can be applied to other languages that are compiled to native code like Rust, Go, and even Fortran. Since this book targets user-mode applications that run close to the hardware, we will not discuss managed environments, e.g., Java. 
 
-Finally, the author assumes that readers have full control over the software that they develop, including the choice of libraries and compiler they use. Hence, this book is not about tuning purchased commercial packages, e.g., tuning SQL database queries.
+Finally, the author assumes that readers have full control over the software that they develop, including the choice of libraries and compilers they use. Hence, this book is not about tuning purchased commercial packages, e.g., tuning SQL database queries.
 
-[TODO][FIX_BEFORE_REVIEW]: Say that in some people's view, "benchmark" is something that is synthesized, contrived and does poor job of representing real-world scenarios. Some people are offended when their application is called a benchmark. 

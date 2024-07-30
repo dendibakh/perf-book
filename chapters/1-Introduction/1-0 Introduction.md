@@ -1,7 +1,5 @@
 # Introduction {#sec:chapter1}
 
-[TODO][FIX_BEFORE_REVIEW]: update the intro. It is the most important part of the book. :)
-
 They say, "performance is king". It was true a decade ago, and it certainly is now. According to [@Domo2017], in 2017, the world has been creating 2.5 quintillion[^1] bytes of data every day, and as predicted in [@Statista2018], it will reach 400 quintillion bytes per day in 2024. In our increasingly data-centric world, the growth of information exchange fuels the need for both faster software (SW) and faster hardware (HW). The rapid growth of generated data requires not only more computing power but also faster storage and network systems. 
 
 Software programmers have had an "easy ride" for decades, thanks to Moore’s law. It used to be the case that some SW vendors preferred to wait for a new generation of HW to speed up their software products and did not spend human resources on making improvements in the code. By looking at Figure @fig:50YearsProcessorTrend, we can see that single-threaded[^2] performance growth is slowing down.

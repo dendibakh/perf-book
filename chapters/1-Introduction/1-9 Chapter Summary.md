@@ -1,5 +1,7 @@
 ## Chapter Summary {.unlisted .unnumbered}
 
+[TODO][FIX_BEFORE_REVIEW]: update
+
 * The single-threaded performance of CPUs is not increasing as rapidly as it used to a few decades ago. That is why performance tuning is becoming more important than it has been for the last 40 years. The computing industry is changing now much more heavily than at any time since the 90s.
 * According to [@Leisersoneaam9744], SW tuning will be one of the key drivers for performance gains in the near future. The importance of performance tuning should not be underestimated. For large distributed applications, every small performance improvement results in immense cost savings.
 * Software doesn't have optimal performance by default. Certain limitations exist that prevent applications from reaching their full performance potential. Both HW and SW environments have such limitations. CPUs cannot magically speed up slow algorithms. Compilers are far from generating optimal code for every program. Due to HW specifics, the best-known algorithm for a certain problem is not always the most performant. All this leaves room for tuning the performance of our applications.
