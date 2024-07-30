@@ -26,7 +26,7 @@ Sometimes fast tools find use in the areas they were not initially designed for.
 
 > “Fast tools don’t just allow users to accomplish tasks faster; they allow users to accomplish entirely new types of tasks, in entirely new ways.” - Nelson Elhage wrote in an [article](https://blog.nelhage.com/post/reflections-on-performance/)[^1]on his blog.
 
-Before starting performance-related work, make sure you have a strong reason to do so. Optimization just for optimization’s sake is useless if it doesn’t add value to your product. Mindful performance engineering starts with clearly defined performance goals, stating what you are trying to achieve and why you are doing it. Also, you should pick the metrics that you will use to measure whether you reach the goal or not.
+Before starting performance-related work, make sure you have a strong reason to do so. Optimization just for optimization’s sake is useless if it doesn’t add value to your product.[^10] Mindful performance engineering starts with clearly defined performance goals, stating what you are trying to achieve and why you are doing it. Also, you should pick the metrics that you will use to measure whether you reach the goal or not.
 
 Now that we've talked about the value of performance engineering, let's uncover what it consist of. When you trying to improve performance of a program, you need to find what to improve (performance analysis) and then improve it (tuning), which is very similar to a regular debugging activity. This is what we will discuss next.
 
@@ -40,3 +40,4 @@ Now that we've talked about the value of performance engineering, let's uncover 
 [^3]: Slides by Marissa Mayer - [https://assets.en.oreilly.com/1/event/29/Keynote Presentation 2.pdf](https://assets.en.oreilly.com/1/event/29/Keynote Presentation 2.pdf)
 [^8]: Slides by Stoyan Stefanov - [https://www.slideshare.net/stoyan/dont-make-me-wait-or-building-highperformance-web-applications](https://www.slideshare.net/stoyan/dont-make-me-wait-or-building-highperformance-web-applications)
 [^9]: In fact, it's not possible to parse the entire codebase in the order of milliseconds. Instead, IntelliSense only reconstructs the portions of AST that has been changed. Watch more details on how the Microsoft team achieves this in the video: [https://channel9.msdn.com/Blogs/Seth-Juarez/Anders-Hejlsberg-on-Modern-Compiler-Construction](https://channel9.msdn.com/Blogs/Seth-Juarez/Anders-Hejlsberg-on-Modern-Compiler-Construction).
+[^10]: Unless you just want to practice performance optimizations, which is fine too.
