@@ -1,8 +1,8 @@
-## What Is not Discussed in this Book?
+## What Is Not Discussed in this Book?
 
-System performance depends on different components: CPU, DRAM, I/O and network devices, etc. Applications may benefit from tuning various components of the system, depending on where a bottleneck is. In general, engineers should analyze the performance of the whole system. However, the biggest factor in systems performance is its heart, the CPU. This is why this book primarily focuses on performance analysis from a CPU perspective. We also discuss memory subsystem quite extensively, but we don't exlore I/O and network performance.
+System performance depends on different components: CPU, DRAM, I/O and network devices, etc. Applications may benefit from tuning various components of the system, depending on where a bottleneck is. In general, engineers should analyze the performance of the whole system. However, the biggest factor in a system's performance is its heart, the CPU. This is why this book primarily focuses on performance analysis from a CPU perspective. We also discuss the memory subsystem quite extensively, but we don't explore I/O and network performance.
 
-Likewise, the software stack includes many layers, e.g., firmware, BIOS, OS, libraries, and the source code of an application. But since most of the lower layers are not under our direct control, the primary focus will be made on the source code level.
+Likewise, the software stack includes many layers, e.g., firmware, BIOS, OS, libraries, and the source code of an application. However, since most of the lower layers are not under our direct control, the primary focus will be on the source code level.
 
 The scope of the book does not go beyond a single CPU socket, so we will not discuss optimization techniques for distributed, NUMA, and heterogeneous systems. Offloading computations to accelerators (GPU, FPGA, etc.) using solutions like OpenCL and openMP is not discussed in this book. 
 
