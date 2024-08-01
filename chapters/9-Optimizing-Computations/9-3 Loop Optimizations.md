@@ -186,6 +186,11 @@ real    0m0.227s
 
 Although Polly is a powerful framework, it still misses out on some common and important loop optimization opportunities.[^7] It is not enabled in the standard optimization pipeline in the LLVM infrastructure and requires that the user provides an explicit compiler option for using it (`-mllvm -polly`). Using polyhedral frameworks is a viable option when searching for a way to speed up your loops.
 
+[TODO]: there is also MLIR/Polygeist. 
+https://dl.acm.org/doi/pdf/10.1145/3674735
+Polygeist raises C/C++ to Polyhedral MLIR [34] as an LLVM/MLIR [28] based approach. It is introduced recently and in active development phase. Polygeist takes an input source program, and (i) extract the high level information, (ii) converts them to MLIR representation, (iii) extracts polyhedral representation, and allows a call to an external polyhedral optimizer like Pluto, and (iv) inally converts it to LLVM IR. As it operates from high-level structure to low-level IR of the program, it has the opportunity to explore optimizations at both levels. Polygeist also supports additional transformations: statement splitting and reduction parallelization.
+
+
 [^1]: Codee: perfect loop nesting - [https://www.codee.com/catalog/glossary-perfect-loop-nesting/](https://www.codee.com/catalog/glossary-perfect-loop-nesting/)
 [^2]: Cache-oblivious algorithm - [https://en.wikipedia.org/wiki/Cache-oblivious_algorithm](https://en.wikipedia.org/wiki/Cache-oblivious_algorithm)
 [^3]: Polyhedral framework - [https://en.wikipedia.org/wiki/Loop_optimization#The_polyhedral_or_constraint-based_framework](https://en.wikipedia.org/wiki/Loop_optimization#The_polyhedral_or_constraint-based_framework).
