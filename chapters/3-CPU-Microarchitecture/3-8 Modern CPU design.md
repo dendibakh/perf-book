@@ -41,20 +41,18 @@ There are certain operations that processors handle in a specific manner, often 
 * **NOP instruction**: `NOP` is often used for padding or alignment purposes. It simply gets marked as completed without allocating it into the reservation station.
 * **Other bypasses**: CPU architects also optimized certain arithmetic operations. For example, multiplying any number by one will always yield the same number. The same goes for dividing any number by one. Multiplying any number by zero always yields zero, etc. Some CPUs can recognize such cases at runtime and execute them with shorter latency than regular multiplication or divide.
 
-[TODO][FIX_BEFORE_REVIEW]: define the term execution port
+The "Scheduler / Reservation Station" (RS) is the structure that tracks the availability of all resources for a given $\mu$op and dispatches the $\mu$op to an *execution port* once it is ready. Execution port is a pathway that connects the scheduler to its execution units. Each execution port may be connected to multiple execution units. When an instruction enters the RS, the scheduler starts tracking its data dependencies. Once all the source operands become available, the RS attempts to dispatch the $\mu$op to a free execution port. The RS has fewer entries than the ROB. It can dispatch up to 6 $\mu$ops per cycle.
 
-The "Scheduler / Reservation Station" (RS) is the structure that tracks the availability of all resources for a given $\mu$op and dispatches the $\mu$op to the assigned port once it is ready. When an instruction enters the RS, the scheduler starts tracking its data dependencies. Once all the source operands become available, the RS tries to dispatch the $\mu$op to a free execution port. The RS has fewer entries than the ROB. It can dispatch up to 6 $\mu$ops per cycle.
+As shown in Figure @fig:Goldencove_diag, there are 12 execution ports in the Goldencove microarchitecture:
 
-[TODO][FIX_BEFORE_REVIEW]: mention that VEC stack does both fp and packed operations
-
-As shown in Figure @fig:Goldencove_diag, there are 12 execution ports:
-
-* Ports 0, 1, 5, 6, and 10 provide all the integer (INT), and floating-point and vector (VEC/FP) operations. Instructions dispatched to those ports do not require memory operations.
+* Ports 0, 1, 5, 6, and 10 provide integer (INT) operations, and some of them handle floating-point and vector (VEC/FP) operations. Instructions dispatched to those ports do not require memory operations.
 * Ports 2, 3, and 11 are used for address generation (AGU) and for load operations. 
 * Ports 4 and 9 are used for store operations (STD).
 * Ports 7 and 8 are used for address generation.
 
-A dispatched arithmetic operation can go to either INT or VEC/FP execution port. Integer and Vector/FP register stacks are located separately. Operations that move values from the INT stack to VEC/FP and vice-versa (e.g., convert, extract or insert) incur additional penalty.
+For example, an `Integer Shift` operation can go only to either port 0 or 6, while a `Floating-Point Divide` operation can only be dispatched to port 0. In a situation when a scheduler has to dispatch two operations that require the same execution port, one of them will have to be dispatched in the next cycle.
+
+The VEC/FP stack does floating-point scalar and *all* packed (SIMD) operations. For instance, ports 0, 1, and 5 can handle ALU operations of the following types: packed integer, packed floating-point, and scalar floating-point. Integer and Vector/FP register stacks are located separately. Operations that move values from the INT stack to VEC/FP and vice-versa (e.g., convert, extract or insert) incur additional penalty.
 
 ### Load-Store Unit {#sec:uarchLSU}
 
