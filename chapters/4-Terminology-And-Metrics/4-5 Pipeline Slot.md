@@ -8,8 +8,9 @@ Another important metric which some performance tools use is the concept of a *p
 
 [TODO][FIX_BEFORE_REVIEW]: update. Apple published that M1 has 8-wide allocation and M3 is 9-wide, see Table 4.10. uop Execution Bandwidth.
 
-Intel's Skylake and AMD Zen3 cores have 4-wide allocation. Intel's SunnyCove microarchitecture was a 5-wide design. As of 2023, most recent Goldencove and Zen4 architectures both have 6-wide allocation. Apple M1 design is not officially disclosed but is measured to be 8-wide.[^1]
+Intel's Skylake and AMD Zen3 cores have 4-wide allocation. Intel's SunnyCove microarchitecture was a 5-wide design. As of the end of 2023, most recent Goldencove and Zen4 architectures both have 6-wide allocation. Apple M1 design is not officially disclosed but is measured to be 8-wide.[^1] The width of a machine puts a cap on IPC. This means that the maximum achievable IPC of a processor equals to its width.[^2] For example, when your calculations show more than 6 IPC on a Goldencove-based machine, you should be suspicious.
 
 Pipeline slot is one of the core metrics in Top-down Microarchitecture Analysis (see [@sec:TMA]). For example, Front-End Bound and Back-End Bound metrics are expressed as a percentage of unutilized Pipeline Slots due to various bottlenecks.
 
 [^1]: Apple Microarchitecture Research - [https://dougallj.github.io/applecpu/firestorm.html](https://dougallj.github.io/applecpu/firestorm.html)
+[^2]: Although there are some exception. For instance macrofused compare-and-branch instructions only require a single pipeline slot, but are counted as two instructions. In some extreme cases this may cause IPC to be greater than machine width.

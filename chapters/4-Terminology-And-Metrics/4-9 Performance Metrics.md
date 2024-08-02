@@ -1,6 +1,8 @@
 ## Performance Metrics {#sec:PerfMetrics}
 
-In addition to the performance events that we discussed earlier in this chapter, performance engineers frequently use metrics, which are built on top of raw events. Table {@tbl:perf_metrics} shows a list of metrics for Intel's 12th-gen Goldencove architecture along with descriptions and formulas. The list is not exhaustive, but it shows the most important metrics. A complete list of metrics for Intel CPUs and their formulas can be found in [TMA_metrics.xlsx](https://github.com/intel/perfmon/blob/main/TMA_Metrics.xlsx).[^1] [@sec:PerfMetricsCaseStudy] shows how performance metrics can be used in practice.
+Being able to collect various performance events is very helpful in performance analysis. However, there is a problem. Say, you ran a program and collected `MEM_LOAD_RETIRED.L3_MISS` event, which counts the LLC misses, and it shows you a value of one billion. Sure it sounds like a lot, so you decided to investigate where these cache misses are coming from. Wrong! Are you really sure it is an issue? If a program only does two billion loads, then yes, it is a problem as half of the loads miss in the LLC. In contrast, if a program does one trillion loads, then only one in a thousand loads results in a L3 cache miss.
+
+That's why in addition to the hardware performance events, performance engineers frequently use metrics, which are built on top of raw events. Table {@tbl:perf_metrics} shows a list of metrics for Intel's 12th-gen Goldencove architecture along with descriptions and formulas. The list is not exhaustive, but it shows the most important metrics. A complete list of metrics for Intel CPUs and their formulas can be found in [TMA_metrics.xlsx](https://github.com/intel/perfmon/blob/main/TMA_Metrics.xlsx).[^1] [@sec:PerfMetricsCaseStudy] shows how performance metrics can be used in practice.
 
 \small
 

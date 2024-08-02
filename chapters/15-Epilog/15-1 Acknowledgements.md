@@ -53,11 +53,8 @@ Marco Castorina authored [@sec:Tracy] "Specialized and Hybrid profilers" that sh
 \begin{wrapfigure}{r}{2.5cm}
 \includegraphics[width=2.5cm]{../../img/contributors/LallySingh_circle.png}
 \end{wrapfigure} 
-Lally Singh has authored [@sec:MarkerAPI] about Marker APIs. [TODO]: Lally's bio
+Lally Singh has authored [@sec:MarkerAPI] about Marker APIs. Lally is currently at Tesla, his prior work includes Datadog's performance team, Google's Search performance team, low latency trading systems, and embedded real-time control systems. Lally has a PhD in CS from Virginia Tech, focusing on scalability in distributed VR.
 
-\hfill \break 
-\hfill \break 
-\hfill \break 
 \hfill \break 
 
 Jumana Mundichipparakkal from ARM, for helping me write about ARM PMU features in [@sec:PmuChapter], for your review and comments. And thanks for your support from the first edition of this book.
@@ -72,8 +69,7 @@ Also, I would like to thank the whole performance community for countless blog a
 
 [TODO]: technical reviewers and proofreaders: Amir Aupov, Charles-Francois Natali
 
-[TODO]: ask for permission 
-I would like to thank my manager at Intel for giving me time slots to work on this book.
+[TODO]: ask for permission. I would like to thank my manager at Intel for giving me time slots to work on this book.
 
 Last but not least, thanks to my family, who were patient enough to tolerate me missing weekend trips and evening walks. Without their support, I wouldn't have finished this book.
 

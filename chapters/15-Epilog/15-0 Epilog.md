@@ -4,6 +4,8 @@
 
 Thanks for reading through the whole book. I hope you enjoyed it and found it useful. I would be even happier if the book would help you solve a real-world problem. In such a case, I would consider it a success and proof that my efforts were not wasted. Before you continue with your endeavors, let me briefly highlight the essential points of the book and give you final recommendations:
 
+[TODO][FIX_BEFORE_REVIEW]: update from chapter 1
+
 * HW performance is not increasing as rapidly as it used to a few decades ago. Performance tuning is becoming more critical than it has been for the last 40 years. It will be one of the key drivers for performance gains in the near future. 
 * Software doesn't have optimal performance by default. Certain limitations exist that prevent applications from reaching their full performance potential. Both HW and SW components have such limitations.
 * There is a famous quote by Donald Knuth: "Premature optimization is the root of all evil". But the opposite is often true as well. Postponed performance engineering work may be too late and cause as much evil as premature optimization. Do not neglect performance aspects when designing your future products. Save your project by integrating automated performance benchmarking into your CI/CD pipeline. *Measure early, measure often.*

@@ -4,8 +4,6 @@
 
 Every modern CPU provides facilities to monitor performance, which are combined into the Performance Monitoring Unit (PMU). This unit incorporates features that help developers to analyze the performance of their applications. An example of a PMU in a modern Intel CPU is provided in Figure @fig:PMU. Most modern PMUs have a set of Performance Monitoring Counters (PMC) that can be used to collect various performance events that happen during the execution of a program. Later in [@sec:counting], we will discuss how PMCs can be used for performance analysis. Also, the PMU has other features that enhance performance analysis, like LBR, PEBS, and PT, a topic to which [@sec:PmuChapter] is devoted.
 
-[TODO][FIX_BEFORE_REVIEW]: The font size used in this diagram is too small for comfortable reading.
-
 ![Performance Monitoring Unit of a modern Intel CPU.](../../img/uarch/PMU.png){#fig:PMU width=100%}
 
 As CPU design evolves with every new generation, so do their PMUs. On Linux, it is possible to determine the version of the PMU in your CPU using the `cpuid` command, as shown in [@lst:QueryPMU]. A similar information can be extracted from the kernel message buffer by checking the output of `dmesg` command. Characteristics of each Intel PMU version, as well as changes from the previous version, can be found in [@IntelOptimizationManual, Volume 3B, Chapter 20].

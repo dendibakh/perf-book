@@ -36,8 +36,6 @@ IPC is useful for evaluating both HW and SW efficiency. HW engineers use this me
 
 IPC is also a useful metric for evaluating software. It gives you an intuition for how quickly instructions in your application progress through the CPU pipeline. Later in this chapter you will see several production applications with varying IPC. Memory intensive applications are usually characterized with a low IPC (0-1), while computationally intensive workloads tend have high IPC (4-6).
 
-[TODO][FIX_BEFORE_REVIEW]: discuss the theoretical maximum IPC of a CPU, and what is achieved by an application.
-
 Linux `perf` users can measure the IPC for their workload by running:
 
 ```bash
