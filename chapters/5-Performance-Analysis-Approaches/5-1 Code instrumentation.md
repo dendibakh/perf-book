@@ -106,14 +106,14 @@ All of the above increases time between experiments and consumes more developmen
 
 When talking about instrumentation, it's important to mention binary instrumentation techniques. The idea behind binary instrumentation is similar but it is done on an already-built executable file rather than on source code. There are two types of binary instrumentation: static (done ahead of time) and dynamic (instrumented code is inserted on-demand as a program executes). The main advantage of dynamic binary instrumentation is that it does not require program recompilation and relinking. Also, with dynamic instrumentation, one can limit the amount of instrumentation to only interesting code regions, instead of instrumenting the entire program.
 
-Binary instrumentation is very useful in performance analysis and debugging. One of the most popular tools for binary instrumentation is the Intel [Pin](https://software.intel.com/en-us/articles/pin-a-dynamic-binary-instrumentation-tool)[^1] tool. Pin intercepts the execution of a program at the occurrence of an interesting event and generates new instrumented code starting at this point in the program. This enables the collecting of various runtime information, for example: 
+Binary instrumentation is very useful in performance analysis and debugging. One of the most popular tools for binary instrumentation is the Intel Pin[^1] tool. Pin intercepts the execution of a program at the occurrence of an interesting event and generates new instrumented code starting at this point in the program. This enables the collecting of various runtime information. One of the most popular tools that is built on top of Pin is Intel SDE (Software Development Emulator),[^2] that enables collecting: 
 
-[TODO][FIX_BEFORE_REVIEW]: add discussion on SDE?
-
-* instruction count and function call counts. 
-* intercepting function calls and execution of any instruction in an application.
-* allows "record and replay" the program region by capturing the memory and HW registers state at the beginning of the region.
+* instruction count and function call counts,
+* instruction mix analysis,
+* intercepting function calls and execution of any instruction in an application,
+* memory intensity and footprint (see [@sec:MemoryIntensityFootprint]).
 
 Like code instrumentation, binary instrumentation enables instrumenting only user-level code and can be very slow.
 
-[^1]: PIN - [https://software.intel.com/en-us/articles/pin-a-dynamic-binary-instrumentation-tool](https://software.intel.com/en-us/articles/pin-a-dynamic-binary-instrumentation-tool)
+[^1]: Pin - [https://software.intel.com/en-us/articles/pin-a-dynamic-binary-instrumentation-tool](https://software.intel.com/en-us/articles/pin-a-dynamic-binary-instrumentation-tool)
+[^2]: Intel SDE - [https://www.intel.com/content/www/us/en/developer/articles/tool/software-development-emulator.html](https://www.intel.com/content/www/us/en/developer/articles/tool/software-development-emulator.html)

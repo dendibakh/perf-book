@@ -8,8 +8,6 @@ This is a book about low-level performance, remember? So, we will focus on extra
 
 But even without a fully fledged characterization methodology, collecting total number of certain performance events can be helpful. We hope that the case studies in the previous chapter that examined performance metrics of four different benchmarks, proved that. PMCs are a very important instrument of low-level performance analysis. They can provide unique information about the execution of a program. PMCs are generally used in two modes: "Counting" and "Sampling". Counting mode is used for workload characterization, while sampling mode is used for finding hotspots, which we will discuss soon. 
 
-[TODO][FIX_BEFORE_REVIEW]: create an abbreviation PME = performance monitoring event and use it across the chapter
-
 ### Counting Performance Monitoring Events
 
 The idea behind counting is very simple: we want to count the total number of certain performance monitoring events while our program is running. Figure @fig:Counting illustrates the process of counting performance events from the start to the end of a program.
@@ -45,23 +43,23 @@ C4H     00H  BR_INST_RETIRED.      Branch instructions that retired.
 
 Table: Example of encoding Skylake performance events. {#tbl:perf_count}
 
-Linux `perf` provides mappings for commonly used performance events. They can be accessed via pseudo names instead of specifying `Event` and `Umask` hexadecimal values. For example, `branches` is just a synonym for `BR_INST_RETIRED.ALL_BRANCHES` and will measure the same thing. A list of available mapping names can be viewed with `perf list`:
-
-[TODO][FIX_BEFORE_REVIEW]: add more interesting events
+Linux `perf` provides mappings for commonly used performance events. They can be accessed via pseudo names instead of specifying `Event` and `Umask` hexadecimal values. For example, `branches` is just a shorthand for `BR_INST_RETIRED.ALL_BRANCHES` and will measure the same thing. A full list of available event names can be viewed with `perf list`:
 
 ```bash
 $ perf list
+  cycles            [Hardware event]
+  ref-cycles        [Hardware event]
+  instructions      [Hardware event]
   branches          [Hardware event]
   branch-misses     [Hardware event]
-  bus-cycles        [Hardware event]
-  cache-misses      [Hardware event]
-  cycles            [Hardware event]
-  instructions      [Hardware event]
-  ref-cycles        [Hardware event]
+  ...
+cache:
+  mem_load_retired.l1_hit
+  mem_load_retired.l1_miss
   ...
 ```
 
-However, Linux `perf` does not necessarily provide mappings for all performance events for every CPU architecture. If the PMC you are looking for doesn't have a mapping, it can be collected with the following syntax:
+Linux `perf` provide mappings for the majority of performance events for every popular CPU architecture. For instance, mem_load_retired.l1_hit provides a mapping for `MEM_LOAD_RETIRED.L1_HIT`. If the PMC you are looking for doesn't have a mapping in the Linux perf list of supported events, it can be collected with the following syntax:
 
 ```bash
 $ perf stat -e cpu/event=0xc4,umask=0x0,name=BR_INST_RETIRED.ALL_BRANCHES/ -- ./a.exe

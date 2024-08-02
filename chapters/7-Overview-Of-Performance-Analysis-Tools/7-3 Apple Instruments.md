@@ -15,7 +15,7 @@ In this chapter we will only showcase the "CPU Counters" instrument, which is th
 
 ### What you cannot do with it: {.unlisted .unnumbered}
 
-[TODO][FIX_BEFORE_REVIEW]: does it have the same blind spots as VTune and uProf?
+Similar to other sampling-based profilers, Xcode Instruments has the same blind spots as VTune and uProf.
 
 ### Example: Profiling Clang Compilation {.unlisted .unnumbered}
 

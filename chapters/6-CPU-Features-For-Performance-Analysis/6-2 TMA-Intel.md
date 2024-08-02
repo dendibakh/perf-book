@@ -22,23 +22,19 @@ We ran the experiments on the machine equipped with Intel Core i5-8259U CPU (Sky
 
 ### Step1: Identify the Bottleneck {.unlisted .unnumbered}
 
-As a first step, we run our microbenchmark and collect a limited set of events that will help us to calculate Level 1 metrics. Here, we try to identify high-level performance bottlenecks of our application by attributing them to the four L1 buckets: `Front End Bound`, `Back End Bound`, `Retiring`, `Bad Speculation`. It is possible to collect Level 1 metrics using Linux `perf` tool. As of Linux kernel 4.8, `perf` has an option `--topdown` used in `perf stat` command that prints TMA Level 1 metrics. Below is the breakdown for our benchmark. Command outputs in this section are trimmed to save space.
-
-[TODO][FIX_BEFORE_REVIEW]: on Alderlake, `perf stat --topdown` doesn't work on kernel 4.8, newer version is required. Also now it can print L1 and L2 TMA metrics. (see https://github.com/dendibakh/perf-book/issues/42)
+As a first step, we run our microbenchmark and collect a limited set of events that will help us to calculate Level 1 metrics. Here, we try to identify high-level performance bottlenecks of our application by attributing them to the four L1 buckets: `Front End Bound`, `Back End Bound`, `Retiring`, `Bad Speculation`. It is possible to collect Level 1 metrics using Linux `perf` tool. The `perf stat` command has a dedicated `--topdown` option, however, in the recent version it will output these metrics by default. Below is the breakdown for our benchmark. The ouput of all commands in this section is trimmed to save space.
 
 ```bash
-$ perf stat --topdown -a -- taskset -c 0 ./benchmark.exe
-       retiring  bad speculat  FE bound  BE bound
-S0-C0    32.5%       0.2%       13.8%      53.4%  <==
-S0-C1    17.4%       2.3%       12.0%      68.2%
-S0-C2    10.1%       5.8%       32.5%      51.6%
-S0-C3    47.3%       0.3%        2.9%      49.6%
+$ perf stat -- ./benchmark.exe
+...
+  TopdownL1 (cpu_core)  #  53.4 %  tma_backend_bound    <==
+                        #   0.2 %  tma_bad_speculation    
+                        #  13.8 %  tma_frontend_bound     
+                        #  32.5 %  tma_retiring
 ...
 ```
 
-To get values for high-level TMA metrics, Linux `perf` requires profiling the whole system (`-a`). This is why we see metrics for all cores. But since we have pinned the benchmark to core 0 with `taskset -c 0`, we need focus only on the row corresponding to `S0-C0`. We can discard other rows as they were running other tasks or remained idle. By looking at the output, we can tell that performance of the application is bound by the CPU backend. Without trying to analyze it right now, let us drill one level down.
-
-Linux perf only supports Level 1 TMA metrics, so to get access to TMA metrics Level 2, 3, and further, we will use the `toplev` tool that is a part of [pmu-tools](https://github.com/andikleen/pmu-tools)[^7] written by Andi Kleen. It is implemented in `Python` and invokes Linux `perf` under the hood. Specific Linux kernel settings must be enabled to use `toplev`, check the documentation for more details.
+By looking at the output, we can tell that performance of the application is bound by the CPU backend. Let's drill one level down. Linux `perf` currently only supports Level 1 TMA metrics, so to get access to TMA metrics Level 2, 3, and further, we will use the `toplev` tool that is a part of [pmu-tools](https://github.com/andikleen/pmu-tools)[^7] written by Andi Kleen. It is implemented in `Python` and uses Linux `perf` under the hood. Specific Linux kernel settings must be enabled to use `toplev`, check the documentation for more details.
 
 ```bash
 $ ~/pmu-tools/toplev.py --core S0-C0 -l2 -v --no-desc taskset -c 0 ./benchmark.exe

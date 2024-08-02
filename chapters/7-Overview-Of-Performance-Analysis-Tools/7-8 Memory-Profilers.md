@@ -71,7 +71,7 @@ Since the number of allocations is growing but the total consumed memory doesn't
 
 Similar to temporary allocations, you can also find the paths that lead to the largest allocations in a program. In the dropdown menu at the top, you would need to select the "Consumed" flame graph. We encourage readers to explore other tabs as well.
 
-### Memory Intensity and Footprint
+### Memory Intensity and Footprint {#sec:MemoryIntensityFootprint}
 
 In this section, we will show how to measure the memory *intensity* and memory *footprint* of a program. Memory intensity refers to the size of data being accessed by a phase of a program, measured, for example, in MB per second. A program with high memory intensity makes heavy use of the memory system, often accessing large amounts of data. On the other hand, a program with low memory intensity makes relatively fewer memory accesses and may be more compute-bound, meaning it spends more time performing calculations rather than waiting for data from memory. Measuring memory intensity during short time intervals enables us to observe how it changes over time. 
 
