@@ -1,5 +1,3 @@
-[TODO][FIX_BEFORE_REVIEW]: possible candidate for Appendix
-
 ## Event Tracing for Windows {#sec:ETW}
 
 Microsoft has developed a system-wide tracing facility named Event Tracing for Windows (ETW). It was originally intended for helping device driver developers, but later found its use in analyzing general-purpose applications as well. ETW is available on all supported Windows platforms (x86, x64 and ARM) with the corresponding platform-dependent installation packages. ETW records structured events in user and kernel code with full call stack trace support, which enables you to observe SW dynamics in a running system and solve many challenging performance issues.
@@ -82,9 +80,7 @@ Windows supports Event Log and Performance Counter triggers that can start a scr
 
 Figure @fig:WPA_MainView shows the recorded ETW data opened in Windows Performance Analyzer (WPA). The WPA view is divided into three vertically layered parts: *CPU Usage (Sampled)*, *Generic Events* and *CPU Usage (Precise)*. To understand the difference between them, let's dive deeper. The upper graph *CPU Usage (Sampled)* is useful for identifying where the CPU time is spent. The data is collected by sampling all the running threads at a regular time interval. This *CPU Usage (Sampled)* graph is very similar to the *Hotspots* view in other profiling tools.
 
-[TODO][FIX_BEFORE_REVIEW]: improve caption of the image
-
-![Windows Performance Analyzer overview of a slow start of an application.](../../img/perf-tools/WPA_MainView.png){#fig:WPA_MainView width=100% }
+![Windows Performance Analyzer: root causing a slow start of an application.](../../img/perf-tools/WPA_MainView.png){#fig:WPA_MainView width=100% }
 
 Next comes the *Generic Events* view, which displays such events like mouse clicks and captured screenshots. Remember that we enabled interception of those events in the ETWController window. Because events are placed on the timeline, it is easy to correlate UI interactions with how the system reacts to them.
 
