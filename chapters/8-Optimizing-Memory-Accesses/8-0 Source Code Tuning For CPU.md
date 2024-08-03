@@ -72,6 +72,6 @@ The next four chapters are organized according to the TMA classification (see [@
 
 The idea behind this classification is to offer a checklist for developers when they are using TMA methodology in their performance engineering work. Whenever TMA attributes a performance bottleneck to one of the categories mentioned above, feel free to consult one of the corresponding chapters to learn about your options.
 
-[TODO][FIX_BEFORE_REVIEW]: update with preview of other chapter
+[@sec:ChapterOtherTuning] coves optimization topics not specifically related to any of the categories covered in the previous four chapters. In this chapter, we will discuss CPU-specific optimizations, examine several microarchitecture-related performance problems, explore techniques used for optimizing low-latency applications, and give you advice on tuning your system for the best performance.
 
-[@sec:ChapterOtherTuning] covers other optimization areas that do not belong to any of the categories above. [@sec:secOptMTApps] addresses some common problems in optimizing multithreaded applications.
+[@sec:secOptMTApps] addresses some common problems in optimizing multithreaded applications. It provides a case study of five real-world multithreaded applications, where we explain why their performance doesn't scale with the increasing number of CPU threads. We also discuss cache coherency issues, such as "False Sharing" and a few tools that are designed to analyze multithreaded applications.

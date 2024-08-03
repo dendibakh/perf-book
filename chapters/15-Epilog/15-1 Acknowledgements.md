@@ -1,5 +1,7 @@
 # Acknowledgments {.unnumbered}
 
+\markright{Acknowledgments}
+
 I write this section with profound gratitude to all the people mentioned below. I feel very humble to deliver to you all the knowledge these people have.
 
 \vspace{-1cm} \hfill \break \vspace{0.5cm}

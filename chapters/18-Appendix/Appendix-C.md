@@ -11,8 +11,6 @@ To utilize huge pages on Windows, one needs to enable `SeLockMemoryPrivilege` [s
 1. Hit start -> search "secpol.msc", launch it.
 2. On the left select "Local Policies" -> "User Rights Assignment", then double-click on "Lock pages in memory".
 
-[TODO][FIX_BEFORE_REVIEW]: This image is too blurry. Redo.
-
 ![Windows security: Lock pages in memory](../../img/appendix-C/WinLockPages.png){width=100%}
 
 3. Add your user and reboot the machine.

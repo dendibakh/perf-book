@@ -54,8 +54,6 @@ S s;
 }                                  │     }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-[TODO][FIX_BEFORE_REVIEW]: Make this image with colors
-
 ![False Sharing: two threads access the same cache line.](../../img/mt-perf/FalseSharing.jpg){#fig:FalseSharing width=60%}
 
 False sharing is a frequent source of performance issues for multithreaded applications. Because of that, modern analysis tools have built-in support for detecting such cases. TMA characterizes applications that experience true/false sharing as `Memory Bound`. Typically, in such cases, you would see a high value for the `Contested Accesses` metric.[^18]
