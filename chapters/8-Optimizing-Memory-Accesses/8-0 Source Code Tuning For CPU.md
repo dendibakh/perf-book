@@ -2,7 +2,7 @@
 
 # Part 2. Source Code Tuning {.unnumbered}
 
-\markright{Part 2. Source Code Tuning}
+\markboth{Part 2. Source Code Tuning}{Part 2. Source Code Tuning}
 
 In Part 1 of this book we discussed how to find performance bottlenecks in code. In Part 2 we will discuss how to fix such
 bottlenecks through the use of techniques for low-level source code optimization, also known as *tuning*.

@@ -1,6 +1,6 @@
 # Appendix D. Intel Processor Traces {.unnumbered}
 
-\markright{Appendix D}
+\markboth{Appendix D}{Appendix D}
 
 The Intel Processor Traces (PT) is a CPU feature that records the program execution by encoding packets in a highly compressed binary format that can be used to reconstruct execution flow with a timestamp on every instruction. PT has extensive coverage and relatively small overhead,[^1] which is usually below `5%`. Its main usages are postmortem analysis and root-causing performance glitches.
 

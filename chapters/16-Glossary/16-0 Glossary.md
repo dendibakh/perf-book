@@ -1,6 +1,6 @@
 # Glossary {.unnumbered}
 
-\markright{Glossary}
+\markboth{Glossary}{Glossary}
 
 \begin{multicols}{2}
 

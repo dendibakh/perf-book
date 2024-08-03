@@ -2,7 +2,7 @@
 
 # Appendix A. Reducing Measurement Noise {.unnumbered}
 
-\markright{Appendix A}
+\markboth{Appendix A}{Appendix A}
 
 Below are some examples of features that can contribute to increased non-determinism in performance measurements. See complete discussion in [@sec:secFairExperiments].
 

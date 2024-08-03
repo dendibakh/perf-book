@@ -1,6 +1,6 @@
 # List of the Major CPU Microarchitectures {.unnumbered}
 
-\markright{List of the Major CPU Microarchitectures}
+\markboth{List of the Major CPU Microarchitectures}{List of the Major CPU Microarchitectures}
 
 [TODO]: add border lines in the tables below
 
@@ -74,5 +74,7 @@ Table: List of the recent AMD microarchitectures. {#tbl:AMDUarchs}
 ------------------------------------------------------------------
 
 Table: List of recent ARM ISAs along with their own and third-party implementations. {#tbl:ARMUarchs}
+
+[TODO]: remove unused entries in biblio.bib
 
 \bibliography{biblio}

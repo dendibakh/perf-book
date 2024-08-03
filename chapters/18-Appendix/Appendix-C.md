@@ -2,7 +2,7 @@
 
 # Appendix C. Enable Huge Pages {.unnumbered}
 
-\markright{Appendix C}
+\markboth{Appendix C}{Appendix C}
 
 ## Windows {.unnumbered}
 
