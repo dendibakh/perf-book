@@ -6,6 +6,8 @@ Microprocessors with the x86 architecture translate complex CISC-like instructio
 
 The main advantage of splitting instructions into micro operations is that $\mu$ops can be executed:
 
+\lstset{linewidth=10cm}
+
 * **Out of order**: consider the `PUSH rbx` instruction, which decrements the stack pointer by 8 bytes and then stores the source operand on the top of the stack. Suppose that `PUSH rbx` is "cracked" into two dependent micro operations after decode:
   ```
   SUB rsp, 8
@@ -37,6 +39,8 @@ Even though we were just talking about how instructions are split into smaller p
     jnz .loop
   ```
   With macrofusion, two $\mu$ops from the `DEC` and `JNZ` instructions are fused into one. The Zen4 microarchitecture also added support for DIV/IDIV and NOP macrofusion [@amd_zen4, sections 2.9.4 and 2.9.5].
+
+\lstset{linewidth=\textwidth}
 
 Both micro- and macrofusion save bandwidth in all stages of the pipeline from decoding to retirement. The fused operations share a single entry in the reorder buffer (ROB). The capacity of the ROB is utilized better when a fused $\mu$op uses only one entry. Such a fused ROB entry is later dispatched to two different execution ports but is retired again as a single unit. Readers can learn more about $\mu$op fusion in [@fogMicroarchitecture].
 

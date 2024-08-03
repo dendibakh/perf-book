@@ -22,6 +22,8 @@ $$
 $$
 In real implementations, pipelining introduces several constraints that limit the ideal model shown above. Pipeline hazards prevent the ideal pipeline behavior, resulting in stalls. The three classes of hazards are structural hazards, data hazards, and control hazards. Luckily for the programmer, in modern CPUs, all classes of hazards are handled by the hardware.
 
+\lstset{linewidth=10cm}
+
 * **Structural hazards**: are caused by resource conflicts. To a large extent, they could be eliminated by replicating the hardware resources, such as using multi-ported registers or memories. However, eliminating all such hazards could potentially become quite expensive in terms of silicon area and power.
 
 * **Data hazards**: are caused by data dependencies in the program and are classified into three types:
@@ -58,6 +60,8 @@ In real implementations, pipelining introduces several constraints that limit th
   Again, for the code on the left, we cannot reorder the two operations, because it could leave the wrong value in `R2`. We need to make sure all the future instructions that use `R2` would see zero. To overcome this limitation, we need to rename all the occurrences of `R2` register starting from the second write (`R2 = 0`) and below to use a different register.
 
 * **Control hazards**: are caused due to changes in the program flow. They arise from pipelining branches and other instructions that change the program flow. The branch condition that determines the direction of the branch (taken vs. not-taken) is resolved in the execute pipeline stage. As a result, the fetch of the next instruction cannot be pipelined unless the control hazard is eliminated. Techniques such as dynamic branch prediction and speculative execution described in the next section are used to overcome control hazards.
+
+\lstset{linewidth=\textwidth}
 
 [^1]: Register renaming - [https://en.wikipedia.org/wiki/Register_renaming](https://en.wikipedia.org/wiki/Register_renaming).
 [^3]: Architectural state - [https://en.wikipedia.org/wiki/Architectural_state](https://en.wikipedia.org/wiki/Architectural_state).
