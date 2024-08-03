@@ -116,5 +116,5 @@ It is worth to mention that data dependencies can also be created through memory
 
 As a closing thought, we would like to emphasize the importance of finding that critical dependency chain. It is not always easy, but it is crucial to know what stands on the critical path in your loop, function, or other block of code. Otherwise, you may find yourself fixing secondary issues that barely make a difference.
 
-[^1]: Apple doesn't publish instruction latency and throughput for their products, but there are experiments that shed some light on it, one such study is here: [https://dougallj.github.io/applecpu/firestorm-simd.html](https://dougallj.github.io/applecpu/firestorm-simd.html). Since this is an unofficial source of data, you should take it with a grain of salt.
+[^1]: Apple published instruction latency and throughput data in [@AppleOptimizationGuide, Appendix A].
 [^2]: Performance Ninja: Dependency Chains 2 - [https://github.com/dendibakh/perf-ninja/tree/main/labs/core_bound/dep_chains_2](https://github.com/dendibakh/perf-ninja/tree/main/labs/core_bound/dep_chains_2)

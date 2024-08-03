@@ -35,7 +35,7 @@ $$
 
 Consider an example of an L1 cache, which size is 32 KB with 64 bytes cache lines, 64 sets and 8 ways. The total number of cache lines in such a cache is `32 KB / 64 bytes = 512 lines`. A new line can be inserted only in one of the 64 sets. Once the set is determined, a new line can go to one of the 8 ways in this set. Similarly, when you later search for this cache line, you determine the set first, and then you only need to examine up to 8 ways in the set.
 
-[TODO][FIX_BEFORE_REVIEW]: Add example of cache organization from Table 4.18. L1D Cache Organization and Table 4.20. Shared L2 Cache Organization from Apple Silicon Optimization Guide.
+Here is another example of cache organization of the Apple M1 processor. The L1 data cache inside each performance core can store 128 KB, has 256 sets with 8-ways in each set, and operates on 64 byte lines. Performance cores form a cluster and share the L2 cache, which can keep 12 MB, is 12-way set-associative, and operates on 128 byte lines. [@AppleOptimizationGuide]
 
 #### Finding Data in the Cache.
 
@@ -72,8 +72,6 @@ $$
 \textrm{Average Access Latency} = \textrm{Hit Time } + \textrm{ Miss Rate } \times \textrm{ Miss Penalty}
 $$
 Hardware designers take on the challenge of reducing the hit time and miss penalty through many novel micro-architecture techniques. Fundamentally, cache misses stall the pipeline and hurt performance. The miss rate for any cache is highly dependent on the cache architecture (block size, associativity) and the software running on the machine. As a result, optimizing the miss rate becomes a hardware-software co-design effort. As discussed earlier, CPUs provide optimal hardware organization for caches. Additional techniques that can be implemented both in hardware and software to minimize cache miss rates are described below.
-
-[TODO]: Memory renaming?
 
 ##### HW and SW Prefetching. {#sec:HwPrefetch}
 

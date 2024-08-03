@@ -2,8 +2,6 @@
 
 ## The Roofline Performance Model {#sec:roofline}
 
-[TODO]: Elaborate on: "Is the model limited to just FLOPS vs memory bandwidth? Or could it be used to graph other metrics, such as integer operations per second, hashes per second, password guesses per second, and so on?"
-
 The Roofline performance model is a throughput-oriented performance model that is heavily used in the HPC world. It was developed at the University of California, Berkeley, in 2009. The "roofline" in this model expresses the fact that the performance of an application cannot exceed the machine's capabilities. Every function and every loop in a program is limited by either compute or memory capacity of a machine. This concept is represented in Figure @fig:RooflineIntro. The performance of an application will always be limited by a certain "roofline" function.
 
 ![The Roofline Performance Model. The maximum performance of an application is limited by the minimum between peak FLOPS (horizontal line) and the platform bandwidth multiplied by arithmetic intensity (diagonal line). *© Image taken from [NERSC Documentation](https://docs.nersc.gov/development/performance-debugging-tools/roofline/#arithmetic-intensity-ai-and-achieved-performance-flops-for-application-characterization).*](../../img/perf-analysis/Roofline-intro.png){#fig:RooflineIntro width=80%}

@@ -55,11 +55,7 @@ Compared to other solutions, SPE is more similar to AMD IBS than it is to Intel 
 
 The SPE sampling process is built in as part of the instruction execution pipeline. Sample collection is still based on a configurable interval, but operations are statistically selected. Each sampled operation generates a sample record, which contains various data about execution of this operation. SPE record saves address of the instruction, virtual and physical address for the data accessed by loads and stores, the source of the data access (cache or DRAM) and timestamp to correlate with other events in the system. Also, it can give latency of various pipeline stages, such as Issue latency (from dispatch to execution), Translation latency (cycle count for a virtual-to-physical address translation) and Execution latency (latency of load/stores in the functional unit). The whitepaper [@ARMSPE] describes ARM SPE in more details as well as shows a few optimization examples using it.
 
-Similar to Intel PEBS and AMD IBS, ARM SPE helps to reduce the sampling overhead and enables longer collections. In addition to that, it supports post-filtering of sample records, which helps to reduce the memory required for storage. 
-
-[TODO]: Linux perf driver for arm_spe should be installed first https://developer.arm.com/documentation/ka005362/latest/ On Amazon Linux 2 and 2023, the SPE PMU is available by default on Graviton metal instances, you can check for its existence by verifying: https://github.com/aws/aws-graviton-getting-started/blob/main/perfrunbook/debug_hw_perf.md#capturing-statistical-profiling-extension-spe-hardware-events-on-graviton-metal-instances `$ sudo apt install linux-modules-extra-$(uname -r)`
-
-SPE profiling is enabled in the Linux `perf` tool and can be used as follows:
+Similar to Intel PEBS and AMD IBS, ARM SPE helps to reduce the sampling overhead and enables longer collections. In addition to that, it supports post-filtering of sample records, which helps to reduce the memory required for storage. SPE profiling is supported in Linux `perf` and can be used as follows:[^6]
 
 ```bash
 $ perf record -e arm_spe_0/<controls>/ -- test_program
@@ -68,8 +64,6 @@ $ spe-parser perf.data -t csv
 ```
 
 , where `<controls>` lets you optionally specify various controls and filters for the collection. `perf report` will give the usual output according to what user asked for with `<controls>` options. `spe-parser`[^5] is a tool developed by ARM engineers to parse the captured perf record data and save all the SPE records into a CSV file.
-
-[TODO]: Is it possible to use SPE on Windows on ARM? Can `WindowsPerf` collect SPE data that can be parsed by `spe-parser`? - Not yet. ETA: September 2024
 
 ### Precise Events
 
@@ -107,8 +101,6 @@ Users of Linux `perf` on Intel and AMD platforms must add `pp` suffix to one of 
 $ perf record -e cycles:pp -- ./a.exe
 ```
 
-[TODO]: For Denis: show example of regular vs. precise events?
-
 Precise events provide a relief for performance engineers as they help to avoid misleading data that often confuses beginners and even senior developers. The TMA methodology heavily relies on precise events to locate the exact line of source code where the inefficient execution takes place.
 
 ### Analyzing Memory Accesses {#sec:sec_PEBS_DLA}
@@ -125,3 +117,4 @@ One of the most important use cases for these extensions is detecting True and F
 [^2]: Performance skid - [https://easyperf.net/blog/2018/08/29/Understanding-performance-events-skid](https://easyperf.net/blog/2018/08/29/Understanding-performance-events-skid)
 [^4]: Hardware event skid - [https://software.intel.com/en-us/vtune-help-hardware-event-skid](https://software.intel.com/en-us/vtune-help-hardware-event-skid)
 [^5]: ARM SPE parser - [https://gitlab.arm.com/telemetry-solution/telemetry-solution](https://gitlab.arm.com/telemetry-solution/telemetry-solution)
+[^6]: Linux perf driver for `arm_spe` should be installed first (see [https://developer.arm.com/documentation/ka005362/latest/](https://developer.arm.com/documentation/ka005362/latest/)). On Amazon Linux 2 and 2023, the SPE PMU is available by default on Graviton metal instances (see [https://github.com/aws/aws-graviton-getting-started/blob/main/perfrunbook/debug_hw_perf.md](https://github.com/aws/aws-graviton-getting-started/blob/main/perfrunbook/debug_hw_perf.md))
