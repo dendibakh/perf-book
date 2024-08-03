@@ -26,7 +26,7 @@ Let's look at the code in [@lst:FMAthroughput]. We intentionally try to make the
 
 Listing: FMA throughput
 
-~~~~ {#lst:FMAthroughput .cpp .numberLines}
+~~~~ {#lst:FMAthroughput .cpp}
 float foo(float * a, float B, int N){  │ .loop:
   float sum = 0;                       │  vfmadd231ps ymm2, ymm1, [rdi + rsi]
   for (int i = 0; i < N; i++)          │  vfmadd231ps ymm3, ymm1, [rdi + rsi + 32]
@@ -40,6 +40,8 @@ float foo(float * a, float B, int N){  │ .loop:
 This is a reduction loop, i.e., we need to sum up all the products and in the end return a single float value. The way this code is written, there is a loop-carry dependency over `sum`. You cannot overwrite `sum` until you accumulate the previous product. A smart way to parallelize this is to have multiple accumulators and roll them up in the end. So, instead a single `sum`, we could have `sum1` to accumulate results from even iterations and `sum2` from odd iterations. This is what Clang-16 has done: it has 4 vectors (`ymm2`-`ymm5`) each holding 8 floating-point accumulators, plus it used FMA to fuse multiplication and addition into single instruction. The constant `B` is broadcast into the `ymm1` register. The `-ffast-math` option allows a compiler to reassociate floating-point operations, we will discuss how this option can aid optimizations in [@sec:Vectorization]. By the way, the multiplication by `B` can be done only once after the loop. This is an oversight by the programmer, but hopefully compilers will be able to handle it in the future.
 
 The code looks good, but is it really optimal? Let's find out. We took the assembly snippet from [@lst:FMAthroughput] to UICA and ran simulations. At the time of writing, Alderlake (Intel's 12th gen, based on GoldenCove) is not supported by UICA, so we ran it on the latest available, which is RocketLake (Intel's 11th gen, based on SunnyCove). Although the architectures differ, the issue exposed by this experiment is equally visible on both. The result of simulation is shown on Figure @fig:FMA_tput_UICA. This is a pipeline diagram similar to what we have shown in Chapter 3. We skipped the first two iterations, and show only iterations 2 and 3 (leftmost column "It."). This is when the execution reaches a steady state, and all further iterations look very similar.
+
+[TODO]: cut image further. Plus adjust the text accordingly.
 
 ![UICA pipeline diagram. `I` = issued, `r` = ready for dispatch, `D` = dispatched, `E` = executed, `R` = retired.](../../img/perf-analysis/fma_tput_uica.png){#fig:FMA_tput_UICA width=100%}
 

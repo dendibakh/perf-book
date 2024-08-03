@@ -59,7 +59,7 @@ Coords findObject(const ObjParams& p, Coords c, float searchRadius) {
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In this hypothetical scenario, we added instrumentation to know how frequently we `zoomIn` before we find an object. The variable `inc.tripCount` counts the number of iterations the loop runs before it exits, and the variable `inc.zoomCount` counts how many times we reduce the search radius. We always expect `inc.zoomCount` to be less or equal `inc.tripCount`. Here is the output one may observe after running the instrumented program:
+In this hypothetical scenario, we added instrumentation to know how frequently we `zoomIn` before we find an object. The variable `inc.tripCount` counts the number of iterations the loop runs before it exits, and the variable `inc.zoomCount` counts how many times we reduce the search radius. We always expect `inc.zoomCount` to be less or equal `inc.tripCount`. Here is the output you may observe after running the instrumented program:
 
 ```
 [7][6]:  2
@@ -80,11 +80,6 @@ In this hypothetical scenario, we added instrumentation to know how frequently w
 [5][2]:  160
 [5][1]:  764
 [5][0]:  34142
-[4][4]:  5
-[4][3]:  31
-[4][2]:  103
-[4][1]:  195
-[4][0]:  14575
 ...
 ```
 

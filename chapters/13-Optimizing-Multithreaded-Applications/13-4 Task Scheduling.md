@@ -13,15 +13,26 @@ Below we show a few typical pitfalls of task scheduling in asymmetric systems. W
 
 Figure @fig:OmpScheduling shows three strategies, which highlight common problems that we regularly see in practice. These screenshots were captured with Intel VTune; with some modifications applied. The bars on the timeline indicate CPU time, i.e., periods when a thread was running. For each software thread, there is one or two corresponding CPU cores. Using this view, we can see on which core each thread was running at any given time.
 
-<div id="fig:OmpScheduling">
-![Static partitioning with pinning threads to the cores: `#pragma omp for schedule(static)` with `OMP_PROC_BIND=true`.](../../img/mt-perf/OmpAffinity.png){#fig:OmpAffinity width=80%}
+\begin{figure}[htbp]
+\centering
 
-![Static partitioning, no thread affinity: `#pragma omp for schedule(static)`.](../../img/mt-perf/OmpStatic.png){#fig:OmpStatic width=80%}
+\subfloat[Static partitioning with pinning threads to the cores:
+\passthrough{\lstinline!\#pragma omp for schedule(static)!} with
+\passthrough{\lstinline!OMP\_PROC\_BIND=true!}.]{\includegraphics[width=0.8\textwidth,height=\textheight]{../../img/mt-perf/OmpAffinity.png}\label{fig:OmpAffinity}}
 
-![Dynamic partitioning with 16 chunks: `#pragma omp for schedule(dynamic, N/16)`.](../../img/mt-perf/OmpDynamic.png){#fig:OmpDynamic width=80%}
+\subfloat[Static partitioning, no thread affinity:
+\passthrough{\lstinline!\#pragma omp for schedule(static)!}.]{\includegraphics[width=0.8\textwidth,height=\textheight]{../../img/mt-perf/OmpStatic.png}\label{fig:OmpStatic}}
 
-Typical task scheduling pitfalls: core affinity blocks thread migration, partitioning jobs with large granularity fails to maximize CPU utilization.
-</div>
+\subfloat[Dynamic partitioning with 16 chunks:
+\passthrough{\lstinline!\#pragma omp for schedule(dynamic, N/16)!}.]{\includegraphics[width=0.8\textwidth,height=\textheight]{../../img/mt-perf/OmpDynamic.png}\label{fig:OmpDynamic}}
+
+\caption{Typical task scheduling pitfalls: core affinity blocks thread
+migration, partitioning jobs with large granularity fails to maximize
+CPU utilization.}
+
+\label{fig:OmpScheduling}
+
+\end{figure}
 
 Our first example uses static partitioning, which divides the processing of our large array into four equal chunks (since we have four cores enabled). For each chunk, the OpenMP runtime will spawn a new thread. Also, we used `OMP_PROC_BIND=true`, which instructs OpenMP runtime to pin spawned threads to the CPU cores. Figure @fig:OmpAffinity demonstrates the effect: P-cores are much better at handling SIMD instructions than E-cores and they finish their jobs two times faster (see *Thread 1* and *Thread 2*). However, thread affinity does not allow *Thread 3* and *Thread 4* to migrate to P-cores, which are waiting at the barrier. That results in a high latency, which is limited by the speed of E-cores.
 

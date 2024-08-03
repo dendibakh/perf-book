@@ -100,9 +100,11 @@
 \captionsetup[subfloat]{margin=0.5em}
 \@ifpackageloaded{float}{}{\usepackage{float}}
 \floatstyle{ruled}
-\@ifundefined{c@chapter}{\newfloat{codelisting}{htbp}{lop}}{\newfloat{codelisting}{htbp}{lop}[chapter]}
+\@ifundefined{c@chapter}{\newfloat{codelisting}{htb}{lop}}{\newfloat{codelisting}{htb}{lop}[chapter]}
 \floatname{codelisting}{Listing}
 \newcommand*\listoflistings{\listof{codelisting}{List of Listings}}
+% Redefine the default htbp figure placement 
+\def\fps@figure{htb}
 \makeatother
 
 \usepackage{graphicx}
