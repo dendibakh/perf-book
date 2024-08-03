@@ -4,37 +4,38 @@
 
 There are types of applications that have hotspots worth tuning heavily. However, compilers do not always do what we want in terms of generated code in those hot places. For example, a program does some computation in a loop which the compiler vectorizes in a suboptimal way. It usually involves some tricky or specialized algorithms, for which we can come up with a better sequence of instructions. It can be very hard or even impossible to make the compiler generate the desired assembly code using standard constructs of the C and C++ languages.
 
-Hopefully, it's possible to force the compiler to generate particular assembly instructions without writing in low-level assembly language. To achieve that, one can use compiler intrinsics, which in turn are translated into specific assembly instructions. Intrinsics provide the same benefit as using inline assembly, but also they improve code readability, allow compiler type checking, assist instruction scheduling, and help reduce debugging. Example in [@lst:Intrinsics] shows how the same loop in function `foo` can be coded via compiler intrinsics (function `bar`).
+Hopefully, it's possible to force the compiler to generate particular assembly instructions without writing in low-level assembly language. To achieve that, one can use compiler intrinsics, which in turn are translated into specific assembly instructions. Intrinsics provide the same benefit as using inline assembly, but also they improve code readability, allow compiler type checking and further optimization, e.g., peephole transformations and instruction scheduling. Example in [@lst:Intrinsics] shows how the horizontal sum of elements in an array (see [@lst:VectIllegal]) can be coded via compiler intrinsics.
 
-[TODO][FIX_BEFORE_REVIEW]: This is not a reduction, but a summing of elements. Rewrite this example. Change caption to "Summing elements of an array using compiler intrinsics."
-
-Listing: Compiler Intrinsics
+Listing: Summing elements of an array with compiler Intrinsics.
 		
 ~~~~ {#lst:Intrinsics .cpp .numberLines}
-void foo(float *a, float *b, float *c, unsigned N) {
-  for (unsigned i = 0; i < N; i++)
-    c[i] = a[i] + b[i]; 
-}
+#include <immintrin.h>
 
-#include <xmmintrin.h>
-
-void bar(float *a, float *b, float *c, unsigned N) {
-  __m128 rA, rB, rC;
-  int i = 0;
-  for (; i + 3 < N; i += 4){
-    rA = _mm_load_ps(&a[i]);
-    rB = _mm_load_ps(&b[i]);
-    rC = _mm_add_ps(rA,rB);
-    _mm_store_ps(&c[i], rC);
+float calcSum(float* a, unsigned N) {  
+  __m128 sum = _mm_setzero_ps();      // init sum with zeros
+  unsigned i = 0;
+  for (; i + 3 < N; i += 4) {
+    __m128 vec = _mm_loadu_ps(a + i); // load 4 floats from array
+    sum = _mm_add_ps(sum, vec);       // accumulate vec into sum
   }
-  for (; i < N; i++) // remainder
-    c[i] = a[i] + b[i];
+
+  // Horizontal sum of the 128-bit vector
+  __m128 shuf = _mm_movehdup_ps(sum); // broadcast elements 3,1 to 2,0
+  sum = _mm_add_ps(sum, shuf);        // partial sums [0+1] and [2+3]
+  shuf = _mm_movehl_ps(shuf, sum);    // high half -> low half
+  sum = _mm_add_ss(sum, shuf);        // result in the lower element
+  float result = _mm_cvtss_f32(sum);  // nop (compiler eliminates it)
+
+  // Process any remaining elements
+  for (; i < N; i++)
+      result += a[i];
+  return result;
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-When compiled for the SSE target, both `foo` and `bar` will generate similar assembly instructions. However, there are several caveats. First, when relying on auto-vectorization, the compiler will insert all necessary runtime checks. For instance, it will ensure that there are enough elements to feed the vector execution units. Secondly, function `foo` will have a fallback scalar version of the loop for processing the remainder of the loop. Finally, most vector intrinsics assume aligned data, so `movaps` (aligned load) is generated for `bar`, while `movups` (unaligned load) is generated for `foo`. Keeping that in mind, developers using compiler intrinsics have to take care of safety aspects themselves.
+When compiling [@lst:VectIllegal] for the SSE target, compilers would generate mostly identical assembly code as for [@lst:Intrinsics]. We show this example just for illustration purposes. Obviously, there is no need to use intrinsics if compiler can generate the same machine code. You should use intrinsics only when compiler fails to generate the desired code. When you leverage compiler auto-vectorization, it will insert all necessary runtime checks. For instance, it will ensure that there are enough elements to feed the vector execution units (see [@lst:Intrinsics], line 6). Also, compiler will generate a scalar version of the loop to process the remainder (line 19). When you use intrinsics, you have to take care of safety aspects yourself.
 
-When writing code using non-portable platform-specific intrinsics, developers should also provide a fallback option for other architectures. A list of all available intrinsics for the Intel platform can be found in this [reference](https://software.intel.com/sites/landingpage/IntrinsicsGuide/)[^11].
+When writing code using non-portable platform-specific intrinsics, developers should also provide a fallback option for other architectures. A list of all available intrinsics for the Intel platform can be found in this [reference](https://software.intel.com/sites/landingpage/IntrinsicsGuide/)[^11]. For ARM, you can find such a list here: [https://developer.arm.com/architectures/instruction-sets/intrinsics/](https://developer.arm.com/architectures/instruction-sets/intrinsics/).
 
 ### Wrapper Libraries for Intrinsics {#sec:secIntrinsicLibraries}
 
