@@ -77,8 +77,6 @@ In our case study, we ran the benchmark two times, however, in practice, one run
 
 The AI Benchmark Alpha has various tests that could exhibit different performance characteristics. The output presented above aggregates all the benchmarks and gives an overall breakdown. This is generally not a good idea if the individual tests indeed have different performance bottlenecks. You need to have a separate Topdown analysis for each of the tests. One way the `topdown-tool` can help is to use `-i` option which will output data per configurable interval of time. You can then compare the intervals and decide on next steps.
 
-[TODO]: update when N2 paper will become public.
-
 [^1]: AI Benchmark Alpha - [https://ai-benchmark.com/alpha.html](https://ai-benchmark.com/alpha.html)
 [^2]: ARM `topdown-tool` - [https://learn.arm.com/install-guides/topdown-tool/](https://learn.arm.com/install-guides/topdown-tool/)
 [^3]: WindowsPerf - [https://gitlab.com/Linaro/WindowsPerf/windowsperf](https://gitlab.com/Linaro/WindowsPerf/windowsperf)
