@@ -87,13 +87,13 @@ Even taking into account the compressed format of the traces, encoded data can c
 
 Users can limit collection even further in several ways. They can limit collecting traces only on user/kernel space code. Also, there is an address range filter, so it's possible to opt-in and opt-out of tracing dynamically to limit the memory bandwidth. This allows us to trace just a single function or even a single loop.
 
-Decoding PT traces can take a long time. On an Intel Core i5-8259U machine, for a workload that runs for 7 milliseconds, encoded PT trace consumes around 1MB of disk space. Decoding this trace using `perf script` takes ~20 seconds. The decoded output from `perf script -F time,ip,sym,symoff,insn` takes ~1.3GB of disk space. As of February 2020, decoding traces with `perf script -F` with `+srcline` or `+srccode` gets extremely slow and is not practical for daily usage. The implementation of Linux perf should be improved. 
+Decoding PT traces can take a long time because it has to follow along with disassembled instructions from the binary and reconstruct the flow. On an Intel Core i5-8259U machine, for a workload that runs for 7 milliseconds, encoded PT trace consumes around 1MB of disk space. Decoding this trace using `perf script -F time,ip,sym,symoff,insn` takes ~20 seconds[^4] and the output consumes ~1.3GB of disk space. 
 
-[TODO][FIX_BEFORE_REVIEW]: Feb 2020: Intel VTune Profiler support for PT is still experimental. But today there is a dedicated analysis type that uses Intel PT.
+## Tools {.unnumbered .unlisted}
+
+Besides Linux perf, there are several other tools that support Intel PT. First, Intel VTune Profiler has *Anomaly Detection* analysis type that uses Intel PT. Another popular tool worth mentioning is magic-trace[^5], which collects and displays high-resolution traces of a process.
 
 ## Intel PT References and links {.unnumbered .unlisted}
-
-[TODO][FIX_BEFORE_REVIEW]: include magic trace
 
 * Intel® 64 and IA-32 Architectures Software Developer Manuals [@IntelOptimizationManual, Volume 3C, Chapter 36].
 * Whitepaper "Hardware-assisted instruction profiling and latency detection" [@IntelPTPaper].
@@ -103,5 +103,7 @@ Decoding PT traces can take a long time. On an Intel Core i5-8259U machine, for 
 * Cheatsheet for Intel Processor Trace, URL: [http://halobates.de/blog/p/410](http://halobates.de/blog/p/410).
 
 [^1]: See more information about Intel PT overhead in [@IntelPTPaper].
-[^2]: Analyze performance glitches with Intel PT - [https://easyperf.net/blog/2019/09/06/Intel-PT-part3](https://easyperf.net/blog/2019/09/06/Intel-PT-part3).
-[^3]: Postmortem debugging with Intel PT - [https://easyperf.net/blog/2019/08/30/Intel-PT-part2](https://easyperf.net/blog/2019/08/30/Intel-PT-part2).
+[^2]: Analyze performance glitches with Intel PT - [https://easyperf.net/blog/2019/09/06/Intel-PT-part3](https://easyperf.net/blog/2019/09/06/Intel-PT-part3)
+[^3]: Postmortem debugging with Intel PT - [https://easyperf.net/blog/2019/08/30/Intel-PT-part2](https://easyperf.net/blog/2019/08/30/Intel-PT-part2)
+[^4]: When you decode traces with `perf script -F` with `+srcline` or `+srccode` to emit source code, it gets even slower.
+[^5]: magic-trace - [https://github.com/janestreet/magic-trace](https://github.com/janestreet/magic-trace)
