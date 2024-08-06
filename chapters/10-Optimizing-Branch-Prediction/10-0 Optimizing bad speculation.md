@@ -16,9 +16,7 @@ Branch predictors use caches and history registers and therefore are susceptible
 
 A program will always take a non-zero number of branch mispredictions. You can find out how much a program suffers from branch mispredictions by looking at TMA `Bad Speculation` metric. It is normal for a general purpose application to have a `Bad Speculation` metric in the range of 5-10\%. Our recommendation is to pay a close attention once this metric goes higher than 10\%.
 
-[TODO]: GCC & LLVM/Clang Compilers Updated For Intel Branch Hint https://www.phoronix.com/news/GCC-Clang-Intel-x86-Branch-Hint
-
-Since branch predictors are good at finding patterns, old advice for optimizing branch prediction is no longer valid. In the past, developers had an option of providing a prediction hint to the processor in the form of an encoding prefix to the branch instruction (`0x2E: Branch Not Taken`, `0x3E: Branch Taken`). This could potentially improve performance on older microarchitectures, like Pentium 4. While using those branch prefixes still gives valid x86/x64 assembly, it won't produce gains on modern processors. 
+In the past, developers had an option of providing a prediction hint to an x86 processor in the form of an encoding prefix to the branch instruction (`0x2E: Branch Not Taken`, `0x3E: Branch Taken`). This could potentially improve performance on older microarchitectures, like Pentium 4. However, modern x86 processors used to ignore those hints until Intel's RedwoodCove started using it again. Its branch predictor is still good at finding dynamic patterns, but now it will use the encoded prediction hint for branches that have never been seen before (i.e., when there is no stored information about a branch). [@IntelOptimizationManual, Section 2.1.1.1 Branch Hint]
 
 One indirect way to reduce branch mispredictions is to straighten the code using source-based and compiler-based techniques. PGO and BOLT are effective at reducing branch mispredictions thanks to improving fallthrough rates that alleviates the pressure on branch predictor structures. We will discuss those techniques in the next chapter.
 
