@@ -69,6 +69,10 @@ Peter Veentjer, for multiple contributions to various places in the book.
 
 Also, I would like to thank the whole performance community for countless blog articles and papers. I was able to learn a lot from reading blogs by Travis Downs, Daniel Lemire, Andi Kleen, Agner Fog, Bruce Dawson, Brendan Gregg, and many others. I stand on the shoulders of giants, and the success of this book should not be attributed only to myself. This book is my way to thank and give back to the whole community.
 
+[TODO]: images created with excalidraw.com
+
+[TODO]: cover desing by {ask permision}
+
 [TODO]: technical reviewers and proofreaders: Amir Aupov, Charles-Francois Natali
 
 [TODO]: ask for permission. I would like to thank my manager at Intel for giving me time slots to work on this book.
