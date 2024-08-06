@@ -1,3 +1,4 @@
+\phantomsection
 # Appendix D. Intel Processor Traces {.unnumbered}
 
 \markboth{Appendix D}{Appendix D}

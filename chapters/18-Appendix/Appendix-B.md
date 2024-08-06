@@ -1,5 +1,4 @@
-
-
+\phantomsection
 # Appendix B. The LLVM Vectorizer {.unnumbered}
 
 \markboth{Appendix B}{Appendix B}

@@ -1,5 +1,4 @@
-
-
+\phantomsection
 # Appendix A. Reducing Measurement Noise {.unnumbered}
 
 \markboth{Appendix A}{Appendix A}

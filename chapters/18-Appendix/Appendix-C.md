@@ -1,5 +1,4 @@
-
-
+\phantomsection
 # Appendix C. Enable Huge Pages {.unnumbered}
 
 \markboth{Appendix C}{Appendix C}

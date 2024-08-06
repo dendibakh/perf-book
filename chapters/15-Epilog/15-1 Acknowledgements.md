@@ -1,3 +1,4 @@
+\phantomsection
 # Acknowledgments {.unnumbered}
 
 \markboth{Acknowledgments}{Acknowledgments}

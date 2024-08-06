@@ -1,3 +1,4 @@
+\phantomsection
 # Glossary {.unnumbered}
 
 \markboth{Glossary}{Glossary}

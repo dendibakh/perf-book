@@ -1,5 +1,4 @@
-
-
+\phantomsection
 # Part 1. Performance Analysis on a Modern CPU {.unnumbered}
 
 # Measuring Performance {#sec:secMeasPerf}

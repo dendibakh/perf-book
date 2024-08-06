@@ -1,3 +1,4 @@
+\phantomsection
 # List of the Major CPU Microarchitectures {.unnumbered}
 
 \markboth{List of the Major CPU Microarchitectures}{List of the Major CPU Microarchitectures}
