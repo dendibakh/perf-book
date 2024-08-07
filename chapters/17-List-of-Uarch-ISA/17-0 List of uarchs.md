@@ -76,6 +76,4 @@ Table: List of the recent AMD microarchitectures. {#tbl:AMDUarchs}
 
 Table: List of recent ARM ISAs along with their own and third-party implementations. {#tbl:ARMUarchs}
 
-[TODO]: remove unused entries in biblio.bib
-
 \bibliography{biblio}
