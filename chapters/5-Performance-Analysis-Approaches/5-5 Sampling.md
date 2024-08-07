@@ -50,7 +50,7 @@ $ perf report -n --stdio
   ...
 ```
 
-Linux perf collected `35,035` samples, which means that the process of interrupting the execution happened that number of times. We also used `-F 1000` which sets the sampling rate at 1000 samples per second. This roughly matches the overall runtime of 36.2 seconds. Notice, Linux perf provided the approximate number of total cycles elapsed. If we divide it by the number of samples, we'll have `156756064947 cycles / 35035 samples = 4.5 million` cycles per sample. That means that Linux perf set the number `N` to roughly `4'500'000` to collect 1000 samples per second. The number `N` can be adjusted by the tool dynamically according to the actual CPU frequency.
+Linux perf collected `35,035` samples, which means that there were the same number of process interrupts. We also used `-F 1000` which sets the sampling rate at 1000 samples per second. This roughly matches the overall runtime of 36.2 seconds. Notice, Linux perf provided the approximate number of total cycles elapsed. If we divide it by the number of samples, we'll have `156756064947 cycles / 35035 samples = 4.5 million` cycles per sample. That means that Linux perf set the number `N` to roughly `4'500'000` to collect 1000 samples per second. The number `N` can be adjusted by the tool dynamically according to the actual CPU frequency.
 
 And of course, most valuable for us is the list of hotspots sorted by the number of samples attributed to each function. After we know what are the hottest functions, we may want to look one level deeper: what are the hot parts of code inside every function. To see the profiling data for functions that were inlined as well as assembly code generated for a particular source code region, we need to build the application with debug information (`-g` compiler flag). 
 
@@ -74,13 +74,11 @@ Percent | Source code & Disassembly of x264 for cycles:ppp
   ...
 ```
 
-Most profilers with a Graphical User Interface (GUI), like the Intel VTune Profiler, can show source code and associated assembly side-by-side. Also, there are tools that can visualize the output of Linux `perf` raw data with a rich graphical interface similar to Intel VTune and other tools. You'll see all that in more details in chapter 7.
+Most profilers with a Graphical User Interface (GUI), like Intel VTune Profiler, can show source code and associated assembly side-by-side. Also, there are tools that can visualize the output of Linux `perf` raw data with a rich graphical interface similar to Intel VTune and other tools. You'll see all that in more details in [@sec:secOverviewPerfTools].
 
-[TODO]: Sampling techniques squash valuable information, not allowing us to detect abnormal behaviors.
+Sampling gives a good statistical representation of a program's execution, however, one of the downsides of this technique is that it has blind spots and is not suitable for detecting abnormal behaviors. Each sample represents an aggregated view of a portion of a program's execution. Aggregation doesn't give us enough details of what exactly happened during that time interval. We cannot zoom in to a particular time interval to learn more about execution nuances. When we squash time intervals into samples, we lose valuable information and it becomes useless for analyzing events with a very short duration. Increasing sampling interval, e.g., more than 1000 samples per second may give you a better picture, but may still not be enough. As a solution, you should use tracing.
 
 ### Collecting Call Stacks {#sec:secCollectCallStacks}
-
-[TODO]: unwinding is painful
 
 Often when sampling, we might encounter a situation when the hottest function in a program gets called from multiple functions. An example of such a scenario is shown in Figure @fig:CallStacks. The output from the profiling tool might reveal that `foo` is one of the hottest functions in the program, but if it has multiple callers, we would like to know which one of them calls `foo` the most number of times. It is a typical situation for applications that have library functions like `memcpy` or `sqrt` appear in the hotspots. To understand why a particular function appeared as a hotspot, we need to know which path in the Control Flow Graph (CFG) of the program caused it.
 
@@ -90,8 +88,8 @@ Analyzing the source code of all the callers of `foo` might be very time-consumi
 
 Collecting call stacks in Linux `perf` is possible with three methods:
 
-1.  Frame pointers (`perf record --call-graph fp`). It requires binary to be built with `--fnoomit-frame-pointer`. Historically, the frame pointer (`RBP` register) was used for debugging since it enables us to get the call stack without popping all the arguments from the stack (also known as stack unwinding). The frame pointer can tell the return address immediately. However, it consumes one register just for this purpose, so it was expensive. It can also be used for profiling since it enables cheap stack unwinding.
-2.  DWARF debug info (`perf record --call-graph dwarf`). It requires binary to be built with DWARF debug information `-g` (`-gline-tables-only`). Obtains call stacks through stack unwinding procedure.
+1.  Frame pointers (`perf record --call-graph fp`). It requires binary to be built with `--fnoomit-frame-pointer`. Historically, the frame pointer (`RBP` register) was used for debugging since it enables us to get the call stack without popping all the arguments from the stack (also known as stack unwinding). The frame pointer can tell the return address immediately. It enables very cheap stack unwinding, which reduces profiling overhead, however, it consumes one additional register just for this purpose. At the time when the number of architectural register was small, using frame pointers was expensive in terms of runtime performance. Nowadays, community moves back to using frame pointers, because it provides better quality call stacks and low profiling overhead.
+2.  DWARF debug info (`perf record --call-graph dwarf`). It requires binary to be built with DWARF debug information `-g` (`-gline-tables-only`). It also obtains call stacks through stack unwinding procedure, but this method is more expensive than using frame pointers.
 3.  Intel Last Branch Record (LBR). This makes use of a hardware feature, and is accessed with the following command: `perf record --call-graph lbr`. It obtains call stacks by parsing the LBR stack (a set of hardware registers). The resulting call graph is not as deep as those produced by the first two methods. See more information about LBR in [@sec:lbr].
 
 Below is an example of collecting call stacks in a program using LBR. By looking at the output, we know that 55% of the time `foo` was called from `func1`, 33% of the time from `func2` and 11% from `fun3`. We can clearly see the distribution of the overhead between callers of `foo` and can now focus our attention on the hottest edge in the CFG of the program, which is `func1 -> foo`, but we should probably also pay attention to the edge `func2 -> foo`.
