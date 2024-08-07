@@ -30,7 +30,6 @@ The book is split into two parts: performance analysis and performance optimizat
 Examples provided in this book are primarily based on open-source software: Linux as the operating system, the LLVM-based Clang compiler for C and C++ languages, and various open-source applications and benchmarks[^1] that you can build and run. The reason is not only the popularity of the projects but also the fact that their source code is open, which enables us to better understand the underlying mechanism of how they work. This is especially useful for learning the concepts presented in this book. This doesn't mean that we will never showcase proprietary tools. For example, we extensively use Intel® VTune™ Profiler.
 
 [TODO]: mention that in this book x86 == x86-64
-[TODO]: spell out SW = software, and HW = hardware
 
 Prior compiler experience helps a lot in performance-related work. Sometimes it's possible to obtain attractive speedups by forcing the compiler to generate desired machine code through various hints. You will find many such examples throughout the book. Luckily, most of the time, you don't have to be a compiler expert to drive performance improvements in your application. The majority of optimizations can be done at a source code level without the need to dig down into compiler sources. 
 

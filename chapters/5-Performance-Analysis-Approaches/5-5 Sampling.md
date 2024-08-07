@@ -10,7 +10,7 @@ As in the example with a debugger, the execution of the analyzed program is inte
 
 ### User-Mode and Hardware Event-based Sampling
 
-Sampling can be performed in 2 different modes, using user-mode or HW event-based sampling (EBS). User-mode sampling is a pure software approach that embeds an agent library into the profiled application. The agent sets up an OS timer for each thread in the application. Upon timer expiration, the application receives the `SIGPROF` signal that is handled by the collector. EBS uses hardware PMCs to trigger interrupts. In particular, the counter overflow feature of the PMU is used, which we will discuss shortly.
+Sampling can be performed in 2 different modes, using user-mode or hardware event-based sampling (EBS). User-mode sampling is a pure software approach that embeds an agent library into the profiled application. The agent sets up an OS timer for each thread in the application. Upon timer expiration, the application receives the `SIGPROF` signal that is handled by the collector. EBS uses hardware PMCs to trigger interrupts. In particular, the counter overflow feature of the PMU is used, which we will discuss shortly.
 
 User-mode sampling can only be used to identify hotspots, while EBS can be used for additional analysis types that involve PMCs, e.g., sampling on cache-misses, TMA (see [@sec:TMA]), etc.
 
@@ -22,7 +22,7 @@ In this section, we will discuss the mechanics of using PMCs with EBS. Figure @f
 
 ![Using performance counter for sampling](../../img/perf-analysis/SamplingFlow.png){#fig:Sampling width=80%}
 
-After we have initialized the register, we start counting and let the benchmark run. Since we have configured a PMC to count cycles, it will be incremented every cycle. Eventually, it will overflow. At the time the register overflows, HW will raise a PMI. The profiling tool is configured to capture PMIs and has an Interrupt Service Routine (ISR) for handling them. We do multiple steps inside the ISR: first of all, we disable counting; after that, we record the instruction which was executed by the CPU at the time the counter overflowed; then, we reset the counter to `N` and resume the benchmark.
+After we have initialized the register, we start counting and let the benchmark run. Since we have configured a PMC to count cycles, it will be incremented every cycle. Eventually, it will overflow. At the time the register overflows, hardware will raise a PMI. The profiling tool is configured to capture PMIs and has an Interrupt Service Routine (ISR) for handling them. We do multiple steps inside the ISR: first of all, we disable counting; after that, we record the instruction which was executed by the CPU at the time the counter overflowed; then, we reset the counter to `N` and resume the benchmark.
 
 Now, let us go back to the value `N`. Using this value, we can control how frequently we want to get a new interrupt. Say we want a finer granularity and have one sample every 1 million instructions. To achieve this, we can set the counter to `(unsigned) -1'000'000` so that it will overflow after every 1 million instructions. This value is also referred to as the "sample after" value.
 
@@ -92,7 +92,7 @@ Collecting call stacks in Linux `perf` is possible with three methods:
 
 1.  Frame pointers (`perf record --call-graph fp`). It requires binary to be built with `--fnoomit-frame-pointer`. Historically, the frame pointer (`RBP` register) was used for debugging since it enables us to get the call stack without popping all the arguments from the stack (also known as stack unwinding). The frame pointer can tell the return address immediately. However, it consumes one register just for this purpose, so it was expensive. It can also be used for profiling since it enables cheap stack unwinding.
 2.  DWARF debug info (`perf record --call-graph dwarf`). It requires binary to be built with DWARF debug information `-g` (`-gline-tables-only`). Obtains call stacks through stack unwinding procedure.
-3.  Intel Last Branch Record (LBR). This makes use of a hardware feature, and is accessed with the following command: `perf record --call-graph lbr`. It obtains call stacks by parsing the LBR stack (a set of HW registers). The resulting call graph is not as deep as those produced by the first two methods. See more information about LBR in [@sec:lbr].
+3.  Intel Last Branch Record (LBR). This makes use of a hardware feature, and is accessed with the following command: `perf record --call-graph lbr`. It obtains call stacks by parsing the LBR stack (a set of hardware registers). The resulting call graph is not as deep as those produced by the first two methods. See more information about LBR in [@sec:lbr].
 
 Below is an example of collecting call stacks in a program using LBR. By looking at the output, we know that 55% of the time `foo` was called from `func1`, 33% of the time from `func2` and 11% from `fun3`. We can clearly see the distribution of the overhead between callers of `foo` and can now focus our attention on the hottest edge in the CFG of the program, which is `func1 -> foo`, but we should probably also pay attention to the edge `func2 -> foo`.
 

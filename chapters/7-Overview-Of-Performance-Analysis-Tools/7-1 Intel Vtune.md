@@ -2,7 +2,7 @@
 
 VTune Profiler (formerly VTune Amplifier) is a performance analysis tool for x86-based machines with a rich GUI. It can be run on Linux or Windows operating systems. We skip discussion about MacOS support for VTune since it doesn't work on Apple's chips (e.g., M1 and M2), and Intel-based Macbooks are quickly becoming obsolete.
 
-VTune can be used on both Intel and AMD systems. However, advanced hardware-based sampling requires an Intel-manufactured CPU. For example, you won't be able to collect HW performance counters on an AMD system with Intel VTune.
+VTune can be used on both Intel and AMD systems. However, advanced hardware-based sampling requires an Intel-manufactured CPU. For example, you won't be able to collect hardware performance counters on an AMD system with Intel VTune.
 
 As of early 2023, VTune is available for free as a stand-alone tool or as part of the Intel oneAPI Base Toolkit.[^1]
 
@@ -71,4 +71,4 @@ Finally, the bottom panel \circled{3} shows the CPU frequency chart for four har
 [^3]: VTune microarchitecture analysis - [https://software.intel.com/en-us/vtune-help-general-exploration-analysis](https://software.intel.com/en-us/vtune-help-general-exploration-analysis). In pre-2019 versions of Intel® VTune Profiler, it was called as “General Exploration” analysis.
 [^4]: 7zip benchmark - [https://github.com/llvm-mirror/test-suite/tree/master/MultiSource/Benchmarks/7zip](https://github.com/llvm-mirror/test-suite/tree/master/MultiSource/Benchmarks/7zip).
 [^19]: Per-function view of TMA metrics is a feature unique to Intel® VTune profiler.
-[^20]: Notice that the call stack doesn't lead all the way to the `main` function. This happens because, with HW-based collection, VTune uses LBR to sample call stacks, which provides limited depth. Most likely we're dealing with recursive functions here, and to investigate that further users will have to dig into the code.
+[^20]: Notice that the call stack doesn't lead all the way to the `main` function. This happens because, with hardware-based collection, VTune uses LBR to sample call stacks, which provides limited depth. Most likely we're dealing with recursive functions here, and to investigate that further users will have to dig into the code.

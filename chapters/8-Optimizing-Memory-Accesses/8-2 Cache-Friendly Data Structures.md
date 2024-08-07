@@ -8,7 +8,7 @@ Next, we will discuss several techniques to make data structures more cache-frie
 
 ### Access Data Sequentially.
 
-The best way to exploit the spatial locality of the caches is to make sequential memory accesses. By doing so, we enable the HW prefetching mechanism (see [@sec:HwPrefetch]) to recognize the memory access pattern and bring in the next chunk of data ahead of time. An example of Row-major versus Column-Major traversal is shown in [@lst:CacheFriend]. Notice, there is only one tiny change in the code (swapped `col` and `row` subscripts), but it has a significant impact on performance.
+The best way to exploit the spatial locality of the caches is to make sequential memory accesses. By doing so, we enable the hardware prefetching mechanism (see [@sec:HwPrefetch]) to recognize the memory access pattern and bring in the next chunk of data ahead of time. An example of Row-major versus Column-Major traversal is shown in [@lst:CacheFriend]. Notice, there is only one tiny change in the code (swapped `col` and `row` subscripts), but it has a significant impact on performance.
 
 The code on the left is not cache-friendly because it skips `NCOLS` elements on every iteration of the inner loop. This results in a very inefficient use of caches. In contrast, the code on the right accesses elements of the matrix in the order in which they are laid out in memory. Row-major traversal exploits spatial locality and is cache-friendly. Figure @fig:ColRowMajor illustrates the difference between the two traversal patterns.
 
@@ -29,7 +29,7 @@ Consider a standard implementation of binary search in a large sorted array, whe
 
 ### Use Appropriate Containers. 
 
-There is a wide variety of ready-to-use containers in almost any language. But it's important to know their underlying storage and performance implications. Keep in mind how the data will be accessed and manipulated. You should consider not only the time and space complexity of operations with a data structure, but also the HW effects associated with them.
+There is a wide variety of ready-to-use containers in almost any language. But it's important to know their underlying storage and performance implications. Keep in mind how the data will be accessed and manipulated. You should consider not only the time and space complexity of operations with a data structure, but also the hardware effects associated with them.
 
 By default, stay away from data structures that rely on pointers, e.g. linked lists or trees. When traversing elements, they require additional memory accesses to follow the pointers. If the maximum number of elements is relatively small and known at compile time, C++ `std::array` might be a better option than `std::vector`. If you need associative container, but don't need to store the elements in a sorted order, `std::unordered_map` should be faster than `std::map`. A good step-by-step guide for choosing appropriate C++ containers can be found in [@fogOptimizeCpp, Section 9.7 Data structures, and container classes].
 

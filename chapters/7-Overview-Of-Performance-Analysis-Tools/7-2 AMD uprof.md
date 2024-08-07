@@ -9,7 +9,7 @@ On Linux, uProf uses Linux perf for data collection. On Windows, uProf uses its 
 ### What you can do with it: {.unlisted .unnumbered}
 
 - Find hotspots: functions, statements, instructions.
-- Monitor various HW performance events and locate lines of code where these events happen.
+- Monitor various hardware performance events and locate lines of code where these events happen.
 - Filter data for a specific function or thread.
 - Observe the workload behavior over time: view various performance events in timeline chart.
 - Analyze hot callpaths: call-graph, flame-graph and bottom-up charts.

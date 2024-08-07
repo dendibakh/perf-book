@@ -93,7 +93,7 @@ MEM_LOAD_RETIRED.*    MEM_LOAD_L3_HIT_RETIRED.*
 
 , where `.*` means that all sub-events inside a group can be configured as precise events.
 
-With AMD IBS and ARM SPE, all the collected samples are precise by design since the HW captures the exact instruction address. In fact, they both work in a very similar fashion. Whenever an overflow occurs, the mechanism saves the instruction causing the overflow into a dedicated buffer which is then read by the interrupt handler. As the address is preserved, IBS and SPE samples attribution to the instructions are precise.
+With AMD IBS and ARM SPE, all the collected samples are precise by design since the hardware captures the exact instruction address. In fact, they both work in a very similar fashion. Whenever an overflow occurs, the mechanism saves the instruction causing the overflow into a dedicated buffer which is then read by the interrupt handler. As the address is preserved, IBS and SPE samples attribution to the instructions are precise.
 
 Users of Linux `perf` on Intel and AMD platforms must add `pp` suffix to one of the events listed above to enable precise tagging as shown below. However, on ARM platforms, it has no effect, so users must use the `arm_spe_0` event.
 

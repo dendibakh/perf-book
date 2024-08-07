@@ -57,7 +57,7 @@ The sibling pairs of CPU threads can be found in the following files:
 For example, on Intel® Core™ i5-8259U, which has 4 cores and 8 threads:
 
 ```bash
-# all 8 HW threads enabled:
+# all 8 hardware threads enabled:
 $ lscpu
 ...
 CPU(s):              8

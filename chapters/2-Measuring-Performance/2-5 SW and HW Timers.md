@@ -24,7 +24,7 @@ To benchmark execution time, engineers usually use two different timers, which a
    }
    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    
- - **Time Stamp Counter (TSC)**: this is an HW timer which is implemented as an HW register. TSC is monotonic and has a constant rate, i.e., it doesn't account for frequency changes. Every CPU has its own TSC, which is simply the number of reference cycles (see [@sec:secRefCycles]) elapsed. It is suitable for measuring short events with a duration from nanoseconds and up to a minute. The value of TSC can be retrieved by using compiler built-in function `__rdtsc` as shown in [@lst:TSC], which uses `RDTSC` assembly instruction under the hood. More low-level details on benchmarking the code using the `RDTSC` assembly instruction can be accessed in the white paper [@IntelRDTSC].
+ - **Time Stamp Counter (TSC)**: this is a hardware timer which is implemented as a hardware register. TSC is monotonic and has a constant rate, i.e., it doesn't account for frequency changes. Every CPU has its own TSC, which is simply the number of reference cycles (see [@sec:secRefCycles]) elapsed. It is suitable for measuring short events with a duration from nanoseconds and up to a minute. The value of TSC can be retrieved by using compiler built-in function `__rdtsc` as shown in [@lst:TSC], which uses `RDTSC` assembly instruction under the hood. More low-level details on benchmarking the code using the `RDTSC` assembly instruction can be accessed in the white paper [@IntelRDTSC].
 
    Listing: Using __rdtsc compiler builtins to access TSC
 

@@ -1,6 +1,6 @@
 ## Chapter Summary {.unlisted .unnumbered}
 
-* Single-threaded CPU performance is not increasing as rapidly as it used to a few decades ago. When it's no longer the case that each HW generation provides a significant performance boost, developers should start optimizing the code of their software.
+* Single-threaded CPU performance is not increasing as rapidly as it used to a few decades ago. When it's no longer the case that each hardware generation provides a significant performance boost, developers should start optimizing the code of their software.
 * Modern software is massively inefficient. A regular server system in a public cloud, typically runs poorly optimized code, consuming more power than it could have consumed, which increases carbon emissions and contributes to other environmental issues.
 * Certain limitations exist that prevent applications from reaching their full performance potential. CPUs cannot magically speed up slow algorithms. Compilers are far from generating optimal code for every program. BigO notation is not always a good indicator of performance as it doesn't account for hardware specifics.
 * For many years performance engineering was a nerdy niche. But now it's becoming mainstream as software vendors realize the impact that their poorly optimized software has on their bottom line.
