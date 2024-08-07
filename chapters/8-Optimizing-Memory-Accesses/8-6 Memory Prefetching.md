@@ -6,7 +6,7 @@ By now, you should know that memory accesses not resolved from caches are often 
 
 Modern CPUs have two automatic mechanisms for solving that problem: hardware prefetching and OOO execution. HW prefetchers help to hide the memory access latency by initiating prefetching requests on repetitive memory access patterns. An OOO engine looks `N` instructions into the future and issues loads early to enable smooth execution of future instructions that will demand this data.
 
-HW prefetchers fail when data accesses patterns are too complicated to predict. And there is nothing SW developers can do about it as we cannot control the behavior of this unit. On the other hand, an OOO engine does not try to predict memory locations that will be needed in the future as HW prefetching does. So, the only measure of success for it is how much latency it was able to hide by scheduling the load in advance.
+HW prefetchers fail when data accesses patterns are too complicated to predict. And there is nothing software developers can do about it as we cannot control the behavior of this unit. On the other hand, an OOO engine does not try to predict memory locations that will be needed in the future as HW prefetching does. So, the only measure of success for it is how much latency it was able to hide by scheduling the load in advance.
 
 Consider a small snippet of code in [@lst:MemPrefetch1], where `arr` is an array of one million integers. The index `idx`, which is assigned to a random value, is immediately used to access a location in `arr`, which almost certainly misses in caches as it is random. It is impossible for a HW prefetcher to predict as every time the load goes to a completely new place in memory. The interval from the time the address of a memory location is known (returned from the function `random_distribution`) until the value of that memory location is demanded (call to `doSomeExtensiveComputation`) is called *prefetching window*. In this example, the OOO engine doesn't have the opportunity to issue the load early since the prefetching window is very small. This leads to the latency of the memory access `arr[idx]` to stand on a critical path while executing the loop as shown in Figure @fig:SWmemprefetch1. It's clear that the program waits for the value to come back (the hatched fill rectangle in the diagram) without making forward progress.
 
@@ -45,7 +45,7 @@ A graphical illustration of this transformation is shown in Figure @fig:SWmempre
 
 Notice the usage of [`__builtin_prefetch`](https://gcc.gnu.org/onlinedocs/gcc/Other-Builtins.html),[^4] a special hint that developers can use to explicitly request a CPU to prefetch a certain memory location. Another option to use compiler intrinsics. For example, on x86 platforms there is `_mm_prefetch` intrinsic, see Intel Intrinsics Guide for more details. In any case, a compiler will generate `PREFETCH` instruction for x86 and `pld` instruction for ARM.
 
-There are situations when SW memory prefetching is not possible. For example, when traversing a linked list, the prefetching window is tiny and it is not possible to hide the latency of pointer chasing.
+There are situations when software memory prefetching is not possible. For example, when traversing a linked list, the prefetching window is tiny and it is not possible to hide the latency of pointer chasing.
 
 In [@lst:MemPrefetch2] we saw an example of prefetching for the next iteration, but also you may frequently encounter a need to prefetch for 2, 4, 8, and sometimes even more iterations. The code in [@lst:MemPrefetch3] is one of those cases, when it could be beneficial. It presents a typical code for populating a graph with edges. If the graph is very sparse and has a lot of vertices, it is very likely that accesses to `this->out_neighbors` and `this->in_neighbors` vectors will miss in caches a lot. This happens because every edge is likely to connect new vertices that are not currently in caches.
 
@@ -53,7 +53,7 @@ This code is different from the previous example as there are no extensive compu
 
 As a general rule, for a prefetch hint to be effective, it must be inserted well ahead of time so that by the time the loaded value will be used in other calculations, it will be already in the cache. However, it also shouldn't be inserted too early since it may pollute the cache with the data that is not used for a long time. Notice, in [@lst:MemPrefetch3], `lookAhead` is a template parameter, which enables a programmer to try different values and see which gives the best performance. More advanced users can try to estimate the prefetching window using the method described in [@sec:timed_lbr]; an example of using this method can be found on the easyperf blog.[^5]
 
-Listing: Example of a SW prefetching for the next 8 iterations.
+Listing: Example of a software prefetching for the next 8 iterations.
 
 ~~~~ {#lst:MemPrefetch3 .cpp}
 template <int lookAhead = 8>

@@ -99,7 +99,7 @@ Ip      Instructions per FP        INST_RETIRED.ANY / (
 Arith   Arithmetic AVX*            FP_ARITH_INST.256B_PACKED_DOUBLE+
 AVX256  256-bit instruction        FP_ARITH_INST.256B_PACKED_SINGLE)
 
-Ip      Instructions per SW        INST_RETIRED.ANY / 
+Ip      Instructions per software  INST_RETIRED.ANY / 
 SWPF    prefetch instruction       SW_PREFETCH_ACCESS.T0:u0xF
         (of any type)
 --------------------------------------------------------------------------

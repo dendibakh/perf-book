@@ -1,8 +1,8 @@
 # Introduction {#sec:chapter1}
 
-They say, "Performance is king". It was true a decade ago, and it certainly is now. According to [@Domo2017], in 2017, the world has been creating 2.5 quintillion[^1] bytes of data every day, and as predicted in [@Statista2018], it will reach 400 quintillion bytes per day in 2024. In our increasingly data-centric world, the growth of information exchange fuels the need for both faster software (SW) and faster hardware (HW).
+They say, "Performance is king". It was true a decade ago, and it certainly is now. According to [@Domo2017], in 2017, the world has been creating 2.5 quintillion[^1] bytes of data every day, and as predicted in [@Statista2018], it will reach 400 quintillion bytes per day in 2024. In our increasingly data-centric world, the growth of information exchange fuels the need for both faster software and faster hardware.
 
-Software programmers have had an "easy ride" for decades, thanks to Moore’s law. It used to be the case that some SW vendors preferred to wait for a new generation of HW to speed up their software products and did not spend human resources on making improvements in the code. By looking at Figure @fig:50YearsProcessorTrend, we can see that single-threaded[^2] performance growth is slowing down.
+Software programmers have had an "easy ride" for decades, thanks to Moore’s law. It used to be the case that some software vendors preferred to wait for a new generation of HW to speed up their software products and did not spend human resources on making improvements in the code. By looking at Figure @fig:50YearsProcessorTrend, we can see that single-threaded[^2] performance growth is slowing down.
 
 ![50 Years of Microprocessor Trend Data. *© Image by K. Rupp via karlrupp.net*. Original data up to the year 2010 was collected and plotted by M. Horowitz, F. Labonte, O. Shacham, K. Olukotun, L. Hammond, and C. Batten. New plot and data collected for 2010-2021 by K. Rupp.](../../img/intro/50-years-processor-trend.png){#fig:50YearsProcessorTrend width=100%}
 

@@ -41,7 +41,7 @@ VTune can provide very rich information about a running process. It is the right
 ### What you cannot do with it: {.unlisted .unnumbered}
 
 - Analyze very short execution anomalies.
-- Observe system-wide complicated SW dynamics.
+- Observe system-wide complicated software dynamics.
 
 Due to the sampling nature of the tool, it will eventually miss events with a very short duration (e.g., submicrosecond).
 

@@ -13,6 +13,6 @@ Conducting fair performance experiments is an essential step towards getting acc
 
 Not a single long-living product exists without ever having performance regressions. This is especially important for large projects with lots of contributors where changes are coming at a very fast pace. This chapter devotes a few pages discussing the automated process of tracking performance changes in Continuous Integration and Continuous Delivery (CI/CD) systems. We also present general guidance on how to properly collect and analyze performance measurements when developers implement changes in their source codebase.
 
-The end of the chapter describes SW and HW timers that can be used by developers in time-based measurements and common pitfalls when designing and writing a good microbenchmark.
+The end of the chapter describes software and HW timers that can be used by developers in time-based measurements and common pitfalls when designing and writing a good microbenchmark.
 
 [^15]: Blog post by Nelson Elhage "Reflections on software performance": [https://blog.nelhage.com/post/reflections-on-performance/](https://blog.nelhage.com/post/reflections-on-performance/).

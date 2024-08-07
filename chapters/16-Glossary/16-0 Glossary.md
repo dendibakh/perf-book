@@ -45,8 +45,6 @@
 
 \textbf{HPC} High Performance Computing
 
-\textbf{HW} Hardware
-
 \textbf{I/O} Input/Output
 
 \textbf{IDE} Integrated Development Environment
@@ -104,8 +102,6 @@
 \textbf{SMT} Simultaneous MultiThreading
 
 \textbf{SOA} Structure Of Arrays
-
-\textbf{SW} Software
 
 \textbf{TLB} Translation Lookaside Buffer
 

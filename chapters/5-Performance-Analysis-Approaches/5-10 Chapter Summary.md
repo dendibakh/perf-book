@@ -2,7 +2,7 @@
 
 ## Chapter Summary {#sec:secApproachesSummary .unlisted .unnumbered}
 
-* Latency and throughput are often the ultimate metrics of the program performance. When seeking ways to improve them, we need to get more detailed information on how the application executes. Both HW and SW provide data that can be used for performance monitoring.
+* Latency and throughput are often the ultimate metrics of the program performance. When seeking ways to improve them, we need to get more detailed information on how the application executes. Both HW and software provide data that can be used for performance monitoring.
 
 * Code instrumentation enables us to track many things in the program but causes relatively large overhead both on the development and runtime side. While most developers are not in the habit of manually instrumenting their code, this approach is still relevant for automated processes, e.g., Profile-Guided Optimizations (PGO).
 
