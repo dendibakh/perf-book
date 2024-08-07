@@ -1,8 +1,6 @@
 \phantomsection
 # Epilog {.unnumbered}
 
-[TODO]: the hyperlink in the PDF document jumps to the previous chapter. Many other places with this problem.
-
 \markboth{Epilog}{Epilog}
 
 Thanks for reading through the whole book. I hope you enjoyed it and found it useful. I would be even happier if the book would help you solve a real-world problem. In such a case, I would consider it a success and proof that my efforts were not wasted. Before you continue with your endeavors, let me briefly highlight the essential points of the book and give you final recommendations:
