@@ -37,7 +37,7 @@ In real implementations, pipelining introduces several constraints that limit th
 
   There is a RAW dependency for register R1. If we take the value directly after addition `R0 ADD 1` is done (from the `EXE` pipeline stage), we don't need to wait until the `WB` stage finishes, and the value will be written to the register file. Bypassing helps to save a few cycles. The longer the pipeline, the more effective bypassing becomes.
 
-  A *write-after-read* (WAR) hazard requires a dependent write to execute after a read. It occurs when instruction `x+1` writes a source before instruction `x` reads the source, resulting in the wrong new value being read. A WAR hazard is not a true dependency and is eliminated by a technique called [register renaming](https://en.wikipedia.org/wiki/Register_renaming).[^1] It is a technique that abstracts logical registers from physical registers. CPUs support register renaming by keeping a large number of physical registers. Logical (architectural) registers, the ones that are defined by the ISA, are just aliases over a wider register file. With such decoupling of [architectural state](https://en.wikipedia.org/wiki/Architectural_state),[^3] solving WAR hazards is simple: we just need to use a different physical register for the write operation. For example:
+  A *write-after-read* (WAR) hazard requires a dependent write to execute after a read. It occurs when instruction `x+1` writes a source before instruction `x` reads the source, resulting in the wrong new value being read. A WAR hazard is not a true dependency and is eliminated by a technique called [register renaming](https://en.wikipedia.org/wiki/Register_renaming).[^1] It is a technique that abstracts logical registers from physical registers. CPUs support register renaming by keeping a large number of physical registers. Logical (architectural) registers, the ones that are defined by the ISA, are just aliases over a wider register file. With such decoupling of the [architectural state](https://en.wikipedia.org/wiki/Architectural_state),[^3] solving WAR hazards is simple: we just need to use a different physical register for the write operation. For example:
 
   ```
   ; machine code                          ; after register renaming 
@@ -46,9 +46,9 @@ In real implementations, pipelining introduces several constraints that limit th
   R0 = R2 ADD 2                           R103 = R102 ADD 2
   ```
 
-  In the original assembly code, there is a WAR dependency for register `R0`. For the code on the left, we cannot reorder execution of the instructions, because it could leave the wrong value in `R1`. However, we can leverage our large pool of physical registers to overcome this limitation. To do that we need to rename all the occurrences of `R0` register starting from the write operation (`R0 = R2 ADD 2`) and below to use a free register, say `R103`. Once we have eliminated a WAR hazard by renaming register `R0`, we can safely execute the two operations in any order.
+  In the original assembly code, there is a WAR dependency for register `R0`. For the code on the left, we cannot reorder execution of the instructions, because it could leave the wrong value in `R1`. However, we can leverage our large pool of physical registers to overcome this limitation. To do that we need to rename all the occurrences of the `R0` register starting from the write operation (`R0 = R2 ADD 2`) and below to use a free register, say `R103`. Once we have eliminated a WAR hazard by renaming register `R0`, we can safely execute the two operations in any order.
 
-  A *write-after-write* (WAW) hazard requires a dependent write to execute after a write. It occurs when instruction `x+1` writes a source before instruction `x` writes to the source, resulting in the wrong order of writes. WAW hazards are also eliminated by register renaming, allowing both writes to execute in any order while preserving the correct final result. Below is an example of eliminating WAW hazard.
+  A *write-after-write* (WAW) hazard requires a dependent write to execute after a write. It occurs when instruction `x+1` writes a source before instruction `x` writes to the source, resulting in the wrong order of writes. WAW hazards are also eliminated by register renaming, allowing both writes to execute in any order while preserving the correct final result. Below is an example of eliminating WAW hazards.
 
   ```
   ; machine code                          ; after register renaming 
@@ -57,9 +57,9 @@ In real implementations, pipelining introduces several constraints that limit th
   R2 = 0                                  R103 = 0
   ```
 
-  Again, for the code on the left, we cannot reorder the two operations, because it could leave the wrong value in `R2`. We need to make sure all the future instructions that use `R2` would see zero. To overcome this limitation, we need to rename all the occurrences of `R2` register starting from the second write (`R2 = 0`) and below to use a different register.
+  Again, for the code on the left, we cannot reorder the two operations, because it could leave the wrong value in `R2`. We need to make sure all the future instructions that use `R2` will see zero. To overcome this limitation, we need to rename all the occurrences of the `R2` register starting from the second write (`R2 = 0`) and below to use a different register.
 
-* **Control hazards**: are caused due to changes in the program flow. They arise from pipelining branches and other instructions that change the program flow. The branch condition that determines the direction of the branch (taken vs. not-taken) is resolved in the execute pipeline stage. As a result, the fetch of the next instruction cannot be pipelined unless the control hazard is eliminated. Techniques such as dynamic branch prediction and speculative execution described in the next section are used to overcome control hazards.
+* **Control hazards**: are caused due to changes in the program flow. They arise from pipelining branches and other instructions that change the program flow. The branch condition that determines the direction of the branch (taken vs. not taken) is resolved in the execute pipeline stage. As a result, the fetch of the next instruction cannot be pipelined unless the control hazard is eliminated. Techniques such as dynamic branch prediction and speculative execution described in the next section are used to overcome control hazards.
 
 \lstset{linewidth=\textwidth}
 
