@@ -1,21 +1,21 @@
 
 
-## Micro-ops {#sec:sec_UOP}
+## Micro-operations {#sec:sec_UOP}
 
 Microprocessors with the x86 architecture translate complex CISC-like instructions into simple RISC-like microoperations, abbreviated as $\mu$ops. A simple addition instruction such as `ADD rax, rbx` generates only one $\mu$op, while a more complex instruction like `ADD rax, [mem]` may generate two: one for loading from the `mem` memory location into a temporary (un-named) register, and one for adding it to the `rax` register. The instruction `ADD [mem], rax` generates three $\mu$ops: one for loading from memory, one for adding, and one for storing the result back to memory. Even though x86 ISA is a register-memory architecture, after $\mu$ops conversion, it becomes a load-store architecture since memory is only accessed via load/store $\mu$ops.
 
-The main advantage of splitting instructions into micro operations is that $\mu$ops can be executed:
+The main advantage of splitting instructions into micro-operations is that $\mu$ops can be executed:
 
 \lstset{linewidth=10cm}
 
-* **Out of order**: consider the `PUSH rbx` instruction, which decrements the stack pointer by 8 bytes and then stores the source operand on the top of the stack. Suppose that `PUSH rbx` is "cracked" into two dependent micro operations after decode:
+* **Out of order**: consider the `PUSH rbx` instruction, which decrements the stack pointer by 8 bytes and then stores the source operand on the top of the stack. Suppose that `PUSH rbx` is "cracked" into two dependent micro-operations after decoding:
   ```
   SUB rsp, 8
   STORE [rsp], rbx
   ```
   Often, a function prologue saves multiple registers by using multiple `PUSH` instructions. In our case, the next `PUSH` instruction can start executing after the `SUB` $\mu$op of the previous `PUSH` instruction finishes, and doesn't have to wait for the `STORE` $\mu$op, which can now execute asynchronously.
 
-* **In parallel**: consider `HADDPD xmm1, xmm2` instruction, which will sum up (reduce) two double precision floating-point values in both `xmm1` and `xmm2` and store two results in `xmm1` as follows: 
+* **In parallel**: consider `HADDPD xmm1, xmm2` instruction, which will sum up (reduce) two double-precision floating-point values in both `xmm1` and `xmm2` and store two results in `xmm1` as follows: 
   ```
   xmm1[63:0] = xmm2[127:64] + xmm2[63:0]
   xmm1[127:64] = xmm1[127:64] + xmm1[63:0]
@@ -53,6 +53,6 @@ $ perf stat -e uops_issued.any,uops_executed.thread,uops_retired.slots -- ./a.ex
   2557884  uops_retired.slots
 ```
 
-The way instructions are split into micro operations may vary across CPU generations. Usually, a lower number of $\mu$ops used for an instruction means that hardware has better support for it and is likely to have lower latency and higher throughput. For the latest Intel and AMD CPUs, the vast majority of instructions generate exactly one $\mu$op. Latency, throughput, port usage, and the number of $\mu$ops for x86 instructions on recent microarchitectures can be found at the [uops.info](https://uops.info/table.html)[^1] website.
+The way instructions are split into micro-operations may vary across CPU generations. Usually, a lower number of $\mu$ops used for an instruction means that hardware has better support for it and is likely to have lower latency and higher throughput. For the latest Intel and AMD CPUs, the vast majority of instructions generate exactly one $\mu$op. Latency, throughput, port usage, and the number of $\mu$ops for x86 instructions on recent microarchitectures can be found at the [uops.info](https://uops.info/table.html)[^1] website.
 
 [^1]: x86 instruction latency and throughput - [https://uops.info/table.html](https://uops.info/table.html)

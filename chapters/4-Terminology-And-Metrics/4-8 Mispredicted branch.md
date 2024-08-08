@@ -1,5 +1,3 @@
-
-
 ## Mispredicted Branch {#sec:BbMisp}
 
 Modern CPUs try to predict the outcome of a branch instruction (taken or not taken). For example, when the processor sees code like this:
@@ -13,7 +11,7 @@ zero:
 # eax is 0
 ```
 
-In the above example, the `jz` instruction is a branch. Modern CPU architectures try to predict the outcome of every branch to increase performance. This is called "Speculative Execution" that we discussed in [@sec:SpeculativeExec]. The processor will speculate that, for example, the branch will not be taken and will execute the code that corresponds to the situation when `eax is not 0`. However, if the guess is wrong, this is called "branch misprediction", and the CPU is required to undo all the speculative work that it has done recently. 
+In the above example, the `jz` instruction is a branch. Modern CPU architectures try to predict the outcome of every branch to increase performance. This is called "Speculative Execution" which we discussed in [@sec:SpeculativeExec]. The processor will speculate that, for example, the branch will not be taken and will execute the code that corresponds to the situation when `eax is not 0`. However, if the guess is wrong, this is called "branch misprediction", and the CPU is required to undo all the speculative work that it has done recently. 
 
 A mispredicted branch typically involves a penalty between 10 and 20 clock cycles. First, all the instructions that were fetched and executed based on the incorrect prediction need to be flushed from the pipeline. After that, some buffers may require cleanup to restore the state from where the bad speculation started. Finally, the pipeline needs to wait until the correct branch target address is determined, which results in additional execution delay.
 

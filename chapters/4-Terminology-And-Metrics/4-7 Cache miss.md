@@ -2,7 +2,7 @@
 
 ## Cache Miss
 
-As discussed in [@sec:MemHierar], any memory request missing in a particular level of cache must be serviced by higher-level caches or DRAM. This implies a significant increase in the latency of such memory access. The typical latency of memory subsystem components is shown in Table {@tbl:mem_latency}. There is also an [interactive view](https://colin-scott.github.io/personal_website/research/interactive_latency.html)[^1] that visualizes the latency of different operations in modern systems. Performance greatly suffers, especially when a memory request misses in Last Level Cache (LLC) and goes all the way down to the main memory. Intel® [Memory Latency Checker](https://www.intel.com/software/mlc)[^2] (MLC) is a tool used to measure memory latencies and bandwidth and how they change with increasing load on the system. MLC is useful for establishing a baseline for the system under test and for performance analysis. We will use this tool when we will talk about memory latency and bandwidth in [@sec:MemLatBw].
+As discussed in [@sec:MemHierar], any memory request missing in a particular level of cache must be serviced by higher-level caches or DRAM. This implies a significant increase in the latency of such memory access. The typical latency of memory subsystem components is shown in Table {@tbl:mem_latency}. There is also an [interactive view](https://colin-scott.github.io/personal_website/research/interactive_latency.html)[^1] that visualizes the latency of different operations in modern systems. Performance greatly suffers, especially when a memory request misses in the Last Level Cache (LLC) and goes all the way down to the main memory. Intel® [Memory Latency Checker](https://www.intel.com/software/mlc)[^2] (MLC) is a tool used to measure memory latencies and bandwidth and how they change with increasing load on the system. MLC is useful for establishing a baseline for the system under test and for performance analysis. We will use this tool when we talk about memory latency and bandwidth in [@sec:MemLatBw].
 
 -------------------------------------------------
 Memory Hierarchy Component   Latency (cycle/time)
@@ -46,7 +46,7 @@ $ perf stat -e mem_load_retired.l1_miss,
    7188  mem_load_retired.l2_miss
 ```
 
-From this example, we can see that 37% of loads that missed in the L1 D-cache also missed in the L2 cache, thus the *L2 hit rate* is 63%. In a similar way, a breakdown for the L3 cache can be made.
+From this example, we can see that 37% of loads that missed in the L1 D-cache also missed in the L2 cache, thus the *L2 hit rate* is 63%. A breakdown for the L3 cache can be made similarly.
 
 [^1]: Interactive latency - [https://colin-scott.github.io/personal_website/research/interactive_latency.html](https://colin-scott.github.io/personal_website/research/interactive_latency.html)
 [^2]: Memory Latency Checker - [https://www.intel.com/software/mlc](https://www.intel.com/software/mlc)

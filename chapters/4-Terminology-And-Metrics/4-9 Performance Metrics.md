@@ -1,6 +1,6 @@
 ## Performance Metrics {#sec:PerfMetrics}
 
-Being able to collect various performance events is very helpful in performance analysis. However, there is a problem. Say, you ran a program and collected `MEM_LOAD_RETIRED.L3_MISS` event, which counts the LLC misses, and it shows you a value of one billion. Sure it sounds like a lot, so you decided to investigate where these cache misses are coming from. Wrong! Are you really sure it is an issue? If a program only does two billion loads, then yes, it is a problem as half of the loads miss in the LLC. In contrast, if a program does one trillion loads, then only one in a thousand loads results in a L3 cache miss.
+Being able to collect various performance events is very helpful in performance analysis. However, there is a problem. Say, you ran a program and collected the `MEM_LOAD_RETIRED.L3_MISS` event, which counts the LLC misses, and it shows you a value of one billion. Sure it sounds like a lot, so you decided to investigate where these cache misses are coming from. Wrong! Are you sure it is an issue? If a program only does two billion loads, then yes, it is a problem as half of the loads miss in the LLC. In contrast, if a program does one trillion loads, then only one in a thousand loads results in a L3 cache miss.
 
 That's why in addition to the hardware performance events, performance engineers frequently use metrics, which are built on top of raw events. Table {@tbl:perf_metrics} shows a list of metrics for Intel's 12th-gen Goldencove architecture along with descriptions and formulas. The list is not exhaustive, but it shows the most important metrics. A complete list of metrics for Intel CPUs and their formulas can be found in [TMA_metrics.xlsx](https://github.com/intel/perfmon/blob/main/TMA_Metrics.xlsx).[^1] [@sec:PerfMetricsCaseStudy] shows how performance metrics can be used in practice.
 
@@ -29,7 +29,7 @@ Ratio
 Code    STLB (2nd level TLB) code  1000 * ITLB_MISSES.WALK_COMPLETED 
 STLB    speculative misses per     / INST_RETIRED.ANY
 MPKI    kilo instruction (misses 
-        of any page-size that 
+        of any page size that 
         complete the page walk)
 
 Load    STLB data load             1000 * DTLB_LD_MISSES.WALK_COMPLETED 
@@ -108,7 +108,7 @@ Table: A list (not exhaustive) of performance metrics along with descriptions an
 
 \normalsize
 
-A few notes on those metrics. First, the ILP and MLP metrics do not represent theoretical maximums for an application; rather they measure the actual ILP and MLP of an application on a given machine. On an ideal machine with infinite resources, these numbers would be higher. Second, all metrics besides "DRAM BW Use" and "Load Miss Real Latency" are fractions; we can apply fairly straightforward reasoning to each of them to tell whether a specific metric is high or low. But to make sense of "DRAM BW Use" and "Load Miss Real Latency" metrics, we need to put it in a context. For the former, we would like to know if a program saturates the memory bandwidth or not. The latter gives you an idea for the average cost of a cache miss, which is useless by itself unless you know the latencies of each component in the cache hierarchy. We will discuss how to find out cache latencies and peak memory bandwidth in the next section.
+A few notes on those metrics. First, the ILP and MLP metrics do not represent theoretical maximums for an application; rather they measure the actual ILP and MLP of an application on a given machine. On an ideal machine with infinite resources, these numbers would be higher. Second, all metrics besides "DRAM BW Use" and "Load Miss Real Latency" are fractions; we can apply fairly straightforward reasoning to each of them to tell whether a specific metric is high or low. But to make sense of "DRAM BW Use" and "Load Miss Real Latency" metrics, we need to put it in context. For the former, we would like to know if a program saturates the memory bandwidth or not. The latter gives you an idea of the average cost of a cache miss, which is useless by itself unless you know the latencies of each component in the cache hierarchy. We will discuss how to find out cache latencies and peak memory bandwidth in the next section.
 
 Some tools can report performance metrics automatically. If not, you can always calculate those metrics manually since you know the formulas and corresponding performance events that must be collected. Table {@tbl:perf_metrics} provides formulas for the Intel Goldencove architecture, but you can build similar metrics on another platform as long as underlying performance events are available.
 
