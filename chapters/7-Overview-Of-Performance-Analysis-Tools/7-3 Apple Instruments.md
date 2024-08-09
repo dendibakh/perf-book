@@ -1,10 +1,10 @@
 ## Apple Xcode Instruments
 
-The most convenient way to do similar performance analysis on MacOS is to use Xcode Instruments. This is an application performance analyzer and visualizer that comes for free with Xcode. Instruments is built on top of the DTrace tracing framework that was ported to MacOS from Solaris. Instruments has many tools to inspect performance of an application and enables us to do most of the basic things that other profilers like Intel VTune can do. The easiest way to get the profiler is to install Xcode from the Apple AppStore. The tool requires no configuration; once you install it you're ready to go.
+The most convenient way to do similar performance analysis on MacOS is to use Xcode Instruments. This is an application performance analyzer and visualizer that comes for free with Xcode. The Instruments profiler is built on top of the DTrace tracing framework that was ported to MacOS from Solaris. It has many tools to inspect the performance of an application and enables us to do most of the basic things that other profilers like Intel VTune can do. The easiest way to get the profiler is to install Xcode from the Apple App Store. The tool requires no configuration; once you install it you're ready to go.
 
-In Instruments, you use specialized tools, known as instruments, to trace different aspects of your apps, processes, and devices over time. Instruments has a powerful visualization mechanism. It collects data as it profiles, and presents the results to you in real time. You can gather different types of data and view them side by side, which enables you to see patterns in the execution, correlate system events and find very subtle performance issues. 
+In Instruments, you use specialized tools, known as instruments, to trace different aspects of your apps, processes, and devices over time. Instruments has a powerful visualization mechanism. It collects data as it profiles and presents the results to you in real-time. You can gather different types of data and view them side by side, which enables you to see patterns in the execution, correlate system events and find very subtle performance issues. 
 
-In this chapter we will only showcase the "CPU Counters" instrument, which is the most relevant for this book. Instruments can also visualize GPU, network and disk activity, track memory allocations and releases, capture user events, such as mouse clicks, provide insights into power efficiency, and more. You can read more about those use cases in the Instruments [documentation](https://help.apple.com/instruments/mac/current).[^1]
+In this chapter, we will only showcase the "CPU Counters" instrument, which is the most relevant for this book. Instruments can also visualize GPU, network, and disk activity, track memory allocations, and releases, capture user events, such as mouse clicks, provide insights into power efficiency, and more. You can read more about those use cases in the Instruments [documentation](https://help.apple.com/instruments/mac/current).[^1]
 
 ### What you can do with it: {.unlisted .unnumbered}
 
@@ -19,17 +19,17 @@ Similar to other sampling-based profilers, Xcode Instruments has the same blind 
 
 ### Example: Profiling Clang Compilation {.unlisted .unnumbered}
 
-In this example we will show how to collect hardware performance counters on an Apple Mac mini with the M1 processor, macOS 13.5.1 Ventura and 16 GB RAM. We took one of the largest files in the LLVM codebase and profiled its compilation using version 15.0 of the Clang C++ compiler. Here is the command line that we used:
+In this example, we will show how to collect hardware performance counters on an Apple Mac mini with the M1 processor, macOS 13.5.1 Ventura, and 16 GB RAM. We took one of the largest files in the LLVM codebase and profiled its compilation using version 15.0 of the Clang C++ compiler. Here is the command line that we used:
 
 ```bash
 $ clang++ -O3 -DNDEBUG -arch arm64 <other options ...> -c llvm/lib/Transforms/Vectorize/LoopVectorize.cpp
 ```
 
-Figure @fig:InstrumentsView shows the main timeline view of Xcode Instruments. This screenshot was taken after the compilation finished. We will get back to it a bit later, and first show how to start the profiling session.
+Figure @fig:InstrumentsView shows the main timeline view of Xcode Instruments. This screenshot was taken after the compilation was finished. We will get back to it a bit later, but first, let us show how to start the profiling session.
 
 ![Xcode Instruments: timeline and statistics panels.](../../img/perf-tools/XcodeInstrumentsView.jpg){#fig:InstrumentsView width=100% }
 
-To begin, open *Instruments* and choose *CPU Counters* analysis type. First step you need to do is configure the collection. Click and hold the red target icon (see \circled{1} in Figure @fig:InstrumentsView), then select *Recording Options...* from the menu. It will display the dialog window shown in Figure @fig:InstrumentsDialog. This is where you can add hardware performance monitoring events for collection.
+To begin, open *Instruments* and choose *CPU Counters* analysis type. The first step you need to do is configure the collection. Click and hold the red target icon (see \circled{1} in Figure @fig:InstrumentsView), then select *Recording Options...* from the menu. It will display the dialog window shown in Figure @fig:InstrumentsDialog. This is where you can add hardware performance monitoring events for collection.
 
 ![Xcode Instruments: CPU Counters options.](../../img/perf-tools/XcodeInstrumentsDialog.png){#fig:InstrumentsDialog width=70% }
 
