@@ -1,6 +1,6 @@
 ## Linux Perf
 
-Linux Perf is probably the most used performance profiler in the world, due to the fact that it is available on most Linux distributions, which makes it accessible for a wide range of users. Perf is natively supported in many popular Linux distributions, including Ubuntu, Red Hat, Debian, and many others. It is included in the kernel, so you can get OS-level statistic (page-faults, cpu-migrations, etc.) on any system that runs Linux. As of mid 2023, the profiler supports x86, ARM, PowerPC64, UltraSPARC, and a few other CPU types.[^2] On such platforms, `perf` provides access to the hardware performance monitoring features, for example, performance counters. More information about Linux `perf` is available on its [wiki page](https://perf.wiki.kernel.org/index.php/Main_Page)[^1].
+Linux Perf is probably the most used performance profiler in the world since it is available on most Linux distributions, which makes it accessible to a wide range of users. Perf is natively supported in many popular Linux distributions, including Ubuntu, Red Hat, Debian, and many others. It is included in the kernel, so you can get OS-level statistics (page faults, cpu-migrations, etc.) on any system that runs Linux. As of mid-2023, the profiler supports x86, ARM, PowerPC64, UltraSPARC, and a few other CPU types.[^2] On such platforms, `perf` provides access to the hardware performance monitoring features, for example, performance counters. More information about Linux `perf` is available on its [wiki page](https://perf.wiki.kernel.org/index.php/Main_Page)[^1].
 
 ### How to configure it {.unlisted .unnumbered}
 
@@ -33,7 +33,7 @@ The output of the `perf record` command is a raw dump of samples. Many tools, bu
 
 ### What you cannot do with it: {.unlisted .unnumbered}
 
-Linux perf is a command-line tool and lacks a GUI, which makes it hard to filter data, observe how the workload behaviour changes over time, zoom into a portion of the runtime, etc. There is a limited console output provided through the `perf report` command, which is fine for quick analysis, although not as convenient as other GUI profilers. Luckily, as we just mentioned, there are GUI tools that can postprocess and visualize the raw output of Linux `perf`.
+Linux perf is a command-line tool and lacks a GUI, which makes it hard to filter data, observe how the workload behavior changes over time, zoom into a portion of the runtime, etc. There is a limited console output provided through the `perf report` command, which is fine for quick analysis, although not as convenient as other GUI profilers. Luckily, as we just mentioned, there are GUI tools that can post-process and visualize the raw output of Linux `perf`.
 
 [^1]: Linux perf wiki - [https://perf.wiki.kernel.org/index.php/Main_Page](https://perf.wiki.kernel.org/index.php/Main_Page).
 [^2]: RISCV is not supported yet as a part of the official kernel, although custom tools from vendors exist.
