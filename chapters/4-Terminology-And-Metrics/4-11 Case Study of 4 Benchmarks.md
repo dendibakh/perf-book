@@ -32,70 +32,70 @@ Table {@tbl:perf_metrics_case_study} provides a side-by-side comparison of perfo
 * __CloverLeaf__. As before, we start with analyzing instructions and core cycles. The amount of work done by P- and E-cores is roughly the same, but it takes P-cores more time to do this work, resulting in a lower IPC of one logical thread on P-core compared to one physical E-core.[^2] The `L*MPKI` metrics are high, especially the number of L3 misses per kilo instructions. The load miss latency (`LdMissLat`) is off the charts, suggesting an extremely high price of the average cache miss. Next, we take a look at the `DRAM BW use` metric and see that memory bandwidth is fully saturated. That's the problem: all the cores in the system share the same memory bus, so they compete for access to the main memory, which effectively stalls the execution. CPUs are undersupplied with the data that they demand. Going further, we can see that CloverLeaf does not suffer from mispredictions or function call overhead. The instruction mix is dominated by FP double-precision scalar operations with some parts of the code being vectorized. Conclusion: multi-threaded CloverLeaf is bound by memory bandwidth.
 
 --------------------------------------------------------------------------
-Metric           Core        Blender     Stockfish   Clang15-   CloverLeaf
-Name             Type                                selfbuild
+Metric           Core        Blender     Stockfish   Clang15-   CloverLeaf
+Name             Type                                selfbuild
 ---------------- ----------- ----------- ----------- ---------- ----------
-Instructions     P-core      6.02E+12    6.59E+11    2.40E+13   1.06E+12
+Instructions     P-core      6.02E+12    6.59E+11    2.40E+13   1.06E+12
 
-Core Cycles      P-core      4.31E+12    3.65E+11    3.78E+13   5.25E+12
+Core Cycles      P-core      4.31E+12    3.65E+11    3.78E+13   5.25E+12
 
-IPC              P-core      1.40        1.80        0.64       0.20
+IPC              P-core      1.40        1.80        0.64       0.20
 
-CPI              P-core      0.72        0.55        1.57       4.96
+CPI              P-core      0.72        0.55        1.57       4.96
 
-Instructions     E-core      4.97E+12    0           1.43E+13   1.11E+12
+Instructions     E-core      4.97E+12    0           1.43E+13   1.11E+12
 
-Core Cycles      E-core      3.73E+12    0           3.19E+13   4.28E+12
+Core Cycles      E-core      3.73E+12    0           3.19E+13   4.28E+12
 
-IPC              E-core      1.33        0           0.45       0.26
+IPC              E-core      1.33        0           0.45       0.26
 
-CPI              E-core      0.75        0           2.23       3.85
+CPI              E-core      0.75        0           2.23       3.85
 
-L1MPKI           P-core      3.88        21.38       6.01       13.44
+L1MPKI           P-core      3.88        21.38       6.01       13.44
 
-L2MPKI           P-core      0.15        1.67        1.09       3.58
+L2MPKI           P-core      0.15        1.67        1.09       3.58
 
-L3MPKI           P-core      0.04        0.14        0.56       3.43
+L3MPKI           P-core      0.04        0.14        0.56       3.43
 
-Br. Misp. Ratio  E-core      0.02        0.08        0.03       0.01
+Br. Misp. Ratio  E-core      0.02        0.08        0.03       0.01
 
-Code stlb MPKI   P-core      0           0.01        0.35       0.01
+Code stlb MPKI   P-core      0           0.01        0.35       0.01
 
-Ld stlb MPKI     P-core      0.08        0.04        0.51       0.03
+Ld stlb MPKI     P-core      0.08        0.04        0.51       0.03
 
-St stlb MPKI     P-core      0           0.01        0.06       0.1
+St stlb MPKI     P-core      0           0.01        0.06       0.1
 
-LdMissLat (Clk)  P-core      12.92       10.37       76.7       253.89
+LdMissLat (Clk)  P-core      12.92       10.37       76.7       253.89
 
-ILP              P-core      3.67        3.65        2.93       2.53
+ILP              P-core      3.67        3.65        2.93       2.53
 
-MLP              P-core      1.61        2.62        1.57       2.78
+MLP              P-core      1.61        2.62        1.57       2.78
 
-DRAM BW (GB/s)   All         1.58        1.42        10.67      24.57
+DRAM BW (GB/s)   All         1.58        1.42        10.67      24.57
 
-IpCall           All         176.8       153.5       40.9       2,729
+IpCall           All         176.8       153.5       40.9       2,729
 
-IpBranch         All         9.8         10.1        5.1        18.8
+IpBranch         All         9.8         10.1        5.1        18.8
 
-IpLoad           All         3.2         3.3         3.6        2.7
+IpLoad           All         3.2         3.3         3.6        2.7
 
-IpStore          All         7.2         7.7         5.9        22.0
+IpStore          All         7.2         7.7         5.9        22.0
 
-IpMispredict     All         610.4       214.7       177.7      2,416
+IpMispredict     All         610.4       214.7       177.7      2,416
 
-IpFLOP           All         1.1         1.82E+06    286,348    1.8
+IpFLOP           All         1.1         1.82E+06    286,348    1.8
 
-IpArith          All         4.5         7.96E+06    268,637    2.1
+IpArith          All         4.5         7.96E+06    268,637    2.1
 
-IpArith Scal SP  All         22.9        4.07E+09    280,583    2.60E+09
+IpArith Scal SP  All         22.9        4.07E+09    280,583    2.60E+09
 
-IpArith Scal DP  All         438.2       1.22E+07    4.65E+06   2.2
+IpArith Scal DP  All         438.2       1.22E+07    4.65E+06   2.2
 
-IpArith AVX128   All         6.9         0.0         1.09E+10   1.62E+09
+IpArith AVX128   All         6.9         0.0         1.09E+10   1.62E+09
 
-IpArith AVX256   All         30.3        0.0         0.0        39.6
+IpArith AVX256   All         30.3        0.0         0.0        39.6
 
-IpSWPF           All         90.2        2,565       105,933    172,348
+IpSWPF           All         90.2        2,565       105,933    172,348
 --------------------------------------------------------------------------
 
 Table: Performance Metrics of Four Benchmarks. {#tbl:perf_metrics_case_study}
