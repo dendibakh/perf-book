@@ -1,6 +1,6 @@
 ## AMD uProf
 
-The [uProf](https://www.amd.com/en/developer/uprof.html) profiler is a tool developed by AMD for monitoring performance of applications running on AMD processors. While uProf can be used on Intel processors as well, you will be able to use only CPU-independent features. The profiler is available for free to download and can be used on Windows, Linux and FreeBSD. AMD uProf can be used for profiling on multiple virtual machines (VMs), including Microsoft Hyper-V, KVM, VMware ESXi, Citrix Xen, but not all features are available on all VMs. Also, uProf supports analyzing applications written in various languages, including C, C++, Java, .NET/CLR.
+The [uProf](https://www.amd.com/en/developer/uprof.html) profiler is a tool developed by AMD for monitoring the performance of applications running on AMD processors. While uProf can be used on Intel processors as well, you will be able to use only CPU-independent features. The profiler is available for free to download and can be used on Windows, Linux, and FreeBSD. AMD uProf can be used for profiling on multiple virtual machines (VMs), including Microsoft Hyper-V, KVM, VMware ESXi, and Citrix Xen, but not all features are available on all VMs. Also, uProf supports analyzing applications written in various languages, including C, C++, Java, .NET/CLR.
 
 ### How to configure it {.unlisted .unnumbered}
 
@@ -11,10 +11,10 @@ On Linux, uProf uses Linux perf for data collection. On Windows, uProf uses its 
 - Find hotspots: functions, statements, instructions.
 - Monitor various hardware performance events and locate lines of code where these events happen.
 - Filter data for a specific function or thread.
-- Observe the workload behavior over time: view various performance events in timeline chart.
-- Analyze hot callpaths: call-graph, flame-graph and bottom-up charts.
+- Observe the workload behavior over time: view various performance events in the timeline chart.
+- Analyze hot callpaths: call-graph, flame-graph, and bottom-up charts.
 
-In addition, uProf can monitor various OS events on Linux: thread state, thread synchronization, system calls, page faults, and others. You can use it to analyze OpenMP applications to detect thread imbalance, and analyze MPI[^3] applications to detect the load imbalance among the nodes of MPI cluster. More details on various features of uProf can be found in the [User Guide](https://www.amd.com/en/developer/uprof.html#documentation)[^1].
+In addition, uProf can monitor various OS events on Linux: thread state, thread synchronization, system calls, page faults, and others. You can use it to analyze OpenMP applications to detect thread imbalance and analyze MPI[^3] applications to detect the load imbalance among the nodes of the MPI cluster. More details on various features of uProf can be found in the [User Guide](https://www.amd.com/en/developer/uprof.html#documentation)[^1].
 
 ### What you cannot do with it: {.unlisted .unnumbered}
 
@@ -28,9 +28,9 @@ Figure @fig:uProfHotspots shows *Function Hotpots* analysis (selected in the men
 
 ![uProf's Function Hotspots view.](../../img/perf-tools/uProf_Hopspot.png){#fig:uProfHotspots width=100% }
 
-Below the timeline graph, you can see a list of hot functions, along with corresponding sampled performance events and calculated metrics. Event counts can be viewed as: sample count, raw event count, and percentage. There are many interesting numbers to look at, but we will not dive deep into the analysis. Instead, readers are encouraged to figure out the performance impact of branch mispredictions and find their source.
+Below the timeline graph, you can see a list of hot functions, along with corresponding sampled performance events and calculated metrics. Event counts can be viewed as sample count, raw event count, or percentage. There are many interesting numbers to look at, but we will not dive deep into the analysis. Instead, readers are encouraged to figure out the performance impact of branch mispredictions and find their source.
 
-Below the functions table, you can see a bottom-up callstack view for the selected function in the functions table. As we can see, the selected `LU_factor` function is called from `kernel_measureLU`, which in turn is called from `main`. In the Scimark2 benchmark, this is the only call stack for `LU_factor`, even though it shows `Call Stacks [5]`. This is an artifact of collection that can be ignored. But in other applications, a hot function can be called from many different places, so you would want to examine other call stacks as well. 
+Below the functions table, you can see a bottom-up call stack view for the selected function in the functions table. As we can see, the selected `LU_factor` function is called from `kernel_measureLU`, which in turn is called from `main`. In the Scimark2 benchmark, this is the only call stack for `LU_factor`, even though it shows `Call Stacks [5]`. This is an artifact of collection that can be ignored. But in other applications, a hot function can be called from many different places, so you would want to examine other call stacks as well. 
 
 If you double-click on any function, uProf will open the source/assembly view for that function. We don't show this view for brevity. On the left panel, there are other views available, like Metrics, Flame Graph, Call Graph view, and Thread Concurrency. They are useful for analysis as well, however we decided to skip them. Readers can experiment and look at those views on their own.
 
