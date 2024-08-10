@@ -1,8 +1,6 @@
-
-
 # Optimizing Memory Accesses {#sec:MemBound}
 
-Modern computers are still being built based on the classical Von Neumann architecture which decouples CPU, memory and input/output units. Nowadays, operations with memory (loads and stores) account for the largest portion of performance bottlenecks and power consumption. It is no surprise that we start with this category first.
+Modern computers are still being built based on the classical Von Neumann architecture which decouples CPU, memory, and input/output units. Nowadays, operations with memory (loads and stores) account for the largest portion of performance bottlenecks and power consumption. It is no surprise that we start with this category first.
 
 The statement that memory hierarchy performance is critical can be exacerbated by Figure @fig:CpuMemGap. It shows the growth of the gap in performance between memory and processors. The vertical axis is on a logarithmic scale and shows the growth of the CPU-DRAM performance gap. The memory baseline is the latency of memory access of 64 KB DRAM chips from 1980. Typical DRAM performance improvement is 7% per year, while CPUs enjoy 20-50% improvement per year. According to this picture, processor performance has plateaued, but even then, the gap in performance remains. [@Hennessy]
 
