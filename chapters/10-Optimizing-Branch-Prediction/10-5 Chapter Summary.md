@@ -1,5 +1,3 @@
-
-
 ## Chapter Summary {.unlisted .unnumbered}
 
 * Modern processors are very good at predicting branch outcomes. So, we recommend starting the work on fixing branch mispredictions only when the TMA report points to a high `Bad Speculation` metric.
