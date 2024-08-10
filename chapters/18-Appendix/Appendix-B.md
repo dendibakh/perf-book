@@ -31,7 +31,7 @@ void bar(float* A, float* B, float K, int n) {
 
 ## Reductions {.unnumbered .unlisted}
 
-In this example, the sum variable is used by consecutive iterations of the loop. Normally, this would prevent vectorization, but the Vectorizer can detect that `sum` is a reduction variable. The variable `sum` becomes a vector of integers, and at the end of the loop, the elements of the array are added together to create the correct result. The LLVM Vectorizer supports a number of different reduction operations, such as addition, multiplication, XOR, AND, and OR.
+In this example, the sum variable is used by consecutive iterations of the loop. Normally, this would prevent vectorization, but the Vectorizer can detect that `sum` is a reduction variable. The variable `sum` becomes a vector of integers, and at the end of the loop, the elements of the array are added together to create the correct result. The LLVM Vectorizer supports several different reduction operations, such as addition, multiplication, XOR, AND, and OR.
 
 ```cpp
 int foo(int *A, int n) {
@@ -47,7 +47,7 @@ The LLVM Vectorizer supports floating-point reduction operations when `-ffast-ma
 
 ## Inductions {.unnumbered .unlisted}
 
-In this example, the value of the induction variable i is saved into an array. The LLVM Loop Vectorizer knows to vectorize induction variables.
+In this example, the value of the induction variable i is saved into an array. The LLVM Loop Vectorizer knows how to vectorize induction variables.
 
 ```cpp
 void bar(float* A, int n) {
@@ -58,7 +58,7 @@ void bar(float* A, int n) {
 
 ## If Conversion {.unnumbered .unlisted}
 
-The LLVM Loop Vectorizer is able to “flatten” the IF statement in the code and generate a single stream of instructions. The Vectorizer supports any control flow in the innermost loop. The innermost loop may contain complex nesting of IFs, ELSEs, and even GOTOs.
+The LLVM Loop Vectorizer can “flatten” the IF statement in the code and generate a single stream of instructions. The Vectorizer supports any control flow in the innermost loop. The innermost loop may contain complex nesting of IFs, ELSEs, and even GOTOs.
 
 ```cpp
 int foo(int *A, int *B, int n) {
@@ -72,7 +72,7 @@ int foo(int *A, int *B, int n) {
 
 ## Pointer Induction Variables {.unnumbered .unlisted}
 
-This example uses the `std::accumulate` function from the standard c++ library. This loop uses C++ iterators, which are pointers, and not integer indices. The LLVM Loop Vectorizer detects pointer induction variables and can vectorize this loop. This feature is important because many C++ programs use iterators.
+This example uses the `std::accumulate` function from the standard C++ library. This loop uses C++ iterators, which are pointers, and not integer indices. The LLVM Loop Vectorizer detects pointer induction variables and can vectorize this loop. This feature is important because many C++ programs use iterators.
 
 ```cpp
 int baz(int *A, int n) {
@@ -93,7 +93,7 @@ int foo(int *A, int n) {
 
 ## Scatter / Gather {.unnumbered .unlisted}
 
-The LLVM Loop Vectorizer can vectorize code that becomes a sequence of scalar instructions that scatter/gathers memory.
+The LLVM Loop Vectorizer can vectorize code that becomes a sequence of scalar instructions that scatters/gathers memory locations.
 
 ```cpp
 int foo(int * A, int * B, int n) {
@@ -130,7 +130,7 @@ fmuladd
 
 ## Partial unrolling during vectorization {.unnumbered .unlisted}
 
-Modern processors feature multiple execution units, and only programs that contain a high degree of parallelism can fully utilize the entire width of the machine. The LLVM Loop Vectorizer increases the instruction-level parallelism (ILP) by performing partial-unrolling of loops.
+Modern processors feature multiple execution units, and only programs that contain a high degree of parallelism can fully utilize the entire width of the machine. The LLVM Loop Vectorizer increases the instruction-level parallelism (ILP) by performing partial unrolling of loops.
 
 In the example below, the entire array is accumulated into the variable `sum`. This is inefficient because only a single execution port can be used by the processor. By unrolling the code, the Loop Vectorizer allows two or more execution ports to be used simultaneously.
 
@@ -148,7 +148,7 @@ The LLVM Loop Vectorizer uses a cost model to decide when it is profitable to un
 
 ## SLP vectorization {.unnumbered .unlisted}
 
-SLP (Superword-Level Parallelism) vectorizer tries to glue multiple scalar operations together into vector operations. It processes the code bottom-up, across basic blocks, in search of scalars to combine. The goal of SLP vectorization is to combine similar independent instructions into vector instructions. Memory accesses, arithmetic operations, comparison operations can all be vectorized using this technique. For example, the following function performs very similar operations on its inputs (a1, b1) and (a2, b2). The basic-block vectorizer may combine the following function into vector operations.
+SLP (Superword-Level Parallelism) vectorizer tries to glue multiple scalar operations together into vector operations. It processes the code bottom-up, across basic blocks, in search of scalars to combine. The goal of SLP vectorization is to combine similar independent instructions into vector instructions. Memory accesses, arithmetic operations, and comparison operations can all be vectorized using this technique. For example, the following function performs very similar operations on its inputs (a1, b1) and (a2, b2). The basic block vectorizer may combine the following function into vector operations.
 
 ```
 void foo(int a1, int a2, int b1, int b2, int *A) {
