@@ -3,11 +3,11 @@
 
 \markboth{Appendix A}{Appendix A}
 
-Below are some examples of features that can contribute to increased non-determinism in performance measurements. See complete discussion in [@sec:secFairExperiments].
+Below are some examples of features that can contribute to increased non-determinism in performance measurements. See the complete discussion in [@sec:secFairExperiments].
 
 ## Dynamic Frequency Scaling {.unnumbered .unlisted}
 
-[Dynamic Frequency Scaling](https://en.wikipedia.org/wiki/Dynamic_frequency_scaling)[^11] (DFS) is a technique to increase the performance of the system by automatically raising CPU operating frequency when it runs demanding tasks. As an example of DFS implementation, Intel CPUs have a feature called [Turbo Boost](https://en.wikipedia.org/wiki/Intel_Turbo_Boost)[^1] and AMD CPUs employ [Turbo Core](https://en.wikipedia.org/wiki/AMD_Turbo_Core)[^2]functionality. 
+[Dynamic Frequency Scaling](https://en.wikipedia.org/wiki/Dynamic_frequency_scaling)[^11] (DFS) is a technique to increase the performance of the system by automatically raising CPU operating frequency when it runs demanding tasks. As an example of DFS implementation, Intel CPUs have a feature called [Turbo Boost](https://en.wikipedia.org/wiki/Intel_Turbo_Boost)[^1], and AMD CPUs employ [Turbo Core](https://en.wikipedia.org/wiki/AMD_Turbo_Core)[^2]functionality. 
 
 Example of an impact Turbo Boost can make for a single-threaded workload running on Intel® Core™ i5-8259U:
 
@@ -86,7 +86,7 @@ $ cat /sys/devices/system/cpu/cpu0/topology/thread_siblings_list
 
 ## Scaling Governor {.unnumbered .unlisted}
 
-Linux kernel is able to control CPU frequency for different purposes. One such purpose is to save the power, in which case the scaling governor[^7] inside the Linux Kernel can decide to decrease CPU operating frequency. For performance measurements, it is recommended to set the scaling governor policy to `performance` to avoid sub-nominal clocking. Here is how we can set it for all the cores:
+Linux kernel can control CPU frequency for different purposes. One such purpose is to save power, in which case the scaling governor[^7] inside the Linux Kernel can decide to decrease CPU operating frequency. For performance measurements, it is recommended to set the scaling governor policy to `performance` to avoid sub-nominal clocking. Here is how we can set it for all the cores:
 
 ```bash
 for i in /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
@@ -127,17 +127,17 @@ $ cset shield --exec -- perf stat -r 10 <cmd>
 
 In Linux, one can increase process priority using the `nice` tool. By increasing the priority process gets more CPU time, and the Linux scheduler favors it more in comparison with processes with normal priority. Niceness ranges from `-20` (highest priority value) to `19` (lowest priority value) with the default of `0`.
 
-Notice in the previous example, execution of the benchmarked process was interrupted by the OS more than 100 times. If we increase process priority by run the benchmark with `sudo nice -n -N`:
+Notice in the previous example, that the execution of the benchmarked process was interrupted by the OS more than 100 times. If we increase process priority by running the benchmark with `sudo nice -n -N`:
 ```bash
 $ perf stat -r 10 -- sudo nice -n -5 taskset -c 1 a.exe
     0   context-switches
     0   cpu-migrations
 ```
-Notice the number of context-switches gets to `0`, so the process received all the computation time uninterrupted.
+Notice the number of context switches gets to `0`, so the process received all the computation time uninterrupted.
 
 ## Filesystem Cache {.unnumbered .unlisted}
 
-Usually, an area of main memory is assigned to cache the file system contents, including various data. This reduces the need for an application to go all the way down to the disk. Here is an example of how file system cache can affect the running time of simple `git status` command:
+Usually, an area of main memory is assigned to cache the file system contents, including various data. This reduces the need for an application to go all the way down to the disk. Here is an example of how the file system cache can affect the running time of a simple `git status` command:
 
 ```bash
 # clean fs cache
