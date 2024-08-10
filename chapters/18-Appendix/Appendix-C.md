@@ -7,7 +7,7 @@
 
 To utilize huge pages on Windows, one needs to enable `SeLockMemoryPrivilege` [security policy](https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/lock-pages-in-memory). This can be done programmatically via the Windows API, or alternatively via the security policy GUI.
 
-1. Hit start -> search "secpol.msc", launch it.
+1. Hit start -> search "secpol.msc", and launch it.
 2. On the left select "Local Policies" -> "User Rights Assignment", then double-click on "Lock pages in memory".
 
 ![Windows security: Lock pages in memory](../../img/appendix-C/WinLockPages.png){width=100%}
@@ -71,7 +71,7 @@ Hugepagesize:       2048 kB
 Hugetlb:          262144 kB <== 256MB of space occupied
 ```
 
-Developers can utilize explicit huge pages in the code by calling `mmap` with `MAP_HUGETLB` flag ([full example](https://github.com/torvalds/linux/blob/master/tools/testing/selftests/vm/map_hugetlb.c)[^25]):
+Developers can utilize explicit huge pages in the code by calling `mmap` with the `MAP_HUGETLB` flag ([full example](https://github.com/torvalds/linux/blob/master/tools/testing/selftests/vm/map_hugetlb.c)[^25]):
 
 ```cpp
 void ptr = mmap(nullptr, size, PROT_READ | PROT_WRITE,
@@ -87,7 +87,7 @@ Other alternatives include:
 
 ### Transparent hugepages {.unnumbered .unlisted}
 
-To allow application use Transparent Huge Pages (THP) on Linux one should make sure that `/sys/kernel/mm/transparent_hugepage/enabled` is `always` or `madvise`. The former enables system wide usage of THPs, while the latter gives control to the user code which memory regions should use THPs, thus avoids the risk of consuming more memory resources. Below is the example of using the `madvise` approach:
+To allow applications to use Transparent Huge Pages (THP) on Linux one should ensure that `/sys/kernel/mm/transparent_hugepage/enabled` is `always` or `madvise`. The former enables system-wide usage of THPs, while the latter gives control to the user code on which memory regions should use THPs, thus avoiding the risk of consuming more memory resources. Below is an example of using the `madvise` approach:
 
 ```cpp
 void ptr = mmap(nullptr, size, PROT_READ | PROT_WRITE | PROT_EXEC,
@@ -106,7 +106,7 @@ HugePages_Total:     128
 HugePages_Free:      128        <== explicit huge pages are not used
 ```
 
-Also, developers can observe how their application utilizes EHPs and/or THPs by looking at `smaps` file specific to their process:
+Also, developers can observe how their application utilizes EHPs and/or THPs by looking at the `smaps` file specific to their process:
 
 ```bash
 $ watch -n1 "cat /proc/<PID_OF_PROCESS>/smaps"
