@@ -31,6 +31,8 @@ Table {@tbl:perf_metrics_case_study} provides a side-by-side comparison of perfo
 
 * __CloverLeaf__. As before, we start with analyzing instructions and core cycles. The amount of work done by P- and E-cores is roughly the same, but it takes P-cores more time to do this work, resulting in a lower IPC of one logical thread on P-core compared to one physical E-core.[^2] The `L*MPKI` metrics are high, especially the number of L3 misses per kilo instructions. The load miss latency (`LdMissLat`) is off the charts, suggesting an extremely high price of the average cache miss. Next, we take a look at the `DRAM BW use` metric and see that memory bandwidth is fully saturated. That's the problem: all the cores in the system share the same memory bus, so they compete for access to the main memory, which effectively stalls the execution. CPUs are undersupplied with the data that they demand. Going further, we can see that CloverLeaf does not suffer from mispredictions or function call overhead. The instruction mix is dominated by FP double-precision scalar operations with some parts of the code being vectorized. Conclusion: multi-threaded CloverLeaf is bound by memory bandwidth.
 
+\small
+
 --------------------------------------------------------------------------
 Metric           Core        Blender     Stockfish   Clang15-   CloverLeaf
 Name             Type                                selfbuild
@@ -99,6 +101,8 @@ IpSWPF           All         90.2        2,565       105,933    172,348
 --------------------------------------------------------------------------
 
 Table: Performance Metrics of Four Benchmarks. {#tbl:perf_metrics_case_study}
+
+\normalsize
 
 As you can see from this study, there is a lot one can learn about the behavior of a program just by looking at the metrics. It answers the "what?" question, but doesn't tell you the "why?". For that, you will need to collect a performance profile, which we will introduce in later chapters. In Part 2 of this book, we will discuss how to mitigate the performance issues we suspect take place in the four benchmarks that we have analyzed.
 
