@@ -30,7 +30,9 @@ I joined Intel in 2017, but even before that I never shied away from software op
 
 I sincerely hope that this book will help you learn low-level performance analysis, and, if you make your application faster as a result, I will consider my mission accomplished.
 
-You will find that I use "we" instead of "I" in many places in the book. This is because I received a lot of help from other people. The PDF version of this book and the "Performance Ninja" online course are available for free. This is my way to give back to the community. The full list of contributors can be found at the end of the book in the "Acknowledgements" section.
+You will find that I use "we" instead of "I" in many places in the book. This is because I received a lot of help from other people. The full list of contributors can be found at the end of the book in the "Acknowledgements" section.
+
+The PDF version of this book and the "Performance Ninja" online course are available for free. This is my way to give back to the community.
 
 ## Target Audience {.unlisted .unnumbered}
 
@@ -40,7 +42,7 @@ This book will also be useful for any developer who wants to understand the perf
 
 Readers are expected to have a minimal background in C/C++ programming languages to understand the book's examples. The ability to read basic x86/ARM assembly is desired but is not a strict requirement. I also expect familiarity with basic concepts of computer architecture and operating systems like central processor, memory, process, thread, virtual and physical memory, context switch, etc. If any of the mentioned terms are new to you, I suggest studying this material first.
 
-I suggest you read the book chapter by chapter, starting from the beginning. If you consider yourself a beginner in performance analysis, I do not recommend skipping chapters. After you finish reading, this book can be used as a reference or a checklist for optimizing software applications. The second part of the book can be a source of ideas for code optimizations.
+I suggest you read the book chapter by chapter, starting from the beginning. If you consider yourself a beginner in performance analysis, I do not recommend skipping chapters. After you finish reading, you can use this book as a a source of ideas whenever you face a performance issue and it's not immediately clear how to fix it. You can skim through the second part of the book to see which optimizations techniques can be applied to your code.
 
 [TODO]: put a link to an errata webpage 
 

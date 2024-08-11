@@ -6,9 +6,9 @@ Likewise, the software stack includes many layers, e.g., firmware, BIOS, OS, lib
 
 The scope of the book does not go beyond a single CPU socket, so we will not discuss optimization techniques for distributed, NUMA, and heterogeneous systems. Offloading computations to accelerators (GPU, FPGA, etc.) using solutions like OpenCL and openMP is not discussed in this book. 
 
-I tried to make this book to be applicable to most modern CPUs, including Intel, AMD, Apple, and other ARM-based processors. I'm very sorry if it doesn't cover your favorite architecture. Nevertheless, many of the principles discussed in this book apply well to other processors. Similarly, most examples in this book were run on Linux, but again, most of the time it doesn't matter since the same techniques benefit applications that run on Windows and macOS operating systems.
+I tried to make this book to be applicable to most modern CPUs, including Intel, AMD, Apple, and other ARM-based processors. I'm sorry if it doesn't cover your favorite architecture. Nevertheless, many of the principles discussed in this book apply well to other processors. Similarly, most examples in this book were run on Linux, but again, most of the time it doesn't matter since the same techniques benefit applications that run on Windows and macOS operating systems.
 
-Code snippets in this book are written in C, C++, or x86 assembly languages, but to a large degree, ideas from this book can be applied to other languages that are compiled to native code like Rust, Go, and even Fortran. Since this book targets user-mode applications that run close to the hardware, we will not discuss managed environments, e.g., Java. 
+Code snippets in this book are written in C, or C++, but to a large degree, ideas from this book can be applied to other languages that are compiled to native code like Rust, Go, and even Fortran. Since this book targets user-mode applications that run close to the hardware, we will not discuss managed environments, e.g., Java. 
 
-Finally, the author assumes that readers have full control over the software that they develop, including the choice of libraries and compilers they use. Hence, this book is not about tuning purchased commercial packages, e.g., tuning SQL database queries.
+Finally, I assume that readers have full control over the software that they develop, including the choice of libraries and compilers they use. Hence, this book is not about tuning purchased commercial packages, e.g., tuning SQL database queries.
 
