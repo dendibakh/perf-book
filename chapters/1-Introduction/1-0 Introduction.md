@@ -6,7 +6,7 @@ Software programmers have had an "easy ride" for decades, thanks to Moore’s la
 
 ![50 Years of Microprocessor Trend Data. *© Image by K. Rupp via karlrupp.net*. Original data up to the year 2010 was collected and plotted by M. Horowitz, F. Labonte, O. Shacham, K. Olukotun, L. Hammond, and C. Batten. New plot and data collected for 2010-2021 by K. Rupp.](../../img/intro/50-years-processor-trend.png){#fig:50YearsProcessorTrend width=100%}
 
-However from 2000 to 2010, single-threaded CPU performance growth was more modest compared to the previous decade (approximately 4 to 5 times). Clock speed stagnated due to a combination of power consumption, heat dissipation challenges, limitations in voltage scaling (Dennard Scaling[^3]), and other fundamental problems. Despite slower clock speed improvements, architectural advancements continued, including better branch prediction, deeper pipelines, larger caches, and more efficient execution units.
+However, from 2000 to 2010, single-threaded CPU performance growth was more modest compared to the previous decade (approximately 4 to 5 times). Clock speed stagnated due to a combination of power consumption, heat dissipation challenges, limitations in voltage scaling (Dennard Scaling[^3]), and other fundamental problems. Despite slower clock speed improvements, architectural advancements continued, including better branch prediction, deeper pipelines, larger caches, and more efficient execution units.
 
 From 2010 to 2020, single-threaded performance grew only by about 2 to 3 times. During this period, CPU manufacturers began to focus more on multi-core processors and parallelism rather than solely increasing single-threaded performance. 
 
