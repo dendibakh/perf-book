@@ -1,5 +1,7 @@
 ## Chapter Summary {.unlisted .unnumbered}
 
+\markright{Summary}
+
 A summary of CPU Front-End optimizations is presented in Table {@tbl:CPU_FE_OPT}.
 
 --------------------------------------------------------------------------

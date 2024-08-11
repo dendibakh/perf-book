@@ -1,5 +1,7 @@
 ## Chapter Summary {.unlisted .unnumbered}
 
+\markright{Summary}
+
 * Utilizing hardware features for low-level tuning is recommended only once all high-level performance issues are fixed. Tuning poorly designed algorithms is a bad investment of time. Once all the major performance problems are eliminated, you can use CPU performance monitoring features to analyze and further tune your application. 
 * Top-down Microarchitecture Analysis (TMA) methodology is a very powerful technique for identifying ineffective usage of CPU microarchitecture by the program. It is a robust and formal methodology that is easy to use even for inexperienced developers. TMA is an iterative process that consists of multiple steps, including characterizing the workload and locating the exact place in the source code where the bottleneck occurs. We advise that TMA should be one of the starting points for every low-level tuning effort.
 * Branch Record mechanisms such as Intel's LBR, AMD's LBR, and ARM's BRBE continuously log the most recent branch outcomes in parallel with executing the program, causing a minimal slowdown. One of the primary usages of these facilities is to collect call stacks. Also, they help identify hot branches, and misprediction rates and enable precise timing of machine code.

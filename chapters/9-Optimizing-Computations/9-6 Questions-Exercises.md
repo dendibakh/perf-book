@@ -1,5 +1,7 @@
 ## Questions and Exercises {.unlisted .unnumbered}
 
+\markright{Questions and Exercises}
+
 1. Solve the following lab assignments using techniques we discussed in this chapter:
 - `perf-ninja::function_inlining_1` 
 - `perf-ninja::vectorization` 1 and 2

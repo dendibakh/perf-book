@@ -1,5 +1,7 @@
 ## Chapter Summary {.unlisted .unnumbered}
 
+\markright{Summary}
+
 * We gave a quick overview of the most popular tools available on three major platforms: Linux, Windows, and MacOS. Depending on the CPU vendor, the choice of a profiling tool will vary. For systems with an Intel processor we recommend using VTune; for systems with an AMD processor use uProf; on Apple platforms use Xcode Instruments. 
 * Linux perf is probably the most frequently used profiling tool on Linux. It has support for processors from all major CPU vendors. It doesn't have a graphical interface. However, some tools can visualize `perf`'s profiling data.
 * We also discussed Windows Event Tracing (ETW), which is designed to observe software dynamics in a running system. Linux has a similar tool called [KUtrace](https://github.com/dicksites/KUtrace),[^1] which we do not cover in the book.

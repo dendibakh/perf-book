@@ -1,5 +1,7 @@
 ## Questions and Exercises {.unlisted .unnumbered}
 
+\markright{Questions and Exercises}
+
 1. Solve the following lab assignments from the Performance Ninja online course: 
 - `perf-ninja::mem_order_violation_1`
 - `perf-ninja::mem_alignment_1`

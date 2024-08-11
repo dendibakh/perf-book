@@ -1,6 +1,6 @@
-
-
 ## Chapter Summary {.unlisted .unnumbered}
+
+\markright{Summary}
 
 * Instruction Set Architecture (ISA) is a fundamental contract between software and hardware. ISA is an abstract model of a computer that defines the set of available operations and data types, a set of registers, memory addressing, and other things. You can implement a specific ISA in many different ways. For example, you can design a "small" core that prioritizes power efficiency or a "big" core that targets high performance. 
 * The details of the implementation are encapsulated in the term CPU "microarchitecture". This topic has been researched by thousands of computer scientists for a long time. Through the years, many smart ideas were invented and implemented in mass-market CPUs. The most notable are pipelining, out-of-order execution, superscalar engines, speculative execution and SIMD processors. All these techniques help exploit Instruction-Level Parallelism (ILP) and improve singe-threaded performance.

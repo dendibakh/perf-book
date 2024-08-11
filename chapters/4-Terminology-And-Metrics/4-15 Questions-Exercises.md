@@ -1,5 +1,7 @@
 ## Questions and Exercises {.unlisted .unnumbered}
 
+\markright{Questions and Exercises}
+
 1. What is the difference between the CPU core clock and the reference clock?
 2. What is the difference between retired and executed instruction?
 3. When you increase the frequency, does IPC go up, down, or stay the same?

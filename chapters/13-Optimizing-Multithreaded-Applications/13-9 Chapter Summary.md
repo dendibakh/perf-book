@@ -1,5 +1,7 @@
 ## Chapter Summary {.unlisted .unnumbered}
 
+\markright{Summary}
+
 * Applications that do not take advantage of modern multicore CPUs are lagging behind their competitors. Preparing software to scale well with a growing amount of CPU cores is very important for the future success of your application.
 * When dealing with a single-threaded application, optimizing one portion of the program usually yields positive results on performance. However, this is not necessarily the case for multithreaded applications. This effect is widely known as Amdahl's law, which constitutes that the speedup of a parallel program is limited by its serial part.
 * Thread communication can yield retrograde speedup as explained by Universal Scalability Law. This poses additional challenges for tuning multithreaded programs. 

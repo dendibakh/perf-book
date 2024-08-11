@@ -1,5 +1,7 @@
 ## Questions and Exercises {.unlisted .unnumbered}
 
+\markright{Questions and Exercises}
+
 1. Which performance analysis approaches would you use in the following scenarios?
 - scenario 1: the client support team reports a customer issue: after upgrading to a new version of the application, the performance of a certain operation drops by 10%.
 - scenario 2: the client support team reports a customer issue: some transactions take 2x longer time to finish than usual with no particular pattern.

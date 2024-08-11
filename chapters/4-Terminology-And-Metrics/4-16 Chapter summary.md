@@ -1,6 +1,6 @@
-
-
 ## Chapter Summary {.unlisted .unnumbered}
+
+\markright{Summary}
 
 * In this chapter, we introduced the basic metrics in performance analysis such as retired/executed instructions, CPU utilization, IPC/CPI, $\mu$ops, pipeline slots, core/reference clocks, cache misses and branch mispredictions. We showed how each of these metrics can be collected with Linux perf.
 * For more advanced performance analysis, there are many derivative metrics that you can collect. For instance, cache misses per kilo instructions (MPKI), instructions per function call, branch, load, etc (Ip*), ILP, MLP, and others. The case studies in this chapter show how you can get actionable insights from analyzing these metrics. 

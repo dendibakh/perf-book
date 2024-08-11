@@ -11,6 +11,6 @@ There is a performance monitoring counter (PMC) in most modern processors that c
 ```bash
 $ perf stat -e instructions ./a.exe
   2173414  instructions  #    0.80  insn per cycle 
-# or just simply do:
+# or just simply run:
 $ perf stat ./a.exe
 ```

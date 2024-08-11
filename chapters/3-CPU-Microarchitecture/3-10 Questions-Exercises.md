@@ -1,5 +1,7 @@
 ## Questions and Exercises {.unlisted .unnumbered}
 
+\markright{Questions and Exercises}
+
 1. Describe pipelining, out-of-order and speculative execution.
 2. How does register renaming help to speed up execution?
 3. Describe spatial and temporal locality.

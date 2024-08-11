@@ -1,5 +1,7 @@
 ## Questions and Exercises {.unlisted .unnumbered}
 
+\markright{Questions and Exercises}
+
 1. Solve the `perf-ninja::false_sharing` lab assignment.
 2. What are the benefits of multithreaded vs. multiprocessed applications?
 3. What is the essence of Amdahl's Law and Universal Scalability Law?

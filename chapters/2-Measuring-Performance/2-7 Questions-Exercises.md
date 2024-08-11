@@ -1,5 +1,7 @@
 ## Questions and Exercises {.unlisted .unnumbered}
 
+\markright{Questions and Exercises}
+
 1. Is it safe to take an average time over a series of measurements?
 2. Suppose you've identified a performance bug that you're now trying to fix in your development environment. How would you reduce the noise in the system to have more pronounced benchmarking results?
 3. Is it OK to track the overall performance of a program with function-level unit tests?

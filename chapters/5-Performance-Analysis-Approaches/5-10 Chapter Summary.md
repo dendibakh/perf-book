@@ -1,6 +1,6 @@
-
-
 ## Chapter Summary {#sec:secApproachesSummary .unlisted .unnumbered}
+
+\markright{Summary}
 
 * Latency and throughput are often the ultimate metrics of the program performance. When seeking ways to improve them, we need to get more detailed information on how the application executes. Both hardware and software provide data that can be used for performance monitoring.
 

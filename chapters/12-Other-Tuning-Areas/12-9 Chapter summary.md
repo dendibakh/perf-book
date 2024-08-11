@@ -1,5 +1,7 @@
 ## Chapter Summary {.unlisted .unnumbered}
 
+\markright{Summary}
+
 * Processors from different vendors are not created equal. They differ in terms of instruction set architecture (ISA) that they support and microarchitecture implementation. Reaching peak performance often requires leveraging the latest ISA extensions and tuning the application for a specific CPU microarchitecture.
 * CPU dispatching is a technique that enables you to introduce platform-specific optimizations. Using it, you can provide a fast path for a specific microarchitecture while keeping a generic implementation for other platforms.
 * We explored several performance corner cases that are caused by the interaction of the application with the CPU microarchitecture. These include memory ordering violations, misaligned memory accesses, cache aliasing, and denormal floating-point numbers.

@@ -1,5 +1,7 @@
 ## Questions and Exercises {.unlisted .unnumbered}
 
+\markright{Questions and Exercises}
+
 1. Solve the following lab assignments using techniques we discussed in this chapter:
 - `perf-ninja::branches_to_cmov_1`
 - `perf-ninja::lookup_tables_1`
