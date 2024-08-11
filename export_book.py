@@ -94,7 +94,7 @@ with open(editTexFile, 'w') as g:
     for line in lines:
         # change font size in listings for paperback
         if args.paperback and "basicstyle=\\ttfamily," in line:
-            g.write(line.replace("basicstyle=\\ttfamily,", "basicstyle=\\footnotesize\\ttfamily,"))
+            g.write(line.replace("basicstyle=\\ttfamily,", "basicstyle=\\lst@ifdisplaystyle\\footnotesize\\fi\\ttfamily,"))
         # workaround for citations and bibliography
         elif "\\usepackage[]{natbib}" in line:
             g.write(line.replace("\\usepackage[]{natbib}", ''))
