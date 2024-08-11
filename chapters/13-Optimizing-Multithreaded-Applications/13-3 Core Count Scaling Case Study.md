@@ -51,7 +51,7 @@ To confirm that frequency throttling is one of the main reasons for performance 
 
 ![Thread Count Scalability chart for Blender and Clang with disabled Turbo Boost. Frequency throttling is a major roadblock to achieving good thread count scaling.](../../img/mt-perf/ScalabilityNoTurboChart.png){#fig:ScalabilityNoTurboChart width=100%}
 
-Going back to the main chart shown in Figure fig:ScalabilityMainChart, for the Clang workload, the tipping point of performance scaling is around 10 threads. This is the point where the frequency throttling starts to have a significant impact on performance, and the benefit of adding additional threads is smaller than the penalty of running at a lower frequency.
+Going back to the main chart shown in Figure @fig:ScalabilityMainChart, for the Clang workload, the tipping point of performance scaling is around 10 threads. This is the point where the frequency throttling starts to have a significant impact on performance, and the benefit of adding additional threads is smaller than the penalty of running at a lower frequency.
 
 ### Zstandard {.unlisted .unnumbered}
 
@@ -108,20 +108,23 @@ To determine the root cause of poor scaling, we collected TMA metrics (see [@sec
 -----------------------------------------------------------------------------
 Metric                               1 thread  2 threads  3 threads 4 threads
 ------------------------------------ --------- ---------  --------- ---------
-Memory Bound (% of pipeline slots)     34.6       53.7      59.0      65.4
+TMA::Memory Bound                    34.6      53.7       59.0      65.4
+(% of pipeline slots)
 
-DRAM Memory Bandwidth (% of cycles)    71.7       83.9      87.0      91.3
+TMA::DRAM Memory Bandwidth           71.7       83.9      87.0      91.3
+(% of cycles)
 
-DRAM Mem BW Use (range, GB/s)          20-22      25-28     27-30     27-30
+Memory Bandwidth Utilization         20-22      25-28     27-30     27-30
+(range, GB/s)
 -----------------------------------------------------------------------------
 
 Table: Performance metrics for CloverLeaf workload. {#tbl:CloverLeaf_metrics}
 
-As you can see from those numbers, the pressure on the memory subsystem kept increasing as we added more threads. An increase in the *Memory Bound* metric indicates that threads increasingly spend more time waiting for data and do less useful work. An increase in the *DRAM Memory Bandwidth* metric further highlights that performance is hurt due to approaching bandwidth limits. The *DRAM Mem BW Use* metric indicates the range total of total memory bandwidth utilization while CloverLeaf was running. We captured these numbers by looking at the memory bandwidth utilization chart in VTune's platform view as shown in Figure @fig:CloverLeafMemBandwidth.
+As you can see from those numbers, the pressure on the memory subsystem kept increasing as we added more threads. An increase in the *TMA::Memory Bound* metric indicates that threads increasingly spend more time waiting for data and do less useful work. An increase in the *DRAM Memory Bandwidth* metric further highlights that performance is hurt due to approaching bandwidth limits. The *Memory Bandwidth Utilization* metric indicates the range of total memory bandwidth utilization while CloverLeaf was running. We captured these numbers by looking at the memory bandwidth utilization chart in VTune's platform view as shown in Figure @fig:CloverLeafMemBandwidth.
 
 ![VTune's platform view of running CloverLeaf with 3 threads.](../../img/mt-perf/CloverLeafMemBandwidth.png){#fig:CloverLeafMemBandwidth width=100%}
 
-Let's put those numbers into perspective, the maximum theoretical memory bandwidth of our platform is `38.4 GB/s`. However, as we measured in [@sec:MemLatBw], the maximum memory bandwidth that can be achieved in practice is `35 GB/s`. With just a single thread, the memory bandwidth utilization reaches `2/3` of the practical limit. CloverLeaf fully saturates the memory bandwidth with three threads. Even when all 16 threads are active, *DRAM Mem BW Use* doesn't go above `30 GB/s`, which is `86%` of the practical limit.
+Let's put those numbers into perspective, the maximum theoretical memory bandwidth of our platform is `38.4 GB/s`. However, as we measured in [@sec:MemLatBw], the maximum memory bandwidth that can be achieved in practice is `35 GB/s`. With just a single thread, the memory bandwidth utilization reaches `2/3` of the practical limit. CloverLeaf fully saturates the memory bandwidth with three threads. Even when all 16 threads are active, *Memory Bandwidth Utilization* doesn't go above `30 GB/s`, which is `86%` of the practical limit.
 
 To confirm our hypothesis, we swapped two `8 GB DDR4 2400 MT/s` memory modules with two DDR4 modules of the same capacity, but faster speed: `3200 MT/s`. This brings the theoretical memory bandwidth of the system to `51.2 GB/s` and the practical maximum to `45 GB/s`. The resulting performance boost grows with an increasing number of threads used and is in the range of 10% to 33%. When running CloverLeaf with 16 threads, faster memory modules provide the expected 33% performance as a ratio of the memory bandwidth increase (`3200 / 2400 = 1.33`). But even with a single thread, there is a 10% performance improvement. This means that there are moments when CloverLeaf fully saturates the memory bandwidth with a single thread.
 

@@ -65,23 +65,28 @@ Notice the explicit handling of remainders after the loop processes multiples of
 
 Highway supports over 200 operations, which can be grouped into the following categories:
 
-*   Initialization
-*   Getting/setting lanes
-*   Getting/setting blocks
-*   Printing
-*   Tuples
-*   Arithmetic
-*   Logical
-*   Masks
-*   Comparisons
-*   Memory
-*   Cache control
-*   Type conversion
-*   Combine
-*   Swizzle/permute
-*   Swizzling within 128-bit blocks
-*   Reductions
-*   Crypto
+\begin{multicols}{2}
+\begin{itemize}
+\tightlist
+\item Initialization
+\item Getting/setting lanes
+\item Getting/setting blocks
+\item Printing
+\item Tuples
+\item Arithmetic
+\item Logical
+\item Masks
+\item Comparisons
+\item Memory
+\item Cache control
+\item Type conversion
+\item Combine
+\item Swizzle/permute
+\item Swizzling within 128-bit blocks
+\item Reductions
+\item Crypto
+\end{itemize}
+\end{multicols}
 
 For the full list of operations, see its documentation [^13] and [FAQ](https://github.com/google/highway/blob/master/g3doc/faq.md). You can also experiment with it in the online [Compiler Explorer](https://gcc.godbolt.org/z/zP7MYe9Yf).
 Other libraries include Eigen, nsimd, SIMDe, VCL, and xsimd. Note that a C++ standardization effort starting with the Vc library resulted in std::experimental::simd, but this provides a very limited set of operations and as of this writing is only supported on the GCC 11 compiler.
