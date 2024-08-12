@@ -46,4 +46,4 @@ $ perf stat -e cycles,instructions -- a.exe
 $ perf stat ./a.exe
 ```
 
-[^1]: When you lower CPU frequency, memory speed becomes artificially faster relative to the CPU. This may alleviate memory bottlenecks and increase IPC.
+[^1]: When you lower CPU frequency, memory speed becomes faster relative to the CPU. This may hide actual memory bottlenecks and artificially increase IPC.

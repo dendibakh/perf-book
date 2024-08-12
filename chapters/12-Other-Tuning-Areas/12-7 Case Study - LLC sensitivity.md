@@ -88,6 +88,8 @@ Similarly, the memory read bandwidth allocated to a thread can be limited. This 
 
 The ultimate metric for quantifying the performance of an application is execution time. To analyze the impact of the memory hierarchy on system performance, we will also use the following three metrics: 1) CPI, cycles per instruction[^6], 2) DMPKI, demand misses in the LLC per thousand instructions, and 3) MPKI, total misses (demand + prefetch) in the LLC per thousand instructions. While CPI has a direct correlation with the performance of an application, DMPKI and MPKI do not necessarily impact performance. Table @tbl:metrics shows the formulas used to calculate each metric from specific hardware counters. Detailed description for each of the counters is available in AMD's Processor Programming Reference [@amd_ppr].
 
+\small
+
 ------   ----------------------------------------------------------------------------
 Metric                                     Formula                   
 ------   ----------------------------------------------------------------------------
@@ -100,6 +102,8 @@ MPKI     L3 Misses[^8] (L3PMCx04) / (Retired Instructions (PMCx0C0) / 1000)
 ------   ----------------------------------------------------------------------------
 
 Table: Formulas for calculating metrics used in the case study. {#tbl:metrics}
+
+\normalsize
 
 Hardware counters can be configured and read through the MSRs. The configuration consists of specifying the event to be monitored and how it will be monitored. In our system, there are six core counters per thread, six counters per L3-CCX, and four data fabric counters. Access to a core event is done by writing to a `PERF_CTL[0-5]` control register (MSR `0xC001020[0,2,4,6,8,A]`). The `PERF_CTR[0-5]` registers (MSR `0xC001020[1,3,5,7,9,B]`) are the counters associated with these control registers. For example, for counter 0 to collect the number of instructions retired from an application running on hardware thread 1, the following commands are executed:
 

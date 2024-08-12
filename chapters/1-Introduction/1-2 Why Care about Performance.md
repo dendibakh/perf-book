@@ -47,7 +47,7 @@ Long-running  User will probably switch away during operation  10 sec - 30 sec
 
 Table: Human-software interaction classes. *Source: Microsoft Windows Blogs*.[^11] {#tbl:WindowsResponsiveness}
 
-> “Fast tools don’t just allow users to accomplish tasks faster; they allow users to accomplish entirely new types of tasks, in entirely new ways.” - Nelson Elhage wrote in an [article](https://blog.nelhage.com/post/reflections-on-performance/)[^1]on his blog.
+> “Fast tools don’t just allow users to accomplish tasks faster; they allow users to accomplish entirely new types of tasks, in entirely new ways.” - Nelson Elhage wrote in his blog.[^1]
 
 Before starting performance-related work, make sure you have a strong reason to do so. Optimization just for optimization’s sake is useless if it doesn’t add value to your product.[^10] Mindful performance engineering starts with clearly defined performance goals, stating what you are trying to achieve and why you are doing it. Also, you should pick the metrics that you will use to measure whether you reach the goal or not.
 
