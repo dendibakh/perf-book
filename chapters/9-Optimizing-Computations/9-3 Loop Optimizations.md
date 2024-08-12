@@ -147,8 +147,6 @@ As we discussed at the beginning of this section, compilers will do the heavy-li
 
 Consider the code in [@lst:Restrict]. A compiler cannot move the expression `strlen(a)` out of the loop body. So, the loop checks if we reached the end of the string on each iteration, which is slow. The reason why a compiler cannot hoist the call is that there could be a situation when the memory regions of arrays `a` and `b` overlap. In this case, it would be illegal to move `strlen(a)` out of the loop body. If developers are sure that the memory regions do not overlap, they can declare both parameters of function `foo` with the `__restrict__` attribute, i.e., `char* __restrict__ a`.
 
-[TODO]: there is a problem with this example. If you change a call to "arbitraryFunction(a)" instead of "strlen(a)", then the opportunity for optimization (even with the use of the "restrict" keyword) would disappear. 
-
 Listing: Cannot move strlen out of the loop
 
 ~~~~ {#lst:Restrict .cpp}
