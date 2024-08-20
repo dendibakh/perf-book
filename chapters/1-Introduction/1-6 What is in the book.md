@@ -2,10 +2,10 @@
 
 This book is written to help developers better understand the performance of their applications, learn to find inefficiencies, and eliminate them. 
 
+* Why did my change cause a 2x performance drop? 
+* Our customers complain about the slowness of my application, where should I start?
 * Why my hand-written compression algorithm performs two times slower than the conventional one? 
-* Why did my change in the function cause a 2x performance drop? 
-* Customers are complaining about the slowness of my application, where should I start?
-* Have I optimized the program to its full potential? 
+* Have I optimized my program to its full potential? 
 * What performance analysis tools are available on my platform? 
 * What are the techniques to reduce the number of cache misses and branch mispredictions?
 

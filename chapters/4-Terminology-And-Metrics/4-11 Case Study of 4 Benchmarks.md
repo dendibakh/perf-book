@@ -112,9 +112,9 @@ Keep in mind that the summary of performance metrics in Table {@tbl:perf_metrics
 $ ~/workspace/pmu-tools/toplev.py -m --global --no-desc -v --xlsx workload.xlsx –xchart -I 10000 -- ./clover_leaf
 ```
 
-![Performance metrics charts for the CloverLeaf benchmark with 10 second intervals.](../../img/terms-and-metrics/CloverMetricCharts2.png){#fig:CloverMetricCharts width=100% }
-
 Even though the deviation from the average values reported in the summary is not very big, we can see that the workload is not stable. After looking at the IPC chart for P-core we can hypothesize that there are no distinct phases in the workload and the variation is caused by multiplexing between performance events (discussed in [@sec:counting]). Yet, this is only a hypothesis that needs to be confirmed or disproved. Possible ways to proceed would be to collect more data points by running collection with higher granularity (in our case it was 10 seconds). The chart that plots L*MPKI suggests that all three metrics hover around their average numbers without much deviation. The DRAM bandwidth utilization chart indicates that there are periods with varying pressure on the main memory. The last chart shows the average frequency of all CPU cores. As you may observe on this chart, throttling starts after the first 10 seconds. We recommend being careful when drawing conclusions just from looking at the aggregate numbers since they may not be a good representation of the workload behavior.
+
+![Performance metrics charts for the CloverLeaf benchmark with 10 second intervals.](../../img/terms-and-metrics/CloverMetricCharts2.png){#fig:CloverMetricCharts width=100% }
 
 In summary, performance metrics help you build the right mental model about what is and what is *not* happening in a program. Going further into analysis, this data will serve you well.
 
