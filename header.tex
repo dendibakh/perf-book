@@ -147,5 +147,11 @@
   addtohook=\AddChapterPrefixInBookmarks,
 }
 
+% Set counter to include chapter number
+\usepackage{chngcntr} 
+\counterwithin{figure}{section}
+\counterwithin{table}{section}
+\counterwithin{codelisting}{section}
+
 % this one to skip adding the title and the author
 \AtBeginDocument{\let\maketitle\relax}
