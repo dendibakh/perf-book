@@ -11,7 +11,7 @@ One of the most well-known cache coherency protocols is MESI (**M**odified **E**
 * **Shared**: a cache line is present here and in other cache lines and matches its value in RAM
 * **Invalid**: a cache line is unused (i.e., does not contain any RAM location)
 
-![MESI States Diagram. *© Image by University of Washington via courses.cs.washington.edu.*](../../img/mt-perf/MESI_Cache_Diagram.jpg){#fig:MESI width=60%}
+![MESI States Diagram. *© Source: University of Washington via courses.cs.washington.edu.*](../../img/mt-perf/MESI_Cache_Diagram.jpg){#fig:MESI width=60%}
 
 When fetched from memory, each cache line has one of the states encoded into its tag. Then the cache line state keeps transiting from one state to another.[^25] In reality, CPU vendors usually implement slightly improved variants of MESI. For example, Intel uses [MESIF](https://en.wikipedia.org/wiki/MESIF_protocol),[^26] which adds a Forwarding (F) state, while AMD employs [MOESI](https://en.wikipedia.org/wiki/MOESI_protocol),[^27] which adds the Owning (O) state. However, these protocols still maintain the essence of the base MESI protocol.
 

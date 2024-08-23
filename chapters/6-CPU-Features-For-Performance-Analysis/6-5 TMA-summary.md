@@ -6,7 +6,7 @@ Another example in which you might see a high `Retiring` value but slow overall 
 
 While it is possible to achieve `Retiring` close to 100% on a toy program, real-world applications are far from getting there. Figure @fig:TMA_google shows top-level TMA metrics for Google's datacenter workloads along with several [SPEC CPU2006](http://spec.org/cpu2006/)[^13] benchmarks running on Intel's IvyBridge server processors. We can see that most data center workloads have a very small fraction in the `Retiring` bucket. This implies that most data center workloads spend time stalled on various bottlenecks. `BackendBound` is the primary source of performance issues. The `FrontendBound` category represents a bigger problem for data center workloads than in SPEC2006 because those applications typically have large codebases. Finally, some workloads suffer from branch mispredictions more than others, e.g., `search2` and `445.gobmk`.
 
-![TMA breakdown of Google's datacenter workloads along with several SPEC CPU2006 benchmarks, *© Image from [@GoogleProfiling]*](../../img/pmu-features/TMA_google.jpg){#fig:TMA_google width=80%}
+![TMA breakdown of Google's datacenter workloads along with several SPEC CPU2006 benchmarks, *© Source: [@GoogleProfiling]*](../../img/pmu-features/TMA_google.jpg){#fig:TMA_google width=80%}
 
 Keep in mind that the numbers are likely to change for other CPU generations as architects constantly try to improve the CPU design. The numbers are also likely to change for other instruction set architectures (ISA) and compiler versions.
 

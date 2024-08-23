@@ -4,7 +4,7 @@
 
 To see how all the concepts we talked about in this chapter are used in practice, let's take a look at the implementation of Intel’s 12th-generation core, Goldencove, which became available in 2021. This core is used as the P-core inside the Alderlake and Sapphire Rapids platforms. Figure @fig:Goldencove_diag shows the block diagram of the Goldencove core. Notice, that this section only describes a single core, not the entire processor. So, we will skip the discussion about frequencies, core counts, L3 caches, core interconnects, memory latency and bandwidth, and other things.
 
-![Block diagram of a CPU Core in the Intel GoldenCove Microarchitecture. *© Image from [@IntelOptimizationManual].*](../../img/uarch/goldencove_block_diagram.png){#fig:Goldencove_diag width=100%}
+![Block diagram of a CPU Core in the Intel GoldenCove Microarchitecture. *© Source: [@IntelOptimizationManual].*](../../img/uarch/goldencove_block_diagram.png){#fig:Goldencove_diag width=100%}
 
 The core is split into an in-order front-end that fetches and decodes x86 instructions into $\mu$ops and a 6-wide superscalar, out-of-order backend. The Goldencove core supports 2-way SMT. It has a 32KB first-level instruction cache (L1 I-cache), and a 48KB first-level data cache (L1 D-cache). The L1 caches are backed up by a unified 1.25MB (2MB in server chips) L2 cache. The L1 and L2 caches are private to each core. At the end of this section, we also take a look at the TLB hierarchy.
 
