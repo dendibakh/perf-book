@@ -8,7 +8,7 @@ For this case study, we use an AMD Milan processor, but other server processors 
 
 ### Target machine: AMD EPYC 7313P {.unlisted .unnumbered}
 
-We have used a server system with a 16-core AMD EPYC 7313P processor, code-named Milan, which AMD launched in 2021. The main characteristics of this system are specified in table @tbl:experimental_setup.
+We have used a server system with a 16-core AMD EPYC 7313P processor, code-named Milan, which AMD launched in 2021. The main characteristics of this system are specified in table @tbl:experimental_setup. Based on our tests, the method described in this section works equally well on AMD Zen4-based desktop processors, such as 7950X and 7950X3D.
 
 ----------------------------------------------------------------------------
  Feature               Value
