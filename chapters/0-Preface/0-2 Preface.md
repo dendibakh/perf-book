@@ -4,7 +4,7 @@
 
 Denis Bakhvalov is a performance engineer at Intel, where he works on optimizing various widespread production applications and benchmarks. Before that, he was a part of the Intel compiler team, that develops C++ compilers for a variety of different architectures. Denis started his career as a software developer in 2008, working on a large C++ enterprise financial application. Before joining Intel, he worked for three years at Nokia, where he was writing embedded software. 
 
-Performance engineering and compilers were always among his primary interests. In 2016 Denis started his `easyperf.net` blog, writing about low-level performance optimizations, C/C++ compilers, and CPU microarchitecture. Denis is a big proponent of an active lifestyle: he plays soccer, tennis, and chess.
+Performance engineering and compilers were always among his primary interests. In 2016 Denis started his `easyperf.net` blog, writing about low-level performance optimizations, C/C++ compilers, and CPU microarchitecture. Away from work, Denis enjoys soccer, chess, and traveling.
 
 Contacts:
 
