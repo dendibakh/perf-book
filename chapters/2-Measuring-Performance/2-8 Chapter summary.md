@@ -2,16 +2,12 @@
 
 \markright{Summary}
 
-* Debugging performance issues is usually harder than debugging functional bugs due to measurement instability.
-* You cannot stop optimizing unless you set a particular goal. To know if you reached the desired goal, you need to come up with meaningful definitions and metrics for how you will measure that. Depending on what you care about, it could be throughput, latency, operations per second (roofline performance), etc. 
-* Modern systems have non-deterministic performance. Eliminating non-determinism in a system is helpful for well-defined, stable performance tests, e.g., microbenchmarks. Measuring performance in production deployment requires dealing with a noisy environment by using statistical methods for analyzing results.
-* More and more often, vendors of large distributed software choose to profile and monitor performance directly on production systems, which requires using only lightweight profiling techniques.
-* It is very beneficial to employ an automated statistical performance tracking system to prevent performance regressions from leaking into production software. Such CI systems are supposed to run automated performance tests, visualize results, and alert on discovered performance anomalies.
-* Visualizing performance distributions also may help discover performance anomalies. It is a safe way of presenting performance results to a wide audience.
-* The statistical relationship between performance distributions is identified using Hypothesis Testing methods. Once it's determined that the difference is statistically significant, then the speedup can be calculated as a ratio between the means or geometric means.
-* It's OK to discard cold runs to ensure that everything is running hot, but do not deliberately discard unwanted data. If you decide to discard some samples, do it uniformly for all distributions. 
-* To benchmark execution time, engineers can use two different timers, which all the modern platforms provide. The system-wide high-resolution timer is suitable for measuring events whose duration is more than a microsecond. For measuring short events with high accuracy, use a Time Stamp Counter.
-* Microbenchmarks are good for proving something quickly, but you should always verify your ideas on a real application in practical conditions. Make sure that you are benchmarking the meaningful code by checking performance profiles.
+* Modern systems have non-deterministic performance. Eliminating non-determinism in a system is helpful for well-defined, stable performance tests, e.g., microbenchmarks.
+* Measuring performance in production is required to assess how users perceive responsiveness of your services. However, this requires dealing with noisy environments and using statistical methods for analyzing results. 
+* It is beneficial to employ an automated performance tracking system to prevent performance regressions from leaking into production software. Such CI systems are supposed to run automated performance tests, visualize results, and alert on discovered performance anomalies.
+* Visualizing performance distributions helps comparing performance results. It is a safe way of presenting performance results to a wide audience.
+* To benchmark execution time, engineers can use two different timers: the system-wide high-resolution timer and the Time Stamp Counter. The former is suitable for measuring events whose duration is more than a microsecond. The latter can be used for measuring short events with high accuracy.
+* Microbenchmarks are good for quick experiments, but you should always verify your ideas on a real application in practical conditions. Make sure that you are benchmarking the right code by checking performance profiles.
 
 \sectionbreak
 
