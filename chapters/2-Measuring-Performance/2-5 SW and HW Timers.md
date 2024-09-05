@@ -1,10 +1,8 @@
-
-
 ## Software and Hardware Timers {#sec:timers}
 
 To benchmark execution time, engineers usually use two different timers, which all the modern platforms provide:
 
- - **System-wide high-resolution timer**: this is a system timer that is typically implemented as a simple count of the number of ticks that have transpired since an arbitrary starting date, called the [epoch](https://en.wikipedia.org/wiki/Epoch_(computing))[^1]. This clock is monotonic; i.e., it always goes up. System time can be retrieved from the OS with a system call. Accessing the system timer on Linux systems is possible via the `clock_gettime` system call. The system timer has a nanosecond resolution, is consistent between all the CPUs and is independent of the CPU frequency. Even though the system timer can return timestamps with a nanosecond accuracy, it is not suitable for measuring short-running events because it takes a long time to obtain the timestamp via the `clock_gettime` system call. But it is OK to measure events with a duration of more than a microsecond. The standard way of accessing system timer in C++ is using `std::chrono` as shown in [@lst:Chrono].
+ - **System-wide high-resolution timer**: this is a system timer that is typically implemented as a simple count of the number of ticks that have transpired since an arbitrary starting date, called the [epoch](https://en.wikipedia.org/wiki/Epoch_(computing))[^1]. This clock is monotonic; i.e., it always goes up. System time can be retrieved from the OS with a system call. Accessing the system timer on Linux systems is possible via the `clock_gettime` system call. The system timer has a nanosecond resolution, is consistent between all the CPUs, and is independent of the CPU frequency. Even though the system timer can return timestamps with a nanosecond accuracy, it is not suitable for measuring short-running events because it takes a long time to obtain the timestamp via the `clock_gettime` system call. But it is OK to measure events with a duration of more than a microsecond. The standard way of accessing the system timer in C++ is using `std::chrono` as shown in [@lst:Chrono].
 
    Listing: Using C++ std::chrono to access system timer
    
@@ -24,7 +22,7 @@ To benchmark execution time, engineers usually use two different timers, which a
    }
    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    
- - **Time Stamp Counter (TSC)**: this is a hardware timer that is implemented as a hardware register. TSC is monotonic and has a constant rate, i.e., it doesn't account for frequency changes. Every CPU has its own TSC, which is simply the number of reference cycles (see [@sec:secRefCycles]) elapsed. It is suitable for measuring short events with a duration from nanoseconds up to one minute. The value of TSC can be retrieved by using the compiler's built-in function `__rdtsc` as shown in [@lst:TSC], which uses `RDTSC` assembly instruction under the hood. More low-level details on benchmarking the code using the `RDTSC` assembly instruction can be accessed in the white paper [@IntelRDTSC].
+ - **Time Stamp Counter (TSC)**: this is a hardware timer that is implemented as a hardware register. TSC is monotonic and has a constant rate, i.e., it doesn't account for frequency changes. Every CPU has its own TSC, which is simply the number of reference cycles (see [@sec:secRefCycles]) elapsed. It is suitable for measuring short events with a duration from nanoseconds up to one minute. The value of TSC can be retrieved by using the compiler's built-in function `__rdtsc` as shown in [@lst:TSC], which uses the `RDTSC` assembly instruction under the hood. More low-level details on benchmarking the code using the `RDTSC` assembly instruction can be accessed in the white paper [@IntelRDTSC].
 
    Listing: Using __rdtsc compiler builtins to access TSC
 
