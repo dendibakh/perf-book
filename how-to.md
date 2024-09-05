@@ -8,7 +8,7 @@ Hint: to save time for exporting the entire book, you can limit it to only a sin
 python.exe export_book.py -ch 1 && pdflatex book.tex && bibtex book && pdflatex book.tex && pdflatex book.tex
 ```
 
-You can also insert LaTex tags directly into the *.md files as shown below. They will not be translated by pandoc. Please try to avoid doing so. :)
+You can also insert LaTeX tags directly into the `*.md` files as shown below. They will not be translated by pandoc. Please try to avoid doing so. :)
 
 ```
 \sectionbreak
@@ -21,7 +21,7 @@ You can also insert LaTex tags directly into the *.md files as shown below. They
 ```
 ![40 Years of Microprocessor Trend Data.](../img/1/40-years-processor-trend.png){#fig:40YearsProcessorTrend width=90%}
 ```
-reference it in the text with `@fig:40YearsProcessorTrend`
+Reference it in the text with `@fig:40YearsProcessorTrend`.
 
 ### Two images side-by-side
 
@@ -33,8 +33,8 @@ reference it in the text with `@fig:40YearsProcessorTrend`
 Two different layouts for the code snippet.
 </div>
 ``` 
-reference it in the text with `@fig:BB_default`, `@fig:BB_better`, or `@fig:BBLayout`
-    
+Reference it in the text with `@fig:BB_default`, `@fig:BB_better`, or `@fig:BBLayout`
+
 ## Table
 
 ```
@@ -51,12 +51,11 @@ C4H     00H  BR_INST_RETIRED.      Branch instructions retired.
 
 Table: Example of encoding Skylake performance events. {#tbl:perf_count}
 ```
-
-reference it in the text with `{@tbl:perf_count}`
+Reference it in the text with `{@tbl:perf_count}`.
 
 ## Paper/Book reference
 
-To reference a book, first download it's citation in a Bibtex format, e.g.:
+To reference a book, first download its citation in BibTeX format, e.g.:
 
 ```
 @Article{Mytkowicz09,
@@ -78,8 +77,7 @@ To reference a book, first download it's citation in a Bibtex format, e.g.:
   url        = {https://doi.org/10.1145/1508284.1508275},
 }
 ```
-
-Reference the paper in the text with `[@Mytkowicz]`
+Reference the paper in the text with `[@Mytkowicz]`.
 
 Not all fields in the citations are required, but get at least `title`, `organization`, `year`, `url`. 
 
@@ -100,7 +98,6 @@ void foo(float* __restrict__ a,
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ```
-
 Reference the code listing in the text with `[@lst:optReport]`
 
 You can also use a simpler version for tiny snippets or command line scripts:
@@ -114,17 +111,15 @@ You can also use a simpler version for tiny snippets or command line scripts:
 ```
 [^1]: Profiling(wikipedia) - [https://en.wikipedia.org/wiki/Profiling_(computer_programming)](https://en.wikipedia.org/wiki/Profiling_(computer_programming)).
 ```
-
 Reference the footnote in the same `*.md` file with `[^1]`
 
 ## Section reference
 
-To reference a section af the book from another chapter, first add a tag to the header of the section that you want to refer to, e.g.:
+To reference a section of the book from another chapter, first add a tag to the header of the section that you want to refer to, e.g.:
 
 ```
 # Performance Analysis {#sec:sec1}
 ```
-
 Reference the section in the text with `[@sec:sec1]`
 
 ## Math formulas
