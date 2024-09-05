@@ -10,7 +10,7 @@ Performance regressions are defects that make the software run slower compared t
 
 It is useful to track the performance of your application with charts, like the one shown in Figure @fig:PerfRegress. Using such a chart you can see historical trends and find moments where performance improved or degraded. Typically, you will have a separate line for each performance test you're tracking. Do not include too many benchmarks on a single chart as it will become very noisy.
 
-![Performance graph (higher better) for an application showing a big drop in performance on August 5th and smaller ones later.](../../img/measurements/PerfRegressions.png){#fig:PerfRegress width=100%}
+![Performance graph (higher better) for an application showing a big drop in performance on August 7th and smaller ones later.](../../img/measurements/PerfRegressions.png){#fig:PerfRegress width=100%}
 
 Let's consider some potential solutions for detecting performance regressions. The first option that comes to mind is: having humans look at the graphs. For the chart in Figure @fig:PerfRegress, humans will likely catch performance regression that happened on August 7th, but it's not obvious that they will detect later smaller regressions. People tend to lose focus quickly and can miss regressions, especially on a busy chart. In addition to that, it is a time-consuming and boring job that must be performed daily.
 

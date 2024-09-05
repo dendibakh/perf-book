@@ -10,7 +10,7 @@ The most straightforward way to compare two performance distributions is to take
 
 Data scientists often present measurements by plotting them. This eliminates biased conclusions and allows readers to interpret the data for themselves. One of the popular ways to plot distributions is by using box plots (also known as a box-and-whisker plot). In Figure @fig:BoxPlot, we visualized performance distributions of two versions of the same functional program ("before" and "after"). There are 70 performance data points in each distribution.
 
-![Performance of three versions of a program presented as box plots. Box plots better visualize performance distribution and enable more accurate comparisons with other distributions.](../../img/measurements/BoxPlots.png){#fig:BoxPlot width=90%}
+![Performance measurements of "Before" and "After" versions of a program presented as box plots.](../../img/measurements/BoxPlots.png){#fig:BoxPlot width=90%}
 
 Let's describe the terms indicated on the image:
 
