@@ -1,4 +1,4 @@
-## Why Care about Performance?
+## Why care about performance?
 
 In addition to the slowing trend of hardware single-threaded performance growth, there are a couple of other business reasons to care about performance. During the PC era,[^12] the costs of slow software were paid by the users, as inefficient software was running on user computers. With the advent of SaaS (software as a service) and cloud computing, the costs of slow software are put back on the software providers, not their users. If you're a SaaS company like Meta or Netflix,[^4] it doesn't matter if you run your service on-premise hardware or you use the public cloud, you pay for the electricity your servers consume. Inefficient software cuts right into your margins and market evaluation. According to Synergy Research Group,[^5] worldwide spending on cloud services topped $100 billion in 2020, and according to Gartner,[^6] it will surpass $675 billion in 2024.
 
