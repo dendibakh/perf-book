@@ -2,17 +2,15 @@
 
 ## Modern CPU Design
 
-To see how all the concepts we talked about in this chapter are used in practice, let's take a look at the implementation of Intel’s 12th-generation core, Goldencove, which became available in 2021. This core is used as the P-core inside the Alderlake and Sapphire Rapids platforms. Figure @fig:Goldencove_diag shows the "big-picture" diagram of the Goldencove core. It shows only the most important blocks; we provide more details in later diagrams. Notice, that this section only describes a single core, not the entire processor. So, we will skip the discussion about frequencies, core counts, L3 caches, core interconnects, memory latency and bandwidth, and other things.
+To see how all the concepts we talked about in this chapter are used in practice, let's take a look at the implementation of Intel’s 12th-generation core, Goldencove, which became available in 2021. This core is used as the P-core inside the Alderlake and Sapphire Rapids platforms. Figure @fig:Goldencove_diag shows the block diagram of the Goldencove core. Notice, that this section only describes a single core, not the entire processor. So, we will skip the discussion about frequencies, core counts, L3 caches, core interconnects, memory latency and bandwidth, and other things.
 
-![Block diagram of a CPU Core in the Intel GoldenCove Microarchitecture.*](../../img/uarch/goldencove_block_diagram.png){#fig:Goldencove_diag width=100%}
+![Block diagram of a CPU Core in the Intel GoldenCove Microarchitecture.](../../img/uarch/goldencove_block_diagram.png){#fig:Goldencove_diag width=100%}
 
 The core is split into an in-order front-end that fetches and decodes x86 instructions into $\mu$ops and a 6-wide superscalar, out-of-order backend. The Goldencove core supports 2-way SMT. It has a 32KB first-level instruction cache (L1 I-cache), and a 48KB first-level data cache (L1 D-cache). The L1 caches are backed up by a unified 1.25MB (2MB in server chips) L2 cache. The L1 and L2 caches are private to each core. At the end of this section, we also take a look at the TLB hierarchy.
 
 ### CPU Front-End {#sec:uarchFE}
 
-The CPU Front-End consists of several functional units that fetch and decode instructions from memory. Its main purpose is to feed prepared instructions to the CPU Back-End, which is responsible for the actual execution of instructions. A more detailed diagram of the GoldenCove Front-End is shown in Figure @fig:Goldencove_FE.
-
-![Block diagram of the CPU Front End of the Intel GoldenCove Microarchitecture.*](../../img/uarch/goldencove_FE.png){#fig:Goldencove_FE=100%}
+The CPU Front-End consists of several functional units that fetch and decode instructions from memory. Its main purpose is to feed prepared instructions to the CPU Back-End, which is responsible for the actual execution of instructions.
 
 Technically, instruction fetch is the first stage to execute an instruction. But once a program reaches a steady state, the branch predictor unit (BPU) steers the work of the CPU Front-End. That is indiciated with the arrow that goes from the BPU to the instruction cache. The BPU predicts the direction of all branch instructions and steers the next instruction fetch based on this prediction.
 
@@ -30,15 +28,15 @@ The Instruction Decode Queue (IDQ) provides the interface between the in-order f
 
 ### CPU Back-End {#sec:uarchBE}
 
-The CPU Back-End employs an OOO engine that executes instructions and stores results. A detailed diagram of the GoldenCove Back-End is shown in Figure @fig:Goldencove_BE.
+The CPU Back-End employs an OOO engine that executes instructions and stores results. We repeated a part of the diagram that depicts the GoldenCove OOO engine in Figure @fig:Goldencove_OOO.
 
-The heart of the CPU backend is the 512-entry ReOrder buffer (ROB). This unit is referred to as "Allocate / Rename" on the diagram. It serves a few purposes. First, it provides register renaming. There are only 16 general-purpose integers and 32 vector/SIMD architectural registers, however, the number of physical registers is much higher.[^1] Physical registers are located in a structure called the physical register file (PRF). The mappings from architecture-visible registers to the physical registers are kept in the register alias table (RAT).
+The heart of the OOO engine is the 512-entry ReOrder Buffer (ROB). It serves a few purposes. First, it provides register renaming. There are only 16 general-purpose integer and 32 floating-point/SIMD architectural registers, however, the number of physical registers is much higher.[^1] Physical registers are located in a structure called the Physical Register File (PRF). There are separate PRFs for integer and floating-point/SIMD registers. The mappings from architecture-visible registers to the physical registers are kept in the register alias table (RAT).
 
-![Block diagram of the CPU Back End of the Intel GoldenCove Microarchitecture.*](../../img/uarch/goldencove_BE.png){#fig:Goldencove_BE=100%}
+![Block diagram of the CPU Back End of the Intel GoldenCove Microarchitecture.](../../img/uarch/goldencove_OOO.png){#fig:Goldencove_OOO width=100%}
 
 Second, the ROB allocates execution resources. When an instruction enters the ROB, a new entry is allocated and resources are assigned to it, mainly an execution unit and the destination physical register. The ROB can allocate up to 6 $\mu$ops per cycle.
 
-Third, the ROB tracks the speculative execution. When an instruction has finished its execution, its status gets updated and it stays there until the previous instructions also finished. It's done that way because instructions are always retired in program order. Once an instruction retires, its ROB entry is deallocated and the results of the instruction become visible. The retiring stage is wider than the allocation: the ROB can retire 8 instructions per cycle.
+Third, the ROB tracks the speculative execution. When an instruction has finished its execution, its status gets updated and it stays there until the previous instructions also finished. It's done that way because instructions must retire in program order. Once an instruction retires, its ROB entry is deallocated and the results of the instruction become visible. The retiring stage is wider than the allocation: the ROB can retire 8 instructions per cycle.
 
 There are certain operations that processors handle in a specific manner, often called idioms, which require no or less costly execution. Processors recognize such cases and allow them to run faster than regular instructions. Here are some of such cases:
 
@@ -49,12 +47,16 @@ There are certain operations that processors handle in a specific manner, often 
 
 The "Scheduler / Reservation Station" (RS) is the structure that tracks the availability of all resources for a given $\mu$op and dispatches the $\mu$op to an *execution port* once it is ready. Execution port is a pathway that connects the scheduler to its execution units. Each execution port may be connected to multiple execution units. When an instruction enters the RS, the scheduler starts tracking its data dependencies. Once all the source operands become available, the RS attempts to dispatch the $\mu$op to a free execution port. The RS has fewer entries[^4] than the ROB. It can dispatch up to 6 $\mu$ops per cycle.
 
-As shown in Figure @fig:Goldencove_diag, there are 12 execution ports in the Goldencove microarchitecture:
+We repeated a part of the diagram that depicts the GoldenCove execution engine and Load-Store unit in Figure @fig:Goldencove_BE_LSU. There are 12 execution ports:
 
-* Ports 0, 1, 5, 6, and 10 provide integer (INT) operations, and some of them handle floating-point and vector (VEC/FP) operations. Instructions dispatched to those ports do not require memory operations.
+* Ports 0, 1, 5, 6, and 10 provide integer (INT) operations, and some of them handle floating-point and vector (VEC/FP) operations.
 * Ports 2, 3, and 11 are used for address generation (AGU) and for load operations. 
 * Ports 4 and 9 are used for store operations (STD).
 * Ports 7 and 8 are used for address generation.
+
+![Block diagram of the execution engine and the Load-Store unit in the Intel GoldenCove Microarchitecture.](../../img/uarch/goldencove_BE_LSU.png){#fig:Goldencove_BE_LSU width=100%}
+
+Instructions that require memory operations are handled by the Load-Store unit (ports 2, 3, 11, 4, 9, 7, and 8) that we will discuss in the next section. If an operation does not involve loading or storing data, then it will be dispatched to the execution engine (ports 0, 1, 5, 6, and 10).
 
 For example, an `Integer Shift` operation can go only to either port 0 or 6, while a `Floating-Point Divide` operation can only be dispatched to port 0. In a situation when a scheduler has to dispatch two operations that require the same execution port, one of them will have to be dispatched in the next cycle.
 
@@ -62,15 +64,15 @@ The VEC/FP stack does floating-point scalar and *all* packed (SIMD) operations. 
 
 ### Load-Store Unit {#sec:uarchLSU}
 
-The Load-Store Unit (LSU) is responsible for operations with memory. A detailed diagram of the GoldenCove Back-End is shown in Figure @fig:Goldencove_BE. The Goldencove core can issue up to three loads (three 256-bit or two 512-bit) by using ports 2, 3, and 11. AGU stands for Address Generation Unit, which is required to access a memory location. It can also issue up to two stores (two 256-bit or one 512-bit) per cycle via ports 4, 9, 7, and 8. STD stands for Store Data.
+The Load-Store Unit (LSU) is responsible for operations with memory. The Goldencove core can issue up to three loads (three 256-bit or two 512-bit) by using ports 2, 3, and 11. AGU stands for Address Generation Unit, which is required to access a memory location. It can also issue up to two stores (two 256-bit or one 512-bit) per cycle via ports 4, 9, 7, and 8. STD stands for Store Data.
 
-Once a load or a store leaves the scheduler, LSU is responsible for accessing the data. Load operations save the fetched value in a register. Store operations transfer value from a register to a location in memory. LSU has a Load Buffer (also known as Load Queue, LDQ) and a Store Buffer (also known as Store Queue, STQ), their sizes are not disclosed.[^2] Both Load Buffer and Store Buffer receive operations at dispatch from the scheduler.
+Notice, that AGU is required for both load and store operations to perform dynamic address calculation. For example, in the instruction `vmovss DWORD PTR [rsi+0x4],xmm0`, the AGU will be responsible for calculating `rsi+0x4` address, which will be used to store data from xmm0.
 
-![Block diagram of the Load-Store Unit in the Intel GoldenCove Microarchitecture.*](../../img/uarch/goldencove_LSU.png){#fig:Goldencove_LSU=100%}
+Once a load or a store leaves the scheduler, LSU is responsible for accessing the data. Load operations save the fetched value in a register. Store operations transfer value from a register to a location in memory. LSU has a Load Buffer (also known as Load Queue) and a Store Buffer (also known as Store Queue), their sizes are not disclosed.[^2] Both Load Buffer and Store Buffer receive operations at dispatch from the scheduler.
 
 When a memory load request comes, the LSU queries the L1 cache using a virtual address and looks up the physical address translation in the TLB. Those two operations are initiated simultaneously. The size of the L1 D-cache is 48KB. If both operations result in a hit, the load delivers data to the integer or floating-point register and leaves the Load Buffer. Similarly, a store would write the data to the data cache and exit the Store Buffer.
 
-In case of an L1 miss, the hardware initiates a query of the (private) L2 cache tags. The L2 cache comes in two variants: 1.25MB for client and 2MB for server processors. While the L2 cache is being queried, a 64-byte wide fill buffer entry (FB) is allocated, which will keep the cache line once it arrives. The Goldencove core has 16 fill buffers. As a way to lower the latency, a speculative query is sent to the L3 cache in parallel with the L2 cache lookup.
+In case of an L1 miss, the hardware initiates a query of the (private) L2 cache tags. The L2 cache comes in two variants: 1.25MB for client and 2MB for server processors. While the L2 cache is being queried, a 64-byte wide fill buffer (FB) entry is allocated, which will keep the cache line once it arrives. The Goldencove core has 16 fill buffers. As a way to lower the latency, a speculative query is sent to the L3 cache in parallel with the L2 cache lookup.
 
 If two loads access the same cache line, they will hit the same FB. Such two loads will be "glued" together and only one memory request will be initiated. LSU dynamically reorders operations, supporting both loads bypassing older loads and loads bypassing older non-conflicting stores. Also, LSU supports store-to-load forwarding when there is an older store containing all of the load's bytes, and the store's data has been produced and is available in the store queue.
 
