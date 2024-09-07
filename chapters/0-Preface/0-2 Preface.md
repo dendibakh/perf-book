@@ -26,7 +26,7 @@ Specifically, I want to highlight the exercises that I added to the second editi
 
 I know firsthand that low-level performance optimization is not easy. I tried to explain everything as clearly as possible, but the topic is very complex. It requires experimentation and practice to fully understand the material. I encourage you to take your time, read through the chapters, and experiment with examples provided in the online course.
 
-I joined Intel in 2017, but even before that I never shied away from software optimization tasks. I always got a dopamine hit when I reduced the running time of my program from ten seconds to one second. The excitement of discovering something and feeling proud left me even more curious, always craving for more. My initial performance work was amateurish and undirected. Now it is my profession, yet I still feel very happy when I make software run faster. I hope you also experience the joy of discovering performance issues, and the satisfaction of fixing them.
+I joined Intel in 2017, but even before that I never shied away from software optimization tasks. I always got a dopamine hit when I reduced the running time of my program from ten seconds to one second. The excitement of discovering something and feeling proud left me even more curious, always craving for more. My initial performance work was very unstructured. Now it is my profession, yet I still feel very happy when I make software run faster. I hope you also experience the joy of discovering performance issues, and the satisfaction of fixing them.
 
 I sincerely hope that this book will help you learn low-level performance analysis. If you make your application faster as a result, I will consider my mission accomplished.
 
@@ -44,7 +44,6 @@ A minimal background in the C and C++ programming languages is necessary to unde
 
 I suggest you read the book chapter by chapter, starting from the beginning. If you consider yourself a beginner in performance analysis, I do not recommend skipping chapters. After you finish reading, you can use this book as a source of ideas whenever you face a performance issue and are unsure how to fix it. You can skim through the second part of the book to see which optimization techniques can be applied to your code.
 
-[TODO]: supply links to prerequisite material (H&P, Tanenbaum(?))
 [TODO]: put a link to an errata webpage
 
 \sectionbreak
