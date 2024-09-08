@@ -8,7 +8,7 @@ Pipelining is the foundational technique used to make CPUs fast wherein multiple
 4. Memory access (MEM)
 5. Write back (WB)
 
-![Simple 5-stage pipeline diagram.](../../img/uarch/Pipelining.png){#fig:Pipelining width=70%}
+![Simple 5-stage pipeline diagram.](../../img/uarch/Pipelining.png){#fig:Pipelining width=80%}
 
 Figure @fig:Pipelining shows an ideal pipeline view of the 5-stage pipeline CPU. In cycle 1, instruction x enters the IF stage of the pipeline. In the next cycle, as instruction x moves to the ID stage, the next instruction in the program enters the IF stage, and so on. Once the pipeline is full, as in cycle 5 above, all pipeline stages of the CPU are busy working on different instructions. Without pipelining, instruction `x+1` couldn't start its execution until after instruction `x` had finished its work.
 
