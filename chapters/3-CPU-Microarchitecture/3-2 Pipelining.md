@@ -24,9 +24,7 @@ In real implementations, pipelining introduces several constraints that limit th
 
 \lstset{linewidth=10cm}
 
-[TODO]: give example of a structural hazard
-
-* **Structural hazards**: are caused by resource conflicts. To a large extent, they could be eliminated by replicating the hardware resources, such as using multi-ported registers or memories. However, eliminating all such hazards could potentially become quite expensive in terms of silicon area and power.
+* **Structural hazards**: are caused by resource conflicts, i.e., when there are two instructions competing for the same resource. An example of such a hazard is when two 32-bit addition instructions are ready to execute in the same cycle, but there is only one execution unit available in that cycle. In this case, we need to choose which one of the two instructions to execute and which one will be executed on the next cycle. To a large extent, they could be eliminated by replicating the hardware resources, such as using multi-ported registers or memories. However, eliminating all such hazards could potentially become quite expensive in terms of silicon area and power.
 
 * **Data hazards**: are caused by data dependencies in the program and are classified into three types:
 
