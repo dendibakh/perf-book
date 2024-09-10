@@ -9,7 +9,7 @@ This book is written to help developers better understand the performance of the
 * What performance analysis tools are available on my platform? 
 * What are techniques to reduce the number of cache misses and branch mispredictions?
 
-Hopefully, by the end of this book, you will be able to answer those questions.
+I hope that by the end of this book, you will be able to answer those questions.
 
 The book is split into two parts. The first part (chapters 2--7) teaches you how to find performance problems, and the second part (chapters 8--13) teaches you how to fix them.
 
