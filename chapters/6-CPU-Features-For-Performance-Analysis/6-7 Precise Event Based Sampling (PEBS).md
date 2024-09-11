@@ -61,7 +61,7 @@ $ perf report --stdio
 $ spe-parser perf.data -t csv
 ```
 
-, where `<controls>` lets you optionally specify various controls and filters for the collection. `perf report` will give the usual output according to what the user asked for with `<controls>` options. `spe-parser`[^5] is a tool developed by ARM engineers to parse the captured perf record data and save all the SPE records into a CSV file.
+where `<controls>` lets you optionally specify various controls and filters for the collection. `perf report` will give the usual output according to what the user asked for with `<controls>` options. `spe-parser`[^5] is a tool developed by ARM engineers to parse the captured perf record data and save all the SPE records into a CSV file.
 
 ### Precise Events
 
