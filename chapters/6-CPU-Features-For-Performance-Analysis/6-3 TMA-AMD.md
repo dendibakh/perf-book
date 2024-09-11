@@ -1,8 +1,8 @@
 ### TMA on AMD Platforms {#sec:secTMA_AMD}
 
-Starting from Zen4, AMD processors support Level-1 and Level-2 TMA analysis. According to AMD documentation, it is called "Pipeline Utilization" analysis but the idea remains the same. The L1 and L2 buckets are also very similar to Intel's. Since kernel 6.2, Linux users can utilize the `perf` tool to collect the pipeline utilization data.
+Starting from Zen4, AMD processors support Level-1 and Level-2 TMA analysis. According to AMD documentation, it is called "Pipeline Utilization" analysis, but the idea remains the same. The L1 and L2 buckets are also very similar to Intel's. Since kernel 6.2, Linux users can utilize the `perf` tool to collect the pipeline utilization data.
 
-Next, we will examine [Crypto++](https://github.com/weidai11/cryptopp)[^1] implementation of SHA-256 (Secure Hash Algorithm 256), the fundamental cryptographic algorithm in Bitcoin mining. Crypto++ is an open-source C++ class library of cryptographic algorithms and contains an implementation of many algorithms, not just SHA-256. However, for our example, we disabled benchmarking all other algorithms by commenting out the corresponding line in the `BenchmarkUnkeyedAlgorithms` function in `bench1.cpp`.
+Next, we will examine the [Crypto++](https://github.com/weidai11/cryptopp)[^1] implementation of SHA-256 (Secure Hash Algorithm 256), the fundamental cryptographic algorithm in Bitcoin mining. Crypto++ is an open-source C++ class library of cryptographic algorithms, and contains an implementation of many algorithms, not just SHA-256. However, for our example, we disabled benchmarking all other algorithms by commenting out the corresponding line in the `BenchmarkUnkeyedAlgorithms` function in `bench1.cpp`.
 
 We ran the test on an AMD Ryzen 9 7950X machine with Ubuntu 22.04, Linux kernel 6.5.0-15-generic. We compiled Crypto++ version 8.9 using GCC 12.3 C++ compiler. We used the default `-O3` optimization option, but it doesn't impact performance much since the code is written with x86 intrinsics (see [@sec:secIntrinsics]) and utilizes the SHA x86 ISA extension. 
 
@@ -24,7 +24,7 @@ $ perf stat -M PipelineL1,PipelineL2 -- ./cryptest.exe b1 10
  6.1 %  retiring_microcode                 (19.99%)
 ```
 
-In the output, numbers in brackets indicate the percentage of runtime duration, when a metric was monitored. As we can see, all the metrics were monitored only 20% of the time due to multiplexing. In our case it is likely not a concern as SHA256 has consistent behavior, however it may not always be the case. To minimize the impact of multiplexing, you can collect a limited set of metrics in a single run, e.g., `perf stat -M frontend_bound,backend_bound`.
+In the output, numbers in brackets indicate the percentage of runtime duration, when a metric was monitored. As we can see, each metric was monitored only 20% of the time due to multiplexing. In our case it is likely not a concern as SHA256 has consistent behavior, however it may not always be the case. To minimize the impact of multiplexing, you can collect a limited set of metrics in a single run, e.g., `perf stat -M frontend_bound,backend_bound`.
 
 A description of pipeline utilization metrics shown above can be found in [@AMDUprofManual, Chapter 2.8 Pipeline Utilization]. By looking at the metrics, we can see that branch mispredictions are not happening in SHA256 (`bad_speculation` is 0%). Only 26.3% of the available dispatch slots were used (`retiring`), which means the rest 73.7% were wasted due to frontend and backend stalls.
 
@@ -34,7 +34,7 @@ The `retiring_microcode` metric indicates that 6.1% of dispatch slots were used 
 
 The majority of cycles are stalled in the CPU backend (`backend_bound`), but only 1.7% of cycles are stalled waiting for memory accesses (`backend_bound_memory`). So, we know that the benchmark is mostly limited by the computing capabilities of the machine. As you will know from Part 2 of this book, it could be related to either data flow dependencies or execution throughput of certain cryptographic operations. They are less frequent than traditional `ADD`, `SUB`, `CMP`, and other instructions and thus can be often executed only on a single execution unit. A large number of such operations may saturate the execution throughput of this particular unit. Further analysis should involve a closer look at the source code and generated assembly, checking execution port utilization, finding data dependencies, etc. 
 
-In summary, Crypto++ implementation of SHA-256 on AMD Ryzen 9 7950X utilizes only 26.3% of the available dispatch slots; 6.1% of the dispatch slots were wasted due to the microcode sequencer bandwidth, and 65.9% were stalled due to lack of computing resources of the machine. The algorithm certainly hits a few hardware limitations, so it's unclear if its performance can be improved or not.
+In summary, the Crypto++ implementation of SHA-256 on AMD Ryzen 9 7950X utilizes only 26.3% of the available dispatch slots; 6.1% of the dispatch slots were wasted due to the microcode sequencer bandwidth, and 65.9% were stalled due to lack of computing resources of the machine. The algorithm certainly hits a few hardware limitations, so it's unclear if its performance can be improved or not.
 
 When it comes to Windows, at the time of writing, TMA methodology is only supported on server platforms (codename Genoa), and not on client systems (codename Raphael). TMA support was added in AMD uProf version 4.1, but only in the command line tool `AMDuProfPcm` tool which is part of AMD uProf installation. You can consult [@AMDUprofManual, Chapter 2.8 Pipeline Utilization] for more details on how to run the analysis. The graphical version of AMD uProf doesn't have the TMA analysis yet. 
 
