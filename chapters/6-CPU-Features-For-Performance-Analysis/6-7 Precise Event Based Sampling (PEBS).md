@@ -4,7 +4,7 @@ Major CPU vendors provide a set of additional features to enhance performance an
 
 ### PEBS on Intel Platforms {#sec:secPEBS}
 
-Similar to the Last Branch Record feature, PEBS is used while profiling the program to capture additional data with every collected sample. When a performance counter is configured for PEBS, the processor saves the set of additional data, which has a defined format and is called the PEBS record. The format of a PEBS record for the Intel Skylake CPU is shown in Figure @fig:PEBS_record. The record contains the state of general-purpose registers (`EAX`, `EBX`, `ESP`, etc.), `EventingIP`, `Data Linear Address`, and `Latency value`, which will discuss later. The content layout of a PEBS record varies across different microarchitectures, see [@IntelOptimizationManual, Volume 3B, Chapter 20 Performance Monitoring].
+Similar to the Last Branch Record feature, PEBS is used while profiling the program to capture additional data with every collected sample. When a performance counter is configured for PEBS, the processor saves the set of additional data, which has a defined format and is called the PEBS record. The format of a PEBS record for the Intel Skylake CPU is shown in Figure @fig:PEBS_record. The record contains the state of general-purpose registers (`EAX`, `EBX`, `ESP`, etc.), `EventingIP`, `Data Linear Address`, and `Latency value`, which we'll discuss later. The content layout of a PEBS record varies across different microarchitectures, see [@IntelOptimizationManual, Volume 3B, Chapter 20 Performance Monitoring].
 
 ![PEBS Record Format for 6th Generation, 7th Generation and 8th Generation Intel Core Processor Families. *© Source: [@IntelOptimizationManual, Volume 3B, Chapter 20].*](../../img/pmu-features/PEBS_record.png){#fig:PEBS_record width=100%}
 
@@ -12,7 +12,7 @@ Since Skylake, the PEBS record has been enhanced to collect XMM registers and LB
 
 One of the notable benefits of using PEBS is lower sampling overhead compared to regular interrupt-based sampling. Recall that when the counter overflows, the CPU generates an interrupt to collect one sample. Frequently generating interrupts and having an analysis tool itself capture the program state inside the interrupt service routine is very costly since it involves OS interaction. 
 
-On the other hand, PEBS keeps a buffer to temporarily store multiple PEBS records. Suppose, we are sampling on load events using PEBS. When a performance counter is configured for PEBS, an overflow condition in the counter will not trigger an interrupt, instead, it will activate the PEBS mechanism. The mechanism will then trap the next load, capture a new record, and store it in the dedicated PEBS buffer area. The mechanism also takes care of clearing the counter overflow status and reloading the counter with the initial value. Only when the dedicated buffer is full, does the processor raise an interrupt, and the buffer gets flushed to memory. This mechanism lowers the sampling overhead by triggering much fewer interrupts.
+On the other hand, PEBS keeps a buffer to temporarily store multiple PEBS records. Suppose, we are sampling on load events using PEBS. When a performance counter is configured for PEBS, an overflow condition in the counter will not trigger an interrupt, instead, it will activate the PEBS mechanism. The mechanism will then trap the next load, capture a new record, and store it in the dedicated PEBS buffer area. The mechanism also takes care of clearing the counter overflow status and reloading the counter with the initial value. Only when the dedicated buffer is full does the processor raise an interrupt, and the buffer gets flushed to memory. This mechanism lowers the sampling overhead by triggering much fewer interrupts.
 
 Linux users can check if PEBS is enabled by executing `dmesg`:
 
@@ -26,7 +26,7 @@ For LBR, Linux perf dumps the entire contents of the LBR stack with every collec
 
 ### IBS on AMD Platforms
 
-Instruction-Based Sampling (IBS) is an AMD64 processor feature that can be used to collect specific metrics related to instruction fetch and instruction execution. The processor pipeline of an AMD processor consists of two separate phases: a front-end phase that fetches AMD64 instruction bytes and a back-end phase that executes `ops`. As the phases are logically separated, there are two independent sampling mechanisms: IBS Fetch and IBS Execute. 
+Instruction-Based Sampling (IBS) is an AMD64 processor feature that can be used to collect specific metrics related to instruction fetch and instruction execution. The pipeline of an AMD processor consists of two separate phases: a front-end phase that fetches AMD64 instruction bytes and a back-end phase that executes `ops`. As the phases are logically separated, there are two independent sampling mechanisms: IBS Fetch and IBS Execute. 
 
 - IBS Fetch monitors the front end of the pipeline and provides information about ITLB (hit or miss), I-cache (hit or miss), fetch address, fetch latency, and a few other things.
 - IBS Execute monitors the back end of the pipeline and provides information about instruction execution behavior by tracking the execution of a single op. For example, branch (taken or not, predicted or not), and load/store (hit or miss in D-caches and DTLB, linear address, load latency).
@@ -53,7 +53,7 @@ Compared to other solutions, SPE is more similar to AMD IBS than it is to Intel 
 
 The SPE sampling process is built in as part of the instruction execution pipeline. Sample collection is still based on a configurable interval, but operations are statistically selected. Each sampled operation generates a sample record, which contains various data about the execution of this operation. SPE record saves the address of the instruction, the virtual and physical address for the data accessed by loads and stores, the source of the data access (cache or DRAM), and the timestamp to correlate with other events in the system. Also, it can give latency of various pipeline stages, such as Issue latency (from dispatch to execution), Translation latency (cycle count for a virtual-to-physical address translation), and Execution latency (latency of load/stores in the functional unit). The whitepaper [@ARMSPE] describes ARM SPE in more detail as well as shows a few optimization examples using it.
 
-Similar to Intel PEBS and AMD IBS, ARM SPE helps to reduce the sampling overhead and enables longer collections. In addition to that, it supports post-filtering of sample records, which helps to reduce the memory required for storage. SPE profiling is supported in Linux `perf` and can be used as follows:[^6]
+Similar to Intel PEBS and AMD IBS, ARM SPE helps to reduce the sampling overhead and enables longer collections. In addition to that, it supports postfiltering of sample records, which helps to reduce the memory required for storage. SPE profiling is supported in Linux `perf` and can be used as follows:[^6]
 
 ```bash
 $ perf record -e arm_spe_0/<controls>/ -- test_program
