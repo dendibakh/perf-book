@@ -2,7 +2,7 @@
 
 Modern high-performance CPUs provide branch recording mechanisms that enable a processor to continuously log a set of previously executed branches. But before going into the details, you may ask: *Why are we so interested in branches?* Well, because this is how we can determine the control flow of a program. We largely ignore other instructions in a basic block (see [@sec:BasicBlock]) because branches are always the last instructions in a basic block. Since all instructions in a basic block are guaranteed to be executed once, we can only focus on branches that will “represent” the entire basic block. Thus, it’s possible to reconstruct the entire line-by-line execution path of the program if we track the outcome of every branch. This is what the Intel Processor Traces (PT) feature is capable of doing, which is discussed in Appendix D. Branch recording mechanisms that we will discuss here are based on sampling, not tracing, and thus have different use cases and capabilities.
 
-Processors designed by Intel, AMD, and ARM all have announced their branch recording extensions. Exact implementations may vary but the idea is the same. Hardware logs the “from” and “to” addresses of each branch along with some additional data in parallel with executing the program. If we collect a long enough history of source-destination pairs, we will be able to unwind the control flow of our program, just like a call stack, but with limited depth. Such extensions are designed to cause minimal slowdown to a running program often within 1%. 
+Processors designed by Intel, AMD, and ARM all have announced their branch recording extensions. Exact implementations may vary but the idea is the same. Hardware logs the “from” and “to” addresses of each branch along with some additional data in parallel with executing the program. If we collect a long enough history of source-destination pairs, we will be able to unwind the control flow of our program, just like a call stack, but with limited depth. Such extensions are designed to cause minimal slowdown to a running program (often within 1%).
 
 With a branch recording mechanism in place, we can sample on branches (or cycles, it doesn't matter), but during each sample, look at the previous N branches that were executed. This gives us reasonable coverage of the control flow in the hot code paths but does not overwhelm us with too much information, as only a smaller number of the total branches are examined. It is important to keep in mind that this is still sampling, so not every executed branch can be examined. A CPU generally executes too fast for that to be feasible.
 
@@ -76,7 +76,7 @@ $ perf record -b -e cycles ./benchmark.exe
 [ perf record: Captured and wrote 17.205 MB perf.data (22089 samples) ]
 ```
 
-LBR stacks can also be collected using the `perf record --call-graph lbr` command, but the amount of information collected is less than using `perf record -b`. For example, branch misprediction and cycles data are not collected when running `perf record --call-graph lbr`. 
+LBR stacks can also be collected using the `perf record --call-graph lbr` command, but the amount of information collected is less than using `perf record -b`. For example, branch misprediction and cycles data are not collected when running `perf record --call-graph lbr`.
 
 Because each collected sample captures the entire LBR stack (32 last branch records), the size of collected data (`perf.data`) is significantly bigger than sampling without LBRs. Still, the runtime overhead for the majority of LBR use cases is below 1%. [@Nowak2014TheOO]
 
@@ -91,7 +91,7 @@ The `dump.txt` file, which can be quite large, contains lines like those shown b
 
 ```
 ...
-0x4edaf9/0x4edab0/P/-/-/29   
+0x4edaf9/0x4edab0/P/-/-/29
 0x4edabd/0x4edad0/P/-/-/2
 0x4edadd/0x4edb00/M/-/-/4
 0x4edb24/0x4edab0/P/-/-/24
@@ -133,16 +133,16 @@ At the time of writing (2023), AMD's LBR and ARM's BRBE don't support call stack
 ```bash
 $ perf record --call-graph lbr -- ./a.exe
 $ perf report -n --stdio
-# Children   Self    Samples  Command  Object  Symbol       
+# Children   Self    Samples  Command  Object  Symbol
 # ........  .......  .......  .......  ......  .......
 	99.96%  99.94%    65447    a.exe    a.exe  [.] bar
-            |          
+            |
              --99.94%--main
-                       |          
+                       |
                        |--90.86%--foo
-                       |          |          
+                       |          |
                        |           --90.86%--bar
-                       |          
+                       |
                         --9.08%--zoo
                                   bar
 ```
@@ -187,10 +187,10 @@ $ perf report -n --sort symbol_from,symbol_to -F +mispredict,srcline_from,srclin
 # Event count (approx.): 657888
 # Overhead  Samples  Mis  From Line  To Line  Source Sym  Target Sym
 # ........  .......  ...  .........  .......  ..........  ..........
-    46.12%   303391   N   dec.c:36   dec.c:40  LzmaDec     LzmaDec   
-    22.33%   146900   N   enc.c:25   enc.c:26  LzmaFind    LzmaFind  
-     6.70%    44074   N   lz.c:13    lz.c:27   LzmaEnc     LzmaEnc   
-     6.33%    41665   Y   dec.c:36   dec.c:40  LzmaDec     LzmaDec 
+    46.12%   303391   N   dec.c:36   dec.c:40  LzmaDec     LzmaDec
+    22.33%   146900   N   enc.c:25   enc.c:26  LzmaFind    LzmaFind
+     6.70%    44074   N   lz.c:13    lz.c:27   LzmaEnc     LzmaEnc
+     6.33%    41665   Y   dec.c:36   dec.c:40  LzmaDec     LzmaDec
 ```
 
 In this example, the lines that correspond to function `LzmaDec` are of particular interest to us. Following a similar analysis from the previous section, we can conclude that the branch on source line `dec.c:36` is the most executed in the benchmark. In the output that Linux `perf` provides, we can spot two entries that correspond to the `LzmaDec` function: one with `Y` and one with `N` letters. Analyzing those two entries together gives us a misprediction rate of the branch. In this case, we know that the branch on line `dec.c:36` was predicted `303391` times (corresponds to `N`) and was mispredicted `41665` times (corresponds to `Y`), which gives us `88%` prediction rate.
@@ -199,14 +199,14 @@ Linux `perf` calculates the misprediction rate by analyzing each LBR entry and e
 
 ### Precise Timing of Machine Code {#sec:timed_lbr}
 
-As we showed in Intel's LBR section, starting from Skylake microarchitecture, there is a special `Cycle Count` field in the LBR entry. This additional field specifies the number of elapsed cycles between two taken branches. Since the target address in the previous (N-1) LBR entry is the beginning of a basic block (BB) and the source address of the current (N) LBR entry is the last instruction of the same basic block, then the cycle count is the latency of this basic block. 
+As we showed in Intel's LBR section, starting from Skylake microarchitecture, there is a special `Cycle Count` field in the LBR entry. This additional field specifies the number of elapsed cycles between two taken branches. Since the target address in the previous (N-1) LBR entry is the beginning of a basic block (BB) and the source address of the current (N) LBR entry is the last instruction of the same basic block, then the cycle count is the latency of this basic block.
 
 This type of analysis is not supported on AMD platforms since they don't record a cycle count in the LBR record. According to ARM's BRBE specification, it can be supported, but due to the unavailability of processors that implement this extension, it is not possible to verify. However, Intel supports it. Here is an example:
 
 ```
 400618:   movb  $0x0, (%rbp,%rdx,1)    <= start of a BB
-40061d:   add $0x1, %rdx 
-400621:   cmp $0xc800000, %rdx 
+40061d:   add $0x1, %rdx
+400621:   cmp $0xc800000, %rdx
 400628:   jnz 0x400644                 <= end of a BB
 ```
 
@@ -219,7 +219,7 @@ Suppose we have two entries in the LBR stack:
   400628    400644     5          <== LBR TOS
 ```
 
-Given that information, we know that there was one occurrence when the basic block that starts at offset `400618` was executed in 5 cycles. If we collect enough samples, we could plot a probability density chart of latency for that basic block. 
+Given that information, we know that there was one occurrence when the basic block that starts at offset `400618` was executed in 5 cycles. If we collect enough samples, we could plot a probability density chart of latency for that basic block.
 
 An example of such a chart is shown in Figure @fig:LBR_timing_BB. It was compiled by analyzing all LBR entries that satisfy the rule described above. The way to read this chart is as follows: it tells what was the rate of occurrence of a given latency value. For example, the basic block latency was measured to be exactly 100 cycles roughly 2% of the time, 14% of the time we measured 280 cycles, and never saw anything between 150 and 200 cycles. Another way to read is: based on the collected data, what is the probability of seeing a certain basic block latency if you were to measure it?
 
@@ -236,23 +236,23 @@ $ perf record -e cycles -b -- ./7zip.exe b
 $ perf report -n --sort symbol_from,symbol_to -F +cycles,srcline_from,srcline_to --stdio
 # Samples: 658K of event 'cycles'
 # Event count (approx.): 658240
-# Overhead  Samples  BBCycles  FromSrcLine  ToSrcLine   
-# ........  .......  ........  ...........  ..........  
-     2.82%   18581      1      dec.c:325    dec.c:326   
-     2.54%   16728      2      dec.c:174    dec.c:174   
-     2.40%   15815      4      dec.c:174    dec.c:174   
-     2.28%   15032      2      find.c:375   find.c:376  
-     1.59%   10484      1      dec.c:174    dec.c:174   
-     1.44%   9474       1      enc.c:1310   enc.c:1315  
-     1.43%   9392      10      7zCrc.c:15   7zCrc.c:17  
-     0.85%   5567      32      dec.c:174    dec.c:174   
-     0.78%   5126       1      enc.c:820    find.c:540  
-     0.77%   5066       1      enc.c:1335   enc.c:1325  
-     0.76%   5014       6      dec.c:299    dec.c:299   
-     0.72%   4770       6      dec.c:174    dec.c:174   
-     0.71%   4681       2      dec.c:396    dec.c:395   
-     0.69%   4563       3      dec.c:174    dec.c:174   
-     0.58%   3804      24      dec.c:174    dec.c:174   
+# Overhead  Samples  BBCycles  FromSrcLine  ToSrcLine
+# ........  .......  ........  ...........  ..........
+     2.82%   18581      1      dec.c:325    dec.c:326
+     2.54%   16728      2      dec.c:174    dec.c:174
+     2.40%   15815      4      dec.c:174    dec.c:174
+     2.28%   15032      2      find.c:375   find.c:376
+     1.59%   10484      1      dec.c:174    dec.c:174
+     1.44%   9474       1      enc.c:1310   enc.c:1315
+     1.43%   9392      10      7zCrc.c:15   7zCrc.c:17
+     0.85%   5567      32      dec.c:174    dec.c:174
+     0.78%   5126       1      enc.c:820    find.c:540
+     0.77%   5066       1      enc.c:1335   enc.c:1325
+     0.76%   5014       6      dec.c:299    dec.c:299
+     0.72%   4770       6      dec.c:174    dec.c:174
+     0.71%   4681       2      dec.c:396    dec.c:395
+     0.69%   4563       3      dec.c:174    dec.c:174
+     0.58%   3804      24      dec.c:174    dec.c:174
 ```
 
 Notice we've added the `-F +cycles` option to show cycle counts in the output (`BBCycles` column). Several insignificant lines were removed from the output of `perf report` to make it fit on the page. Let's focus on lines in which the source and destination are `dec.c:174`, there are seven such lines in the output. In the source code, the line `dec.c:174` expands a macro that has a self-contained branch. That’s why the source and destination point to the same line.
