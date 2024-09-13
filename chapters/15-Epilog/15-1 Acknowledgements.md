@@ -64,7 +64,7 @@ Jumana Mundichipparakkal from ARM, for helping me write about ARM PMU features i
 
 Yann Collet, the author of Zstandard, for providing me with the information about the internal workings of Zstd for [@sec:ThreadCountScalingStudy].
 
-Ciaran McHale, for finding tons of grammar mistakes in my text.
+Ciaran McHale, for finding tons of grammar mistakes in my initial draft.
 
 Peter Veentjer, for multiple contributions to various places in the book.
 
@@ -74,9 +74,13 @@ Also, I would like to thank the whole performance community for countless blog a
 
 [TODO]: cover desing by {ask permision}
 
-[TODO]: technical reviewers and proofreaders: Amir Aupov, Charles-Francois Natali
+[TODO]: acknowledge Amir Aupov, Charles-Francois Natali
 
 [TODO]: ask for permission. I would like to thank my manager at Intel for giving me time slots to work on this book.
+
+[TODO]: acknowledge Nick Black.
+
+[TODO]: acknowledge technical reviewers.
 
 Last but not least, thanks to my family, who were patient enough to tolerate me missing weekend trips and evening walks. Without their support, I wouldn't have finished this book.
 
