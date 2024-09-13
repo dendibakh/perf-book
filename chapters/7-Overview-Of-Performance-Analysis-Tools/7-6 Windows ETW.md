@@ -4,7 +4,7 @@ Microsoft has developed a system-wide tracing facility named Event Tracing for W
 
 ### How to configure it {.unlisted .unnumbered}
 
-Recording ETW data is possible without any extra download since Windows 10 with `Wpr.exe`. But to enable system-wide profiling you must be an administrator and have the `SeSystemProfilePrivilege` enabled. The \underline{W}indows \underline{P}erformance \underline{R}ecorder tool supports a set of built-in recording profiles that are suitable for common performance issues. You can tailor your recording needs by authoring a custom performance recorder profile xml file with the `.wprp` extension.
+Recording ETW data is possible without any extra download since Windows 10 with `WPR.exe`. But to enable system-wide profiling you must be an administrator and have the `SeSystemProfilePrivilege` enabled. The \underline{W}indows \underline{P}erformance \underline{R}ecorder tool supports a set of built-in recording profiles that are suitable for common performance issues. You can tailor your recording needs by authoring a custom performance recorder profile xml file with the `.wprp` extension.
 
 If you want to not only record but also view the recorded ETW data you need to install the Windows Performance Toolkit (WPT). You can download it from the Windows SDK[^1] or ADK[^2] download page. The Windows SDK is huge; you don't necessarily need all its parts. In our case, we just enabled the checkbox of the Windows Performance Toolkit. You are allowed to redistribute WPT as a part of your own application.
 
@@ -28,7 +28,7 @@ ETW traces capture the dynamics of all processes at the system level, however, i
 
 Here is the list of tools one can use to capture ETW traces:
 
-- `wpr.exe`: a command line recording tool, part of Windows 10 and Windows Performance Toolkit.
+- `WPR.exe`: a command line recording tool, part of Windows 10 and Windows Performance Toolkit.
 - `WPRUI.exe`: a simple UI for recording ETW data, part of Windows Performance Toolkit
 - `xperf`: a command line predecessor of wpr, part of Windows Performance Toolkit.
 - `PerfView`:[^3] a graphical recording and analysis tool with the main focus on .NET Applications. This is an open-source application developed by Microsoft.
@@ -51,12 +51,12 @@ Now we will take a look at an example of using ETWController to capture ETW trac
 #### Setup {.unlisted .unnumbered}
 
 - Download ETWController to record ETW data and screenshots.
-- Download the latest Windows 11 Performance Toolkit[^1] to be able to view the data with WPA. Make sure that the newer Win 11 `wpr.exe` comes first in your path by moving the install folder of the WPT before the `C:\\Windows\\system32` in the System Environment dialog. This is how it should look like: 
+- Download the latest Windows 11 Performance Toolkit[^1] to be able to view the data with WPA. Make sure that the newer Win 11 `WPR.exe` comes first in your path by moving the install folder of the WPT before the `C:\\Windows\\system32` in the System Environment dialog. This is how it should look like: 
 
 ```
 C> where wpr 
-C:\Program Files (x86)\Windows Kits\10\Windows Performance Toolkit\wpr.exe
-C:\Windows\System32\wpr.exe
+C:\Program Files (x86)\Windows Kits\10\Windows Performance Toolkit\WPR.exe
+C:\Windows\System32\WPR.exe
 ```
 
 #### Capture traces {.unlisted .unnumbered}
