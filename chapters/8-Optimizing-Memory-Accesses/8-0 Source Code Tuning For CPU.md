@@ -58,16 +58,16 @@ Another widespread example of DDD is Small Size optimization. The idea is to sta
 
 Performance engineering is an art. And like in any art, the set of possible scenarios is endless. It's impossible to cover all the various optimizations one can imagine. The chapters in Part 2 primarily address optimizations specific to modern CPU architectures. 
 
-Before we jump into particular source code tuning techniques, there are a few caution notes to make. First, avoid tuning bad code. If a piece of code has a high-level performance inefficiency, you shouldn't apply machine-specific optimizations to it. Always focus on fixing the major problem first. Only once you're sure that the algorithms and data structures are optimal for the problem you're trying to solve, should you try applying low-level improvements.
+Before we jump into particular source code tuning techniques, there are a few caution notes to make. First, avoid tuning bad code. If a piece of code has a high-level performance inefficiency, you shouldn't apply machine-specific optimizations to it. Always focus on fixing the major problem first. Only once you're sure that the algorithms and data structures are optimal for the problem you're trying to solve should you try applying low-level improvements.
 
 Second, remember that an optimization you implement might not be beneficial on every platform. For example, Loop Blocking (tiling), which is discussed in [@sec:LoopOptsHighLevel], depends on characteristics of the memory hierarchy in a system, especially L2 and L3 cache sizes. So, an algorithm tuned for a CPU with particular sizes of L2 and L3 caches might not work well for CPUs with smaller caches. It is important to test the change on the platforms your application will be running on.
 
 The next four chapters are organized according to the TMA classification (see [@sec:TMA]):
 
-* [@sec:MemBound]. Optimizing Memory Accesses --- the `TMA:MemoryBound` category.
-* [@sec:CoreBound]. Optimizing Computations --- the `TMA:CoreBound` category.
-* [@sec:ChapterBadSpec]. Optimizing Branch Prediction --- the `TMA:BadSpeculation` category.
-* [@sec:secFEOpt]. Machine Code Layout Optimizations --- the `TMA:FrontEndBound` category.
+* [@sec:MemBound]. Optimizing Memory Accesses---the `TMA:MemoryBound` category.
+* [@sec:CoreBound]. Optimizing Computations---the `TMA:CoreBound` category.
+* [@sec:ChapterBadSpec]. Optimizing Branch Prediction---the `TMA:BadSpeculation` category.
+* [@sec:secFEOpt]. Machine Code Layout Optimizations---the `TMA:FrontEndBound` category.
 
 The idea behind this classification is to offer a checklist for developers when they are using TMA methodology in their performance engineering work. Whenever TMA attributes a performance bottleneck to one of the categories mentioned above, feel free to consult one of the corresponding chapters to learn about your options.
 
