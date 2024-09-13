@@ -2,7 +2,7 @@
 
 \markright{Summary}
 
-* Modern systems have non-deterministic performance. Eliminating non-determinism in a system is helpful for well-defined, stable performance tests, e.g., microbenchmarks.
+* Modern systems have nondeterministic performance. Eliminating nondeterminism in a system is helpful for well-defined, stable performance tests, e.g., microbenchmarks.
 * Measuring performance in production is required to assess how users perceive the responsiveness of your services. However, this requires dealing with noisy environments and using statistical methods for analyzing results. 
 * It is beneficial to employ an automated performance tracking system to prevent performance regressions from leaking into production software. Such CI systems are supposed to run automated performance tests, visualize results, and alert on discovered performance anomalies.
 * Visualizing performance distributions helps compare performance results. It is a safe way of presenting performance results to a wide audience.

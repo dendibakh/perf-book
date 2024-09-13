@@ -9,7 +9,7 @@ Performance problems are often harder to reproduce and root cause than most func
 
 Conducting fair performance experiments is an essential step towards getting accurate and meaningful results. You need to ensure you're looking at the right problem and are not debugging some unrelated issue. Designing performance tests and configuring the environment are both important components in the process of evaluating performance. 
 
-Because of the measurement bias, performance evaluations often involve statistical methods, which deserves a whole book just for itself. There are many corner cases and a huge amount of research done in this field. We will not dive into statistical methods for evaluating performance measurements. Instead, we only discuss high-level ideas and give basic directions to follow. We encourage you to research deeper on your own.
+Because of the measurement bias, performance evaluations often involve statistical methods, which deserve a whole book just for themselves. There are many corner cases and a huge amount of research done in this field. We will not dive into statistical methods for evaluating performance measurements. Instead, we only discuss high-level ideas and give basic directions to follow. We encourage you to research deeper on your own.
 
 In this chapter, we:
 
