@@ -90,7 +90,7 @@ Collecting call stacks in Linux `perf` is possible with three methods:
 2. DWARF debug info (`perf record --call-graph dwarf`). It requires binary to be built with DWARF debug information `-g` (`-gline-tables-only`). It also obtains call stacks through the stack unwinding procedure, but this method is more expensive than using frame pointers.
 3. Intel Last Branch Record (LBR). This makes use of a hardware feature, and is accessed with the following command: `perf record --call-graph lbr`. It obtains call stacks by parsing the LBR stack (a set of hardware registers). The resulting call graph is not as deep as those produced by the first two methods. See more information about LBR in [@sec:lbr].
 
-Below is an example of collecting call stacks in a program using LBR. By looking at the output, we know that 55% of the time `foo` was called from `func1`, 33% of the time from `func2`, and 11% from `fun3`. We can clearly see the distribution of the overhead between callers of `foo` and can now focus our attention on the hottest edge in the CFG of the program, which is `func1 -> foo`, but we should probably also pay attention to the edge `func2 -> foo`.
+Below is an example of collecting call stacks in a program using LBR. By looking at the output, we know that 55% of the time `foo` was called from `func1`, 33% of the time from `func2`, and 11% from `fun3`. We can clearly see the distribution of the overhead between callers of `foo` and can now focus our attention on the hottest edge in the CFG of the program, which is `func1 &rarr; foo`, but we should probably also pay attention to the edge `func2 &rarr; foo`.
 
 ```bash
 $ perf record --call-graph lbr -- ./a.out
