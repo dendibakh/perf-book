@@ -126,7 +126,7 @@ At the time of writing, there were no commercially available machines that imple
 
 Several important use cases become possible thanks to branch recording. In this and a few later sections, we will cover the most important ones.
 
-One of the most popular use cases for branch recording is capturing call stacks. We already covered why we need to collect them in [@sec:secCollectCallStacks]. Branch recording can be used as a lightweight substitution for collecting call-graph information even if you compiled a program without frame pointers or debug information.
+One of the most popular use cases for branch recording is capturing call stacks. We already covered why we need to collect them in [@sec:secCollectCallStacks]. Branch recording can be used as a lightweight substitution for collecting call graph information even if you compiled a program without frame pointers or debug information.
 
 At the time of writing (2023), AMD's LBR and ARM's BRBE don't support call stack collection, but Intel's LBR does. Here is how you can do it with Intel LBR:
 

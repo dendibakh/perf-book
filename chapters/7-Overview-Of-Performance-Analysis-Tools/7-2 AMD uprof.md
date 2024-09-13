@@ -4,7 +4,7 @@ The [uProf](https://www.amd.com/en/developer/uprof.html) profiler is a tool deve
 
 ### How to configure it {.unlisted .unnumbered}
 
-On Linux, uProf uses Linux perf for data collection. On Windows, uProf uses its own sampling driver that gets installed when you install uProf, no additional configuration is required. AMD uProf supports both command-line interface (CLI) and graphical interface (GUI). The CLI interface requires two separate steps - collect and report, similar to Linux perf.
+On Linux, uProf uses Linux perf for data collection. On Windows, uProf uses its own sampling driver that gets installed when you install uProf, no additional configuration is required. AMD uProf supports both command-line interface (CLI) and graphical interface (GUI). The CLI interface requires two separate steps---collect and report, similar to Linux perf.
 
 ### What you can do with it: {.unlisted .unnumbered}
 
@@ -12,7 +12,7 @@ On Linux, uProf uses Linux perf for data collection. On Windows, uProf uses its 
 - Monitor various hardware performance events and locate lines of code where these events happen.
 - Filter data for a specific function or thread.
 - Observe the workload behavior over time: view various performance events in the timeline chart.
-- Analyze hot callpaths: call-graph, flame-graph, and bottom-up charts.
+- Analyze hot callpaths: call graph, flame graph, and bottom-up charts.
 
 In addition, uProf can monitor various OS events on Linux: thread state, thread synchronization, system calls, page faults, and others. You can use it to analyze OpenMP applications to detect thread imbalance and analyze MPI[^3] applications to detect the load imbalance among the nodes of the MPI cluster. More details on various features of uProf can be found in the [User Guide](https://www.amd.com/en/developer/uprof.html#documentation)[^1].
 
