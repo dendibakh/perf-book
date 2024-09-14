@@ -1,8 +1,6 @@
-
-
 ## Cache Miss
 
-As discussed in [@sec:MemHierar], any memory request missing in a particular level of cache must be serviced by higher-level caches or DRAM. This implies a significant increase in the latency of such memory access. The typical latency of memory subsystem components is shown in Table {@tbl:mem_latency}. There is also an [interactive view](https://colin-scott.github.io/personal_website/research/interactive_latency.html)[^1] that visualizes the latency of different operations in modern systems. Performance greatly suffers, especially when a memory request misses in the Last Level Cache (LLC) and goes all the way down to the main memory. Intel® [Memory Latency Checker](https://www.intel.com/software/mlc)[^2] (MLC) is a tool used to measure memory latencies and bandwidth and how they change with increasing load on the system. MLC is useful for establishing a baseline for the system under test and for performance analysis. We will use this tool when we talk about memory latency and bandwidth in [@sec:MemLatBw].
+As discussed in [@sec:MemHierar], any memory request missing in a particular level of cache must be serviced by higher-level caches or DRAM. This implies a significant increase in the latency of such memory access. The typical latency of memory subsystem components is shown in Table {@tbl:mem_latency}. There is also an [interactive view](https://colin-scott.github.io/personal_website/research/interactive_latency.html)[^1] that visualizes the latency of different operations in modern systems. Performance greatly suffers when a memory request misses in the Last Level Cache (LLC) and goes all the way down to the main memory.
 
 -------------------------------------------------
 Memory Hierarchy Component   Latency (cycle/time)
@@ -34,7 +32,7 @@ $ perf stat -e mem_load_retired.fb_hit,mem_load_retired.l1_miss,
   546230  mem_inst_retired.all_loads
 ```
 
-Above is the breakdown of all loads for the L1 data cache and fill buffers. A load might either hit the already allocated fill buffer (`fb_hit`), or hit the L1 cache (`l1_hit`), or miss both (`l1_miss`), thus `all_loads = fb_hit + l1_hit + l1_miss`. We can see that only 3.5% of all loads miss in the L1 cache, thus the *L1 hit rate* is 96.5%. 
+Above is the breakdown of all loads for the L1 data cache and fill buffers. A load might either hit the already allocated fill buffer (`fb_hit`), or hit the L1 cache (`l1_hit`), or miss both (`l1_miss`), thus `all_loads = fb_hit + l1_hit + l1_miss`.[^2] We can see that only 3.5% of all loads miss in the L1 cache, thus the *L1 hit rate* is 96.5%.
 
 We can further break down L1 data misses and analyze L2 cache behavior by running:
 
@@ -49,4 +47,4 @@ $ perf stat -e mem_load_retired.l1_miss,
 From this example, we can see that 37% of loads that missed in the L1 D-cache also missed in the L2 cache, thus the *L2 hit rate* is 63%. A breakdown for the L3 cache can be made similarly.
 
 [^1]: Interactive latency - [https://colin-scott.github.io/personal_website/research/interactive_latency.html](https://colin-scott.github.io/personal_website/research/interactive_latency.html)
-[^2]: Memory Latency Checker - [https://www.intel.com/software/mlc](https://www.intel.com/software/mlc)
+[^2]: Careful readers may notice discrepancy in the numbers: `fb_hit + l1_hit + l1_miss = 545,820`, which doesn't exactly match `all_loads`. We did not investigate this since the numbers are very close.
