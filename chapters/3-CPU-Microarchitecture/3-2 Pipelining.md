@@ -1,6 +1,6 @@
 ## Pipelining
 
-Pipelining is the foundational technique used to make CPUs fast wherein multiple instructions are overlapped during their execution. Pipelining in CPUs drew inspiration from the automotive assembly lines. The processing of instructions is divided into stages. The stages operate in parallel, working on different parts of different instructions. DLX is a relatively simple architecture designed by John L. Hennessy and David A. Patterson in 1994. As defined in [@Hennessy], it has a 5-stage pipeline which consists of:
+Pipelining is a foundational technique used to make CPUs fast wherein multiple instructions are overlapped during their execution. Pipelining in CPUs drew inspiration from automotive assembly lines. The processing of instructions is divided into stages. The stages operate in parallel, working on different parts of different instructions. DLX is a relatively simple architecture designed by John L. Hennessy and David A. Patterson in 1994. As defined in [@Hennessy], it has a 5-stage pipeline which consists of:
 
 1. Instruction fetch (IF)
 2. Instruction decode (ID)
@@ -35,9 +35,9 @@ In real implementations, pipelining introduces several constraints that limit th
   R2 = R1 ADD 2
   ```
 
-  There is a RAW dependency for register R1. If we take the value directly after addition `R0 ADD 1` is done (from the `EXE` pipeline stage), we don't need to wait until the `WB` stage finishes, and the value will be written to the register file. Bypassing helps to save a few cycles. The longer the pipeline, the more effective bypassing becomes.
+  There is a RAW dependency for register R1. If we take the value directly after addition `R0 ADD 1` is done (from the `EXE` pipeline stage), we don't need to wait until the `WB` stage finishes (when the value will be written to the register file). Bypassing helps to save a few cycles. The longer the pipeline, the more effective bypassing becomes.
 
-  A *write-after-read* (WAR) hazard requires a dependent write to execute after a read. It occurs when instruction `x+1` writes a source before instruction `x` reads the source, resulting in the wrong new value being read. A WAR hazard is not a true dependency and is eliminated by a technique called *register renaming*. It is a technique that abstracts logical registers from physical registers. CPUs support register renaming by keeping a large number of physical registers. Logical (*architectural*) registers, the ones that are defined by the ISA, are just aliases over a wider register file. With such decoupling of the *architectural state, solving WAR hazards is simple: we just need to use a different physical register for the write operation. For example:
+  A *write-after-read* (WAR) hazard requires a dependent write to execute after a read. It occurs when instruction `x+1` writes a source before instruction `x` reads the source, resulting in the wrong new value being read. A WAR hazard is not a true dependency and is eliminated by a technique called *register renaming*. It is a technique that abstracts logical registers from physical registers. CPUs support register renaming by keeping a large number of physical registers. Logical (*architectural*) registers, the ones that are defined by the ISA, are just aliases over a wider register file. With such decoupling of the *architectural* state, solving WAR hazards is simple: we just need to use a different physical register for the write operation. For example:
 
   ```
   ; machine code, WAR hazard              ; after register renaming 
