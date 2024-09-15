@@ -10,7 +10,7 @@ Currently, there are very few tools available that can reliably measure code foo
 $ perf-tools/do.py profile --profile-mask 100 -a <your benchmark>
 ```
 
-, where `--profile-mask 100` initiates LBR sampling, and `-a` enables you to specify a program to run. This command will collect code footprint along with various other data. We don't show the output of the tool, curious readers are welcome to study documentation and experiment with the tool.
+`--profile-mask 100` initiates LBR sampling, and `-a` enables you to specify a program to run. This command will collect code footprint along with various other data. We don't show the output of the tool, curious readers are welcome to study documentation and experiment with the tool.
 
 We took a set of four benchmarks: Clang C++ compilation, Blender ray tracing, Cloverleaf hydrodynamics, and Stockfish chess engine; these workloads should be already familiar to you from [@sec:PerfMetricsCaseStudy] where we analyzed their performance characteristics. We ran them on one of Intel's Alderlake-based processors using the same commands we used in [@sec:PerfMetricsCaseStudy]. As expected, the code footprint numbers obtained by running the same benchmarks on a Skylake-based machine are very similar to those from the Alderlake run. Code footprint depends on the program and input data, and not on characteristics of a particular machine, so results should look similar across architectures.
 
