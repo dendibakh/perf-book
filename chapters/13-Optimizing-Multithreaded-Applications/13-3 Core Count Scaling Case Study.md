@@ -5,11 +5,11 @@ Thread count scaling is perhaps the most valuable analysis you can perform on a 
 1. Blender 3.4 - an open-source 3D creation and modeling software project. This test is of Blender's Cycles performance with the BMW27 blend file. URL: [https://download.blender.org/release](https://download.blender.org/release). Command line: `./blender -b bmw27_cpu.blend -noaudio --enable-autoexec -o output.test -x 1 -F JPEG -f 1 -t N`, where `N` is the number of threads. Clang 17 self-build - this test uses clang 17 to build the clang 17 compiler from sources. URL: [https://www.llvm.org](https://www.llvm.org). Command line: `ninja -jN clang`, where `N` is the number of threads.
 3. Zstandard v1.5.5, a fast lossless compression algorithm. URL: [https://github.com/facebook/zstd](https://github.com/facebook/zstd). A dataset used for compression: [http://wanos.co/assets/silesia.tar](http://wanos.co/assets/silesia.tar). Command line: `./zstd -TN -3 -f -- silesia.tar`, where `N` is the number of compression worker threads.
 4. CloverLeaf 2018 - a Lagrangian-Eulerian hydrodynamics benchmark. All hardware threads are used. This test uses the input file `clover_bm.in` (Problem 5). URL: [http://uk-mac.github.io/CloverLeaf](http://uk-mac.github.io/CloverLeaf). Command line: `export OMP_NUM_THREADS=N; ./clover_leaf`, where `N` is the number of threads.
-5. CPython 3.12, a reference implementation of the Python programming language. URL: [https://github.com/python/cpython](https://github.com/python/cpython). We run a simple multithreaded binary search script written in Python, which searches `10'000` random numbers (needles) in a sorted list of `1'000'000` elements (haystack). Command line: `./python3 binary_search.py N`, where `N` is the number of threads. Needles are divided equally between threads.
+5. CPython 3.12, a reference implementation of the Python programming language. URL: [https://github.com/python/cpython](https://github.com/python/cpython). We run a simple multithreaded binary search script written in Python, which searches `10,000` random numbers (needles) in a sorted list of `1,000,000` elements (haystack). Command line: `./python3 binary_search.py N`, where `N` is the number of threads. Needles are divided equally between threads.
 
 The benchmarks were executed on a machine with the configuration shown below:
 
-* 12th Gen Alderlake Intel(R) Core(TM) i7-1260P CPU @ 2.10GHz (4.70GHz Turbo), 4P+8E cores, 18MB L3-cache.
+* 12th Gen Alder Lake Intel&reg; Core&trade; i7-1260P CPU @ 2.10GHz (4.70GHz Turbo), 4P+8E cores, 18MB L3-cache.
 * 16 GB RAM, DDR4 @ 2400 MT/s.
 * Clang 15 compiler with the following options: `-O3 -march=core-avx2`.
 * 256GB NVMe PCIe M.2 SSD.
@@ -37,7 +37,7 @@ There is another aspect of scaling degradation that we will talk about when disc
 
 ### Clang {.unlisted .unnumbered}
 
-While Blender uses multithreading to exploit parallelism, concurrency in C++ compilation is usually achieved with multiprocessing. Clang 17 has more than `2'500` translation units, and to compile each of them, a new process is spawned. Similar to Blender, we classify Clang compilation as massively parallel, yet they scale differently. We recommend you revisit [@sec:PerfMetricsCaseStudy] for an overview of Clang compiler performance bottlenecks. In short, it has a large codebase, flat profile, many small functions, and "branchy" code. Its performance is affected by Dcache, Icache, and TLB misses, and branch mispredictions. Clang's thread count scaling is affected by the same scaling issues as Blender: P-cores are more effective than E-cores, and P-core SMT scaling is about `1.1x`. However, there is more. Notice that scaling stops at around 10 threads, and starts to degrade. Let's understand why that happens.
+While Blender uses multithreading to exploit parallelism, concurrency in C++ compilation is usually achieved with multiprocessing. Clang 17 has more than `2,500` translation units, and to compile each of them, a new process is spawned. Similar to Blender, we classify Clang compilation as massively parallel, yet they scale differently. We recommend you revisit [@sec:PerfMetricsCaseStudy] for an overview of Clang compiler performance bottlenecks. In short, it has a large codebase, flat profile, many small functions, and "branchy" code. Its performance is affected by D-Cache, I-Cache, and TLB misses, and branch mispredictions. Clang's thread count scaling is affected by the same scaling issues as Blender: P-cores are more effective than E-cores, and P-core SMT scaling is about `1.1x`. However, there is more. Notice that scaling stops at around 10 threads, and starts to degrade. Let's understand why that happens.
 
 The problem is related to the frequency throttling. When multiple cores are utilized simultaneously, the processor generates more heat due to the increased workload on each core. To prevent overheating and maintain stability, CPUs often throttle down their clock speeds depending on how many cores are in use. Additionally, boosting all cores to their maximum turbo frequency simultaneously would require significantly more power, which might exceed the power delivery capabilities of the CPU. Our system doesn't possess an advanced liquid cooling solution and only has a single processor fan. That's why it cannot sustain high frequencies when many cores are utilized.
 
@@ -73,14 +73,14 @@ On the image, we have the main thread at the bottom (TID 913273), and eight work
 
 On the worker thread timeline (top 8 rows) we have the following markers:
 
-* 'job0' - 'job25' bars indicate the start and end of a job.
-* 'ww' (short for "worker wait") bars indicate a period when a worker thread is waiting for a new job.
+* `job0`--`job25` bars indicate the start and end of a job.
+* `ww` (short for "worker wait") bars indicate a period when a worker thread is waiting for a new job.
 * Notches below job periods indicate that a thread has just finished compressing a portion of the input block and is signaling to the main thread that the data is available to be partially flushed.
 
 On the main thread timeline (row 9, TID 913273) we have the following markers:
 
-* 'p0' - 'p25' boxes indicate periods of preparing a new job. It starts when the main thread starts filling up the input buffer until it is full (but this new job is not necessarily posted on the worker queue immediately).
-* 'fw' (short for "flush wait") markers indicate a period when the main thread waits for the produced data to start flushing it. During this time, the main thread is blocked.
+* `p0`--`p25` boxes indicate periods of preparing a new job. It starts when the main thread starts filling up the input buffer until it is full (but this new job is not necessarily posted on the worker queue immediately).
+* `fw` (short for "flush wait") markers indicate a period when the main thread waits for the produced data to start flushing it. During this time, the main thread is blocked.
 
 With a quick glance at the image, we can tell that there are many `ww` periods when worker threads are waiting. This negatively affects the performance of Zstandard compression. Let's progress through the timeline and try to understand what's going on.
 
