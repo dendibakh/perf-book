@@ -7,7 +7,7 @@ The major differences between x86 (considered as CISC) and RISC ISAs, such as AR
 * x86 instructions are variable-length, while ARM and RISC-V instructions are fixed-length. This makes decoding x86 instructions more complex.
 * x86 ISA has many addressing modes, while ARM and RISC-V have few addressing modes. Operands in ARM and RISC-V instructions are either registers or immediate values, while x86 instruction inputs can also come from memory. This bloats the number of x86 instructions but also allows for more powerful single instructions. For instance, ARM requires loading a memory location first, then performing the operation; x86 can do both in one instruction.
 
-In addition to this, there are a few other differences that you should consider when optimizing for a specific microarchitecture. As of 2024, the most recent x86-64 ISA has 16 architectural general-purpose registers, while the latest ARMv8 and RV64 require a CPU to provide 32 general-purpose registers. Extra architectural registers reduce register spilling and hence reduce the number of loads/stores. Intel has announced a new extension called APX[^1] that will increase the number of registers to 32. There is also a difference in the memory page size between x86 and ARM. The default page size for x86 platforms is 4 KB, while most ARM systems (for example, Apple MacBooks) use a 16 KB page size, although both platforms support larger page sizes (see [@sec:ArchHugePages], and [@sec:secDTLB]). All these differences can affect the performance of your application when it becomes a bottleneck.
+In addition to this, there are a few other differences that you should consider when optimizing for a specific microarchitecture. As of 2024, the most recent x86-64 ISA has 16 architectural general-purpose registers, while the latest ARMv8 and RV64 require a CPU to provide 32 general-purpose registers. Extra architectural registers reduce register spilling and hence reduce the number of loads/stores. Intel has announced a new extension called APX[^1] that will increase the number of registers to 32. There is also a difference in the memory page size between x86 and ARM. The default page size for x86 platforms is 4 KB, while most ARM systems (for example, Apple MacBooks) use a 16 KB page size, although both platforms support larger page sizes (see [@sec:ArchHugePages], and [@sec:secDTLB]). All these differences can affect the performance of your application when they become a bottleneck.
 
 Although ISA differences *may* have a tangible impact on the performance of a specific application, numerous studies show that on average, differences between the two most popular ISAs, namely x86 and ARM, don't have a measurable performance impact. Throughout this book, we carefully avoided advertisements of any products (e.g., Intel vs. AMD vs. Apple) and any religious ISA debates (x86 vs. ARM vs. RISC-V).[^5] Below are some references that we hope will close the debate:
 
@@ -20,7 +20,7 @@ Nevertheless, this doesn't remove the value of architecture-specific optimizatio
 
 ### ISA Extensions
 
-ISA evolution has been continuous, it has focused on accelerating specialized workloads, such as cryptography, AI, multimedia, and others. Utilizing ISA extensions often results in lucrative performance improvements. Developers keep finding smart ways to leverage these extensions in general-purpose applications. So, even if you're outside of one of these highly specialized domains, you might still benefit from using ISA extensions.
+ISA evolution has been continuous. It has focused on accelerating specialized workloads, such as cryptography, AI, multimedia, and others. Utilizing ISA extensions often results in lucrative performance improvements. Developers keep finding smart ways to leverage these extensions in general-purpose applications. So, even if you're outside of one of these highly specialized domains, you might still benefit from using ISA extensions.
 
 It's not possible to learn about all specific instructions. But we suggest you familiarize yourself with major ISA extensions available on your target platform. For example, if you are developing an AI application that uses `fp16` data types, and you target one of the modern ARM processors, make sure that your program's machine code contains corresponding `fp16` ISA extensions. If you're developing encryption/decryption software, check if it utilizes crypto extensions of your target ISA. And so on.
 
@@ -36,12 +36,12 @@ Here is a list of some notable x86 ISA extensions:
 
 Here is a list of some notable ARM ISA extensions:
 
-* asimd: also known as neon, provides SIMD instructions for floating-point and integer operations.
-* aes/sha1/sha2/sha3/sha512/crc32: provide instructions for encryption, hashing, and checksumming.
-* fp16/bf16: provide 16-bit half-precision and `Bfloat16` floating-point instructions.
-* dotprod: support for dot product instructions for accelerating machine learning workloads.
-* sve: enables scalable vector length instructions.
-* sme: Scalable Matrix Extension for accelerating matrix multiplication.
+* Advanced SIMD: also known as NEON, provides arithmetic SIMD instructions.
+* Cryptographic Instructions: provide instructions for encryption, hashing, and checksumming.
+* FP16/BF16: provide 16-bit half-precision and `Bfloat16` floating-point instructions.
+* UDOT/SDOT: support for dot product instructions for accelerating machine learning workloads.
+* SVE: enables scalable vector length instructions.
+* SME: Scalable Matrix Extension for accelerating matrix multiplication.
 
 When compiling your applications, make sure to enable the necessary compiler flags to activate required ISA extensions. On GCC and Clang compilers use the `-march` option. For example, `-march=native` will activate ISA features of your host system, i.e., on which you run the compilation. Or you can include a specific version of ISA, e.g., `-march=armv8.6-a`. On the MSVC compiler, use the `/arch` option, e.g., `/arch:AVX2`.
 
@@ -65,7 +65,7 @@ Even though CPU dispatching is a runtime check, its overhead is not high. Develo
 
 ### Instruction Latencies and Throughput
 
-Besides ISA extensions, it's worth learning about the number and type of execution units in your processor. For instance, the number of loads, stores, divisions, and multiplications a processor can issue every cycle. For most processors, this information is published by CPU vendors in corresponding technical manuals. However, information about latencies and throughput of specific instructions is not usually disclosed. Nevertheless, people have benchmarked individual instructions, which can be accessed online. For the latest Intel and AMD CPUs, latency, throughput, port usage, and the number of $\mu$ops for an instruction can be found at the [uops.info](https://uops.info/table.html)[^2] website. For the Apple M1 processor, similar data is accessible in [@AppleOptimizationGuide, Appendix A].[^6] Along with instructions latencies and throughput, developers have reverse-engineered other aspects of a microarchitecture such as the size of branch prediction history buffers, reorder buffer capacity, size of load/store buffers, and others. Since this is an unofficial source of data, you should take it with a grain of salt.
+Besides ISA extensions, it's worth learning about the number and type of execution units in your processor (e.g., the number of loads, stores, divisions, and multiplications a processor can issue every cycle). For most processors, this information is published by CPU vendors in corresponding technical manuals. However, information about latencies and throughput of specific instructions is not usually disclosed. Nevertheless, people have benchmarked individual instructions, which can be accessed online. For the latest Intel and AMD CPUs, latency, throughput, port usage, and the number of $\mu$ops for an instruction can be found at the [uops.info](https://uops.info/table.html)[^2] website. For the Apple M1 processor, similar data is accessible in [@AppleOptimizationGuide, Appendix A].[^6] Along with instruction latencies and throughput, developers have reverse-engineered other aspects of a microarchitecture such as the size of branch prediction history buffers, reorder buffer capacity, size of load/store buffers, and others. Since this is an unofficial source of data, you should take it with a grain of salt.
 
 Be very careful about making conclusions just on the instruction latency and throughput numbers. In many cases, instruction latencies are hidden by the out-of-order execution engine, and it may not matter if an instruction has a latency of 4 or 8 cycles. If it doesn't block forward progress, such instruction will be handled "in the background" without harming performance. However, the latency of an instruction becomes important when it stands on a critical dependency chain because it delays the execution of dependent operations.
 
@@ -88,12 +88,12 @@ float sqSum(float *a, int N) {         │ .loop:
 }                                      │  jne .loop
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The code looks very logical; it uses fused multiply-add instruction to compute the product of one element of `a` (in `xmm1`) and then accumulates the result in `xmm0`. The problem is that there is a data dependency over `xmm0`. A processor cannot issue a new `vfmadd231ss` instruction until the previous one has finished since `xmm0` is both an input and an output of `vfmadd231ss`. The performance of this loop is bound by FMA latency, which in Intel's Alderlake equals 4 cycles.
+The code looks very logical; it uses fused multiply-add instruction to compute the product of one element of `a` (in `xmm1`) and then accumulates the result in `xmm0`. The problem is that there is a data dependency over `xmm0`. A processor cannot issue a new `vfmadd231ss` instruction until the previous one has finished since `xmm0` is both an input and an output of `vfmadd231ss`. The performance of this loop is bound by FMA latency, which in Intel's Alder Lake equals 4 cycles.
 
 You may think: "But wait, multiplications do not depend on each other." Yes, you're right, yet the whole FMA instruction needs to wait until all its inputs become available. So, in this case, fusing multiplication and addition hurts performance. We would be better off with two separate instructions. The `nanobench` experiment below proves that:
 
 ```
-# ran on Intel Core i7-1260P (Alderlake)
+# ran on Intel Core i7-1260P (Alder Lake)
 $ sudo ./kernel-nanoBench.sh -f -basic │ $ sudo ./kernel-nanoBench.sh -f -basic
  -loop 100 -unroll 1000                │  -loop 100 -unroll 1000 
  -warm_up_count 10 -asm "              │  -warm_up_count 10 -asm "
