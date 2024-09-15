@@ -45,7 +45,7 @@ Figure @fig:milan7313P shows the clustered memory hierarchy of the AMD Milan 731
 
 ![The clustered memory hierarchy of the AMD Milan 7313P processor.](../../img/other-tuning/Milan7313P.png){#fig:milan7313P width=80%}
 
-Although there is a total of 128 MiB of LLC, the four cores of a CCX cannot store cache lines in an LLC other than their own 32 MiB LLC (32 MiB/CCX x 4 CCX). Since we will be running single-threaded benchmarks, we can focus on a single CCX. The size of LLC in our experiments will vary from 0 to 32 Mib with steps of 2 Mib.
+Although there is a total of 128 MiB of LLC, the four cores of a CCX cannot store cache lines in an LLC other than their own 32 MiB LLC (32 MiB/CCX x 4 CCX). Since we will be running single-threaded benchmarks, we can focus on a single CCX. The size of LLC in our experiments will vary from 0 to 32 MiB with steps of 2 MiB.
 
 ### Workload: SPEC CPU2017 {.unlisted .unnumbered}
 
@@ -122,7 +122,7 @@ The methodology used in this case study is described in more detail in [@Balance
 
 ### Results {.unlisted .unnumbered}
 
-We run a set of SPEC CPU2017 benchmarks *alone* in the system using only one instance and a single hardware thread. We repeat those runs while changing the available LLC size from 0 to 32 MiB with 2 MiB steps. Figure @fig:characterization_llc shows in graphs, from left to right, CPI, DMPKI, and MPKI for each assigned LLC size. For the CPI chart, a lower value on the Y-axis means better performance. Also, since the frequency on the system is fixed, the CPI chart is reflective of absolute scores. For example, `520.omnetpp` (dotted line) with 32 MiB LLC is 2.5 times faster than with 0 Mib LLC.
+We run a set of SPEC CPU2017 benchmarks *alone* in the system using only one instance and a single hardware thread. We repeat those runs while changing the available LLC size from 0 to 32 MiB with 2 MiB steps. Figure @fig:characterization_llc shows in graphs, from left to right, CPI, DMPKI, and MPKI for each assigned LLC size. For the CPI chart, a lower value on the Y-axis means better performance. Also, since the frequency on the system is fixed, the CPI chart is reflective of absolute scores. For example, `520.omnetpp` (dotted line) with 32 MiB LLC is 2.5 times faster than with 0 MiB LLC.
 
 For the DMPKI and MPKI charts, the lower the value on the Y-axis, the better. Three lines that correspond to `503.bwaves` (solid), `520.omnetpp` (dotted), and `554.roms` (dashed), represent the three main trends observed in all applications. We do not show the rest of the benchmarks.
 
