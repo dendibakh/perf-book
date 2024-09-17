@@ -2,6 +2,8 @@
 
 In some scenarios, branches can be replaced with arithmetic. The code in [@lst:LookupBranches], can also be rewritten using a simple arithmetic formula, as shown in [@lst:ArithmeticBranches]. For this code, the Clang-17 compiler replaces expensive division with a much cheaper multiplication operation.
 
+[TODO]: provide assembly code on the right to prove MUL instead of DIV?
+
 Listing: Replacing branches with arithmetic.
 
 ~~~~ {#lst:ArithmeticBranches .cpp}
