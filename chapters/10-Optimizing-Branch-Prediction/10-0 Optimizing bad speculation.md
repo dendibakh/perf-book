@@ -20,7 +20,7 @@ In the past, developers had an option of providing a prediction hint to an x86 p
 
 One indirect way to reduce branch mispredictions is to straighten the code using source-based and compiler-based techniques. PGO and BOLT are effective at reducing branch mispredictions thanks to improving fallthrough rate that alleviates the pressure on branch predictor structures. We will discuss those techniques in the next chapter.
 
-So perhaps the only direct way to get rid of branch mispredictions is to get rid of the branch itself. In the two subsequent sections, we will take a look at how branches can be replaced with lookup tables and predication.
+So perhaps the only direct way to get rid of branch mispredictions is to get rid of the branch itself. In the two subsequent sections, we will take a look at how branches can be replaced with lookup tables and selection.
 
 There is a conventional wisdom that never-taken branches are transparent to the branch prediction and can't affect performance, and therefore it doesn't make much sense to remove them, at least from a prediction perspective. However, contrary to the wisdom, an experiment conducted by authors of BOLT optimizer demonstrated that replacing never-taken branches with equal-sized no-ops in a large code footprint application, such as Clang C++ compiler, leads to approximately 5\% speedup on modern Intel CPUs. So it still pays to try to eliminate all branches.
 

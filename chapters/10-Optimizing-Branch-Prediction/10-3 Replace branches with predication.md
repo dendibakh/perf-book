@@ -1,12 +1,10 @@
-## Replace Branches with Predication {#sec:BranchlessPredication}
+## Replace Branches with Selection {#sec:BranchlessSelection}
 
-[TODO]: Replace the word "predication" with "selection"
+Some branches could be effectively eliminated by executing both parts of the branch and then selecting the right result. An example of code when such transformation might be profitable is shown in [@lst:ReplaceBranchesWithSelection]. If TMA suggests that the `if (cond)` branch has a very high number of mispredictions, you can try to eliminate the branch by doing the transformation shown on the right.
 
-Some branches could be effectively eliminated by executing both parts of the branch and then selecting the right result (*predication*). An example of code when such transformation might be profitable is shown in [@lst:PredicatingBranchesCode]. If TMA suggests that the `if (cond)` branch has a very high number of mispredictions, you can try to eliminate the branch by doing the transformation shown on the right.
+Listing: Replacing Branches with Selection.
 
-Listing: Predicating branches.
-
-~~~~ {#lst:PredicatingBranchesCode .cpp}
+~~~~ {#lst:ReplaceBranchesWithSelection .cpp}
 int a;                                             int x = computeX();
 if (cond) { /* frequently mispredicted */   =>     int y = computeY();
   a = computeX();                                  int a = cond ? x : y;
@@ -17,13 +15,13 @@ if (cond) { /* frequently mispredicted */   =>     int y = computeY();
 
 [TODO]: Add continuation `foo(a);` in the code example.
 
-For the code on the right, the compiler can replace the branch that comes from the ternary operator, and generate a `CMOV` x86 instruction instead. A `CMOVcc` instruction checks the state of one or more of the status flags in the `EFLAGS` register (`CF, OF, PF, SF` and `ZF`) and performs a move operation if the flags are in a specified state or condition. A similar transformation can be done for floating-point numbers with `FCMOVcc,VMAXSS/VMINSS` instructions. [@lst:PredicatingBranchesAsm] shows assembly listings for the original and the branchless version.
+For the code on the right, the compiler can replace the branch that comes from the ternary operator, and generate a `CMOV` x86 instruction instead. A `CMOVcc` instruction checks the state of one or more of the status flags in the `EFLAGS` register (`CF, OF, PF, SF` and `ZF`) and performs a move operation if the flags are in a specified state or condition. A similar transformation can be done for floating-point numbers with `FCMOVcc,VMAXSS/VMINSS` instructions. [@lst:ReplaceBranchesWithSelectionAsm] shows assembly listings for the original and the branchless version.
 
 [TODO]: Name similar instructions on ARM side, e.g., `csel`.
 
-Listing: Predicating branches - x86 assembly code.
+Listing: Replacing Branches with Selection - x86 assembly code.
 
-~~~~ {#lst:PredicatingBranchesAsm .bash}
+~~~~ {#lst:ReplaceBranchesWithSelectionAsm .bash}
 # original version              # branchless version
 400504: test edi,edi            400537: mov eax,0x0
 400506: je 400514               40053c: call <computeX> # compute x; a = x
@@ -37,7 +35,7 @@ Listing: Predicating branches - x86 assembly code.
 
 In contrast with the original version, the branchless version doesn't have jump instructions. However, the branchless version calculates both `x` and `y` independently, and then selects one of the values and discards the other. While this transformation eliminates the penalty of a branch misprediction, it is potentially doing more work than the original code. Performance improvement, in this case, very much depends on the characteristics of `computeX` and `computeY` functions. If the functions are small and the compiler can inline them, then it might bring noticeable performance benefits. If the functions are big, it might be cheaper to take the cost of a branch mispredict than to execute both functions. 
 
-It is important to note that predication does not always benefit the performance of the application. The issue with predication is that it limits the parallel execution capabilities of the CPU. For the original version of the code, the CPU can predict that the branch will be taken, speculatively call `computeX`, and continue executing the rest of the program. This type of speculation is not possible for the branchless version as the CPU has to wait for the result of the `CMOVNE` instruction to proceed.
+It is important to note that this technique does not always benefit the performance of the application. The issue with selection is that it limits the parallel execution capabilities of the CPU. For the original version of the code, the CPU can predict that the branch will be taken, speculatively call `computeX`, and continue executing the rest of the program. This type of speculation is not possible for the branchless version as the CPU has to wait for the result of the `CMOVNE` instruction to proceed.
 
 [TODO]: Provide better explanation of the tradeoffs. Maybe I don't need this binary search SO discussion?
 
@@ -48,7 +46,7 @@ The typical example of the tradeoffs involved when choosing between the regular 
 
 The binary search is a great example that shows tradeoffs between standard and branchless implementations. The real-world scenario can be more difficult to analyze, so again, measure to find out if it would be beneficial to replace branches in your case.
 
-Without profiling data, compilers don't have visibility into the misprediction rates. As a result, compilers usually prefer to generate branches, i.e., the original version, by default. They are conservative at using predication and may resist generating `CMOV` instructions even in simple cases. Again, the tradeoffs are complicated, and it is hard to make the right decision without the runtime data. Hardware-based PGO (see [@sec:secPGO]) will be a huge step forward here. Also, there is a way to indicate to the compiler that a branch condition is unpredictable by hardware mechanisms. Starting from Clang-17, the compiler now respects a `__builtin_unpredictable`, which can be very effective at replacing unpredictable branches with `CMOV` x86 instructions. For example:
+Without profiling data, compilers don't have visibility into the misprediction rates. As a result, compilers usually prefer to generate branches, i.e., the original version, by default. They are conservative at using selection and may resist generating `CMOV` instructions even in simple cases. Again, the tradeoffs are complicated, and it is hard to make the right decision without the runtime data. Hardware-based PGO (see [@sec:secPGO]) will be a huge step forward here. Also, there is a way to indicate to the compiler that a branch condition is unpredictable by hardware mechanisms. Starting from Clang-17, the compiler now respects a `__builtin_unpredictable`, which can be very effective at replacing unpredictable branches with `CMOV` x86 instructions. For example:
 
 [TODO]: WTF? I need a better example. 
 
