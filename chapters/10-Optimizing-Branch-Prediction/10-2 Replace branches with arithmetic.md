@@ -16,3 +16,5 @@ int8_t mapToBucket(unsigned v) {
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 As of the year 2023, compilers are usually unable to find these shortcuts on their own, so it is up to the programmer to do it manually. If you can find a way to replace a branch with arithmetic, you will likely see a performance improvement. Unfortunately, this is not always possible. 
+
+[TODO]: include the LFSR example?
