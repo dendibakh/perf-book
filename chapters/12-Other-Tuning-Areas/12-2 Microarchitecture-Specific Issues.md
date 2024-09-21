@@ -89,8 +89,6 @@ However, it's not enough to only align the starting offset of a matrix. Consider
 
 So, in addition to aligning the starting offset, each row of the matrix should be aligned as well. For example in Figure @fig:MemAlignment, it can be achieved by inserting seven dummy columns into the matrix, effectively making it a `9x16` matrix. This will align the second row (elements 10-18) at the offset `0x40`. Similarly, we need to align all other rows. The dummy columns will not be processed by the algorithm, but they will ensure that the actual data is aligned at the cache line boundary. In our testing, the performance impact of this change was up to 30%, depending on the matrix size and the platform configuration.
 
-[TODO]: Check MACHINE_CLEARS.MEMORY_ORDERING event
-
 Alignment and padding often cause holes with unused bytes, which potentially decreases memory bandwidth utilization. For small matrices, like our 9x9 matrix, padding will cause almost half of each line to be unused. However, for large matrices, like 1025x1025 the impact of padding is not that big. Nevertheless, for some algorithms, like AI, memory bandwidth can be a bigger concern. Use these techniques with care and always measure to see if the performance gain from alignment is worth the cost of unused bytes.
 
 Accesses that cross a 4 KB boundary introduce more complications because virtual to physical address translations are usually handled in 4 KB pages. Handling such access would require accessing two TLB entries as well. Unless a TLB supports multiple lookups per cycle, such loads can cause a significant slowdown.
