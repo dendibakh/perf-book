@@ -55,15 +55,3 @@ if (__builtin_unpredictable(cond)) {
 [^1]: Just a handfull instructions that can be completed in a few cycles.
 [^2]: More than twenty instructions that take more than twenty cycles.
 [^4]: Hardware-based PGO (see [@sec:secPGO]) will be a huge step forward here.
-
-
-[TODO]: Maybe I don't need this binary search SO discussion? Maybe convert it into a case study (perf-ninja lab)?
-
-The typical example of the tradeoffs involved when choosing between the regular and the branchless versions of the code is binary search:[^3]
-
-* For a search over a large array that doesn't fit in CPU caches, a branch-based binary search version performs better because the penalty of a branch misprediction is low compared to the latency of memory accesses (which are high because of the cache misses). Because of the branches in place, the CPU can speculate on their outcome, which allows loading the array element from the current iteration and the next one at the same time. It doesn't end there: the speculation continues, and you might have multiple loads in flight at the same time.
-* The situation is reversed for small arrays that fit in CPU caches. The branchless search still has all the memory accesses serialized, as explained earlier. But this time, the load latency is small (only a handful of cycles) since the array fits in CPU caches. The branch-based binary search suffers constant mispredictions, which cost roughly 10-20 cycles. In this case, the cost of a mispredict is much more than the cost of a memory access, so the benefits of speculative execution are hindered. The branchless version usually ends up being faster in this case.
-
-The binary search is a great example that shows tradeoffs between standard and branchless implementations. The real-world scenario can be more difficult to analyze, so again, measure to find out if it would be beneficial to replace branches in your case.
-
-[^3]: Discussion on branchless binary search - [https://stackoverflow.com/a/54273248](https://stackoverflow.com/a/54273248).
