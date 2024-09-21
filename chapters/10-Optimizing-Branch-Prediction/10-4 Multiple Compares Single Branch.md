@@ -6,7 +6,7 @@ The last technique that we discuss in this chapter aims at minimizing the dynami
 
 Listing: Find the longest line (one character at a time).
 
-~~~~ {#lst:LongestLineNaive .cpp .numberLines}
+~~~~ {#lst:LongestLineNaive .cpp}
 uint32_t longestLine(const std::string &str) {
   uint32_t maxLen = 0;
   uint32_t curLen = 0;
@@ -70,7 +70,7 @@ We start of by preparing an 8-byte mask of `eol` symbols. The inner loop loads e
 
 If the mask is zero, that means there are no `eol` characters in the current chunk and we can skip it (see line 11). This is a critical optimization that provides large speedups for input strings with long lines. If a mask is not zero, that means there are `eol` characters and we need to find their positions. To do so, we use the `tzcnt` function, that counts the number of trailing zero bits in an 8-bit mask. For example, for the mask `0b00100100`, it will return 2. We use the position of the rightmost set bit in the mask to calculate the length of the current line. We repeat until there are no set bits in the mask and then start processing the next chunk. Most ISAs support implementing the `tzcnt` function with a single instruction.[^3]
 
-We tested this idea using AVX2 implementation on several different inputs, including textbooks, whitepapers and source code files. The result was 5--6 times fewer branch instructions and more than 4x better performance when running on Intel Core i7-1260P (12th Gen, Alderlake).
+We tested this technique using AVX2 implementation on several different inputs, including textbooks, whitepapers and source code files. The result was 5--6 times fewer branch instructions and more than 4x better performance when running on Intel Core i7-1260P (12th Gen, Alderlake).
 
 [^1]: Assuming that compiler will avoid generating branch instructions for `std::max`.
 [^2]: Performance Ninja: compiler intrinsics 2 - [https://github.com/dendibakh/perf-ninja/tree/main/labs/core_bound/compiler_intrinsics_2](https://github.com/dendibakh/perf-ninja/tree/main/labs/core_bound/compiler_intrinsics_2).
