@@ -2,7 +2,7 @@
 
 Starting from Zen4, AMD processors support Level-1 and Level-2 TMA analysis. According to AMD documentation, it is called "Pipeline Utilization" analysis, but the idea remains the same. The L1 and L2 buckets are also very similar to Intel's. Since kernel 6.2, Linux users can utilize the `perf` tool to collect the pipeline utilization data.
 
-Next, we will examine the [Crypto++](https://github.com/weidai11/cryptopp)[^1] implementation of SHA-256 (Secure Hash Algorithm 256), the fundamental cryptographic algorithm in Bitcoin mining. Crypto++ is an open-source C++ class library of cryptographic algorithms, and contains an implementation of many algorithms, not just SHA-256. However, for our example, we disabled benchmarking all other algorithms by commenting out the corresponding line in the `BenchmarkUnkeyedAlgorithms` function in `bench1.cpp`.
+Next, we will examine the [Crypto++](https://github.com/weidai11/cryptopp)[^1] implementation of SHA-256 (Secure Hash Algorithm 256), the fundamental cryptographic algorithm in Bitcoin mining. Crypto++ is an open-source C++ class library of cryptographic algorithms, and contains an implementation of many algorithms, not just SHA-256. However, for our example, we disabled benchmarking of other algorithms by commenting out corresponding lines in the `BenchmarkUnkeyedAlgorithms` function in `bench1.cpp`.
 
 We ran the test on an AMD Ryzen 9 7950X machine with Ubuntu 22.04, Linux kernel 6.5.0-15-generic. We compiled Crypto++ version 8.9 using GCC 12.3 C++ compiler. We used the default `-O3` optimization option, but it doesn't impact performance much since the code is written with x86 intrinsics (see [@sec:secIntrinsics]) and utilizes the SHA x86 ISA extension. 
 

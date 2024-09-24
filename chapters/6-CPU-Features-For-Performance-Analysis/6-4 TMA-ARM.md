@@ -65,7 +65,7 @@ Stage 2 (uarch metrics)
   Crypto Operations Percentage........  0.00% operations
 ```
 
-In the command above, the option `-n BackendBound` collects all the metrics associated with the `Backend Bound` category as well as its descendants. The description for every metric in the output is given in [@ARMNeoverseV1TopDown]. Note, that they are quite similar to what we have discussed in [@sec:PerfMetricsCaseStudy], so you may want to revisit it as well.
+In the command above, the option `-n BackendBound` collects all the metrics associated with the `Backend Bound` category as well as its descendants. The description for every metric in the output is given in [@ARMNeoverseV1TopDown]. Note, that they are quite similar to what we have discussed in [@sec:PerfMetrics], so you may want to revisit it as well.
 
 We don't have a goal of optimizing the benchmark, rather we want to characterize performance bottlenecks. However, if given such a task, here is how our analysis could continue. There are a substantial number of `L1 Data TLB` misses (3.8 MPKI), but then 90% of those misses hit in L2 TLB (see `L2 Unified TLB Miss Ratio`). All in all, only 0.1% of all TLB accesses result in a page table walk (see `DTLB Walk Ratio`), which suggests that it is not our primary concern, although a quick experiment that utilizes huge pages is still worthwhile.
 

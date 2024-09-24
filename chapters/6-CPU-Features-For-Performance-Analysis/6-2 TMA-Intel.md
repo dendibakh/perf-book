@@ -142,7 +142,7 @@ Listing: Source code of function main.
 extern "C" { void foo(char* a, int n); }
 const int _200MB = 1024*1024*200;
 int main() {
-  char* a = (char*)malloc(_200MB); // 200 MB buffer
+  char* a = new char[_200MB]; // 200 MB buffer
   ...
   for (int i = 0; i < 100000000; i++) {
     int random_int = distribution(generator);
