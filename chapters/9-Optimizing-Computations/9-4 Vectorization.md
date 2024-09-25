@@ -42,7 +42,7 @@ An alternative way to use compiler optimization reports is to check assembly out
 
 There are a few common cases that developers frequently run into when trying to accelerate vectorizable code. Below we present four typical scenarios and give general guidance on how to proceed in each case.
 
-#### Vectorization Is Illegal
+#### Vectorization Is Illegal.
 
 In some cases, the code that iterates over elements of an array is simply not vectorizable. Vectorization remarks are very effective at explaining what went wrong and why the compiler can’t vectorize the code. [@lst:VectDep] shows an example of dependence inside a loop that prevents vectorization.[^31]
 
