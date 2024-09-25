@@ -147,7 +147,7 @@ $ perf report -n --stdio
                                   bar
 ```
 
-As you can see, we've identified the hottest function in the program (which is `bar`). Also, we found out callers that contribute to the most time spent in function `bar`: 91% of the time the tool captured the `main->foo->bar` call stack, and 9% of the time it captured `main->zoo->bar`. In other words, 91% of samples in `bar` have `foo` as its caller function.
+As you can see, we've identified the hottest function in the program (which is `bar`). Also, we found out callers that contribute to the most time spent in function `bar`: 91% of the time the tool captured the `main`&rarr;`foo`&rarr;`bar` call stack, and 9% of the time it captured `main`&rarr;`zoo`&rarr;`bar`. In other words, 91% of samples in `bar` have `foo` as its caller function.
 
 It's important to mention that we cannot necessarily drive conclusions about function call counts in this case. For example, we cannot say that `foo` calls `bar` 10 times more frequently than `zoo`. It could be the case that `foo` calls `bar` once, but it executes an expensive path inside `bar` while `zoo` calls `bar` many times but returns quickly from it.
 
