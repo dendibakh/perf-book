@@ -96,7 +96,7 @@ Since Linux kernel 6.8, there is a new functionality in the `perf` tool that all
 
 ### Other Data Structure Reorganization Techniques
 
-To close the topic of cache-friendly data structures, we will briefly mention two other techniques: *structure splitting* and *pointer inlining* that can be used to improve cache utilization.
+To close the topic of cache-friendly data structures, we will briefly mention two other techniques that can be used to improve cache utilization: *structure splitting* and *pointer inlining*.
 
 **Structure splitting**. Splitting a large structure into smaller ones can improve cache utilization. For example, if you have a structure that contains a large number of fields, but only a few of them are accessed together, you can split the structure into two or more smaller ones. This way, you can avoid loading unnecessary data into the cache. An example of structure splitting is shown in [@lst:StructureSplitting]. By splitting the `Point` structure into `PointCoords` and `PointInfo`, we can avoid loading the `PointInfo` data into caches when we only need `PointCoords`. This way, we can fit more points on a single cache line.
 
