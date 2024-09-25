@@ -29,7 +29,7 @@ Figure @fig:InstrumentsView shows the main timeline view of Xcode Instruments. T
 
 ![Xcode Instruments: timeline and statistics panels.](../../img/perf-tools/XcodeInstrumentsView.jpg){#fig:InstrumentsView width=100% }
 
-To begin, open *Instruments* and choose *CPU Counters* analysis type. The first step you need to do is configure the collection. Click and hold the red target icon (see \circled{1} in Figure @fig:InstrumentsView), then select *Recording Options...* from the menu. It will display the dialog window shown in Figure @fig:InstrumentsDialog. This is where you can add hardware performance monitoring events for collection.
+To begin, open *Instruments* and choose the *CPU Counters* analysis type. The first step you need to do is configure the collection. Click and hold the red target icon (see \circled{1} in Figure @fig:InstrumentsView), then select *Recording Options...* from the menu. It will display the dialog window shown in Figure @fig:InstrumentsDialog. This is where you can add hardware performance monitoring events for collection.
 
 ![Xcode Instruments: CPU Counters options.](../../img/perf-tools/XcodeInstrumentsDialog.png){#fig:InstrumentsDialog width=70% }
 
@@ -41,7 +41,7 @@ $ plutil -convert json /usr/share/kpep/a14.plist -o a14.json
 
 and then open `a14.json` using a regular text editor.
 
-The second step is to set the profiling target. To do that, click and hold the name of an application (marked \circled{2} in Figure @fig:InstrumentsView) and choose the one you're interested in, set the arguments and environment variables if needed. Now, you're ready to start the collection; press the red target icon \circled{1}.
+The second step is to set the profiling target. To do that, click and hold the name of an application (marked \circled{2} in Figure @fig:InstrumentsView) and choose the one you're interested in. Set the arguments and environment variables if needed. Now, you're ready to start the collection; press the red target icon \circled{1}.
 
 *Instruments* shows a timeline and constantly updates statistics about the running application. Once the program finishes, Instruments will display the results like those shown in Figure @fig:InstrumentsView. The compilation took 7.3 seconds and we can see how the volume of events changed over time. For example, branch mispredictions become more pronounced towards the end of the runtime. You can zoom in to that interval on the timeline to examine the functions involved.
 

@@ -1,19 +1,19 @@
 ## Event Tracing for Windows {#sec:ETW}
 
-Microsoft has developed a system-wide tracing facility named Event Tracing for Windows (ETW). It was originally intended for helping device driver developers, but later found its use in analyzing general-purpose applications as well. ETW is available on all supported Windows platforms (x86 and ARM) with the corresponding platform-dependent installation packages. ETW records structured events in user and kernel code with full call stack trace support, which enables you to observe software dynamics in a running system and solve many challenging performance issues.
+Microsoft has developed a system-wide tracing facility named Event Tracing for Windows (ETW). It was originally intended for helping device driver developers, but later found use in analyzing general-purpose applications as well. ETW is available on all supported Windows platforms (x86 and ARM) with the corresponding platform-dependent installation packages. ETW records structured events in user and kernel code with full call stack trace support, which enables you to observe software dynamics in a running system and solve many challenging performance issues.
 
 ### How to configure it {.unlisted .unnumbered}
 
-Recording ETW data is possible without any extra download since Windows 10 with `Wpr.exe`. But to enable system-wide profiling you must be an administrator and have the `SeSystemProfilePrivilege` enabled. The \underline{W}indows \underline{P}erformance \underline{R}ecorder tool supports a set of built-in recording profiles that are suitable for common performance issues. You can tailor your recording needs by authoring a custom performance recorder profile xml file with the `.wprp` extension.
+Recording ETW data is possible without any extra download since Windows 10 with `WPR.exe`. But to enable system-wide profiling you must be an administrator and have the `SeSystemProfilePrivilege` enabled. The \underline{W}indows \underline{P}erformance \underline{R}ecorder tool supports a set of built-in recording profiles that are suitable for common performance issues. You can tailor your recording needs by authoring a custom performance recorder profile xml file with the `.wprp` extension.
 
-If you want to not only record but also view the recorded ETW data you need to install the Windows Performance Toolkit (WPT). You can download it from the Windows SDK[^1] or ADK[^2] download page. Windows SDK is huge, you don't necessarily need all its parts. In our case, we just enabled the checkbox of the Windows Performance Toolkit. You are allowed to redistribute WPT as a part of your own application.
+If you want to not only record but also view the recorded ETW data you need to install the Windows Performance Toolkit (WPT). You can download it from the Windows SDK[^1] or ADK[^2] download page. The Windows SDK is huge; you don't necessarily need all its parts. In our case, we just enabled the checkbox of the Windows Performance Toolkit. You are allowed to redistribute WPT as a part of your own application.
 
 ### What you can do with it: {.unlisted .unnumbered}
 
-- Look at CPU hotspots with a configurable CPU sampling rate from 125 microseconds up to 10 seconds. The default is 1 millisecond which costs approximately 5-10% runtime overhead.
+- Look at CPU hotspots with a configurable CPU sampling rate from 125 microseconds up to 10 seconds. The default is 1 millisecond which costs approximately 5--10% runtime overhead.
 - Determine what blocks a certain thread and for how long (e.g., late event signals, unnecessary thread sleep, etc).
 - Examine how fast a disk serves read/write requests and discover what initiates that work.
-- Check file access performance and patterns (includes cached read/writes that lead to no disk IO).
+- Check file access performance and patterns (including cached read/writes that lead to no disk IO).
 - Trace the TCP/IP stack to see how packets flow between network interfaces and computers.
 
 All the items listed above are recorded system-wide for all processes with configurable call stack traces (kernel and user mode call stacks are combined). It's also possible to add your own ETW provider to correlate the system-wide traces with your application behavior. You can extend the amount of data collected by instrumenting your code. For example, you can inject enter/leave ETW tracing hooks in functions into your source code to measure how often a certain function was executed.
@@ -22,13 +22,13 @@ All the items listed above are recorded system-wide for all processes with confi
 
 ETW traces are not useful for examining CPU microarchitectural bottlenecks. For that, use vendor-specific tools like Intel VTune, AMD uProf, Apple Instruments, etc.
 
-ETW traces capture the dynamics of all processes at the system level, however, it may generate a lot of data. For example, capturing thread context switching data to observe various waits and delays can easily generate 1-2 GB per minute. That's why it is not practical to record high-volume events for hours without overriding previously stored traces.
+ETW traces capture the dynamics of all processes at the system level, however, it may generate a lot of data. For example, capturing thread context switching data to observe various waits and delays can easily generate 1--2 GB per minute. That's why it is not practical to record high-volume events for hours without overriding previously stored traces.
 
 ### Tools to Record ETW traces {.unlisted .unnumbered}
 
 Here is the list of tools one can use to capture ETW traces:
 
-- `wpr.exe`: a command line recording tool, part of Windows 10 and Windows Performance Toolkit.
+- `WPR.exe`: a command line recording tool, part of Windows 10 and Windows Performance Toolkit.
 - `WPRUI.exe`: a simple UI for recording ETW data, part of Windows Performance Toolkit
 - `xperf`: a command line predecessor of wpr, part of Windows Performance Toolkit.
 - `PerfView`:[^3] a graphical recording and analysis tool with the main focus on .NET Applications. This is an open-source application developed by Microsoft.
@@ -51,12 +51,12 @@ Now we will take a look at an example of using ETWController to capture ETW trac
 #### Setup {.unlisted .unnumbered}
 
 - Download ETWController to record ETW data and screenshots.
-- Download the latest Windows 11 Performance Toolkit[^1] to be able to view the data with WPA. Make sure that the newer Win 11 `wpr.exe` comes first in your path by moving the install folder of the WPT before the `C:\\Windows\\system32` in the System Environment dialog. This is how it should look like: 
+- Download the latest Windows 11 Performance Toolkit[^1] to be able to view the data with WPA. Make sure that the newer Win 11 `WPR.exe` comes first in your path by moving the install folder of the WPT before the `C:\\Windows\\system32` in the System Environment dialog. This is how it should look: 
 
 ```
 C> where wpr 
-C:\Program Files (x86)\Windows Kits\10\Windows Performance Toolkit\wpr.exe
-C:\Windows\System32\wpr.exe
+C:\Program Files (x86)\Windows Kits\10\Windows Performance Toolkit\WPR.exe
+C:\Windows\System32\WPR.exe
 ```
 
 #### Capture traces {.unlisted .unnumbered}
@@ -70,9 +70,9 @@ C:\Windows\System32\wpr.exe
 
 ![Starting ETW collection with ETWController UI.](../../img/perf-tools/ETWController_Dialog.png){#fig:ETWController_Dialog width=100%}
 
-Stopping profiling the first time takes a bit longer because Program-Debug Data Base files (PDBs) are generated for all managed code, which is a one-time operation. After profiling has reached the Stopped state you can press the *Open in WPA* button to load the ETL file into the Windows Performance Analyzer with an ETWController supplied profile. The CSwitch profile generates a large amount of data that is stored in a 4 GB ring buffer, which allows you to record 1-2 minutes before the oldest events are overwritten. Sometimes it is a bit of an art to stop profiling at the right time point. If you have sporadic issues you can keep recording enabled for hours and stop it when an event like a log entry in a file shows up, which is checked by a polling script, to stop profiling when the issue has occurred.
+Stopping profiling the first time takes a bit longer because Program-Debug Data Base files (PDBs) are generated for all managed code, which is a one-time operation. After profiling has reached the Stopped state you can press the *Open in WPA* button to load the ETL file into the Windows Performance Analyzer with an ETWController-supplied profile. The CSwitch profile generates a large amount of data that is stored in a 4 GB ring buffer, which allows you to record 1-2 minutes before the oldest events are overwritten. Sometimes it is a bit of an art to stop profiling at the right time point. If you have sporadic issues you can keep recording enabled for hours and stop it when an event like a log entry in a file shows up, which is checked by a polling script.
 
-Windows supports Event Log and Performance Counter triggers that can start a script when a performance counter reaches a threshold value or a specific event is written to an event log. If you need more sophisticated stop triggers, you should take a look at PerfView; this enables you to define a Performance Counter threshold that must be reached and stay there for `N` seconds before profiling is stopped. This way, random spikes are no longer triggering false positives. 
+Windows supports Event Log and Performance Counter triggers that can start a script when a performance counter reaches a threshold value or a specific event is written to an event log. If you need more sophisticated stop triggers, you should take a look at PerfView; this enables you to define a Performance Counter threshold that must be reached and stay there for `N` seconds before profiling is stopped. This way, random spikes will no longer trigger false positives. 
 
 #### Analysis in WPA {.unlisted .unnumbered}
 
@@ -96,7 +96,7 @@ Since we are dealing with delays, we are interested in wait times. These are ava
 
 Knowing that Defender was the issue is just the first step. If you look at the top panel again, you'll see that the delay is not entirely caused by busy antivirus scanning. The `MsMpEng.exe` process was active from the time `35.1` until `35.7`, but the application didn't start immediately after that. There is an additional delay of 0.5 sec from time `35.7`until `36.2`, during which the CPU was mostly idle, not doing anything. To find the root cause of this, you would need to follow the thread wakeup history across processes, which we will not present here. In the end, you would find a blocking web service call to `MpClient.dll!MpClient::CMpSpyNetContext::UpdateSpynetMetrics` which did wait for some Microsoft Defender web service to respond. If you enable TCP/IP or socket ETW traces you can also find out with which remote endpoint Microsoft Defender was communicating. So, the second part of the delay is caused by the `MsMpEng.exe` process waiting for the network, which also blocked our application from running.
 
-This case study shows only one example of what type of issues you can effectively analyze with WPA, but there are many others. The WPA interface is very rich and highly customizable. It supports custom profiles to configure the graphs and tables for visualizing event data in the way you like best. Originally, WPA was developed for device driver developers and there are built-in profiles that do not focus on application development. ETWController brings its own profile (*Overview.wpaprofile*) that you can set as the default profile under *Profiles -> Save Startup Profile* to always use the performance overview profile.
+This case study shows only one example of what type of issues you can effectively analyze with WPA, but there are many others. The WPA interface is very rich and highly customizable. It supports custom profiles to configure the graphs and tables for visualizing event data in the way you like best. Originally, WPA was developed for device driver developers and there are built-in profiles that do not focus on application development. ETWController brings its own profile (*Overview.wpaprofile*) that you can set as the default profile under *Profiles &rarr; Save Startup Profile* to always use the performance overview profile.
 
 [^1]: Windows SDK Downloads - [https://developer.microsoft.com/en-us/windows/downloads/sdk-archive/](https://developer.microsoft.com/en-us/windows/downloads/sdk-archive/)
 [^2]: Windows ADK Downloads - [https://learn.microsoft.com/en-us/windows-hardware/get-started/adk-install#other-adk-downloads](https://learn.microsoft.com/en-us/windows-hardware/get-started/adk-install#other-adk-downloads)

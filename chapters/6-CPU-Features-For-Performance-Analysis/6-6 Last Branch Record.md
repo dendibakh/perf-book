@@ -24,7 +24,7 @@ Listing: Example of logging branches.
  ---- 4eda2d:  jne   4eda10              <== (1)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Below is one of the possible branch histories that can be logged with a branch recording mechanism. It shows the last 7 branch outcomes (many more not shown) at the moment we executed the `CALL` instruction. Because on the latest iteration of the loop, the `JNS` branch (`4eda14` -> `4eda1e`) was not taken, it is not logged and thus does not appear in the history.
+Below is one of the possible branch histories that can be logged with a branch recording mechanism. It shows the last 7 branch outcomes (many more not shown) at the moment we executed the `CALL` instruction. Because on the latest iteration of the loop, the `JNS` branch (`4eda14` &rarr; `4eda1e`) was not taken, it is not logged and thus does not appear in the history.
 
 ```
     Source Address    Destination Address
@@ -126,7 +126,7 @@ At the time of writing, there were no commercially available machines that imple
 
 Several important use cases become possible thanks to branch recording. In this and a few later sections, we will cover the most important ones.
 
-One of the most popular use cases for branch recording is capturing call stacks. We already covered why we need to collect them in [@sec:secCollectCallStacks]. Branch recording can be used as a lightweight substitution for collecting call-graph information even if you compiled a program without frame pointers or debug information.
+One of the most popular use cases for branch recording is capturing call stacks. We already covered why we need to collect them in [@sec:secCollectCallStacks]. Branch recording can be used as a lightweight substitution for collecting call graph information even if you compiled a program without frame pointers or debug information.
 
 At the time of writing (2023), AMD's LBR and ARM's BRBE don't support call stack collection, but Intel's LBR does. Here is how you can do it with Intel LBR:
 

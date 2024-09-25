@@ -1,6 +1,6 @@
 ## Linux Perf
 
-Linux Perf is probably the most used performance profiler in the world since it is available on most Linux distributions, which makes it accessible to a wide range of users. Perf is natively supported in many popular Linux distributions, including Ubuntu, Red Hat, Debian, and many others. It is included in the kernel, so you can get OS-level statistics (page faults, cpu-migrations, etc.) on any system that runs Linux. As of mid-2023, the profiler supports x86, ARM, PowerPC64, UltraSPARC, and a few other CPU types.[^2] On such platforms, `perf` provides access to the hardware performance monitoring features, for example, performance counters. More information about Linux `perf` is available on its [wiki page](https://perf.wiki.kernel.org/index.php/Main_Page)[^1].
+Linux Perf is probably the most used performance profiler in the world since it is available on most Linux distributions, which makes it accessible to a wide range of users. Perf is natively supported in many popular Linux distributions, including Ubuntu, Red Hat, Debian, and many others. It is included in the kernel, so you can get OS-level statistics (page faults, CPU migrations, etc.) on any system that runs Linux. As of mid-2024, the profiler supports x86, ARM, PowerPC64, UltraSPARC, and a few other CPU types.[^2] On such platforms, `perf` provides access to the hardware performance monitoring features, for example, performance counters. More information about Linux `perf` is available on its [wiki page](https://perf.wiki.kernel.org/index.php/Main_Page)[^1].
 
 ### How to configure it {.unlisted .unnumbered}
 
@@ -15,10 +15,10 @@ Also, consider changing the following defaults unless security is a concern:
 ```bash
 # Allow kernel profiling and access to CPU events for unprivileged users
 $ echo 0 | sudo tee /proc/sys/kernel/perf_event_paranoid
-$ sudo sh -c 'echo kernel.perf_event_paranoid=0 >> /etc/sysctl.d/local.conf'
+$ echo kernel.perf_event_paranoid=0 | sudo tee -a /etc/sysctl.d/local.conf
 # Enable kernel modules symbols resolution for unprivileged users
 $ echo 0 | sudo tee /proc/sys/kernel/kptr_restrict
-$ sudo sh -c 'echo kernel.kptr_restrict=0 >> /etc/sysctl.d/local.conf'
+$ echo kernel.kptr_restrict=0 | sudo tee -a /etc/sysctl.d/local.conf
 ```
 
 ### What you can do with it: {.unlisted .unnumbered}
