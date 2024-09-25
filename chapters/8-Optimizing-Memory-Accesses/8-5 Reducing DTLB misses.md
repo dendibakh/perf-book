@@ -12,7 +12,7 @@ Many real-world applications already take advantage of huge pages, for example, 
 
 Both Windows and Linux allow applications to establish huge-page memory regions. Instructions on how to enable huge pages for Windows and Linux can be found in Appendix C. On Linux, there are two ways of using huge pages in an application: Explicit and Transparent Huge Pages. Windows support is not as rich as Linux and will be discussed later.
 
-### Explicit Hugepages.
+### Explicit Hugepages
 
 Explicit Huge Pages (EHP) are available as part of the system memory, and are exposed as a huge page file system `hugetlbfs`. EHPs should be reserved either at system boot time or before an application starts. See Appendix C for instructions on how to do that. Reserving EHPs at boot time increases the possibility of successful allocation because the memory has not yet been significantly fragmented. Explicitly preallocated pages reside in a reserved chunk of memory and cannot be swapped out under memory pressure. Also, this memory space cannot be used for other purposes, so users should be careful and reserve only the number of pages they need.
 
@@ -31,7 +31,7 @@ munmap(ptr, size);
 
 In the past, there was an option to use the [libhugetlbfs](https://github.com/libhugetlbfs/libhugetlbfs)[^1] library, which overrode `malloc` calls used in existing dynamically linked executables, to allocate memory in EHPs. Unfortunately, this project is no longer maintained. It didn't require users to modify the code or to relink the binary. They could simply prepend the command line with `LD_PRELOAD=libhugetlbfs.so HUGETLB_MORECORE=yes <your app command line>` to make use of it. But luckily, other libraries enable the use of huge pages (not EHPs) with `malloc`, which we will discuss next.
 
-### Transparent Huge Pages.
+### Transparent Huge Pages
 
 Linux also offers Transparent Huge Page Support (THP), which has two modes of operation: system-wide and per-process. When THP is enabled system-wide, the kernel manages huge pages automatically and it is transparent for applications. The OS kernel tries to assign huge pages to any process when large blocks of memory are needed and it is possible to allocate such, so huge pages do not need to be reserved manually. If THP is enabled per process, the kernel only assigns huge pages to individual processes' memory areas attributed to the `madvise` system call. You can check if THP is enabled in the system with:
 
@@ -76,7 +76,7 @@ $ LD_PRELOAD=/usr/local/libjemalloc.so.2 MALLOC_CONF="thp:always" <your app comm
 
 Windows only offers using huge pages in a way similar to the Linux THP per-process mode via the `VirtualAlloc` system call. See details in Appendix C.
 
-### Explicit vs. Transparent Hugepages.
+### Explicit vs. Transparent Hugepages
 
 Linux users can use huge pages in three different modes:
 
