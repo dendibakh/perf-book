@@ -6,7 +6,7 @@ The cache line is the smallest unit of data that can be transferred between the 
 
 Next, we will discuss several techniques to make data structures more cache-friendly.
 
-### Access Data Sequentially.
+### Access Data Sequentially
 
 The best way to exploit the spatial locality of the caches is to make sequential memory accesses. By doing so, we enable the hardware prefetching mechanism (see [@sec:HwPrefetch]) to recognize the memory access pattern and bring in the next chunk of data ahead of time. An example of Row-major versus Column-Major traversal is shown in [@lst:CacheFriend]. Notice, that there is only one tiny change in the code (swapped `col` and `row` subscripts), but it has a significant impact on performance.
 
@@ -37,7 +37,7 @@ Sometimes, it's more efficient to store pointers to contained objects, instead o
 
 If your data structure is accessed by multiple threads, consider using lock-free data structures. They are designed to avoid the overhead of locks and are often faster than their lock-based counterparts. However, they are much more difficult to implement and debug.
 
-### Packing the Data.
+### Packing the Data
 
 The utilization of data caches can be also improved by making data more compact. There are many ways to pack data. One of the classic examples is to use bitfields. An example of code when packing data might be profitable is shown in [@lst:DataPacking]. If we know that `a`, `b`, and `c` represent enum values that take a certain number of bits to encode, we can reduce the storage of the struct `S`.
 
@@ -96,7 +96,7 @@ Since Linux kernel 6.8, there is a new functionality in the `perf` tool that all
 
 ### Other Data Structure Reorganization Techniques
 
-To close the topic of cache-friendly data structures, we will briefly mention two other techniques: *structure splitting* and *pointer inlining* that can be used to improve cache utilization.
+To close the topic of cache-friendly data structures, we will briefly mention two other techniques that can be used to improve cache utilization: *structure splitting* and *pointer inlining*.
 
 **Structure splitting**. Splitting a large structure into smaller ones can improve cache utilization. For example, if you have a structure that contains a large number of fields, but only a few of them are accessed together, you can split the structure into two or more smaller ones. This way, you can avoid loading unnecessary data into the cache. An example of structure splitting is shown in [@lst:StructureSplitting]. By splitting the `Point` structure into `PointCoords` and `PointInfo`, we can avoid loading the `PointInfo` data into caches when we only need `PointCoords`. This way, we can fit more points on a single cache line.
 

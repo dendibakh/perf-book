@@ -4,7 +4,7 @@ The [uProf](https://www.amd.com/en/developer/uprof.html) profiler is a tool deve
 
 ### How to configure it {.unlisted .unnumbered}
 
-On Linux, uProf uses Linux perf for data collection. On Windows, uProf uses its own sampling driver that gets installed when you install uProf, no additional configuration is required. AMD uProf supports both command-line interface (CLI) and graphical interface (GUI). The CLI interface requires two separate steps - collect and report, similar to Linux perf.
+On Linux, uProf uses Linux perf for data collection. On Windows, uProf uses its own sampling driver that gets installed when you install uProf, no additional configuration is required. AMD uProf supports both command-line interface (CLI) and graphical interface (GUI). The CLI interface requires two separate steps---collect and report, similar to Linux perf.
 
 ### What you can do with it: {.unlisted .unnumbered}
 
@@ -12,7 +12,7 @@ On Linux, uProf uses Linux perf for data collection. On Windows, uProf uses its 
 - Monitor various hardware performance events and locate lines of code where these events happen.
 - Filter data for a specific function or thread.
 - Observe the workload behavior over time: view various performance events in the timeline chart.
-- Analyze hot callpaths: call-graph, flame-graph, and bottom-up charts.
+- Analyze hot callpaths: call graph, flame graph, and bottom-up charts.
 
 In addition, uProf can monitor various OS events on Linux: thread state, thread synchronization, system calls, page faults, and others. You can use it to analyze OpenMP applications to detect thread imbalance and analyze MPI[^3] applications to detect the load imbalance among the nodes of the MPI cluster. More details on various features of uProf can be found in the [User Guide](https://www.amd.com/en/developer/uprof.html#documentation)[^1].
 
@@ -24,7 +24,7 @@ Due to the sampling nature of the tool, it will eventually miss events with a ve
 
 To demonstrate the look-and-feel of the AMD uProf tool, we ran the dense LU matrix factorization component from the [Scimark2](https://math.nist.gov/scimark2/index.html)[^2] benchmark on an AMD Ryzen 9 7950X, running Windows 11, with 64 GB RAM.
 
-Figure @fig:uProfHotspots shows *Function Hotpots* analysis (selected in the menu list on the left side of the image). At the top of the image, you can see an event timeline showing the number of events observed at various times of the application execution. On the right, you can select which metric to plot, we selected `RETIRED_BR_INST_MISP`. Notice a spike in branch mispredictions in the time range from 20s to 40s. You can select this region to analyze closely what's going on there. Once you do that, it will update the bottom panels to show statistics only for that time interval.
+Figure @fig:uProfHotspots shows *Function Hotpots* analysis (selected in the menu list on the left side of the image). At the top of the image, you can see an event timeline showing the number of events observed at various times of the application execution. On the right, you can select which metric to plot; we selected `RETIRED_BR_INST_MISP`. Notice a spike in branch mispredictions in the time range from 20s to 40s. You can select this region to analyze closely what's going on there. Once you do that, it will update the bottom panels to show statistics only for that time interval.
 
 ![uProf's Function Hotspots view.](../../img/perf-tools/uProf_Hopspot.png){#fig:uProfHotspots width=100% }
 

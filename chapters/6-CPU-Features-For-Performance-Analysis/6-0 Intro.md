@@ -17,4 +17,4 @@ Modern CPUs are constantly getting new features that enhance performance analysi
 
 The Intel PT feature is covered in Appendix D. Intel PT was supposed to be an "end game" for performance analysis. With its low runtime overhead, it is a very powerful analysis feature. But it turns out to be not very popular among performance engineers. Partially because the support in the tools is not mature, and partially because in many cases it is overkill, and it's just easier to use a sampling profiler. Also, it produces a lot of data, which is not practical for long-running workloads.
 
-The features mentioned above provide insights into the efficiency of a program from the CPU perspective. In the next chapter, we will discuss how profiling tools leverage them to provide many different types of performance analysis.
+The hardware performance monitoring features mentioned above provide insights into the efficiency of a program from the CPU perspective. In the next chapter, we will discuss how profiling tools use these features to provide many different types of analysis.

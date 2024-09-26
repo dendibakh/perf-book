@@ -1,5 +1,3 @@
-![Build PDF Windows](https://github.com/dendibakh/perf-book/actions/workflows/build_pdf.yml/badge.svg) 
-
 [![X (formerly Twitter) Follow](https://img.shields.io/twitter/follow/dendibakh)](https://twitter.com/dendibakh)
 ![GitHub Repo stars](https://img.shields.io/github/stars/dendibakh/perf-book)
 

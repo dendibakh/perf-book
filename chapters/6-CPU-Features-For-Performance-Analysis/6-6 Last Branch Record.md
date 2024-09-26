@@ -2,7 +2,7 @@
 
 Modern high-performance CPUs provide branch recording mechanisms that enable a processor to continuously log a set of previously executed branches. But before going into the details, you may ask: *Why are we so interested in branches?* Well, because this is how we can determine the control flow of a program. We largely ignore other instructions in a basic block (see [@sec:BasicBlock]) because branches are always the last instructions in a basic block. Since all instructions in a basic block are guaranteed to be executed once, we can only focus on branches that will “represent” the entire basic block. Thus, it’s possible to reconstruct the entire line-by-line execution path of the program if we track the outcome of every branch. This is what the Intel Processor Traces (PT) feature is capable of doing, which is discussed in Appendix D. Branch recording mechanisms that we will discuss here are based on sampling, not tracing, and thus have different use cases and capabilities.
 
-Processors designed by Intel, AMD, and ARM all have announced their branch recording extensions. Exact implementations may vary but the idea is the same. Hardware logs the “from” and “to” addresses of each branch along with some additional data in parallel with executing the program. If we collect a long enough history of source-destination pairs, we will be able to unwind the control flow of our program, just like a call stack, but with limited depth. Such extensions are designed to cause minimal slowdown to a running program often within 1%. 
+Processors designed by Intel, AMD, and ARM all have announced their branch recording extensions. Exact implementations may vary but the idea is the same. Hardware logs the “from” and “to” addresses of each branch along with some additional data in parallel with executing the program. If we collect a long enough history of source-destination pairs, we will be able to unwind the control flow of our program, just like a call stack, but with limited depth. Such extensions are designed to cause minimal slowdown to a running program (often within 1%).
 
 With a branch recording mechanism in place, we can sample on branches (or cycles, it doesn't matter), but during each sample, look at the previous N branches that were executed. This gives us reasonable coverage of the control flow in the hot code paths but does not overwhelm us with too much information, as only a smaller number of the total branches are examined. It is important to keep in mind that this is still sampling, so not every executed branch can be examined. A CPU generally executes too fast for that to be feasible.
 
@@ -24,7 +24,7 @@ Listing: Example of logging branches.
  ---- 4eda2d:  jne   4eda10              <== (1)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Below is one of the possible branch histories that can be logged with a branch recording mechanism. It shows the last 7 branch outcomes (many more not shown) at the moment we executed the `CALL` instruction. Because on the latest iteration of the loop, the `JNS` branch (`4eda14` -> `4eda1e`) was not taken, it is not logged and thus does not appear in the history.
+Below is one of the possible branch histories that can be logged with a branch recording mechanism. It shows the last 7 branch outcomes (many more not shown) at the moment we executed the `CALL` instruction. Because on the latest iteration of the loop, the `JNS` branch (`4eda14` &rarr; `4eda1e`) was not taken, it is not logged and thus does not appear in the history.
 
 ```
     Source Address    Destination Address
@@ -43,7 +43,7 @@ Next, we will take a look at each vendor's branch recording mechanism and then e
 
 ### LBR on Intel Platforms
 
-Intel has first implemented its Last Branch Record (LBR) facility in the Netburst microarchitecture. Initially, it could record only the 4 most recent branch outcomes. It was later enhanced to 16 starting with Nehalem and to 32 starting from Skylake. Prior to the Goldencove microarchitecture, LBR was implemented as a set of model-specific registers (MSRs), but now it works within architectural registers. The primary advantage of it is that LBR features are clearly defined and there is no need to check the exact model number of the current CPU. It makes support in the OS and profiling tools much easier. Also, LBR entries can be configured to be included in the PEBS records (see [@sec:secPEBS]).
+Intel first implemented its Last Branch Record (LBR) facility in the NetBurst microarchitecture. Initially, it could record only the 4 most recent branch outcomes. It was later enhanced to 16 starting with Nehalem and to 32 starting from Skylake. Prior to the Goldencove microarchitecture, LBR was implemented as a set of model-specific registers (MSRs), but now it works within architectural registers. Its primary advantage is that LBR features are clearly defined and there is no need to check the exact model number of the current CPU. It makes support in the OS and profiling tools much easier. Also, LBR entries can be configured to be included in the PEBS records (see [@sec:secPEBS]).
 
 The LBR registers act like a ring buffer that is continuously overwritten and provides only 32 most recent branch outcomes. Each LBR entry is comprised of three 64-bit values:
 
@@ -57,7 +57,7 @@ When a sampling counter overflows and a Performance Monitoring Interrupt (PMI) i
 
 LBR collection can be limited to a set of specific branch types, for example, a user may choose to log only function calls and returns. When applying such a filter to the code in [@lst:LogBranches], we would only see branches (3) and (4) in the history. Users can also filter in/out conditional and unconditional jumps, indirect jumps and calls, system calls, interrupts, and others. In Linux perf, there is a `-j` option that enables/disables the recording of various branch types.
 
-By default, the LBR array works as a ring buffer that captures control flow transitions. However, the depth of the LBR array is limited, which can be a limiting factor when profiling certain applications, in which a transition of the execution flow is accompanied by a large number of leaf function calls. These calls to leaf functions, and their returns, are likely to displace the main execution context from the LBRs. Consider the example in [@lst:LogBranches] again. Say, we want to unwind the call stack from the history in LBR, and so we configured LBR to capture only function calls and returns. If the loop runs thousands of iterations, then taking into account that the LBR array is only 32 entries deep, there is a very high chance we would only see 16 pairs of entries (3) and (4). In such a scenario, the LBR array is cluttered with leaf function calls which don't help us to unwind the current call stack.
+By default, the LBR array works as a ring buffer that captures control flow transitions. However, the depth of the LBR array is limited, which can be a limiting factor when profiling applications in which a transition of the execution flow is accompanied by a large number of leaf function calls. These calls to leaf functions, and their returns, are likely to displace the main execution context from the LBRs. Consider the example in [@lst:LogBranches] again. Say we want to unwind the call stack from the history in LBR, and so we configured LBR to capture only function calls and returns. If the loop runs thousands of iterations, then taking into account that the LBR array is only 32 entries deep, there is a very high chance we would only see 16 pairs of entries (3) and (4). In such a scenario, the LBR array is cluttered with leaf function calls which don't help us to unwind the current call stack.
 
 This is why LBR supports call-stack mode. With this mode enabled, the LBR array captures function calls as before, but as return instructions are executed the last captured branch (`call`) record is flushed from the array in a last-in-first-out (LIFO) manner. Thus, branch records with completed leaf functions will not be retained, while preserving the call stack information of the main line execution path. When configured in this manner, the LBR array emulates a call stack, where a `CALL` instruction pushes and a `RET` instruction pops entry from the stack. If the depth of the call stack in your application never goes beyond 32 nested frames, LBRs will give you very accurate information. [@IntelOptimizationManual, Volume 3B, Chapter 19 Last Branch Records]
 
@@ -76,7 +76,7 @@ $ perf record -b -e cycles ./benchmark.exe
 [ perf record: Captured and wrote 17.205 MB perf.data (22089 samples) ]
 ```
 
-LBR stacks can also be collected using the `perf record --call-graph lbr` command, but the amount of information collected is less than using `perf record -b`. For example, branch misprediction and cycles data are not collected when running `perf record --call-graph lbr`. 
+LBR stacks can also be collected using the `perf record --call-graph lbr` command, but the amount of information collected is less than using `perf record -b`. For example, branch misprediction and cycles data are not collected when running `perf record --call-graph lbr`.
 
 Because each collected sample captures the entire LBR stack (32 last branch records), the size of collected data (`perf.data`) is significantly bigger than sampling without LBRs. Still, the runtime overhead for the majority of LBR use cases is below 1%. [@Nowak2014TheOO]
 
@@ -91,7 +91,7 @@ The `dump.txt` file, which can be quite large, contains lines like those shown b
 
 ```
 ...
-0x4edaf9/0x4edab0/P/-/-/29   
+0x4edaf9/0x4edab0/P/-/-/29
 0x4edabd/0x4edad0/P/-/-/2
 0x4edadd/0x4edb00/M/-/-/4
 0x4edb24/0x4edab0/P/-/-/24
@@ -106,9 +106,9 @@ In the output above, we present eight entries from the LBR stack, which typicall
 
 ### LBR on AMD Platforms
 
-AMD processors also support Last Branch Record (LBR) on AMD Zen4 processors. Zen4 has 16 pairs of "from" and "to" address logging along with some additional metadata. Similar to Intel LBR, AMD processors can record various types of branches. The main difference to Intel LBR is that AMD processors don't support call stack mode yet, hence the LBR feature can't be used for call stack collection. Another noticeable difference is that there is no cycle count field in the AMD LBR record. For more details see [@AMDProgrammingManual, 13.1.1.9 Last Branch Stack Registers].
+AMD processors also support Last Branch Record (LBR) on AMD Zen4 processors. Zen4 can log 16 pairs of "from" and "to" addresses along with some additional metadata. Similar to Intel LBR, AMD processors can record various types of branches. The main difference from Intel LBR is that AMD processors don't support call stack mode yet, hence the LBR feature can't be used for call stack collection. Another noticeable difference is that there is no cycle count field in the AMD LBR record. For more details see [@AMDProgrammingManual, 13.1.1.9 Last Branch Stack Registers].
 
-Since Linux kernel 6.1 onwards, Linux 'perf' on AMD Zen4 processors supports the branch analysis use cases we discuss below unless explicitly mentioned otherwise. The Linux `perf` commands to collect AMD LBRs use the same `-b` and `-j` options.
+Since Linux kernel 6.1 onwards, Linux `perf` on AMD Zen4 processors supports the branch analysis use cases we discuss below unless explicitly mentioned otherwise. The Linux `perf` commands to collect AMD LBRs use the same `-b` and `-j` options.
 
 Branch analysis is also possible with the AMD uProf CLI tool. The example command below dumps collected raw LBR records and generates a CSV report:
 
@@ -118,7 +118,7 @@ $ AMDuProfCLI collect --branch-filter -o /tmp/ ./AMDTClassicMatMul-bin
 
 ### BRBE on ARM Platforms
 
-ARM introduced its branch recording extension called BRBE in 2020 as a part of ARMv9.2-A ISA. ARM BRBE is very similar to Intel's LBR and provides many similar features. Just like Intel's LBR, BRBE records contain source and destination addresses, a misprediction bit, and a cycle count value. According to the latest available BRBE specification, the call stack mode is not supported. The Branch records only contain information for a branch that is architecturally executed, i.e., not on a mispredicted path. Users can also filter records based on specific branch types. One notable difference is that BRBE supports configurable depth of the BRBE buffer: processors can choose the capacity of the BRBE buffer to be 8, 16, 32, or 64 records. More details are available in [@Armv9ManualSupplement, Chapter F1 "Branch Record Buffer Extension"].
+ARM introduced its branch recording extension called BRBE in 2020 as a part of the ARMv9.2-A ISA. ARM BRBE is very similar to Intel's LBR and provides many similar features. Just like Intel's LBR, BRBE records contain source and destination addresses, a misprediction bit, and a cycle count value. According to the latest available BRBE specification, the call stack mode is not supported. The Branch records only contain information for a branch that is architecturally executed, i.e., not on a mispredicted path. Users can also filter records based on specific branch types. One notable difference is that BRBE supports configurable depth of the BRBE buffer: processors can choose the capacity of the BRBE buffer to be 8, 16, 32, or 64 records. More details are available in [@Armv9ManualSupplement, Chapter F1 "Branch Record Buffer Extension"].
 
 At the time of writing, there were no commercially available machines that implement ARMv9.2-A, so it is not possible to test this extension in action.
 
@@ -126,28 +126,28 @@ At the time of writing, there were no commercially available machines that imple
 
 Several important use cases become possible thanks to branch recording. In this and a few later sections, we will cover the most important ones.
 
-One of the most popular use cases for branch recording is capturing call stacks. We already covered why we need to collect them in [@sec:secCollectCallStacks]. Branch recording can be used as a lightweight substitution for collecting call-graph information even if you compiled a program without frame pointers or debug information.
+One of the most popular use cases for branch recording is capturing call stacks. We already covered why we need to collect them in [@sec:secCollectCallStacks]. Branch recording can be used as a lightweight substitution for collecting call graph information even if you compiled a program without frame pointers or debug information.
 
 At the time of writing (2023), AMD's LBR and ARM's BRBE don't support call stack collection, but Intel's LBR does. Here is how you can do it with Intel LBR:
 
 ```bash
 $ perf record --call-graph lbr -- ./a.exe
 $ perf report -n --stdio
-# Children   Self    Samples  Command  Object  Symbol       
+# Children   Self    Samples  Command  Object  Symbol
 # ........  .......  .......  .......  ......  .......
 	99.96%  99.94%    65447    a.exe    a.exe  [.] bar
-            |          
+            |
              --99.94%--main
-                       |          
+                       |
                        |--90.86%--foo
-                       |          |          
+                       |          |
                        |           --90.86%--bar
-                       |          
+                       |
                         --9.08%--zoo
                                   bar
 ```
 
-As you can see, we've identified the hottest function in the program (which is `bar`). Also, we found out callers that contribute to the most time spent in function `bar`: 91% of the time the tool captured the `main->foo->bar` call stack, and 9% of the time it captured `main->zoo->bar`. In other words, 91% of samples in `bar` have `foo` as its caller function.
+As you can see, we've identified the hottest function in the program (which is `bar`). Also, we found out callers that contribute to the most time spent in function `bar`: 91% of the time the tool captured the `main`&rarr;`foo`&rarr;`bar` call stack, and 9% of the time it captured `main`&rarr;`zoo`&rarr;`bar`. In other words, 91% of samples in `bar` have `foo` as its caller function.
 
 It's important to mention that we cannot necessarily drive conclusions about function call counts in this case. For example, we cannot say that `foo` calls `bar` 10 times more frequently than `zoo`. It could be the case that `foo` calls `bar` once, but it executes an expensive path inside `bar` while `zoo` calls `bar` many times but returns quickly from it.
 
@@ -187,10 +187,10 @@ $ perf report -n --sort symbol_from,symbol_to -F +mispredict,srcline_from,srclin
 # Event count (approx.): 657888
 # Overhead  Samples  Mis  From Line  To Line  Source Sym  Target Sym
 # ........  .......  ...  .........  .......  ..........  ..........
-    46.12%   303391   N   dec.c:36   dec.c:40  LzmaDec     LzmaDec   
-    22.33%   146900   N   enc.c:25   enc.c:26  LzmaFind    LzmaFind  
-     6.70%    44074   N   lz.c:13    lz.c:27   LzmaEnc     LzmaEnc   
-     6.33%    41665   Y   dec.c:36   dec.c:40  LzmaDec     LzmaDec 
+    46.12%   303391   N   dec.c:36   dec.c:40  LzmaDec     LzmaDec
+    22.33%   146900   N   enc.c:25   enc.c:26  LzmaFind    LzmaFind
+     6.70%    44074   N   lz.c:13    lz.c:27   LzmaEnc     LzmaEnc
+     6.33%    41665   Y   dec.c:36   dec.c:40  LzmaDec     LzmaDec
 ```
 
 In this example, the lines that correspond to function `LzmaDec` are of particular interest to us. Following a similar analysis from the previous section, we can conclude that the branch on source line `dec.c:36` is the most executed in the benchmark. In the output that Linux `perf` provides, we can spot two entries that correspond to the `LzmaDec` function: one with `Y` and one with `N` letters. Analyzing those two entries together gives us a misprediction rate of the branch. In this case, we know that the branch on line `dec.c:36` was predicted `303391` times (corresponds to `N`) and was mispredicted `41665` times (corresponds to `Y`), which gives us `88%` prediction rate.
@@ -199,14 +199,14 @@ Linux `perf` calculates the misprediction rate by analyzing each LBR entry and e
 
 ### Precise Timing of Machine Code {#sec:timed_lbr}
 
-As we showed in Intel's LBR section, starting from Skylake microarchitecture, there is a special `Cycle Count` field in the LBR entry. This additional field specifies the number of elapsed cycles between two taken branches. Since the target address in the previous (N-1) LBR entry is the beginning of a basic block (BB) and the source address of the current (N) LBR entry is the last instruction of the same basic block, then the cycle count is the latency of this basic block. 
+As we showed in Intel's LBR section, starting from Skylake microarchitecture, there is a special `Cycle Count` field in the LBR entry. This additional field specifies the number of elapsed cycles between two taken branches. Since the target address in the previous (N-1) LBR entry is the beginning of a basic block (BB) and the source address of the current (N) LBR entry is the last instruction of the same basic block, then the cycle count is the latency of this basic block.
 
 This type of analysis is not supported on AMD platforms since they don't record a cycle count in the LBR record. According to ARM's BRBE specification, it can be supported, but due to the unavailability of processors that implement this extension, it is not possible to verify. However, Intel supports it. Here is an example:
 
 ```
 400618:   movb  $0x0, (%rbp,%rdx,1)    <= start of a BB
-40061d:   add $0x1, %rdx 
-400621:   cmp $0xc800000, %rdx 
+40061d:   add $0x1, %rdx
+400621:   cmp $0xc800000, %rdx
 400628:   jnz 0x400644                 <= end of a BB
 ```
 
@@ -219,7 +219,7 @@ Suppose we have two entries in the LBR stack:
   400628    400644     5          <== LBR TOS
 ```
 
-Given that information, we know that there was one occurrence when the basic block that starts at offset `400618` was executed in 5 cycles. If we collect enough samples, we could plot a probability density chart of latency for that basic block. 
+Given that information, we know that there was one occurrence when the basic block that starts at offset `400618` was executed in 5 cycles. If we collect enough samples, we could plot a probability density chart of latency for that basic block.
 
 An example of such a chart is shown in Figure @fig:LBR_timing_BB. It was compiled by analyzing all LBR entries that satisfy the rule described above. The way to read this chart is as follows: it tells what was the rate of occurrence of a given latency value. For example, the basic block latency was measured to be exactly 100 cycles roughly 2% of the time, 14% of the time we measured 280 cycles, and never saw anything between 150 and 200 cycles. Another way to read is: based on the collected data, what is the probability of seeing a certain basic block latency if you were to measure it?
 
@@ -236,23 +236,23 @@ $ perf record -e cycles -b -- ./7zip.exe b
 $ perf report -n --sort symbol_from,symbol_to -F +cycles,srcline_from,srcline_to --stdio
 # Samples: 658K of event 'cycles'
 # Event count (approx.): 658240
-# Overhead  Samples  BBCycles  FromSrcLine  ToSrcLine   
-# ........  .......  ........  ...........  ..........  
-     2.82%   18581      1      dec.c:325    dec.c:326   
-     2.54%   16728      2      dec.c:174    dec.c:174   
-     2.40%   15815      4      dec.c:174    dec.c:174   
-     2.28%   15032      2      find.c:375   find.c:376  
-     1.59%   10484      1      dec.c:174    dec.c:174   
-     1.44%   9474       1      enc.c:1310   enc.c:1315  
-     1.43%   9392      10      7zCrc.c:15   7zCrc.c:17  
-     0.85%   5567      32      dec.c:174    dec.c:174   
-     0.78%   5126       1      enc.c:820    find.c:540  
-     0.77%   5066       1      enc.c:1335   enc.c:1325  
-     0.76%   5014       6      dec.c:299    dec.c:299   
-     0.72%   4770       6      dec.c:174    dec.c:174   
-     0.71%   4681       2      dec.c:396    dec.c:395   
-     0.69%   4563       3      dec.c:174    dec.c:174   
-     0.58%   3804      24      dec.c:174    dec.c:174   
+# Overhead  Samples  BBCycles  FromSrcLine  ToSrcLine
+# ........  .......  ........  ...........  ..........
+     2.82%   18581      1      dec.c:325    dec.c:326
+     2.54%   16728      2      dec.c:174    dec.c:174
+     2.40%   15815      4      dec.c:174    dec.c:174
+     2.28%   15032      2      find.c:375   find.c:376
+     1.59%   10484      1      dec.c:174    dec.c:174
+     1.44%   9474       1      enc.c:1310   enc.c:1315
+     1.43%   9392      10      7zCrc.c:15   7zCrc.c:17
+     0.85%   5567      32      dec.c:174    dec.c:174
+     0.78%   5126       1      enc.c:820    find.c:540
+     0.77%   5066       1      enc.c:1335   enc.c:1325
+     0.76%   5014       6      dec.c:299    dec.c:299
+     0.72%   4770       6      dec.c:174    dec.c:174
+     0.71%   4681       2      dec.c:396    dec.c:395
+     0.69%   4563       3      dec.c:174    dec.c:174
+     0.58%   3804      24      dec.c:174    dec.c:174
 ```
 
 Notice we've added the `-F +cycles` option to show cycle counts in the output (`BBCycles` column). Several insignificant lines were removed from the output of `perf report` to make it fit on the page. Let's focus on lines in which the source and destination are `dec.c:174`, there are seven such lines in the output. In the source code, the line `dec.c:174` expands a macro that has a self-contained branch. That’s why the source and destination point to the same line.
@@ -291,7 +291,7 @@ LBR enables us to collect this data without instrumenting the code. As the outco
 
 ### Providing Compiler Feedback Data
 
-We will discuss Profile Guided Optimizations (PGO) later in [@sec:secPGO], so just a quick mention here. Branch recording mechanisms can provide profiling feedback data for optimizing compilers. Imagine that we can feed all the data we discovered in the previous sections back to the compiler. In some cases, this data cannot be obtained using traditional static code instrumentation, so branch recording mechanisms are not only a better choice because of the lower overhead, but also because of richer profiling data. PGO workflows that rely on data collected from the hardware PMU, are becoming more popular and likely will take off sharply once the support in AMD and ARM will mature.
+We will discuss Profile Guided Optimizations (PGO) later in [@sec:secPGO], so just a quick mention here. Branch recording mechanisms can provide profiling feedback data for optimizing compilers. Imagine that we can feed all the data we discovered in the previous sections back to the compiler. In some cases, this data cannot be obtained using traditional static code instrumentation, so branch recording mechanisms are not only a better choice because of the lower overhead, but also because of richer profiling data. PGO workflows that rely on data collected from the hardware PMU are becoming more popular and likely will take off sharply once the support in AMD and ARM matures.
 
 [^2]: Linux `perf script` manual page - [http://man7.org/linux/man-pages/man1/perf-script.1.html](http://man7.org/linux/man-pages/man1/perf-script.1.html).
 [^5]: The report header generated by perf might still be confusing because it says `21K of event cycles`. But there are `21K` LBR entries, not `cycles`.

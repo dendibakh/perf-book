@@ -1,4 +1,4 @@
-## Dynamic Memory Allocation.
+## Dynamic Memory Allocation
 
 Developers should realize that dynamic memory allocation has many associated costs. Allocating an object on the stack is done instantly, regardless of the size of the object: you just need to move the stack pointer. However, dynamic memory allocation is a more complex operation. It involves calling a standard library function like `malloc`, which potentially may delegate the allocation to the operating system. Avoiding unnecessary dynamic memory allocation is the first step to avoiding these costs. The easy target in this process is temporary allocations, i.e., allocations that are directly followed by their deallocation. In [@sec:HeaptrackCaseStudy] we showed how you can use `heaptrack` to find sources of dynamic memory allocations.
 

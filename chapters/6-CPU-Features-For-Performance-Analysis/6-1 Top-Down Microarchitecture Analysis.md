@@ -2,7 +2,7 @@
 
 Top-down Microarchitecture Analysis (TMA) methodology is a very powerful technique for identifying CPU bottlenecks in the program. It is a robust and formal methodology that is easy to use even for inexperienced developers. The best part of this methodology is that it does not require a developer to have a deep understanding of the microarchitecture and PMCs in the system and still efficiently find CPU bottlenecks.
 
-At a conceptual level, TMA identifies what was stalling the execution of a program. Figure @fig:TMA_concept illustrates the core idea of TMA. This is not how the analysis works in practice because analyzing every single microoperation ($\mu$op) would be terribly slow. Nevertheless, the diagram helps us understand the methodology.
+At a conceptual level, TMA identifies what is stalling the execution of a program. Figure @fig:TMA_concept illustrates the core idea of TMA. This is not how the analysis works in practice because analyzing every single microoperation ($\mu$op) would be terribly slow. Nevertheless, the diagram helps us understand the methodology.
 
 ![The concept behind TMA's top-level breakdown. *© Source: [@TMA_ISPASS]*](../../img/pmu-features/TMAM_diag.png){#fig:TMA_concept width=80%}
 
