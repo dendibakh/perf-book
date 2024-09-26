@@ -5,11 +5,11 @@ Thread count scaling is perhaps the most valuable analysis you can perform on a 
 1. Blender 3.4 - an open-source 3D creation and modeling software project. This test is of Blender's Cycles performance with the BMW27 blend file. URL: [https://download.blender.org/release](https://download.blender.org/release). Command line: `./blender -b bmw27_cpu.blend -noaudio --enable-autoexec -o output.test -x 1 -F JPEG -f 1 -t N`, where `N` is the number of threads. Clang 17 self-build - this test uses clang 17 to build the clang 17 compiler from sources. URL: [https://www.llvm.org](https://www.llvm.org). Command line: `ninja -jN clang`, where `N` is the number of threads.
 3. Zstandard v1.5.5, a fast lossless compression algorithm. URL: [https://github.com/facebook/zstd](https://github.com/facebook/zstd). A dataset used for compression: [http://wanos.co/assets/silesia.tar](http://wanos.co/assets/silesia.tar). Command line: `./zstd -TN -3 -f -- silesia.tar`, where `N` is the number of compression worker threads.
 4. CloverLeaf 2018 - a Lagrangian-Eulerian hydrodynamics benchmark. All hardware threads are used. This test uses the input file `clover_bm.in` (Problem 5). URL: [http://uk-mac.github.io/CloverLeaf](http://uk-mac.github.io/CloverLeaf). Command line: `export OMP_NUM_THREADS=N; ./clover_leaf`, where `N` is the number of threads.
-5. CPython 3.12, a reference implementation of the Python programming language. URL: [https://github.com/python/cpython](https://github.com/python/cpython). We run a simple multithreaded binary search script written in Python, which searches `10'000` random numbers (needles) in a sorted list of `1'000'000` elements (haystack). Command line: `./python3 binary_search.py N`, where `N` is the number of threads. Needles are divided equally between threads.
+5. CPython 3.12, a reference implementation of the Python programming language. URL: [https://github.com/python/cpython](https://github.com/python/cpython). We run a simple multithreaded binary search script written in Python, which searches `10,000` random numbers (needles) in a sorted list of `1,000,000` elements (haystack). Command line: `./python3 binary_search.py N`, where `N` is the number of threads. Needles are divided equally between threads.
 
 The benchmarks were executed on a machine with the configuration shown below:
 
-* 12th Gen Alderlake Intel(R) Core(TM) i7-1260P CPU @ 2.10GHz (4.70GHz Turbo), 4P+8E cores, 18MB L3-cache.
+* 12th Gen Alder Lake Intel&reg; Core&trade; i7-1260P CPU @ 2.10GHz (4.70GHz Turbo), 4P+8E cores, 18MB L3-cache.
 * 16 GB RAM, DDR4 @ 2400 MT/s.
 * Clang 15 compiler with the following options: `-O3 -march=core-avx2`.
 * 256GB NVMe PCIe M.2 SSD.
@@ -37,7 +37,7 @@ There is another aspect of scaling degradation that we will talk about when disc
 
 ### Clang {.unlisted .unnumbered}
 
-While Blender uses multithreading to exploit parallelism, concurrency in C++ compilation is usually achieved with multiprocessing. Clang 17 has more than `2'500` translation units, and to compile each of them, a new process is spawned. Similar to Blender, we classify Clang compilation as massively parallel, yet they scale differently. We recommend you revisit [@sec:PerfMetricsCaseStudy] for an overview of Clang compiler performance bottlenecks. In short, it has a large codebase, flat profile, many small functions, and "branchy" code. Its performance is affected by Dcache, Icache, and TLB misses, and branch mispredictions. Clang's thread count scaling is affected by the same scaling issues as Blender: P-cores are more effective than E-cores, and P-core SMT scaling is about `1.1x`. However, there is more. Notice that scaling stops at around 10 threads, and starts to degrade. Let's understand why that happens.
+While Blender uses multithreading to exploit parallelism, concurrency in C++ compilation is usually achieved with multiprocessing. Clang 17 has more than `2,500` translation units, and to compile each of them, a new process is spawned. Similar to Blender, we classify Clang compilation as massively parallel, yet they scale differently. We recommend you revisit [@sec:PerfMetricsCaseStudy] for an overview of Clang compiler performance bottlenecks. In short, it has a large codebase, flat profile, many small functions, and "branchy" code. Its performance is affected by D-Cache, I-Cache, and TLB misses, and branch mispredictions. Clang's thread count scaling is affected by the same scaling issues as Blender: P-cores are more effective than E-cores, and P-core SMT scaling is about `1.1x`. However, there is more. Notice that scaling stops at around 10 threads, and starts to degrade. Let's understand why that happens.
 
 The problem is related to the frequency throttling. When multiple cores are utilized simultaneously, the processor generates more heat due to the increased workload on each core. To prevent overheating and maintain stability, CPUs often throttle down their clock speeds depending on how many cores are in use. Additionally, boosting all cores to their maximum turbo frequency simultaneously would require significantly more power, which might exceed the power delivery capabilities of the CPU. Our system doesn't possess an advanced liquid cooling solution and only has a single processor fan. That's why it cannot sustain high frequencies when many cores are utilized.
 
@@ -73,19 +73,19 @@ On the image, we have the main thread at the bottom (TID 913273), and eight work
 
 On the worker thread timeline (top 8 rows) we have the following markers:
 
-* 'job0' - 'job25' bars indicate the start and end of a job.
-* 'ww' (short for "worker wait") bars indicate a period when a worker thread is waiting for a new job.
+* `job0`--`job25` bars indicate the start and end of a job.
+* `ww` (short for "worker wait") bars indicate a period when a worker thread is waiting for a new job.
 * Notches below job periods indicate that a thread has just finished compressing a portion of the input block and is signaling to the main thread that the data is available to be partially flushed.
 
 On the main thread timeline (row 9, TID 913273) we have the following markers:
 
-* 'p0' - 'p25' boxes indicate periods of preparing a new job. It starts when the main thread starts filling up the input buffer until it is full (but this new job is not necessarily posted on the worker queue immediately).
-* 'fw' (short for "flush wait") markers indicate a period when the main thread waits for the produced data to start flushing it. During this time, the main thread is blocked.
+* `p0`--`p25` boxes indicate periods of preparing a new job. It starts when the main thread starts filling up the input buffer until it is full (but this new job is not necessarily posted on the worker queue immediately).
+* `fw` (short for "flush wait") markers indicate a period when the main thread waits for the produced data to start flushing it. During this time, the main thread is blocked.
 
 With a quick glance at the image, we can tell that there are many `ww` periods when worker threads are waiting. This negatively affects the performance of Zstandard compression. Let's progress through the timeline and try to understand what's going on.
 
 1. First, when worker threads are created, there is no work to do, so they are waiting for the main thread to post a new job. 
-2. Then the main thread starts to fill up the input buffers for the worker threads. It has prepared jobs 0 to 7 (see bars `p0` - `p7`), which were picked up by worker threads immediately. Notice, that the main thread also prepared `job8` (`p8`), but it hasn't posted it in the worker queue yet. This is because all workers are still busy.
+2. Then the main thread starts to fill up the input buffers for the worker threads. It has prepared jobs 0 to 7 (see bars `p0`--`p7`), which were picked up by worker threads immediately. Notice, that the main thread also prepared `job8` (`p8`), but it hasn't posted it in the worker queue yet. This is because all workers are still busy.
 3. After the main thread has finished `p8`, it flushed the data already produced by `job0`. Notice, that by this time, `job0` has already delivered five portions of compressed data (first five notches below the `job0` bar). Now, the main thread enters its first `fw` period and starts to wait for more data from `job0`.
 4. At the timestamp `45ms`, one more chunk of compressed data is produced by `job0`, and the main thread briefly wakes up to flush it, see \circled{1}. After that, it goes to sleep again.
 5. `Job3` is the first to finish, but there is a couple of milliseconds delay before TID 913309 picks up the new job, see \circled{2}. This happens because `job8` was not posted in the queue by the main thread. Luckily, the new portion of compressed data comes from `job0`, so the main thread wakes up, flushes it, and notices that there are idle worker threads. So, it posts `job8` to the worker queue and starts preparing the next job (`p9`).
@@ -93,7 +93,7 @@ With a quick glance at the image, we can tell that there are many `ww` periods w
 7. We should have expected that the main thread would start preparing `job11` immediately after `job10` was posted in the queue as it did before. But it didn't. This happens because there are no available input buffers. We will discuss it in more detail shortly.
 8. Only when `job0` finishes, the main thread was able to acquire a new input buffer and start preparing `job11` (see  \circled{5}). 
 
-As we just said, the reason for the 20-40ms delays between jobs is the lack of input buffers, which are required to start preparing a new job. Zstd maintains a single memory pool, which allocates space for both input and output buffers. This memory pool is prone to fragmentation issues, as it has to provide contiguous blocks of memory. When a worker finishes a job, the output buffer is waiting to be flushed, but it still occupies memory. And to start working on another job, it will require another pair of buffers. 
+As we just said, the reason for the 20--40ms delays between jobs is the lack of input buffers, which are required to start preparing a new job. Zstd maintains a single memory pool, which allocates space for both input and output buffers. This memory pool is prone to fragmentation issues, as it has to provide contiguous blocks of memory. When a worker finishes a job, the output buffer is waiting to be flushed, but it still occupies memory. And to start working on another job, it will require another pair of buffers. 
 
 Limiting the capacity of the memory pool is a design decision to reduce memory consumption. In the worst case, there could be many "run-away" buffers, left by workers that have completed their jobs very fast, and move on to process the next job; meanwhile, the flush queue is still blocked by one slow job. In such a scenario, the memory consumption would be very high, which is undesirable. However, the downside here is increased wait time between the jobs.
 
