@@ -1,160 +1,117 @@
 \phantomsection
-# Appendix B. The LLVM Vectorizer {.unnumbered}
+# Appendix B. Enable Huge Pages {.unnumbered}
 
 \markboth{Appendix B}{Appendix B}
 
-This section describes the state of the LLVM Loop Vectorizer inside the Clang compiler as of the year 2020. Innerloop vectorization is the process of transforming code in the innermost loops into code that uses vectors across multiple loop iterations. Each lane in the SIMD vector performs independent arithmetic on consecutive loop iterations. Usually, loops are not found in a clean state, and the Vectorizer has to guess and assume missing information and check for details at runtime. If the assumptions are proven wrong, the Vectorizer falls back to running the scalar loop. The examples below highlight some of the code patterns that the LLVM Vectorizer supports. 
+## Windows {.unnumbered}
 
-## Loops with unknown trip count {.unnumbered .unlisted}
+To utilize huge pages on Windows, one needs to enable `SeLockMemoryPrivilege` [security policy](https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/lock-pages-in-memory). This can be done programmatically via the Windows API, or alternatively via the security policy GUI.
 
-The LLVM Loop Vectorizer supports loops with an unknown trip count. In the loop below, the iteration start and finish points are unknown, and the Vectorizer has a mechanism to vectorize loops that do not start at zero. In this example, `n` may not be a multiple of the vector width, and the Vectorizer has to execute the last few iterations as scalar code. Keeping a scalar copy of the loop increases the code size.
+1. Hit start &rarr; search "secpol.msc", and launch it.
+2. On the left select "Local Policies" &rarr; "User Rights Assignment", then double-click on "Lock pages in memory".
 
-```cpp
-void bar(float* A, float* B, float K, int start, int end) {
-  for (int i = start; i < end; ++i)
-    A[i] *= B[i] + K;
-}
-```
+![Windows security: Lock pages in memory](../../img/appendix-C/WinLockPages.png){width=100%}
 
-## Runtime Checks of Pointers {.unnumbered .unlisted}
+3. Add your user and reboot the machine.
 
-In the example below, if the pointers A and B point to consecutive addresses, then it is illegal to vectorize the code because some elements of A will be written before they are read from array B.
+4. Check that huge pages are used at runtime with [RAMMap](https://docs.microsoft.com/en-us/sysinternals/downloads/rammap) tool.
 
-Some programmers use the `restrict` keyword to notify the compiler that the pointers are disjointed, but in our example, the LLVM Loop Vectorizer has no way of knowing that the pointers A and B are unique. The Loop Vectorizer handles this loop by placing code that checks, at runtime, if the arrays A and B point to disjointed memory locations. If arrays A and B overlap, then the scalar version of the loop is executed.
+Use huge pages in the code with:
 
 ```cpp
-void bar(float* A, float* B, float K, int n) {
-  for (int i = 0; i < n; ++i)
-    A[i] *= B[i] + K;
-}
+void* p = VirtualAlloc(NULL, size, MEM_RESERVE | 
+                                   MEM_COMMIT | 
+                                   MEM_LARGE_PAGES,
+                       PAGE_READWRITE);
+...
+VirtualFree(ptr, 0, MEM_RELEASE);
 ```
 
-## Reductions {.unnumbered .unlisted}
+## Linux {.unnumbered}
 
-In this example, the sum variable is used by consecutive iterations of the loop. Normally, this would prevent vectorization, but the Vectorizer can detect that `sum` is a reduction variable. The variable `sum` becomes a vector of integers, and at the end of the loop, the elements of the array are added together to create the correct result. The LLVM Vectorizer supports several different reduction operations, such as addition, multiplication, XOR, AND, and OR.
+On Linux OS, there are two ways of using huge pages in an application: Explicit and Transparent Huge Pages.
 
-```cpp
-int foo(int *A, int n) {
-  unsigned sum = 0;
-  for (int i = 0; i < n; ++i)
-    sum += A[i] + 5;
-  return sum;
-}
-```
+### Explicit hugepages {.unnumbered .unlisted}
 
-
-The LLVM Vectorizer supports floating-point reduction operations when `-ffast-math` is used.
-
-## Inductions {.unnumbered .unlisted}
-
-In this example, the value of the induction variable i is saved into an array. The LLVM Loop Vectorizer knows how to vectorize induction variables.
-
-```cpp
-void bar(float* A, int n) {
-  for (int i = 0; i < n; ++i)
-    A[i] = i;
-}
-```
-
-## If Conversion {.unnumbered .unlisted}
-
-The LLVM Loop Vectorizer can “flatten” the IF statement in the code and generate a single stream of instructions. The Vectorizer supports any control flow in the innermost loop. The innermost loop may contain complex nesting of IFs, ELSEs, and even GOTOs.
-
-```cpp
-int foo(int *A, int *B, int n) {
-  unsigned sum = 0;
-  for (int i = 0; i < n; ++i)
-    if (A[i] > B[i])
-      sum += A[i] + 5;
-  return sum;
-}
-```
-
-## Pointer Induction Variables {.unnumbered .unlisted}
-
-This example uses the `std::accumulate` function from the standard C++ library. This loop uses C++ iterators, which are pointers, and not integer indices. The LLVM Loop Vectorizer detects pointer induction variables and can vectorize this loop. This feature is important because many C++ programs use iterators.
-
-```cpp
-int baz(int *A, int n) {
-  return std::accumulate(A, A + n, 0);
-}
-```
-
-## Reverse Iterators {.unnumbered .unlisted}
-
-The LLVM Loop Vectorizer can vectorize loops that count backward.
-
-```cpp
-int foo(int *A, int n) {
-  for (int i = n; i > 0; --i)
-    A[i] +=1;
-}
-```
-
-## Scatter / Gather {.unnumbered .unlisted}
-
-The LLVM Loop Vectorizer can vectorize code that becomes a sequence of scalar instructions that scatters/gathers memory locations.
-
-```cpp
-int foo(int * A, int * B, int n) {
-  for (intptr_t i = 0; i < n; ++i)
-      A[i] += B[i * 4];
-}
-```
-
-In many situations, the cost model will decide that this transformation is not profitable. 
-
-## Vectorization of Mixed Types {.unnumbered .unlisted}
-
-The LLVM Loop Vectorizer can vectorize programs with mixed types. The Vectorizer cost model can estimate the cost of the type conversion and decide if vectorization is profitable.
-
-```cpp
-int foo(int *A, char *B, int n) {
-  for (int i = 0; i < n; ++i)
-    A[i] += 4 * B[i];
-}
-```
-
-## Vectorization of function calls {.unnumbered .unlisted}
-
-The LLVM Loop Vectorizer can vectorize intrinsic math functions. See the table below for a list of these functions.
+Explicit huge pages can be reserved at system boot time or before an application starts. To make a permanent change to force the Linux kernel to allocate 128 huge pages at the boot time, run the following command:
 
 ```bash
-pow        exp        exp2
-sin        cos        sqrt
-log        log2       log10
-fabs       floor      ceil
-fma        trunc      nearbyint
-fmuladd
+$ echo "vm.nr_hugepages = 128" >> /etc/sysctl.conf
 ```
 
-## Partial unrolling during vectorization {.unnumbered .unlisted}
+To explicitly allocate a fixed number of huge pages after the system has booted, one can use [libhugetlbfs](https://github.com/libhugetlbfs/libhugetlbfs). The following command preallocates 128 huge pages.
 
-Modern processors feature multiple execution units, and only programs that contain a high degree of parallelism can fully utilize the entire width of the machine. The LLVM Loop Vectorizer increases the instruction-level parallelism (ILP) by performing partial unrolling of loops.
+```bash
+$ sudo apt install libhugetlbfs-bin
+$ sudo hugeadm --create-global-mounts
+$ sudo hugeadm --pool-pages-min 2M:128
+```
 
-In the example below, the entire array is accumulated into the variable `sum`. This is inefficient because only a single execution port can be used by the processor. By unrolling the code, the Loop Vectorizer allows two or more execution ports to be used simultaneously.
+This is roughly the equivalent of executing the following commands which do not require `libhugetlbfs` (see the [kernel docs](https://www.kernel.org/doc/Documentation/vm/hugetlbpage.txt)):
+
+```bash
+$ echo 128 > /proc/sys/vm/nr_hugepages
+$ mount -t hugetlbfs                                                      \
+    -o uid=<value>,gid=<value>,mode=<value>,pagesize=<value>,size=<value>,\
+    min_size=<value>,nr_inodes=<value> none /mnt/huge
+```
+
+You should be able to observe the effect in `/proc/meminfo`. Note that it is a system-wide view and not per-process:
+
+```bash
+$ watch -n1 "cat /proc/meminfo  | grep huge -i"
+AnonHugePages:      2048 kB
+ShmemHugePages:        0 kB
+FileHugePages:         0 kB
+HugePages_Total:     128    <== 128 huge pages allocated
+HugePages_Free:      128
+HugePages_Rsvd:        0
+HugePages_Surp:        0
+Hugepagesize:       2048 kB
+Hugetlb:          262144 kB <== 256MB of space occupied
+```
+
+Developers can utilize explicit huge pages in the code by calling `mmap` with the `MAP_HUGETLB` flag ([full example](https://github.com/torvalds/linux/blob/master/tools/testing/selftests/vm/map_hugetlb.c)[^25]):
 
 ```cpp
-int foo(int *A, int n) {
-  unsigned sum = 0;
-  for (int i = 0; i < n; ++i)
-      sum += A[i];
-  return sum;
-}
+void ptr = mmap(nullptr, size, PROT_READ | PROT_WRITE,
+                MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
+...
+munmap(ptr, size);
 ```
 
+Other alternatives include:
 
-The LLVM Loop Vectorizer uses a cost model to decide when it is profitable to unroll loops. The decision to unroll the loop depends on the register pressure and the generated code size.
+* `mmap` using a file from a mounted `hugetlbfs` filesystem ([example code](https://github.com/torvalds/linux/blob/master/tools/testing/selftests/vm/hugepage-mmap.c)[^26]).
+* `shmget` using the `SHM_HUGETLB` flag ([example code](https://github.com/torvalds/linux/blob/master/tools/testing/selftests/vm/hugepage-shm.c)[^27]).
 
-## SLP vectorization {.unnumbered .unlisted}
+### Transparent hugepages {.unnumbered .unlisted}
 
-SLP (Superword-Level Parallelism) vectorizer tries to glue multiple scalar operations together into vector operations. It processes the code bottom-up, across basic blocks, in search of scalars to combine. The goal of SLP vectorization is to combine similar independent instructions into vector instructions. Memory accesses, arithmetic operations, and comparison operations can all be vectorized using this technique. For example, the following function performs very similar operations on its inputs (a1, b1) and (a2, b2). The basic block vectorizer may combine the following function into vector operations.
+To allow applications to use Transparent Huge Pages (THP) on Linux one should ensure that `/sys/kernel/mm/transparent_hugepage/enabled` is `always` or `madvise`. The former enables system-wide usage of THPs, while the latter gives control to the user code on which memory regions should use THPs, thus avoiding the risk of consuming more memory resources. Below is an example of using the `madvise` approach:
 
+```cpp
+void ptr = mmap(nullptr, size, PROT_READ | PROT_WRITE | PROT_EXEC,
+                MAP_PRIVATE | MAP_ANONYMOUS, -1 , 0);
+madvise(ptr, size, MADV_HUGEPAGE);
+...
+munmap(ptr, size);
 ```
-void foo(int a1, int a2, int b1, int b2, int *A) {
-  A[0] = a1*(a1 + b1);
-  A[1] = a2*(a2 + b2);
-  A[2] = a1*(a1 + b1);
-  A[3] = a2*(a2 + b2);
-}
+
+You can observe the system-wide effect in `/proc/meminfo` under `AnonHugePages`:
+
+```bash
+$ watch -n1 "cat /proc/meminfo  | grep huge -i" 
+AnonHugePages:     61440 kB     <== 30 transparent huge pages are in use
+HugePages_Total:     128
+HugePages_Free:      128        <== explicit huge pages are not used
 ```
+
+Also, developers can observe how their application utilizes EHPs and/or THPs by looking at the `smaps` file specific to their process:
+
+```bash
+$ watch -n1 "cat /proc/<PID_OF_PROCESS>/smaps"
+```
+
+[^25]: MAP_HUGETLB example - [https://github.com/torvalds/linux/blob/master/tools/testing/selftests/vm/map_hugetlb.c](https://github.com/torvalds/linux/blob/master/tools/testing/selftests/vm/map_hugetlb.c).
+[^26]: Mounted `hugetlbfs` filesystem - [https://github.com/torvalds/linux/blob/master/tools/testing/selftests/vm/hugepage-mmap.c](https://github.com/torvalds/linux/blob/master/tools/testing/selftests/vm/hugepage-mmap.c).
+[^27]: SHM_HUGETLB example - [https://github.com/torvalds/linux/blob/master/tools/testing/selftests/vm/hugepage-shm.c](https://github.com/torvalds/linux/blob/master/tools/testing/selftests/vm/hugepage-shm.c).

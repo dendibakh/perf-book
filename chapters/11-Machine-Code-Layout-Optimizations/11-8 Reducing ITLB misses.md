@@ -26,7 +26,7 @@ The second option is to remap the code section at runtime. This option does not 
 $ LD_PRELOAD=/usr/lib64/liblppreload.so clang++ a.cpp
 ```
 
-While the first method only works with explicit huge pages, the second approach which uses `iodlr` works both with explicit and transparent huge pages. Instructions on how to enable huge pages for Windows and Linux can be found in Appendix C.
+While the first method only works with explicit huge pages, the second approach which uses `iodlr` works both with explicit and transparent huge pages. Instructions on how to enable huge pages for Windows and Linux can be found in Appendix B.
 
 Besides employing huge pages, standard techniques for optimizing I-cache performance can be used to improve ITLB performance. Namely, reordering functions so that hot functions are collocated better, reducing the size of hot regions via Link-Time Optimizations (LTO/IPO), using Profile-Guided Optimizations (PGO) and BOLT, and less aggressive inlining.
 

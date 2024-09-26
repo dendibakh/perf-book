@@ -18,7 +18,7 @@ For a middle path between low-effort but unpredictable autovectorization, and ve
 
 Note that when using intrinsics or a wrapper library, it is still advisable to write the initial implementation using C++. This allows rapid prototyping and verification of correctness, by comparing the results of the original code against the new vectorized implementation.
 
-In the remainder of this section, we will discuss several of these approaches, especially inner loop vectorization because it is the most common type of autovectorization. The other two types, outer loop vectorization, and SLP (Superword-Level Parallelism) vectorization, are mentioned in Appendix B.
+In the remainder of this section, we will discuss several of these approaches, especially inner loop vectorization because it is the most common type of autovectorization. The other two types, outer loop vectorization, and SLP (Superword-Level Parallelism) vectorization, are not discussed in this book.
 
 ### Compiler Autovectorization
 
