@@ -41,7 +41,7 @@ Swarup Sahoo helped me with writing about AMD PMU features in [@sec:PmuChapter],
 \begin{wrapfigure}{r}{2.5cm}
 \includegraphics[width=2.5cm]{../../img/contributors/AloisKraus_circle.png}
 \end{wrapfigure} 
-Alois Kraus authored [@sec:ETW] "Event Tracing for Windows". He developed `ETWAnalyzer`, a command-line tool for analyzing ETW files with simple queries. He is employed by Siemens Healthineers where he studies the performance of large software systems. Alois' personal webpage and blog: [https://aloiskraus.wordpress.com](https://aloiskraus.wordpress.com).
+Alois Kraus authored [@sec:ETW] "Event Tracing for Windows", and Appendix D. He developed `ETWAnalyzer`, a command-line tool for analyzing ETW files with simple queries. He is employed by Siemens Healthineers where he studies the performance of large software systems. Alois' personal webpage and blog: [https://aloiskraus.wordpress.com](https://aloiskraus.wordpress.com).
 
 \vspace{-1cm} \hfill \break \vspace{0.5cm}
 \newpage
