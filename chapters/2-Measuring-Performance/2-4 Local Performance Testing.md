@@ -10,7 +10,7 @@ The most straightforward way to compare two performance distributions is to take
 
 Data scientists often present measurements by plotting them. This eliminates biased conclusions and allows readers to interpret the data for themselves. One of the popular ways to plot distributions is by using box plots (also known as a box-and-whisker plot). In Figure @fig:BoxPlot, we visualized performance distributions of two versions of the same functional program ("before" and "after"). There are 70 performance data points in each distribution.
 
-![Performance measurements of "Before" and "After" versions of a program presented as box plots.](../../img/measurements/BoxPlots.png){#fig:BoxPlot width=90%}
+![Performance measurements (lower is better) of "Before" and "After" versions of a program presented as box plots.](../../img/measurements/BoxPlots.png){#fig:BoxPlot width=90%}
 
 Let's describe the terms indicated on the image:
 
@@ -38,6 +38,8 @@ One of the most important factors in calculating accurate speedup ratios is coll
 How do you know how many samples are required to reach a statistically sufficient distribution? The answer depends on the level of accuracy you want for your comparison. The lower the standard deviation in the distribution, the lower the number of samples you need. You can implement an adaptive strategy by dynamically limiting the number of benchmark iterations based on standard deviation, i.e., you collect samples until you get a standard deviation that lies in a certain range. Once you have a standard deviation lower than the threshold, you can stop collecting measurements. This strategy is explained in more detail in [@Akinshin2019, Chapter 4].
 
 Another important thing to watch out for is the presence of outliers. It is OK to discard some samples (for example, cold runs) as outliers, but do not deliberately discard unwanted samples from the measurement set. For some types of benchmarks, outliers can be one of the most important metrics. For example, when benchmarking software that has real-time constraints, the 99 percentile could be very interesting.
+
+In the next two sections we will discuss how to measure wall clock time (latency), which is the most common case. However, sometimes we also may want to measure other things, like number fo requests per second (throughput), heap allocations, context switches, etc.
 
 [^1]: SPEC CPU 2017 benchmarks - [http://spec.org/cpu2017/Docs/overview.html#benchmarks](http://spec.org/cpu2017/Docs/overview.html#benchmarks)
 [^12]: Book "Workload Modeling for Computer Systems Performance Evaluation" - [https://www.cs.huji.ac.il/~feit/wlmod/](http://cs.huji.ac.il/~feit/wlmod/)
