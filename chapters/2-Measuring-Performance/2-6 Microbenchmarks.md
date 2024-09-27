@@ -12,7 +12,9 @@ void foo() {
 }
 ```
 
-A simple way to test this is to check the performance profile of the benchmark and see if the intended code stands out as the hotspot. Sometimes abnormal timings can be spotted instantly, so use common sense while analyzing and comparing benchmark runs. One of the popular ways to keep the compiler from optimizing away important code is to use [`DoNotOptimize`](https://github.com/google/benchmark/blob/c078337494086f9372a46b4ed31a3ae7b3f1a6a2/include/benchmark/benchmark.h#L307)-like[^7] helper functions, which do the necessary inline assembly magic under the hood:
+Blunders like that one are nicely captured in the paper "Always Measure One Level Deeper" [@MeasureOneLevelDeeper], where the author advocates for a more scientific approach, and measuring performance from different angles. Following advice from the paper, we should check the performance profile of the benchmark and make sure the intended code stands out as the hotspot. Sometimes abnormal timings can be spotted instantly, so use common sense while analyzing and comparing benchmark runs. 
+
+One of the popular ways to keep the compiler from optimizing away important code is to use [`DoNotOptimize`](https://github.com/google/benchmark/blob/c078337494086f9372a46b4ed31a3ae7b3f1a6a2/include/benchmark/benchmark.h#L307)-like[^7] helper functions, which do the necessary inline assembly magic under the hood:
 
 ```cpp
 // foo benchmarks string creation

@@ -8,6 +8,7 @@
 * Visualizing performance distributions helps compare performance results. It is a safe way of presenting performance results to a wide audience.
 * To benchmark execution time, engineers can use two different timers: the system-wide high-resolution timer and the Time Stamp Counter. The former is suitable for measuring events whose duration is more than a microsecond. The latter can be used for measuring short events with high accuracy.
 * Microbenchmarks are good for quick experiments, but you should always verify your ideas on a real application in practical conditions. Make sure that you are benchmarking the right code by checking performance profiles.
+* Always measure one level deeper, collect as many metrics as possible to support your conclusions, and be ready to explain the underlying technical reasons for performance results you observe.
 
 \sectionbreak
 
