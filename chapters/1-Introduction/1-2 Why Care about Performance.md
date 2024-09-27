@@ -18,7 +18,7 @@ Outside cloud services, there are many other performance-critical industries whe
 
 > "Not all fast software is world-class, but all world-class software is fast. Performance is _the_ killer feature." ---Tobi Lutke, CEO of Shopify.
 
-I hope it goes without saying that people hate using slow software, especially when their productivity goes down because of it. Table 2 shows that most people consider a delay of 2 seconds or more to be a "long wait," and would switch to something else after 10 seconds of waiting (I think much sooner). If you want to keep users' attention, your application must react quickly. 
+I hope it goes without saying that people hate using slow software, especially when their productivity goes down because of it. Table 1.2 shows that most people consider a delay of 2 seconds or more to be a "long wait," and would switch to something else after 10 seconds of waiting (I think much sooner). If you want to keep users' attention, your application must react quickly. 
 
 Application performance can drive your customers to a competitor's product. By emphasizing performance, you can give your product a competitive advantage.
 
