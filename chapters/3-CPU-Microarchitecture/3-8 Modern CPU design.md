@@ -6,7 +6,7 @@ To see how all the concepts we talked about in this chapter are used in practice
 
 ![Block diagram of a CPU Core in the Intel GoldenCove Microarchitecture.](../../img/uarch/goldencove_block_diagram.png){#fig:Goldencove_diag width=100%}
 
-The core is split into an in-order frontend that fetches and decodes x86 instructions into $\mu$ops and a 6-wide superscalar, out-of-order backend. The Goldencove core supports 2-way SMT. It has a 32KB first-level instruction cache (L1 I-cache), and a 48KB first-level data cache (L1 D-cache). The L1 caches are backed up by a unified 1.25MB (2MB in server chips) L2 cache. The L1 and L2 caches are private to each core. At the end of this section, we also take a look at the TLB hierarchy.
+The core is split into an in-order frontend that fetches and decodes x86 instructions into $\mu$ops[^9] and a 6-wide superscalar, out-of-order backend. The Goldencove core supports 2-way SMT. It has a 32KB first-level instruction cache (L1 I-cache), and a 48KB first-level data cache (L1 D-cache). The L1 caches are backed up by a unified 1.25MB (2MB in server chips) L2 cache. The L1 and L2 caches are private to each core. At the end of this section, we also take a look at the TLB hierarchy.
 
 ### CPU Frontend {#sec:uarchFE}
 
@@ -16,7 +16,7 @@ Technically, instruction fetch is the first stage to execute an instruction. But
 
 The heart of the BPU is a branch target buffer (BTB) with 12K entries containing information about branches and their targets. This information is used by the prediction algorithms. Every cycle, the BPU generates the next fetch address and passes it to the CPU Frontend.
 
-The CPU Frontend fetches 32 bytes per cycle of x86 instructions from the L1 I-cache. This is shared among the two threads, so each thread gets 32 bytes every other cycle. These are complex, variable-length x86 instructions. First, the pre-decode stage determines and marks the boundaries of the variable instructions by inspecting the chunk. In x86, the instruction length can range from 1 to 15 bytes. This stage also identifies branch instructions. The pre-decode stage moves up to 6 instructions (also referred to as *macroinstructions*) to the Instruction Queue that is split between the two threads. The instruction queue also supports a macro-op fusion unit that detects when two macroinstructions can be fused into a single micro-operation ($\mu$op). This optimization saves bandwidth in the rest of the pipeline.
+The CPU Frontend fetches 32 bytes per cycle of x86 instructions from the L1 I-cache. This is shared among the two threads (if SMT is enabled), so each thread gets 32 bytes every other cycle. These are complex, variable-length x86 instructions. First, the pre-decode stage determines and marks the boundaries of the variable instructions by inspecting the chunk. In x86, the instruction length can range from 1 to 15 bytes. This stage also identifies branch instructions. The pre-decode stage moves up to 6 instructions (also referred to as *macroinstructions*) to the Instruction Queue that is split between the two threads. The instruction queue also supports a macro-op fusion unit that detects when two macroinstructions can be fused into a single micro-operation ($\mu$op). This optimization saves bandwidth in the rest of the pipeline.
 
 Later, up to six pre-decoded instructions are sent from the Instruction Queue to the decoder unit every cycle. The two SMT threads alternate every cycle to access this interface. The 6-way decoder converts the complex macro-Ops into fixed-length $\mu$ops. Decoded $\mu$ops are queued into the Instruction Decode Queue (IDQ), labeled as "$\mu$op Queue" on the diagram.
 
@@ -30,7 +30,7 @@ The Instruction Decode Queue (IDQ) provides the interface between the in-order f
 
 The CPU Back-End employs an OOO engine that executes instructions and stores results. We repeated a part of the diagram that depicts the GoldenCove OOO engine in Figure @fig:Goldencove_OOO.
 
-The heart of the OOO engine is the 512-entry ReOrder Buffer (ROB). It serves a few purposes. First, it provides register renaming. There are only 16 general-purpose integer and 32 floating-point/SIMD architectural registers, however, the number of physical registers is much higher.[^1] Physical registers are located in a structure called the Physical Register File (PRF). There are separate PRFs for integer and floating-point/SIMD registers. The mappings from architecture-visible registers to the physical registers are kept in the register alias table (RAT).
+The heart of the OOO engine is the 512-entry ReOrder Buffer (ROB). It serves a few purposes. First, it provides register renaming.[^5] There are only 16 general-purpose integer and 32 floating-point/SIMD architectural registers, however, the number of physical registers is much higher.[^1] Physical registers are located in a structure called the Physical Register File (PRF). There are separate PRFs for integer and floating-point/SIMD registers. The mappings from architecture-visible registers to the physical registers are kept in the register alias table (RAT).
 
 ![Block diagram of the CPU Back End of the Intel GoldenCove Microarchitecture.](../../img/uarch/goldencove_OOO.png){#fig:Goldencove_OOO width=100%}
 
@@ -40,8 +40,8 @@ Third, the ROB tracks speculative execution. When an instruction has finished it
 
 There are certain operations that processors handle in a specific manner, often called idioms, which require no or less costly execution. Processors recognize such cases and allow them to run faster than regular instructions. Here are some of such cases:
 
-* **Zeroing**: to assign zero to a register, compilers often use `XOR / PXOR / XORPS / XORPD` instructions, e.g., `XOR RAX, RAX`, which are preferred by compilers instead of the equivalent `MOV RAX, 0x0` instruction as the XOR encoding uses fewer encoding bytes. Such zeroing idioms are not executed as any other regular instruction and are resolved in the CPU frontend, which saves execution resources. The instruction later retires as usual.
-* **Move elimination**: similar to the previous one, register-to-register `mov` operations, e.g., `MOV RAX, RBX`, are executed with zero cycle delay.
+* **Zeroing**: to assign zero to a register, compilers often use `XOR / PXOR / XORPS / XORPD` instructions, e.g., `XOR EAX, EAX`, which are preferred by compilers instead of the equivalent `MOV EAX, 0x0` instruction as the XOR encoding uses fewer encoding bytes. Such zeroing idioms are not executed as any other regular instruction and are resolved in the CPU frontend, which saves execution resources. The instruction later retires as usual.
+* **Move elimination**: similar to the previous one, register-to-register `mov` operations, e.g., `MOV EAX, EBX`, are executed with zero cycle delay.
 * **NOP instruction**: `NOP` is often used for padding or alignment purposes. It simply gets marked as completed without allocating it to the reservation station.
 * **Other bypasses**: CPU architects also optimized certain arithmetic operations. For example, multiplying any number by one will always yield the same number. The same goes for dividing any number by one. Multiplying any number by zero always yields zero, etc. Some CPUs can recognize such cases at runtime and execute them with shorter latency than regular multiplication or divide.
 
@@ -56,11 +56,11 @@ We repeated a part of the diagram that depicts the GoldenCove execution engine a
 
 ![Block diagram of the execution engine and the Load-Store unit in the Intel GoldenCove Microarchitecture.](../../img/uarch/goldencove_BE_LSU.png){#fig:Goldencove_BE_LSU width=100%}
 
-Instructions that require memory operations are handled by the Load-Store unit (ports 2, 3, 11, 4, 9, 7, and 8) that we will discuss in the next section. If an operation does not involve loading or storing data, then it will be dispatched to the execution engine (ports 0, 1, 5, 6, and 10).
+Instructions that require memory operations are handled by the Load-Store unit (ports 2, 3, 11, 4, 9, 7, and 8) that we will discuss in the next section. If an operation does not involve loading or storing data, then it will be dispatched to the execution engine (ports 0, 1, 5, 6, and 10). Some instructions may require two $\mu$ops that must be executed on different execution ports, e.g., load and add.
 
 For example, an `Integer Shift` operation can go only to either port 0 or 6, while a `Floating-Point Divide` operation can only be dispatched to port 0. In a situation when a scheduler has to dispatch two operations that require the same execution port, one of them will have to be delayed.
 
-The VEC/FP stack does floating-point scalar and *all* packed (SIMD) operations. For instance, ports 0, 1, and 5 can handle ALU operations of the following types: packed integer, packed floating-point, and scalar floating-point. Integer and Vector/FP register stacks are located separately. Operations that move values from the INT stack to VEC/FP and vice-versa (e.g., convert, extract or insert) incur additional penalties.
+The VEC/FP stack does floating-point scalar and *all* packed (SIMD) operations. For instance, ports 0, 1, and 5 can handle ALU operations of the following types: packed integer, packed floating-point, and scalar floating-point. Integer and Vector/FP register files are located separately. Operations that move values from the INT stack to VEC/FP and vice-versa (e.g., convert, extract or insert) incur additional penalties.
 
 ### Load-Store Unit {#sec:uarchLSU}
 
@@ -133,3 +133,5 @@ The Goldencove specification doesn't disclose how resources are shared between t
 [^2]: Load Buffer and Store Buffer sizes are not disclosed, but people have measured 192 and 114 entries respectively.
 [^3]: AMD's equivalent is called Page Walk Caches.
 [^4]: People have measured  ~200 entries in the RS, however the actual number of entries is not disclosed.
+[^5]: Renaming must be done in program order.
+[^9]: Complex CISC instructions are translated into simple RISC microoperations, see [@sec:sec_UOP].

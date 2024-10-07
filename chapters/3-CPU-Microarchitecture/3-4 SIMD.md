@@ -38,7 +38,7 @@ Initially, SIMD was driven by multimedia applications and scientific computation
 - Machine Learning and Artificial Intelligence (speeding up PyTorch, TensorFlow).
 
 [^1]: UTF-8 validation - [https://github.com/rusticstuff/simdutf8](https://github.com/rusticstuff/simdutf8)
-[^2]: Parsing JSON - [https://github.com/simdjson/simdjson](https://github.com/simdjson/simdjson).
+[^2]: Parsing JSON - [https://github.com/simdjson/simdjson](https://github.com/simdjson/simdjson)
 [^3]: Parsing CSV - [https://github.com/geofflangdale/simdcsv](https://github.com/geofflangdale/simdcsv)
 [^4]: SIMD hashing - [https://github.com/google/highwayhash](https://github.com/google/highwayhash)
 [^5]: Random generation - [abseil library](https://github.com/abseil/abseil-cpp/blob/master/absl/random/internal/randen.h)

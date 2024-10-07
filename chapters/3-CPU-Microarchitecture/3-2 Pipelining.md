@@ -16,11 +16,7 @@ Modern high-performance CPUs have multiple pipeline stages, often ranging from 1
 
 The *throughput* of a pipelined CPU is defined as the number of instructions that complete and exit the pipeline per unit of time. The *latency* for any given instruction is the total time through all the stages of the pipeline. Since all the stages of the pipeline are linked together, each stage must be ready to move to the next instruction in lockstep. The time required to move an instruction from one stage to the next defines the basic machine *cycle* or clock for the CPU. The value chosen for the clock for a given pipeline is defined by the slowest stage of the pipeline. CPU hardware designers strive to balance the amount of work that can be done in a stage as this directly affects the frequency of operation of the CPU.
 
-In an ideal pipeline that is perfectly balanced and doesn’t incur any stalls, the time per instruction in the pipelined machine is calculated as
-$$
-\textrm{Time per instruction on pipelined machine} = \frac{\textrm{Time per instr. on nonpipelined machine}}{\textrm{Number of pipe stages}}
-$$
-In real implementations, pipelining introduces several constraints that limit the ideal model shown above. Pipeline hazards prevent the ideal pipeline behavior, resulting in stalls. The three classes of hazards are structural hazards, data hazards, and control hazards. Luckily for the programmer, in modern CPUs, all classes of hazards are handled by the hardware.
+In real implementations, pipelining introduces several constraints that limit the nicely-flowing execution illustreated in Figure @fig:Pipelining. Pipeline hazards prevent the ideal pipeline behavior, resulting in stalls. The three classes of hazards are structural hazards, data hazards, and control hazards. Luckily for the programmer, in modern CPUs, all classes of hazards are handled by the hardware.
 
 \lstset{linewidth=10cm}
 
@@ -37,7 +33,7 @@ In real implementations, pipelining introduces several constraints that limit th
 
   There is a RAW dependency for register R1. If we take the value directly after the addition `R0 ADD 1` is done (from the `EXE` pipeline stage), we don't need to wait until the `WB` stage finishes (when the value will be written to the register file). Bypassing helps to save a few cycles. The longer the pipeline, the more effective bypassing becomes.
 
-  A *write-after-read* (WAR) hazard requires a dependent write to execute after a read. It occurs when an instruction writes a register before an earlier instruction reads the source, resulting in the wrong new value being read. A WAR hazard is not a true dependency and is eliminated by a technique called *register renaming*. It is a technique that abstracts logical registers from physical registers. CPUs support register renaming by keeping a large number of physical registers. Logical (*architectural*) registers, the ones that are defined by the ISA, are just aliases over a wider register file. With such decoupling of the architectural state, solving WAR hazards is simple: we just need to use a different physical register for the write operation. For example:
+  A *write-after-read* (WAR) hazard requires a dependent write to execute after a read. It occurs when an instruction writes a register before an earlier instruction reads the source, resulting in the wrong new value being read. A WAR hazard is not a true dependency and can be eliminated by a technique called *register renaming*. It is a technique that abstracts logical registers from physical registers. CPUs support register renaming by keeping a large number of physical registers. Logical (*architectural*) registers, the ones that are defined by the ISA, are just aliases over a wider register file. With such decoupling of the architectural state, solving WAR hazards is simple: we just need to use a different physical register for the write operation. For example:
 
   ```
   ; machine code, WAR hazard              ; after register renaming 
@@ -60,6 +56,6 @@ In real implementations, pipelining introduces several constraints that limit th
 
   You will see similar code in many production programs. In our example, `R1` keeps the temporary result of the `ADD` operation. Once the `SUB` instruction is complete, `R1` is immediately reused to store the result of the `MUL` operation. The original code on the left features all three types of data hazards. There is a RAW dependency over `R1` between `ADD` and `SUB`, and it must survive register renaming. Also, we have WAW and WAR hazards over the same `R1` register for the `MUL` operation. Again, we need to rename registers to eliminate those two hazards. Notice that after register renaming we have a new destination register (`R104`) for the `MUL` operation. Now we can safely reorder `MUL` with the other two operations.
 
-* **Control hazards**: are caused due to changes in the program flow. They arise from pipelining branches and other instructions that change the program flow. The branch condition that determines the direction of the branch (taken vs. not taken) is resolved in the execute pipeline stage. As a result, the fetch of the next instruction cannot be pipelined unless the control hazard is eliminated. Techniques such as dynamic branch prediction and speculative execution described in the next section are used to overcome control hazards.
+* **Control hazards**: are caused due to changes in the program flow. They arise from pipelining branches and other instructions that change the program flow. The branch condition that determines the direction of the branch (taken vs. not taken) is resolved in the execute pipeline stage. As a result, the fetch of the next instruction cannot be pipelined unless the control hazard is eliminated. Techniques such as dynamic branch prediction and speculative execution described in the next section are used to mitigate control hazards.
 
 \lstset{linewidth=\textwidth}
