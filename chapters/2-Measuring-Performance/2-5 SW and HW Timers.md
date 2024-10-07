@@ -16,13 +16,12 @@ To benchmark execution time, engineers usually use two different timers, which a
      auto start = steady_clock::now();
      // run something
      auto end = steady_clock::now();
-     uint64_t delta = duration_cast<nanoseconds>
-         (end - start).count();
+     uint64_t delta = duration_cast<nanoseconds>(end - start).count();
      return delta;
    }
    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    
- - **Time Stamp Counter (TSC)**: this is a hardware timer that is implemented as a hardware register. TSC is monotonic and has a constant rate, i.e., it doesn't account for frequency changes. Every CPU has its own TSC, which is simply the number of reference cycles (see [@sec:secRefCycles]) elapsed. It is suitable for measuring short events with a duration from nanoseconds up to one minute. The value of TSC can be retrieved by using the compiler's built-in function `__rdtsc` as shown in [@lst:TSC], which uses the `RDTSC` assembly instruction under the hood. More low-level details on benchmarking the code using the `RDTSC` assembly instruction can be accessed in the white paper [@IntelRDTSC].
+ - **Time Stamp Counter (TSC)**: this is a hardware timer that is implemented as a hardware register. TSC is monotonic and has a constant rate, i.e., it doesn't account for frequency changes. Every CPU has its own TSC, which is simply the number of reference cycles (see [@sec:secRefCycles]) elapsed. It is suitable for measuring short events with a duration from nanoseconds up to one minute. On x86 platforms, the value of TSC can be retrieved by using the compiler's built-in function `__rdtsc` as shown in [@lst:TSC], which uses the `RDTSC` assembly instruction under the hood. More low-level details on benchmarking the code using the `RDTSC` assembly instruction can be accessed in the white paper [@IntelRDTSC]. On ARM platforms you can read `CNTVCT_EL0`, Counter-timer Virtual Count Register.
 
    Listing: Using __rdtsc compiler builtins to access TSC
 
@@ -38,7 +37,7 @@ To benchmark execution time, engineers usually use two different timers, which a
    }
    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Choosing which timer to use is very simple and depends on how long the thing is that you want to measure. If you measure something over a very short time period, TSC will give you better accuracy. Conversely, it's pointless to use the TSC to measure a program that runs for hours. Unless you need cycle accuracy, the system timer should be enough for a large proportion of cases. It's important to keep in mind that accessing the system timer usually has a higher latency than accessing TSC. Making a `clock_gettime` system call can be easily ten times slower than executing `RDTSC` instruction, which takes 20+ CPU cycles. This may become important for minimizing measurement overhead, especially in the production environment. A performance comparison of different APIs for accessing timers on various platforms is available on the wiki page of the CppPerformanceBenchmarks repository.[^3]
+Choosing which timer to use is very simple and depends on how long the thing is that you want to measure. If you measure something over a very short time period, TSC will give you better accuracy. Conversely, it's pointless to use the TSC to measure a program that runs for hours. Unless you need cycle accuracy, the system timer should be enough for a large proportion of cases. It's important to keep in mind that accessing the system timer usually has a higher latency than accessing TSC. Making a `clock_gettime` system call can be much slower than executing `RDTSC` instruction. The latter takes about 5 ns (20 CPU cycles), while the former takes about 500 ns. This may become important for minimizing measurement overhead, especially in the production environment. A performance comparison of different APIs for accessing timers on various platforms is available on the wiki page of the CppPerformanceBenchmarks repository.[^3]
 
 [^1]: Unix epoch starts on 1 January 1970 00:00:00 UT: [https://en.wikipedia.org/wiki/Unix_epoch](https://en.wikipedia.org/wiki/Unix_epoch).
 [^3]: CppPerformanceBenchmarks wiki - [https://gitlab.com/chriscox/CppPerformanceBenchmarks/-/wikis/ClockTimeAnalysis](https://gitlab.com/chriscox/CppPerformanceBenchmarks/-/wikis/ClockTimeAnalysis)
