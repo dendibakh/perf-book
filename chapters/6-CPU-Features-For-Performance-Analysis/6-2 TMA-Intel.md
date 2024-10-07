@@ -129,7 +129,7 @@ Percent |  Disassembly of benchmark.exe for MEM_LOAD_RETIRED.L3_MISS
         :  foo():
    0.00 :    400a00:  nop  DWORD PTR [rax+rax*1+0x0]
    0.00 :    400a08:  nop  DWORD PTR [rax+rax*1+0x0]
-                 ...
+                 ...  # more NOPs
  100.00 :    400e07:  mov  rax,QWORD PTR [rdi+rsi*1] <==
                  ...
    0.00 :    400e13:  xor  rax,rax
@@ -156,7 +156,7 @@ By looking at [@lst:TMA_asm], we can see that all L3 cache misses in function `f
 
 ### Step 3: Fix the Issue {.unlisted .unnumbered}
 
-Remember that there is dummy work emulated with NOPs at the beginning of the `foo` function. This creates a time window between the moment when we get the next address that will be accessed and the actual load instruction. The presence of the time windows allows us to start prefetching the memory location in parallel with the dummy work. [@lst:TMA_prefetch] shows this idea in action. More information about the explicit memory prefetching technique can be found in [@sec:memPrefetch].
+There is dummy work emulated with NOPs at the beginning of the `foo` function. This creates a time window between the moment when we get the next address that will be accessed and the actual load instruction. The presence of the time windows allows us to start prefetching the memory location in parallel with the dummy work. [@lst:TMA_prefetch] shows this idea in action. More information about the explicit memory prefetching technique can be found in [@sec:memPrefetch].
 
 Listing: Inserting memory prefetch into main.
 

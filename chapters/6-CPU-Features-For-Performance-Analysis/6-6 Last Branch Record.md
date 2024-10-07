@@ -102,7 +102,7 @@ The `dump.txt` file, which can be quite large, contains lines like those shown b
 ...
 ```
 
-In the output above, we present eight entries from the LBR stack, which typically consists of 32 LBR entries. Each entry has `FROM` and `TO` addresses (hexadecimal values), a predicted flag (`M` - Mispredicted, `P` - Predicted), and the number of cycles (number in the last position of each entry). Components marked with "`-`" are related to transactional memory extension (TSX), which we won't discuss here. Curious readers can look up the format of a decoded LBR entry in the `perf script` [specification](http://man7.org/linux/man-pages/man1/perf-script.1.html)[^2].
+In the output above, we present eight entries from the LBR stack, which typically consists of 32 LBR entries. Each entry has `FROM` and `TO` addresses (hexadecimal values), a predicted flag (this one single branch outcome was `M` - Mispredicted, `P` - Predicted), and the number of cycles since the previous record (number in the last position of each entry). Components marked with "`-`" are related to transactional memory extension (TSX), which we won't discuss here. Curious readers can look up the format of a decoded LBR entry in the `perf script` [specification](http://man7.org/linux/man-pages/man1/perf-script.1.html)[^2].
 
 ### LBR on AMD Platforms
 
@@ -170,7 +170,7 @@ $ perf report -n --sort overhead,srcline_from,srcline_to -F +dso,symbol_from,sym
    4.03%        863   a.exe   [.] main   [.] foo      a.c:21     (null)
 ```
 
-From this example, we can see that more than 50% of taken branches are within the `bar` function, 22% of branches are function calls from `foo` to `bar`, and so on. Notice how `perf` switched from `cycles` events to analyzing LBR stacks: only 670 samples were collected, yet we have an entire LBR stack captured with every sample. This gives us `670 * 32 = 21440` LBR entries (branch outcomes) for analysis.[^5]
+From this example, we can see that more than 50% of taken branches are within the `bar` function, 22% of branches are function calls from `foo` to `bar`, and so on. Notice how `perf` switched from `cycles` events to analyzing LBR stacks: only 670 samples were collected, yet we have an entire 32-entry LBR stack captured with every sample. This gives us `670 * 32 = 21440` LBR entries (branch outcomes) for analysis.[^5]
 
 Most of the time, it’s possible to determine the location of the branch just from the line of code and target symbol. However, theoretically, one could write code with two `if` statements written on a single line. Also, when expanding the macro definition, all the expanded code is attributed to the same source line, which is another situation when this might happen. This issue does not completely block the analysis but only makes it a little more difficult. To disambiguate two branches, you likely need to analyze raw LBR stacks yourself (see example on [easyperf](https://easyperf.net/blog/2019/05/06/Estimating-branch-probability)[^6] blog).
 
@@ -193,7 +193,7 @@ $ perf report -n --sort symbol_from,symbol_to -F +mispredict,srcline_from,srclin
      6.33%    41665   Y   dec.c:36   dec.c:40  LzmaDec     LzmaDec
 ```
 
-In this example, the lines that correspond to function `LzmaDec` are of particular interest to us. Following a similar analysis from the previous section, we can conclude that the branch on source line `dec.c:36` is the most executed in the benchmark. In the output that Linux `perf` provides, we can spot two entries that correspond to the `LzmaDec` function: one with `Y` and one with `N` letters. Analyzing those two entries together gives us a misprediction rate of the branch. In this case, we know that the branch on line `dec.c:36` was predicted `303391` times (corresponds to `N`) and was mispredicted `41665` times (corresponds to `Y`), which gives us `88%` prediction rate.
+In this example, the lines that correspond to function `LzmaDec` are of particular interest to us. In the output that Linux `perf` provides, we can spot two entries that correspond to the `LzmaDec` function: one with `Y` and one with `N` letters. We can conclude that the branch on source line `dec.c:36` is the most executed in the benchmark since more than 50% of samples are attributed to it. Analyzing those two entries together gives us a misprediction rate of the branch. We know that the branch on line `dec.c:36` was predicted `303391` times (corresponds to `N`) and was mispredicted `41665` times (corresponds to `Y`), which gives us `88%` prediction rate.
 
 Linux `perf` calculates the misprediction rate by analyzing each LBR entry and extracting misprediction bits from it. So for every branch, we have a number of times it was predicted correctly and a number of mispredictions. Again, due to the nature of sampling, some branches might have an `N` entry but no corresponding `Y` entry. It could mean there are no LBR entries for the branch being mispredicted, but that doesn’t necessarily mean the prediction rate is `100%`.
 
@@ -210,18 +210,22 @@ This type of analysis is not supported on AMD platforms since they don't record 
 400628:   jnz 0x400644                 <= end of a BB
 ```
 
-Suppose we have two entries in the LBR stack:
+Suppose we have the following entries in the LBR stack:
 
 ```
   FROM_IP   TO_IP    Cycle Count
-  ...       ...      ...
+  ...       ...      ...        <== 24 entries
   40060a    400618    10
-  400628    400644     5          <== LBR TOS
+  400628    400644    80        <== occurence 1 
+  40064e    400600     3
+  40060a    400618     9
+  400628    400644   300        <== occurence 2
+  40064e    400600     3        <== LBR TOS
 ```
 
-Given that information, we know that there was one occurrence when the basic block that starts at offset `400618` was executed in 5 cycles. If we collect enough samples, we could plot a probability density chart of latency for that basic block.
+Given that information, we have two occurences of the basic block that starts at offset `400618`. The first once was completed in 80 cycles, while the second one took 300 cycles. If we collect enough samples like that, we could plot a probability density chart of latency for that basic block.
 
-An example of such a chart is shown in Figure @fig:LBR_timing_BB. It was compiled by analyzing all LBR entries that satisfy the rule described above. The way to read this chart is as follows: it tells what was the rate of occurrence of a given latency value. For example, the basic block latency was measured to be exactly 100 cycles roughly 2% of the time, 14% of the time we measured 280 cycles, and never saw anything between 150 and 200 cycles. Another way to read is: based on the collected data, what is the probability of seeing a certain basic block latency if you were to measure it?
+An example of such a chart is shown in Figure @fig:LBR_timing_BB. It was compiled by analyzing relevant LBR entries. The way to read this chart is as follows: it tells what was the rate of occurrence of a given latency value. For example, the basic block latency was measured to be exactly 100 cycles roughly 2% of the time, 14% of the time we measured 280 cycles, and never saw anything between 150 and 200 cycles. Another way to read is: based on the collected data, what is the probability of seeing a certain basic block latency if you were to measure it?
 
 ![Probability density chart for latency of the basic block that starts at address `0x400618`.](../../img/pmu-features/LBR_timing_BB.png){#fig:LBR_timing_BB width=90%}
 
