@@ -11,7 +11,7 @@ The majority of modern CPUs, including Intel and AMD CPUs, don't have a fixed fr
 The core clock cycles counter is counting clock cycles at the actual frequency that the CPU core is running at, rather than the external clock (reference cycles). Let's take a look at an experiment on a Skylake i7-6000 processor running a single-threaded application, which has a base frequency of 3.4 GHz:
 
 ```bash
-$ perf stat -e cycles,ref-cycles ./a.exe
+$ perf stat -e cycles,ref-cycles -- ./a.exe
   43340884632  cycles		# 3.97 GHz
   37028245322  ref-cycles	# 3.39 GHz
       10,899462364 seconds time elapsed

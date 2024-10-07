@@ -71,7 +71,7 @@ $ dmesg | grep -i lbr
 With Linux `perf`, you can collect LBR stacks using the following command:
 
 ```bash
-$ perf record -b -e cycles ./benchmark.exe
+$ perf record -b -e cycles -- ./benchmark.exe
 [ perf record: Woken up 68 times to write data ]
 [ perf record: Captured and wrote 17.205 MB perf.data (22089 samples) ]
 ```
@@ -83,7 +83,7 @@ Because each collected sample captures the entire LBR stack (32 last branch reco
 Users can export raw LBR stacks for custom analysis. Below is the Linux perf command you can use to dump the contents of collected branch stacks:
 
 ```bash
-$ perf record -b -e cycles ./benchmark.exe
+$ perf record -b -e cycles -- ./benchmark.exe
 $ perf script -F brstack &> dump.txt
 ```
 

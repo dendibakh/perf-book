@@ -12,10 +12,7 @@ Our system under test is an Intel Alderlake box with a Core i7-1260P CPU and 16G
 $ ./mlc --idle_latency -c0 -L -b10m
 Intel(R) Memory Latency Checker - v3.10
 Command line parameters: --idle_latency -c0 -L -b10m
-
 Using buffer size of 10.000MiB
-*** Unable to modify prefetchers (try executing 'modprobe msr')
-*** So, enabling random access for latency measurements
 Each iteration took 31.1 base frequency clocks (	12.5	ns)
 ```
 

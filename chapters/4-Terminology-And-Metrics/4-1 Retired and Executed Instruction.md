@@ -9,8 +9,8 @@ There is an exception. Certain instructions are recognized as idioms and are res
 There is a performance monitoring counter (PMC) in most modern processors that collects the number of retired instructions. There is no performance event to collect executed instructions, though there is a way to collect executed and retired *$\mu$ops* as we shall see soon. The number of retired instructions can be easily obtained with Linux `perf` by running:
 
 ```bash
-$ perf stat -e instructions ./a.exe
+$ perf stat -e instructions -- ./a.exe
   2173414  instructions  #    0.80  insn per cycle 
 # or just simply run:
-$ perf stat ./a.exe
+$ perf stat -- ./a.exe
 ```

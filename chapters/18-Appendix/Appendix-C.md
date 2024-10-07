@@ -32,7 +32,7 @@ In the example shown in Figure @fig:PT_timings, instruction data (control flow) 
 Intel PT traces can be easily collected with the Linux `perf` tool:
 
 ```bash
-$ perf record -e intel_pt/cyc=1/u ./a.out
+$ perf record -e intel_pt/cyc=1/u -- ./a.out
 ```
 
 In the command line above, we asked the PT mechanism to update timing information every cycle. But likely, it will not increase our accuracy greatly since timing packets will only be sent when paired with another control flow packet.

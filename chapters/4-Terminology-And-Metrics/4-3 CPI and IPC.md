@@ -43,7 +43,7 @@ $ perf stat -e cycles,instructions -- a.exe
   2369632  cycles                               
   1725916  instructions  #    0,73  insn per cycle
 # or as simple as:
-$ perf stat ./a.exe
+$ perf stat -- ./a.exe
 ```
 
 [^1]: When you lower CPU frequency, memory speed becomes faster relative to the CPU. This may hide actual memory bottlenecks and artificially increase IPC.
