@@ -2,7 +2,7 @@
 
 ## Micro-operations {#sec:sec_UOP}
 
-Microprocessors with the x86 architecture translate complex CISC instructions into simple RISC microoperations, abbreviated as $\mu$ops. A simple addition instruction such as `ADD rax, rbx` generates only one $\mu$op, while a more complex instruction like `ADD rax, [mem]` may generate two: one for loading from the `mem` memory location into a temporary (unnamed) register, and one for adding it to the `rax` register. The instruction `ADD [mem], rax` generates three $\mu$ops: one for loading from memory, one for adding, and one for storing the result back to memory. Even though the x86 ISA is a register-memory architecture, after $\mu$ops conversion, it becomes a load-store architecture since memory is only accessed via load/store $\mu$ops.
+Microprocessors with the x86 architecture translate complex CISC instructions into simple RISC microoperations, abbreviated as $\mu$ops. A simple register-to-register addition instruction such as `ADD rax, rbx` generates only one $\mu$op, while a more complex instruction like `ADD rax, [mem]` may generate two: one for loading from the `mem` memory location into a temporary (unnamed) register, and one for adding it to the `rax` register. The instruction `ADD [mem], rax` generates three $\mu$ops: one for loading from memory, one for adding, and one for storing the result back to memory. Even though the x86 ISA is a register-memory architecture, after $\mu$ops conversion, it becomes a load-store architecture since memory is only accessed via load/store $\mu$ops.
 
 The main advantage of splitting instructions into micro-operations is that $\mu$ops can be executed:
 

@@ -8,6 +8,6 @@ Another important metric that some performance tools use is the concept of a *pi
 
 Intel's Skylake and AMD Zen3 cores have a 4-wide allocation. Intel's SunnyCove microarchitecture was a 5-wide design. As of the end of 2023, the most recent Goldencove and Zen4 architectures both have a 6-wide allocation. Apple M1 and M2 designs 8-wide, and Apple M3 is 9-$\mu$op execution bandwidth see [@AppleOptimizationGuide, Table 4.10]. The width of a machine puts a cap on the IPC. This means that the maximum achievable IPC of a processor equals its width.[^2] For example, when your calculations show more than 6 IPC on a Goldencove-based machine, you should be suspicious.
 
-Pipeline slot is one of the core metrics in Top-down Microarchitecture Analysis (see [@sec:TMA]). For example, Front-End Bound and Back-End Bound metrics are expressed as a percentage of unutilized Pipeline Slots due to various bottlenecks.
+Pipeline slot utilization is one of the core metrics in Top-down Microarchitecture Analysis (see [@sec:TMA]). For example, Front-End Bound and Back-End Bound metrics are expressed as a percentage of unutilized pipeline slots due to various bottlenecks.
 
 [^2]: Although there are some exceptions. For instance, macrofused compare-and-branch instructions only require a single pipeline slot but are counted as two instructions. In some extreme cases, this may cause IPC to be greater than the machine width.

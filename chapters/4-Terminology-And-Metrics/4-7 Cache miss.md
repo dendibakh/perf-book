@@ -47,4 +47,4 @@ $ perf stat -e mem_load_retired.l1_miss,
 From this example, we can see that 37% of loads that missed in the L1 D-cache also missed in the L2 cache, thus the *L2 hit rate* is 63%. A breakdown for the L3 cache can be made similarly.
 
 [^1]: Interactive latency - [https://colin-scott.github.io/personal_website/research/interactive_latency.html](https://colin-scott.github.io/personal_website/research/interactive_latency.html)
-[^2]: Careful readers may notice a discrepancy in the numbers: `fb_hit + l1_hit + l1_miss = 545,820`, which doesn't exactly match `all_loads`. We did not investigate this since the numbers are very close.
+[^2]: Careful readers may notice a discrepancy in the numbers: `fb_hit + l1_hit + l1_miss = 545,820`, which doesn't exactly match `all_loads`. Most likely it's due to slight inaccuracy in hardware event collection, but we did not investigate this since the numbers are very close.

@@ -96,8 +96,10 @@ with open(editTexFile, 'w') as g:
 
     startTableCPUFESummary = False
     startTableARMsChip = False
+    startTablePerfMetrics = False
     addTabularnewlineTableCPUFESummary = False
     addTabularnewlineTableARMsChip = False
+    addTabularnewlineTablePerfMetrics = False
     for line in lines:
         # change font size in listings for paperback
         if (args.paperback or args.kindle) and "basicstyle=\\ttfamily," in line:
@@ -127,7 +129,18 @@ with open(editTexFile, 'w') as g:
                 line = line.replace("\\end{minipage}\\tabularnewline", "\\end{minipage}\\tabularnewline\\tabularnewline")                
             if addTabularnewlineTableARMsChip and "\\end{longtable}" in line:
                 addTabularnewlineTableARMsChip = False
-                startTableARMsChip = False                
+                startTableARMsChip = False      
+
+            if "\\caption{A list (not exhaustive) of performance metrics along with" in line:
+                startTablePerfMetrics = True
+            if startTablePerfMetrics and "\\endhead" in line:
+                addTabularnewlineTablePerfMetrics = True
+            if addTabularnewlineTablePerfMetrics and "\\end{minipage}\\tabularnewline" in line:
+                line = line.replace("\\end{minipage}\\tabularnewline", "\\end{minipage}\\tabularnewline\\tabularnewline")                
+            if addTabularnewlineTablePerfMetrics and "\\end{longtable}" in line:
+                addTabularnewlineTablePerfMetrics = False
+                startTablePerfMetrics = False      
+                      
             
             # workaround for citations and bibliography
             if "\\citep" in line:
