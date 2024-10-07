@@ -27,8 +27,6 @@ Performance speedups can be calculated by taking a ratio between the two means. 
 
 *Standard deviation* quantifies how much the values in a dataset deviate from the mean on average. A low standard deviation indicates that the data points are close to the mean, while a high standard deviation indicates that they are spread out over a wider range. Unless distributions have low standard deviation, do not calculate speedups. If the standard deviation in the measurements is on the same order of magnitude as the mean, the average is not a representative metric. Consider taking steps to reduce noise in your measurements. If that is not possible, present your results as a combination of the key metrics such as mean, median, standard deviation, percentiles, min, max, etc.
 
-[TODO]: mention https://github.com/sharkdp/hyperfine, which automatically determines the number of runs, and can visualize the results as a table with mean, min, max, or as a box plot.
-
 Performance gains are usually represented in two ways: as a speedup factor or percentage improvement. If a program originally took 10 seconds to run, and you optimized it down to 1 second, that's a 10x speedup. We shaved off 9 seconds of running time from the original program, that's a 90% reduction in time. The formula to calculate percentage improvement is shown below. In the book, we will use both ways of representing speedups.
 $$
 \textrm{Percentage Speedup} = (1 - \frac{\textrm{New Time}}{\textrm{Old Time}}) ~\times~100\%
@@ -39,10 +37,13 @@ If obtaining new measurements is expensive, don't rush collecting many samples. 
 
 In an automated setting, you can implement an adaptive strategy by dynamically limiting the number of benchmark iterations based on standard deviation, i.e., you collect samples until you get a standard deviation that lies in a certain range. The lower the standard deviation in the distribution, the lower the number of samples you need. Once you have a standard deviation lower than the threshold, you can stop collecting measurements. This strategy is explained in more detail in [@Akinshin2019, Chapter 4].
 
-Another important thing to watch out for is the presence of outliers. It is OK to discard some samples (for example, cold runs) as outliers, but do not deliberately discard unwanted samples from the measurement set. Outliers can be one of the most important metrics for some types of benchmarks. For example, when benchmarking software that has real-time constraints, the 99 percentile could be very interesting.
+An important thing to watch out for is the presence of outliers. It is OK to discard some samples (for example, cold runs) as outliers, but do not deliberately discard unwanted samples from the measurement set. Outliers can be one of the most important metrics for some types of benchmarks. For example, when benchmarking software that has real-time constraints, the 99 percentile could be very interesting.
+
+I recommend using benchmarking tools as they automate performance measurements. For example, Hyperfine[^4] is a popular crossplatform command-line benchmarking tool that automatically determines the number of runs, and can visualize the results as a table with mean, min, max, or as a box plot.
 
 In the next two sections, we will discuss how to measure wall clock time (latency), which is the most common case. However, sometimes we also may want to measure other things, like the number of requests per second (throughput), heap allocations, context switches, etc.
 
 [^1]: SPEC CPU 2017 benchmarks - [http://spec.org/cpu2017/Docs/overview.html#benchmarks](http://spec.org/cpu2017/Docs/overview.html#benchmarks)
 [^12]: Book "Workload Modeling for Computer Systems Performance Evaluation" - [https://www.cs.huji.ac.il/~feit/wlmod/](http://cs.huji.ac.il/~feit/wlmod/)
 [^13]: Stefan Marr's blog post about box plots - [https://stefan-marr.de/2024/06/5-reasons-for-box-plots-as-default/](https://stefan-marr.de/2024/06/5-reasons-for-box-plots-as-default/)
+[^4]: hyperfine - [https://github.com/sharkdp/hyperfine](https://github.com/sharkdp/hyperfine)
