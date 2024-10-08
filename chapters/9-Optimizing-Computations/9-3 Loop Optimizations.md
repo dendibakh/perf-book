@@ -12,7 +12,7 @@ Compilers can automatically recognize an opportunity to perform certain loop tra
 
 Let's start with simple loop optimizations that transform the code inside a single loop: Loop Invariant Code Motion, Loop Unrolling, Loop Strength Reduction, and Loop Unswitching. Such optimizations usually help improve the performance of a loop with high arithmetic intensity (see [@sec:roofline]), i.e., when a loop is bound by CPU compute capabilities. Generally, compilers are good at doing such transformations; however, there are still cases when a compiler might need a developer's support. We will talk about that in subsequent sections.
 
-**Loop Invariant Code Motion (LICM)**: an expression whose value never changes across iterations of a loop is called a *loop invariant*. Since its value doesn't change across loop iterations, we can move a loop invariant expression outside of the loop. We do so by storing the result in a temporary variable and using it inside the loop (see [@lst:LICM]). All decent compilers nowadays successfully perform LICM in the majority of cases.
+**Loop Invariant Code Motion (LICM)**: an expression whose value never changes across iterations of a loop is called a *loop invariant*. Since its value doesn't change across loop iterations, we can move a loop invariant expression outside of the loop. We do so by storing the result in a temporary variable and using it inside the loop (see [@lst:LICM]).[^17] All decent compilers nowadays successfully perform LICM in the majority of cases.
 
 Listing: Loop Invariant Code Motion
 
@@ -139,28 +139,15 @@ for (int i = 0; i < N; i++)           for (int i = 0; i+1 < N; i+=2)
 
 Loop Unroll and Jam can be performed as long as there are no cross-iteration dependencies on the outer loops, in other words, two iterations of the inner loop can be executed in parallel. Also, this transformation makes sense if the inner loop has memory accesses that are strided on the outer loop index (`i` in this case), otherwise, other transformations likely apply better. The Unroll and Jam technique is especially useful when the trip count of the inner loop is low, e.g., less than 4. By doing the transformation, we pack more independent operations into the inner loop, which increases the ILP.
 
-Unroll and Jam transformation sometimes could be very useful for outer loop vectorization, which, at the time of writing, compilers cannot do automatically. In a situation when the trip count of the inner loop is not visible to a compiler, the compiler could still vectorize the original inner loop, hoping that it will execute enough iterations to hit the vectorized code (more on vectorization in the next section). But if the trip count is low, the program will use a slow scalar version of the loop. By performing Unroll and Jam, we enable the compiler to vectorize the code differently: now "gluing" the independent instructions in the inner loop together. This technique is also known as superword-level parallelism (SLP) vectorization.
+Unroll and Jam transformation sometimes are very useful for outer loop vectorization, which, at the time of writing, compilers cannot do automatically. In a situation when the trip count of the inner loop is not visible to a compiler, the compiler could still vectorize the original inner loop, hoping that it will execute enough iterations to hit the vectorized code (more on vectorization in the next section). But if the trip count is low, the program will use a slow scalar version of the loop. By performing Unroll and Jam, we enable the compiler to vectorize the code differently: now "gluing" the independent instructions in the inner loop together. This technique is also known as Superword-Level Parallelism (SLP) vectorization.
 
 ### Discovering Loop Optimization Opportunities. {#sec:DiscoverLoopOpts}
 
 As we discussed at the beginning of this section, compilers will do the heavy-lifting part of optimizing your loops. You can count on them to make all the obvious improvements in the code of your loops, like eliminating unnecessary work, doing various peephole optimizations, etc. Sometimes a compiler is clever enough to generate the fast version of a loop automatically, but other times we have to do some rewriting to help the compiler. As we said earlier, from a compiler's perspective, doing loop transformations legally and automatically is very difficult. Often, compilers have to be conservative when they cannot prove the legality of a transformation. 
 
-Consider the code in [@lst:Restrict]. A compiler cannot move the expression `strlen(a)` out of the loop body. So, the loop checks if we reached the end of the string on each iteration, which is slow. The reason why a compiler cannot hoist the call is that there could be a situation when the memory regions of arrays `a` and `b` overlap. In this case, it would be illegal to move `strlen(a)` out of the loop body. If developers are sure that the memory regions do not overlap, they can declare both parameters of function `foo` with the `__restrict__` attribute, i.e., `char* __restrict__ a`.
+As a first step, you can check compiler optimization reports or examine the machine code[^16] of the loop to search for easy improvements. Sometimes, it's possible to adjust compiler transformations using user directives. There are compiler pragmas that control certain transformations, like loop vectorization, loop unrolling, loop distribution, and others. For a complete list of user directives, check your compiler's manual.
 
-Listing: Cannot move strlen out of the loop
-
-~~~~ {#lst:Restrict .cpp}
-void foo(char* a, char* b) {
-  for (int i = 0; i < strlen(a); ++i)
-    b[i] = (a[i] == 'x') ? 'y' : 'n';
-}
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Sometimes compilers can inform us about failed transformations via compiler optimization reports (see [@sec:compilerOptReports]). However, in this case, neither Clang 10 nor GCC 10 were able to explicitly tell that the expression `strlen(a)` was not hoisted out of the loop. The only way to find this out is to examine hot parts of the generated assembly code according to the profile of the application. Analyzing machine code requires the basic ability to read assembly language, but it is a highly rewarding activity.
-
-It is a reasonable strategy to try to get the low-hanging fruit first. Developers could use compiler optimization reports or examine the machine code of a loop to search for easy improvements. Sometimes, it's possible to adjust compiler transformations using user directives. For example, when we find out that the compiler unrolled a loop by a factor of 4, we may check if using a higher unrolling factor will improve performance. Most compilers support `#pragma unroll(8)`, which will instruct a compiler to use the unrolling factor specified by the user. There are other pragmas that control certain transformations, like loop vectorization, loop distribution, and others. For a complete list of user directives, readers should check their compiler's manual.
-
-Next, developers should identify the bottlenecks in the loop and assess performance against the hardware theoretical maximum. Start with the Roofline Performance Model ([@sec:roofline]), which will reveal the bottlenecks that developers should try to address. The performance of the loops is limited by one or many of the following factors: memory latency, memory bandwidth, or the computing capabilities of a machine. Once the bottlenecks of a loop have been identified, developers can try to apply one of the transformations discussed earlier in this section.
+Next, you should identify the bottlenecks in the loop and assess performance against the hardware theoretical maximum. The Top-down Microarchitecture Analysis (TMA, see [@sec:TMA]) methodology and the Roofline performance model ([@sec:roofline]) both help with that. The performance of the loops is limited by one or many of the following factors: memory latency, memory bandwidth, or the computing capabilities of a machine. Once the bottlenecks of a loop have been identified, apply the required transformations that we discussed in a few previous sections.
 
 Even though there are well-known optimization techniques for a particular set of computational problems, loop optimizations remain a "black art" that comes with experience. We recommend that you rely on a compiler and complement it with manually transforming code when necessary. Above all, keep the code as simple as possible and do not introduce unreasonably complicated changes if the performance benefits are negligible.
 
@@ -191,3 +178,5 @@ A more recent approach to building a polyhedral compiler is a project called Pol
 [^6]: Polybench - [https://web.cse.ohio-state.edu/~pouchet.2/software/polybench/](https://web.cse.ohio-state.edu/~pouchet.2/software/polybench/).
 [^7]: Why not Polly? - [https://sites.google.com/site/parallelizationforllvm/why-not-polly](https://sites.google.com/site/parallelizationforllvm/why-not-polly).
 [^8]: Polygeist - [https://github.com/llvm/Polygeist](https://github.com/llvm/Polygeist)
+[^16]: Sometimes difficult, but always a rewarding activity.
+[^17]: The compiler will perform the transformation only if it can prove `a` and `c` don’t alias.

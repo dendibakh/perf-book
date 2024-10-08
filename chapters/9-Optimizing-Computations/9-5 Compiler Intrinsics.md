@@ -88,8 +88,7 @@ Highway supports over 200 operations, which can be grouped into the following ca
 \end{itemize}
 \end{multicols}
 
-For the full list of operations, see its documentation [^13] and [FAQ](https://github.com/google/highway/blob/master/g3doc/faq.md). You can also experiment with it in the online [Compiler Explorer](https://gcc.godbolt.org/z/zP7MYe9Yf).
-Other libraries include Eigen, nsimd, SIMDe, VCL, and xsimd. Note that a C++ standardization effort starting with the Vc library resulted in std::experimental::simd, but this provides a very limited set of operations and as of this writing is only supported on the GCC 11 compiler.
+For the full list of operations, see its documentation [^13] and [FAQ](https://github.com/google/highway/blob/master/g3doc/faq.md). Highway is not the only library of this kind. Other libraries include nsimd, SIMDe, VCL, and xsimd. Note that a C++ standardization effort starting with the Vc library resulted in std::experimental::simd, but this provides a very limited set of operations and as of this writing is not supported on all the major compilers.
 
 [^11]: Intel Intrinsics Guide - [https://software.intel.com/sites/landingpage/IntrinsicsGuide/](https://software.intel.com/sites/landingpage/IntrinsicsGuide/).
 [^12]: Highway library: [https://github.com/google/highway](https://github.com/google/highway)
