@@ -5,18 +5,18 @@ One way to avoid frequently mispredicted branches is to use lookup tables. An ex
 Listing: Replacing branches with lookup tables.
 
 ~~~~ {#lst:LookupBranches .cpp}
-int8_t mapToBucket(unsigned v) {            int8_t buckets[50] = {
-  if      (v < 10) return 0;                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-  else if (v < 20) return 1;                  1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-  else if (v < 30) return 2;         =>       2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-  else if (v < 40) return 3;                  3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-  else if (v < 50) return 4;                  4, 4, 4, 4, 4, 4, 4, 4, 4, 4 };
+int8_t mapToBucket(unsigned v) {       int8_t buckets[50] = {
+  if      (v < 10) return 0;             0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  else if (v < 20) return 1;             1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  else if (v < 30) return 2;      =>     2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+  else if (v < 40) return 3;             3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+  else if (v < 50) return 4;             4, 4, 4, 4, 4, 4, 4, 4, 4, 4 };
   return -1;
-}                                           int8_t mapToBucket(unsigned v) {
-                                              if (v < (sizeof(buckets) / sizeof(int8_t)))
-                                                return buckets[v];
-                                              return -1;
-                                            }
+}                                      int8_t mapToBucket(unsigned v) {
+                                         if (v < (sizeof(buckets) / sizeof(int8_t)))
+                                           return buckets[v];
+                                         return -1;
+                                       }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 For the improved version of `mapToBucket` on the right, a compiler will likely generate a single branch instruction that guards against out-of-bounds access to the `buckets` array. A typical hot path through this function will execute the untaken branch and one load instruction. The branch will be well-predicted by the CPU branch predictor since we expect most of the input values to fall into the range covered by the `buckets` array. The lookup will also be fast since the `buckets` array is small and likely to be in the L1 D-cache.
