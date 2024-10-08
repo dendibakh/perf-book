@@ -21,7 +21,7 @@ Google introduced the CP concept in the 2010 paper “Google-Wide Profiling” [
 5. In Jan 2021, Pyroscope released its open-source Continuous Profiler.
 6. In October 2021, Elastic acquired Optimyze and its Continuous Profiler (Prodfiler); Polar Signals released its open-source Parca Continuous Profiler. It was open-source in April 2024.
 7. In December 2021, Splunk released its AlwaysOn Profiler.
-8. In March 2022, Intel acquired Granulate and its Continuous Profiler (gProfiler). It was open-source in March 2024.
+8. In March 2022, Intel acquired Granulate and its Continuous Profiler (gProfiler). It was made open-source in March 2024.
 
 New entrants into this space continue to pop up in both open-source and commercial varieties. Some of these offerings require more hand-holding than others. For example, some require source code or configuration file changes to begin profiling. Others require different agents for different language runtimes (e.g., Ruby, Python, Golang, C/C++/Rust). The best of them have crafted a secret sauce around eBPF so that nothing other than simply installing the runtime agent is necessary.
 
