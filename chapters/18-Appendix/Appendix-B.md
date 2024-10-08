@@ -31,7 +31,7 @@ VirtualFree(ptr, 0, MEM_RELEASE);
 
 On Linux OS, there are two ways of using huge pages in an application: Explicit and Transparent Huge Pages.
 
-### Explicit hugepages {.unnumbered .unlisted}
+### Explicit Huge Pages {.unnumbered .unlisted}
 
 Explicit huge pages can be reserved at system boot time or before an application starts. To make a permanent change to force the Linux kernel to allocate 128 huge pages at the boot time, run the following command:
 
@@ -85,7 +85,7 @@ Other alternatives include:
 * `mmap` using a file from a mounted `hugetlbfs` filesystem ([example code](https://github.com/torvalds/linux/blob/master/tools/testing/selftests/vm/hugepage-mmap.c)[^26]).
 * `shmget` using the `SHM_HUGETLB` flag ([example code](https://github.com/torvalds/linux/blob/master/tools/testing/selftests/vm/hugepage-shm.c)[^27]).
 
-### Transparent hugepages {.unnumbered .unlisted}
+### Transparent Huge Pages {.unnumbered .unlisted}
 
 To allow applications to use Transparent Huge Pages (THP) on Linux one should ensure that `/sys/kernel/mm/transparent_hugepage/enabled` is `always` or `madvise`. The former enables system-wide usage of THPs, while the latter gives control to the user code on which memory regions should use THPs, thus avoiding the risk of consuming more memory resources. Below is an example of using the `madvise` approach:
 

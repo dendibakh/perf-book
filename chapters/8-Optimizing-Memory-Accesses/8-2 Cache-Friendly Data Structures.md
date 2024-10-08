@@ -10,7 +10,7 @@ Next, we will discuss several techniques to make data structures more cache-frie
 
 The best way to exploit the spatial locality of the caches is to make sequential memory accesses. By doing so, we enable the hardware prefetching mechanism (see [@sec:HwPrefetch]) to recognize the memory access pattern and bring in the next chunk of data ahead of time. An example of Row-major versus Column-Major traversal is shown in [@lst:CacheFriend]. Notice, that there is only one tiny change in the code (swapped `col` and `row` subscripts), but it has a significant impact on performance.
 
-The code on the left is not cache-friendly because it skips the `NCOLS` elements on every iteration of the inner loop. This results in a very inefficient use of caches. In contrast, the code on the right accesses elements of the matrix in the order in which they are laid out in memory. Row-major traversal exploits spatial locality and is cache-friendly. Figure @fig:ColRowMajor illustrates the difference between the two traversal patterns.
+The code on the left is not cache-friendly because it skips the `NCOLS` elements on every iteration of the inner loop. This results in a very inefficient use of caches: we aren't making full use of the entire prefetched cache line before it gets evicted. In contrast, the code on the right accesses elements of the matrix in the order in which they are laid out in memory. This guarantees that the cache line will be fully used before it gets evicted. Row-major traversal exploits spatial locality and is cache-friendly. Figure @fig:ColRowMajor illustrates the difference between the two traversal patterns.
 
 Listing: Cache-friendly memory accesses.
 
@@ -44,17 +44,17 @@ The utilization of data caches can be also improved by making data more compact.
 Listing: Data Packing
 
 ~~~~ {#lst:DataPacking .cpp}
-// S is `sizeof(unsigned int) * 3` bytes          // S is only 1 byte
-struct S {                                        struct S {
-  unsigned a;                                       unsigned a:4;
-  unsigned b;                              =>       unsigned b:2;
-  unsigned c;                                       unsigned c:2;
-};                                                };
+// S is 3 bytes                         // S is 1 byte
+struct S {                              struct S {
+  unsigned char a;                        unsigned char a:4;
+  unsigned char b;                =>      unsigned char b:2;
+  unsigned char c;                        unsigned char c:2;
+};                                      };
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Notice the 12 times less space required to store an object of the packed version of `S`. This greatly reduces the amount of memory transferred back and forth and saves cache space. However, using bitfields comes with additional costs. Since the bits of `a`, `b`, and `c` are packed into a single byte, the compiler needs to perform additional bit manipulation operations to extract and insert them. For example, to load `b`, you need to shift the byte value right (`>>`) by 2 and do logical AND (`&`) with `0x3`. Similarly, shift left (`<<`) and logical OR (`|`) operations are needed to store the updated value back into the packed format. Data packing is beneficial in places where additional computation is cheaper than the delay caused by inefficient memory transfers.
+Notice the three times less space required to store an object of the packed version of `S`. This greatly reduces the amount of memory transferred back and forth and saves cache space. However, using bitfields comes with additional costs.[^15] Since the bits of `a`, `b`, and `c` are packed into a single byte, the compiler needs to perform additional bit manipulation operations to extract and insert them. For example, to load `b`, you need to shift the byte value right (`>>`) by 2 and do logical AND (`&`) with `0x3`. Similarly, shift left (`<<`) and logical OR (`|`) operations are needed to store the updated value back into the packed format. Data packing is beneficial in places where additional computation is cheaper than the delay caused by inefficient memory transfers.
 
-Also, a programmer can reduce memory usage by rearranging fields in a struct or class when it avoids padding added by a compiler. The reason for a compiler to insert unused bytes of memory (pads) is to enable efficient storing and fetching of individual members of a struct. In the example in [@lst:AvoidPadding], the size of `S` can be reduced if its members are declared in the order of decreasing size. Figure @fig:AvoidPadding illustrates the effect of rearranging the fields in struct `S`.
+Also, a programmer can reduce memory usage by rearranging fields in a struct or class when it avoids padding added by a compiler. Inserting unused bytes of memory (pads) enables efficient storing and fetching of individual members of a struct. In the example in [@lst:AvoidPadding], the size of `S` can be reduced if its members are declared in the order of decreasing size. Figure @fig:AvoidPadding illustrates the effect of rearranging the fields in struct `S`.
 
 Listing: Avoid compiler padding.
 
@@ -115,9 +115,9 @@ std::vector<Point> points;                      /*many other fields*/
                                               std::vector<PointInfo> pointInfos;
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-**Pointer inlining**. Inlining a pointer into a structure can improve cache utilization. For example, if you have a structure that contains a pointer to another structure, you can inline the pointer into the first structure. This way, you can avoid additional memory access to fetch the second structure. An example of pointer inlining is shown in [@lst:PointerInlining]. The `weight` parameter is used in many graph algorithms, and thus, it is frequently accessed. However, in the original version on the left, retrieving the edge weight requires additional memory access, which can result in a cache miss. By inlining the `weight` parameter into the `GraphEdge` structure, we avoid such issues.
+**Pointer inlining**. Inlining a pointer into a structure can improve cache utilization. For example, if you have a structure that contains a pointer to another structure, you can inline the pointer into the first structure. This way, you can avoid additional memory access to fetch the second structure. An example of pointer inlining is shown in [@lst:PointerInlining]. The `weight` parameter is used in many graph algorithms, and thus, it is frequently accessed. However, in the original version on the left, retrieving the edge weight requires additional memory access, which can result in a cache miss. By moving the `weight` parameter into the `GraphEdge` structure, we avoid such issues.
 
-Listing: Pointer inlining in a structure.
+Listing: Moving the `weight` parameter into the parent structure.
 
 ~~~~ {#lst:PointerInlining .cpp}
 struct GraphEdge {                            struct GraphEdge {
@@ -143,3 +143,4 @@ Data-type profiling is very effective at finding opportunities to improve cache 
 [^12]: aligned_alloc - [https://en.cppreference.com/w/c/memory/aligned_alloc](https://en.cppreference.com/w/c/memory/aligned_alloc)
 [^13]: Linux manual page for `memalign` - [https://linux.die.net/man/3/memalign](https://linux.die.net/man/3/memalign)
 [^14]: Generating aligned memory - [https://embeddedartistry.com/blog/2017/02/22/generating-aligned-memory/](https://embeddedartistry.com/blog/2017/02/22/generating-aligned-memory/)
+[^15]: Also, you cannot take the address of a bitfield.

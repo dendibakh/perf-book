@@ -31,7 +31,7 @@
 
 \textbf{EBS} Event-Based Sampling
 
-\textbf{EHP} Explicit Hugepages
+\textbf{EHP} Explicit Huge Pages
 
 \textbf{FLOPS} FLoating-point Operations Per Second
 
