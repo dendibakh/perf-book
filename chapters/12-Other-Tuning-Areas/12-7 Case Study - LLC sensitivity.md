@@ -12,40 +12,44 @@ For this case study, we use an AMD Milan processor, but other server processors 
 
 We have used a server system with a 16-core AMD EPYC 7313P processor, code-named Milan, which AMD launched in 2021. The main characteristics of this system are specified in table @tbl:experimental_setup. Based on our tests, the method described in this section works equally well on AMD Zen4-based desktop processors, such as 7950X and 7950X3D.
 
-----------------------------------------------------------------------------
- Feature               Value
-----------------       ----------------------------------------------------
- Processor             AMD EPYC 7313P
+\small
 
- Cores x threads       16 $\times$ 2
+---------------------------------------------------------------------------
+Feature               Value
+----------------      -----------------------------------------------------
+Processor             AMD EPYC 7313P
+
+Cores x threads       16 $\times$ 2
  
- Configuration         4 CCX $\times$ 4 cores/CCX
+Configuration         4 CCX $\times$ 4 cores/CCX
  
- Frequency             3.0/3.7 GHz, base/max
+Frequency             3.0/3.7 GHz, base/max
 
- L1 cache (I, D)       8-ways, 32 KiB (per core)
+L1 cache (I, D)       8-ways, 32 KiB (per core), 64-byte lines
 
- L2 cache              8-ways, 512 KiB (per core)
+L2 cache              8-ways, 512 KiB (per core), 64-byte lines
 
- LLC                   16-ways, 32 MiB, non-inclusive (per CCX)
+LLC                   16-ways, 32 MiB, non-inclusive (per CCX), 64-byte lines
  
- Main Memory           512 GiB DDR4, 8 channels, nominal peak BW: 204.8 GB/s,
+Main Memory           512 GiB DDR4, 8 channels, nominal peak BW: 204.8 GB/s
 
- TurboBoost            Disabled
+TurboBoost            Disabled
 
- Hyperthreading        Disabled (1 thread/core)
+Hyperthreading        Disabled (1 thread/core)
 
- OS                    Ubuntu 22.04, kernel 5.15.0-76
+OS                    Ubuntu 22.04, kernel 5.15.0-76
 
-----------------------------------------------------------------------------
+---------------------------------------------------------------------------
 
 Table: Main features of the server used in the experiments. {#tbl:experimental_setup}
 
-Figure @fig:milan7313P shows the clustered memory hierarchy of the AMD Milan 7313P processor. It consists of four Core Complex Dies (CCDs) connected to each other and to off-chip memory via an I/O chiplet. Each CCD integrates a Core CompleX (CCX) and an I/O connection. In turn, each CCX has four Zen3 cores capable of running eight threads that share a 32 MiB victim LLC, i.e., the LLC is filled with the cache lines evicted from the four L2 caches of a CCX. 
+\normalsize
+
+Figure @fig:milan7313P shows the clustered memory hierarchy of the AMD Milan 7313P processor. It consists of four Core Complex Dies (CCDs) connected to each other and to off-chip memory via an I/O chiplet. Each CCD integrates a Core CompleX (CCX) and an I/O connection. In turn, each CCX has four Zen3 cores that share a 32 MiB victim LLC, i.e., the LLC is filled with the cache lines evicted from the four L2 caches of a CCX. 
 
 ![The clustered memory hierarchy of the AMD Milan 7313P processor.](../../img/other-tuning/Milan7313P.png){#fig:milan7313P width=80%}
 
-Although there is a total of 128 MiB of LLC, the four cores of a CCX cannot store cache lines in an LLC other than their own 32 MiB LLC (32 MiB/CCX x 4 CCX). Since we will be running single-threaded benchmarks, we can focus on a single CCX. The size of LLC in our experiments will vary from 0 to 32 MiB with steps of 2 MiB.
+Although there is a total of 128 MiB of LLC, the four cores of a CCX cannot store cache lines in an LLC other than their own 32 MiB LLC (32 MiB/CCX x 4 CCX). Since we will be running single-threaded benchmarks, we can focus on a single CCX. The size of LLC in our experiments will vary from 0 to 32 MiB with steps of 2 MiB. This is directly related to having a 16-way LLC: by disabling one of 16 ways, we reduce the LLC size by 2 MiB.
 
 ### Workload: SPEC CPU2017 {.unlisted .unnumbered}
 
@@ -97,7 +101,7 @@ Metric                                     Formula
 ------   ----------------------------------------------------------------------------
 CPI      Cycles not in Halt (PMCx076) / Retired Instructions (PMCx0C0)
 
-DMPKI    Demand Data Cache Fills[^9] (PMCx043) / (Retired Instructions (PMCx0C0) / 1000)
+DMPKI    Demand Data Cache Fills[^9] (PMCx043) / (Retired Instr (PMCx0C0) / 1000)
 
 MPKI     L3 Misses[^8] (L3PMCx04) / (Retired Instructions (PMCx0C0) / 1000)
 
@@ -122,9 +126,9 @@ The methodology used in this case study is described in more detail in [@Balance
 
 ### Results {.unlisted .unnumbered}
 
-We run a set of SPEC CPU2017 benchmarks *alone* in the system using only one instance and a single hardware thread. We repeat those runs while changing the available LLC size from 0 to 32 MiB with 2 MiB steps. Figure @fig:characterization_llc shows in graphs, from left to right, CPI, DMPKI, and MPKI for each assigned LLC size. For the CPI chart, a lower value on the Y-axis means better performance. Also, since the frequency on the system is fixed, the CPI chart is reflective of absolute scores. For example, `520.omnetpp` (dotted line) with 32 MiB LLC is 2.5 times faster than with 0 MiB LLC.
+We run a set of SPEC CPU2017 benchmarks *alone* in the system using only one instance and a single hardware thread. We repeat those runs while changing the available LLC size from 0 to 32 MiB in 2 MiB steps. Figure @fig:characterization_llc shows in graphs, from left to right, CPI, DMPKI, and MPKI for each assigned LLC size. For the CPI chart, a lower value on the Y-axis means better performance. Also, since the frequency on the system is fixed, the CPI chart is reflective of absolute scores. For example, `520.omnetpp` (green line) with 32 MiB LLC is 2.5 times faster than with 0 MiB LLC.
 
-For the DMPKI and MPKI charts, the lower the value on the Y-axis, the better. Three lines that correspond to `503.bwaves` (solid), `520.omnetpp` (dotted), and `554.roms` (dashed), represent the three main trends observed in all applications. We do not show the rest of the benchmarks.
+For the DMPKI and MPKI charts, the lower the value on the Y-axis, the better. Three lines that correspond to `503.bwaves` (blue), `520.omnetpp` (green), and `554.roms` (red), represent the three main trends observed in all applications. We do not show the rest of the benchmarks.
 
 ![CPI, DMPKI, and MPKI for increasing LLC allocation limits (2 MiB steps).](../../img/other-tuning/llc-bw.png){#fig:characterization_llc width=100%}
 
