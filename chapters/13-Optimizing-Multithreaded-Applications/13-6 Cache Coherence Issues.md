@@ -15,29 +15,29 @@ One of the most well-known cache coherency protocols is MESI (**M**odified **E**
 
 When fetched from memory, each cache line has one of the states encoded into its tag. Then the cache line state keeps transiting from one state to another.[^25] In reality, CPU vendors usually implement slightly improved variants of MESI. For example, Intel uses [MESIF](https://en.wikipedia.org/wiki/MESIF_protocol),[^26] which adds a Forwarding (F) state, while AMD employs [MOESI](https://en.wikipedia.org/wiki/MOESI_protocol),[^27] which adds the Owning (O) state. However, these protocols still maintain the essence of the base MESI protocol.
 
-As an earlier example demonstrates, the cache coherency problem can cause sequentially inconsistent programs. This problem can be mitigated by having _snoop_ caches watch all memory transactions and cooperate with each other to maintain memory consistency. Unfortunately, it comes with a cost since modification done by one processor invalidates the corresponding cache line in another processor's cache. This causes memory stalls and wastes system bandwidth. In contrast to serialization and locking issues, which can only put a ceiling on the performance of the application, coherency issues can cause retrograde effects as attributed by USL in [@sec:secAmdahl]. Two widely known types of coherency problems are "True Sharing" and "False Sharing", which we will explore next.
+As an earlier example demonstrates, the cache coherency problem can cause sequentially inconsistent programs. This problem can be mitigated by having _snoop_ caches watch all memory transactions and cooperate with each other to maintain memory consistency. Unfortunately, it comes with a cost since modification done by one core invalidates the corresponding cache line in another core's cache. This causes memory stalls and wastes system bandwidth. In contrast to serialization and locking issues, which can only put a ceiling on the performance of the application, coherency issues can cause retrograde effects as attributed by USL in [@sec:secAmdahl]. Two widely known types of coherency problems are *true sharing* and *false sharing*, which we will explore next.
 
 ### True Sharing {#sec:secTrueSharing}
 
-True sharing occurs when two different processors access the same variable (see [@lst:TrueSharing]).
+True sharing occurs when two different cores access the same variable (see [@lst:TrueSharing]).
 
 Listing: True Sharing Example.
 
 ~~~~ {#lst:TrueSharing .cpp}
-unsigned int sum;
-{ // parallel section
-  for (int i = 0; i < N; i++)
-    sum += a[i]; // sum is shared between all threads
-}
+unsigned int sum; // shared between all threads
+{ // code executed by thread A      │ { // code executed by thread B
+  for (int i = 0; i < N; i++)       │   for (int i = 0; i < N; i++)
+    sum += a[i];                    │     sum += b[i];
+}                                   │ }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-First of all, true sharing implies data races that can be tricky to detect. Fortunately, there are tools that can help identify such issues. [Thread sanitizer](https://clang.llvm.org/docs/ThreadSanitizer.html)[^30] from Clang and [helgrind](https://www.valgrind.org/docs/manual/hg-manual.html)[^31] are among such tools. To prevent the data race in [@lst:TrueSharing], you should declare the `sum` variable as `std::atomic<unsigned int> sum`.
+First of all, we have a bigger problem besides true sharing. We actually have a *data races*, which sometimes can be quite tricky to detect. Notice, we don't have a proper synchronization mechanisms in place, which can lead to unpredictable or incorrect program behavior, because the operations on the shared data might interfere with one another. Fortunately, there are tools that can help identify such issues. [Thread sanitizer](https://clang.llvm.org/docs/ThreadSanitizer.html)[^30] from Clang and [helgrind](https://www.valgrind.org/docs/manual/hg-manual.html)[^31] are among such tools. To prevent the data race in [@lst:TrueSharing], you should declare the `sum` variable as `std::atomic<unsigned int> sum`.
 
-Using C++ atomics can help to solve data races when true sharing happens. However, it effectively serializes accesses to the atomic variable, which may hurt performance. Another way of solving true sharing issues is by using Thread Local Storage (TLS). TLS is the method by which each thread in a given multithreaded process can allocate memory to store thread-specific data. By doing so, threads modify their local copies instead of contending for a globally available memory location. The example in [@lst:TrueSharing] can be fixed by declaring `sum` with a TLS class specifier: `thread_local unsigned int sum` (since C++11). The main thread should then incorporate results from all the local copies of each worker thread.
+Using C++ atomics can help to solve data races when true sharing happens. However, it effectively serializes accesses to the atomic variable, which may hurt performance. A better way of solving our true sharing issue is by using Thread Local Storage (TLS). TLS is the method by which each thread in a given multithreaded process can allocate memory to store thread-specific data. By doing so, threads modify their local copies instead of contending for a globally available memory location. The example in [@lst:TrueSharing] can be fixed by declaring `sum` with a TLS class specifier: `thread_local unsigned int sum` (since C++11). The main thread should then incorporate results from all the local copies of each worker thread.
 
 ### False Sharing {#sec:secFalseSharing}
 
-False sharing occurs when two different processors modify different variables that happen to reside on the same cache line. In the code sample shown in [@lst:FalseSharing], even though threads `A` and `B` update different fields of struct `S`, they are very likely to reside on the same cache line, which will trigger a false sharing issue. Figure @fig:FalseSharing illustrates this problem.
+If not careful, you may attempt to solve the true sharing issue as shown in [@lst:FalseSharing]. However, this solution introduces another problem: false sharing. False sharing occurs when two different cores modify different variables that happen to reside on the same cache line. In the code sample shown in [@lst:FalseSharing], even though threads `A` and `B` update different fields of struct `S`, they are very likely to reside on the same cache line, which will trigger a false sharing issue. Figure @fig:FalseSharing illustrates this problem.
 
 Listing: False Sharing Example.
 
