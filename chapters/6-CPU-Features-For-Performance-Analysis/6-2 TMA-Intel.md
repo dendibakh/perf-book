@@ -172,13 +172,6 @@ This explicit memory prefetching hint decreases execution time from 8.5 seconds 
 
 TMA is an iterative process, so once we fix one problem, we need to repeat the process starting from Step 1. Likely it will move the bottleneck into another bucket, in this case, `Retiring`. This was an easy example demonstrating the workflow of TMA methodology. Analyzing real-world applications is unlikely to be that easy. Chapters in the second part of the book are organized to make them convenient for use with the TMA process. In particular, Chapter 8 covers the `Memory Bound` category, Chapter 9 covers `Core Bound`, Chapter 10 covers `Bad Speculation`, and Chapter 11 covers `FrontEnd Bound`. Such a structure is intended to form a checklist that you can use to drive code changes when you encounter a certain performance bottleneck.
 
-#### Additional resources and links {.unlisted .unnumbered}
-
-- Ahmad Yasin’s paper “A top-down method for performance analysis and counters architecture” [@TMA_ISPASS].
-- Presentation "Software Optimizations Become Simple with Top-down Analysis on Intel Skylake" by Ahmad Yasin at IDF'15, URL: [https://youtu.be/kjufVhyuV_A](https://youtu.be/kjufVhyuV_A).
-- Andi Kleen's blog: pmu-tools, part II: toplev, URL: [http://halobates.de/blog/p/262](http://halobates.de/blog/p/262).
-- Toplev manual, URL: [https://github.com/andikleen/pmu-tools/wiki/toplev-manual](https://github.com/andikleen/pmu-tools/wiki/toplev-manual).
-
 [^2]: TMA metrics - [https://github.com/intel/perfmon/blob/main/TMA_Metrics.xlsx](https://github.com/intel/perfmon/blob/main/TMA_Metrics.xlsx).
 [^7]: PMU tools - [https://github.com/andikleen/pmu-tools](https://github.com/andikleen/pmu-tools).
 [^8]: Case study example - [https://github.com/dendibakh/dendibakh.github.io/tree/master/_posts/code/TMAM](https://github.com/dendibakh/dendibakh.github.io/tree/master/_posts/code/TMAM).
