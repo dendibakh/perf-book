@@ -22,7 +22,7 @@ Nevertheless, this doesn't remove the value of architecture-specific optimizatio
 
 ISA evolution has been continuous. It has focused on accelerating specialized workloads, such as cryptography, AI, multimedia, and others. Utilizing ISA extensions often results in substantial performance improvements. Developers keep finding smart ways to leverage these extensions in general-purpose applications. So, even if you're outside of one of these highly specialized domains, you might still benefit from using ISA extensions.
 
-It's not possible to learn about all specific instructions. But we suggest you familiarize yourself with major ISA extensions available on your target platform. For example, if you are developing an AI application that uses `fp16` data types, and you target one of the modern ARM processors, make sure that your program's machine code contains corresponding `fp16` ISA extensions. If you're developing encryption/decryption software, check if it utilizes crypto extensions of your target ISA. And so on.
+It's not possible to learn about all specific instructions. But we suggest you familiarize yourself with major ISA extensions available on your target platform. For example, if you are developing an AI application that uses `fp16` (16-bit half-precision floating-point) data types, and you target one of the modern ARM processors, make sure that your program's machine code contains corresponding `fp16` ISA extensions. If you're developing encryption/decryption software, check if it utilizes crypto extensions of your target ISA. And so on.
 
 Here is a list of some notable x86 ISA extensions:
 
@@ -44,6 +44,8 @@ Here is a list of some notable ARM ISA extensions:
 * SME: Scalable Matrix Extension for accelerating matrix multiplication.
 
 When compiling your applications, make sure to enable the necessary compiler flags to activate required ISA extensions. On GCC and Clang compilers use the `-march` option. For example, `-march=native` will activate ISA features of your host system, i.e., on which you run the compilation. Or you can include a specific version of ISA, e.g., `-march=armv8.6-a`. On the MSVC compiler, use the `/arch` option, e.g., `/arch:AVX2`.
+
+I do not recommend using `-march=native` for production builds, because code generation will depend on which machine you're building your code. Many CI/CD systems have old machines. Building software on one of these  machines with `-march=native` may lead to suboptimal performance when the application is run on a newer machine. Instead, use `-march` with a specific microarchitecture that you want to target. 
 
 ### CPU Dispatch
 
@@ -88,9 +90,11 @@ float sqSum(float *a, int N) {         │ .loop:
 }                                      │  jne .loop
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The code looks very logical; it uses fused multiply-add instruction to compute the product of one element of `a` (in `xmm1`) and then accumulates the result in `xmm0`. The problem is that there is a data dependency over `xmm0`. A processor cannot issue a new `vfmadd231ss` instruction until the previous one has finished since `xmm0` is both an input and an output of `vfmadd231ss`. The performance of this loop is bound by FMA latency, which in Intel's Alder Lake equals 4 cycles.
+On each iteration of the loop, we have two operations: calculate the squared value of `a[i]` and accumulate the product in the `sum` variable. If you look closer, you may notice that multiplications are independent of each other, so they can be executed in parallel. The generated machine code (on the right) uses fused multiply-add (FMA) to perform both operations with a single instruction. The problem here is that by using FMAs, the compiler has included multiplication into the critical dependency chain of the loop.
 
-You may think: "But wait, multiplications do not depend on each other." Yes, you're right, yet the whole FMA instruction needs to wait until all its inputs become available. So, in this case, fusing multiplication and addition hurts performance. We would be better off with two separate instructions. The `nanobench` experiment below proves that:
+The `vfmadd231ss` instruction computes the squared value of `a[i]` (in `xmm1`) and then accumulates the result in `xmm0`. There is a data dependency over `xmm0`: a processor cannot issue a new `vfmadd231ss` instruction until the previous one has finished since `xmm0` is both an input and an output of `vfmadd231ss`. Even though multiplication parts of FMA do not depend on each other, these instructions need to wait until all inputs become available. The performance of this loop is bound by FMA latency, which in Intel's Alder Lake is 4 cycles.
+
+In this case, fusing multiplication and addition hurts performance. We would be better off with two separate instructions. The `nanobench` experiment below proves that:
 
 ```
 # ran on Intel Core i7-1260P (Alder Lake)
