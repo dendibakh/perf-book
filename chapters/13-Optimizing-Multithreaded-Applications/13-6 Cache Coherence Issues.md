@@ -1,6 +1,6 @@
 ## Cache Coherence {#sec:TrueFalseSharing}
 
-Multiprocessor systems incorporate means to ensure data coherence during shared usage of memory by each core containing its own, separate cache entity. Without such a protocol, if both CPU `A` and `B` read memory location `L` into their individual caches, and CPU `B` subsequently modifies its cached value for `L`, then the CPUs would have incoherent values of the same memory location `L`. Cache Coherency Protocols ensure that any updates to cached entries are dutifully updated in any other cached entry of the same location.
+Multiprocessor systems incorporate means to ensure data coherence during shared usage of memory by each core containing its own, separate cache entity. Without such a protocol, if both CPU `A` and `B` read memory location `L` into their individual caches, and CPU `B` subsequently modifies its cached value for `L`, then the CPUs would have incoherent values of the same memory location `L`. Cache Coherency Protocols ensure that any updates to cached entries are dutifully updated or invalidated in any other cached entry of the same location.
 
 ### Cache Coherency Protocols
 
