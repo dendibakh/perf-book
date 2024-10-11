@@ -29,7 +29,7 @@ L1 cache (I, D)       8-ways, 32 KiB (per core), 64-byte lines
 
 L2 cache              8-ways, 512 KiB (per core), 64-byte lines
 
-LLC                   16-ways, 32 MiB, non-inclusive (per CCX), 64-byte lines
+LLC                   16-ways, 32 MB, non-inclusive (per CCX), 64-byte lines
  
 Main Memory           512 GiB DDR4, 8 channels, nominal peak BW: 204.8 GB/s
 
@@ -45,11 +45,11 @@ Table: Main features of the server used in the experiments. {#tbl:experimental_s
 
 \normalsize
 
-Figure @fig:milan7313P shows the clustered memory hierarchy of the AMD Milan 7313P processor. It consists of four Core Complex Dies (CCDs) connected to each other and to off-chip memory via an I/O chiplet. Each CCD integrates a Core CompleX (CCX) and an I/O connection. In turn, each CCX has four Zen3 cores that share a 32 MiB victim LLC, i.e., the LLC is filled with the cache lines evicted from the four L2 caches of a CCX. 
+Figure @fig:milan7313P shows the clustered memory hierarchy of the AMD Milan 7313P processor. It consists of four Core Complex Dies (CCDs) connected to each other and to off-chip memory via an I/O chiplet. Each CCD integrates a Core CompleX (CCX) and an I/O connection. In turn, each CCX has four Zen3 cores that share a 32 MB victim LLC, i.e., the LLC is filled with the cache lines evicted from the four L2 caches of a CCX. 
 
 ![The clustered memory hierarchy of the AMD Milan 7313P processor.](../../img/other-tuning/Milan7313P.png){#fig:milan7313P width=80%}
 
-Although there is a total of 128 MiB of LLC, the four cores of a CCX cannot store cache lines in an LLC other than their own 32 MiB LLC (32 MiB/CCX x 4 CCX). Since we will be running single-threaded benchmarks, we can focus on a single CCX. The size of LLC in our experiments will vary from 0 to 32 MiB with steps of 2 MiB. This is directly related to having a 16-way LLC: by disabling one of 16 ways, we reduce the LLC size by 2 MiB.
+Although there is a total of 128 MB of LLC, the four cores of a CCX cannot store cache lines in an LLC other than their own 32 MB LLC (32 MB/CCX x 4 CCX). Since we will be running single-threaded benchmarks, we can focus on a single CCX. The size of LLC in our experiments will vary from 0 to 32 MB with steps of 2 MB. This is directly related to having a 16-way LLC: by disabling one of 16 ways, we reduce the LLC size by 2 MB.
 
 ### Workload: SPEC CPU2017 {.unlisted .unnumbered}
 
@@ -68,7 +68,7 @@ $ wrmsr -p 1 0xC8F 0x200000001
 
 where `-p 1` refers to the hardware thread 1. All `rdmsr` and `wrmsr` commands that we show require root access.
 
-LLC space management is performed by writing to a 16-bit per-thread binary mask. Each bit of the mask allows a thread to use a given sixteenth fraction of the LLC (1/16 = 2 MiB in the case of the AMD Milan 7313P). Multiple threads can use the same fraction(s), implying a competitive shared use of the same subset of LLC.
+LLC space management is performed by writing to a 16-bit per-thread binary mask. Each bit of the mask allows a thread to use a given sixteenth fraction of the LLC (1/16 = 2 MB in the case of the AMD Milan 7313P). Multiple threads can use the same fraction(s), implying a competitive shared use of the same subset of LLC.
 
 To set limits on the LLC usage by thread 1, we need to write to the `L3_MASK_n` register, where `n` is the COS, the cache partitions that can be used by the corresponding COS. For example, to limit thread 1 to use only half of the available space in the LLC, run the following command:
 
@@ -126,11 +126,11 @@ The methodology used in this case study is described in more detail in [@Balance
 
 ### Results {.unlisted .unnumbered}
 
-We run a set of SPEC CPU2017 benchmarks *alone* in the system using only one instance and a single hardware thread. We repeat those runs while changing the available LLC size from 0 to 32 MiB in 2 MiB steps. Figure @fig:characterization_llc shows in graphs, from left to right, CPI, DMPKI, and MPKI for each assigned LLC size. For the CPI chart, a lower value on the Y-axis means better performance. Also, since the frequency on the system is fixed, the CPI chart is reflective of absolute scores. For example, `520.omnetpp` (green line) with 32 MiB LLC is 2.5 times faster than with 0 MiB LLC.
+We run a set of SPEC CPU2017 benchmarks *alone* in the system using only one instance and a single hardware thread. We repeat those runs while changing the available LLC size from 0 to 32 MB in 2 MB steps. Figure @fig:characterization_llc shows in graphs, from left to right, CPI, DMPKI, and MPKI for each assigned LLC size. For the CPI chart, a lower value on the Y-axis means better performance. Also, since the frequency on the system is fixed, the CPI chart is reflective of absolute scores. For example, `520.omnetpp` (green line) with 32 MB LLC is 2.5 times faster than with 0 MB LLC.
 
 For the DMPKI and MPKI charts, the lower the value on the Y-axis, the better. Three lines that correspond to `503.bwaves` (blue), `520.omnetpp` (green), and `554.roms` (red), represent the three main trends observed in all applications. We do not show the rest of the benchmarks.
 
-![CPI, DMPKI, and MPKI for increasing LLC allocation limits (2 MiB steps).](../../img/other-tuning/llc-bw.png){#fig:characterization_llc width=100%}
+![CPI, DMPKI, and MPKI for increasing LLC allocation limits (2 MB steps).](../../img/other-tuning/llc-bw.png){#fig:characterization_llc width=100%}
 
 Two behaviors can be distinguished in the CPI and DMPKI graphs. On one hand, `520.omnetpp` takes advantage of its available space in the LLC: both CPI and DMPKI decrease significantly as the space allocated in the LLC increases. We can say that the behavior of `520.omnetpp` is sensitive to the size available in the LLC. Increasing the allocated LLC space improves performance because it avoids evicting cache lines that will be used in the future.
 
