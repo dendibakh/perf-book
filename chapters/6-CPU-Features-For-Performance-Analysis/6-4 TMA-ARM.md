@@ -1,6 +1,6 @@
 ### TMA On ARM Platforms
 
-ARM CPU architects also have developed a TMA performance analysis methodology for their processors, which we will discuss next. ARM calls it "Topdown" in their documentation [@ARMNeoverseV1TopDown], so we will use their naming. At the time of this writing (late 2023), Topdown is only supported on cores designed by ARM, e.g. Neoverse N1 and Neoverse V1, and their derivatives, e.g. Ampere Altra and AWS Graviton3. Refer to the list of major CPU microarchitectures at the end of this book if you need to refresh your memory on ARM chip families. Processors designed by Apple don't support the ARM Topdown performance analysis methodology yet.
+ARM CPU architects also have developed a TMA performance analysis methodology for their processors, which we will discuss next. ARM calls it "Topdown" in their documentation [@ARMNeoverseV1TopDown], so we will use their naming. At the time of this writing (late 2023), Topdown is only supported on cores designed by ARM, e.g. Neoverse N1 and Neoverse V1,[^5] and their derivatives, e.g. Ampere Altra and AWS Graviton3. Refer to the list of major CPU microarchitectures at the end of this book if you need to refresh your memory on ARM chip families. Processors designed by Apple don't support the ARM Topdown performance analysis methodology yet.
 
 ARM Neoverse V1 is the first CPU in the Neoverse family that supports a full set of level 1 Topdown metrics: `Bad Speculation`, `Frontend Bound`, `Backend Bound`, and `Retiring`. Future Neoverse cores are said to support further levels of TMA. At the time of writing, there are no analysis guides for Neoverse N2 and V2 cores. Prior to V1 cores, Neoverse N1 supported only two L1 categories: `Frontend Stalled Cycles` and `Backend Stalled Cycles`.
 
@@ -65,7 +65,7 @@ Stage 2 (uarch metrics)
   Crypto Operations Percentage........  0.00% operations
 ```
 
-In the command above, the option `-n BackendBound` collects all the metrics associated with the `Backend Bound` category as well as its descendants. The description for every metric in the output is given in [@ARMNeoverseV1TopDown]. Note, that they are quite similar to what we have discussed in [@sec:PerfMetrics], so you may want to revisit it as well.
+In the command above, the option `-n BackendBound` collects all the metrics associated with the `Backend Bound` category as well as its descendants. The description for every metric in the output is given in [@ARMNeoverseV1TopDown]. Note, that they are quite similar to what we have discussed in [@sec:PerfMetrics], so you may want to revisit it as well. 
 
 We don't have a goal of optimizing the benchmark, rather we want to characterize performance bottlenecks. However, if given such a task, here is how our analysis could continue. There are a substantial number of `L1 Data TLB` misses (3.8 MPKI), but then 90% of those misses hit in L2 TLB (see `L2 Unified TLB Miss Ratio`). All in all, only 0.1% of all TLB accesses result in a page table walk (see `DTLB Walk Ratio`), which suggests that it is not our primary concern, although a quick experiment that utilizes huge pages is still worthwhile.
 
@@ -80,3 +80,4 @@ The AI Benchmark Alpha has various tests that could exhibit different performanc
 [^1]: AI Benchmark Alpha - [https://ai-benchmark.com/alpha.html](https://ai-benchmark.com/alpha.html)
 [^2]: ARM `topdown-tool` - [https://learn.arm.com/install-guides/topdown-tool/](https://learn.arm.com/install-guides/topdown-tool/)
 [^3]: WindowsPerf - [https://gitlab.com/Linaro/WindowsPerf/windowsperf](https://gitlab.com/Linaro/WindowsPerf/windowsperf)
+[^5]: In September 2024, ARM published performance analysis for Neoverse V2 and V3 cores - [https://developer.arm.com/telemetry](https://developer.arm.com/telemetry)
