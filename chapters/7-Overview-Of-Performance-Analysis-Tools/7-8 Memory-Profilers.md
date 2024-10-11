@@ -38,7 +38,7 @@ Since the heap is usually the largest consumer of memory resources, it makes sen
 
 In this case study, we use [heaptrack](https://github.com/KDE/heaptrack)[^2], an open-sourced heap memory profiler for Linux developed by KDE. Ubuntu users can install it very easily with `apt install heaptrack heaptrack-gui`. Heaptrack can find places in the code where the largest and most frequent allocations happen among many other things. On Windows, you can use [Mtuner](https://github.com/milostosic/MTuner)[^3] which has similar capabilities to Heaptrack.
 
-In our case study, we analyzed [Stockfish's](https://github.com/official-stockfish/Stockfish)[^4] chess engine built-in benchmark, which we have already looked at in [@sec:PerfMetricsCaseStudy]. As before, we compiled it using the Clang 15 compiler with `-O3 -mavx2` options. We collected the Heaptrack memory profile of a single-threaded Stockfish built-in benchmark on an Intel Alderlake i7-1260P processor using the following command:
+In our case study, we analyzed [Stockfish's](https://github.com/official-stockfish/Stockfish)[^4] chess engine built-in benchmark, which we have already looked at in [@sec:PerfMetricsCaseStudy]. As before, we compiled it using the Clang 15 compiler with `-O3 -mavx2` options. We collected the Heaptrack memory profile of a single-threaded Stockfish built-in benchmark on an Intel Alder Lake i7-1260P processor using the following command:
 
 ```bash
 $ heaptrack ./stockfish bench 128 1 24 default depth

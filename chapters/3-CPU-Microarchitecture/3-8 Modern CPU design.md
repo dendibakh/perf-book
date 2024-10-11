@@ -2,7 +2,7 @@
 
 ## Modern CPU Design
 
-To see how all the concepts we talked about in this chapter are used in practice, let's take a look at the implementation of Intel’s 12th-generation core, Goldencove, which became available in 2021. This core is used as the P-core inside the Alderlake and Sapphire Rapids platforms. Figure @fig:Goldencove_diag shows the block diagram of the Goldencove core. Notice that this section only describes a single core, not the entire processor. So, we will skip the discussion about frequencies, core counts, L3 caches, core interconnects, memory latency and bandwidth, and other things.
+To see how all the concepts we talked about in this chapter are used in practice, let's take a look at the implementation of Intel’s 12th-generation core, Goldencove, which became available in 2021. This core is used as the P-core inside the Alder Lake and Sapphire Rapids platforms. Figure @fig:Goldencove_diag shows the block diagram of the Goldencove core. Notice that this section only describes a single core, not the entire processor. So, we will skip the discussion about frequencies, core counts, L3 caches, core interconnects, memory latency and bandwidth, and other things.
 
 ![Block diagram of a CPU Core in the Intel GoldenCove Microarchitecture.](../../img/uarch/goldencove_block_diagram.png){#fig:Goldencove_diag width=100%}
 
