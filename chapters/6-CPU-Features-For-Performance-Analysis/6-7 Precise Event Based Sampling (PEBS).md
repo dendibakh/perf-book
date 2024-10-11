@@ -26,10 +26,10 @@ For LBR, Linux perf dumps the entire contents of the LBR stack with every collec
 
 ### IBS on AMD Platforms
 
-Instruction-Based Sampling (IBS) is an AMD64 processor feature that can be used to collect specific metrics related to instruction fetch and instruction execution. The pipeline of an AMD processor consists of two separate phases: a Frontend phase that fetches AMD64 instruction bytes and a back-end phase that executes `ops`. As the phases are logically separated, there are two independent sampling mechanisms: IBS Fetch and IBS Execute. 
+Instruction-Based Sampling (IBS) is an AMD64 processor feature that can be used to collect specific metrics related to instruction fetch and instruction execution. The pipeline of an AMD processor consists of two separate phases: a Frontend phase that fetches AMD64 instruction bytes and a Backend phase that executes `ops`. As the phases are logically separated, there are two independent sampling mechanisms: IBS Fetch and IBS Execute. 
 
 - IBS Fetch monitors the Frontend of the pipeline and provides information about ITLB (hit or miss), I-cache (hit or miss), fetch address, fetch latency, and a few other things.
-- IBS Execute monitors the back end of the pipeline and provides information about instruction execution behavior by tracking the execution of a single op. For example, branch (taken or not, predicted or not), and load/store (hit or miss in D-caches and DTLB, linear address, load latency).
+- IBS Execute monitors the Backend of the pipeline and provides information about instruction execution behavior by tracking the execution of a single op. For example, branch (taken or not, predicted or not), and load/store (hit or miss in D-caches and DTLB, linear address, load latency).
 
 There are several important differences between PMC and IBS in AMD processors. PMC counters are programmable, whereas IBS acts like fixed counters. IBS counters can only be enabled or disabled for monitoring, they can't be programmed to any selective events. IBS Fetch and Execute counters can be enabled/disabled independently. With PMC, the user has to decide what events to monitor ahead of time. With IBS, a rich set of data is collected for each sampled instruction and then it is up to the user to analyze parts of the data they are interested in. IBS selects and tags an instruction to be monitored and then captures microarchitectural events caused by this instruction during its execution. A more detailed comparison of Intel PEBS and AMD IBS can be found in [@ComparisonPEBSIBS].
 

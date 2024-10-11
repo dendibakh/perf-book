@@ -10,6 +10,6 @@ Intel's Skylake and AMD Zen3 cores have a 4-wide allocation. Intel's SunnyCove m
 
 Very few applications can achieve the maximum IPC of a machine. Intel Goldencove core can theoretically execute four integer additions/subtractions, plus one load, plus one store (for a total of six instructions) per clock, but an application is highly unlikely to have the appropriate mix of independent instructions adjacent to each other to exploit all that potential parallelism.
 
-Pipeline slot utilization is one of the core metrics in Top-down Microarchitecture Analysis (see [@sec:TMA]). For example, Frontend Bound and Back-End Bound metrics are expressed as a percentage of unutilized pipeline slots due to various bottlenecks.
+Pipeline slot utilization is one of the core metrics in Top-down Microarchitecture Analysis (see [@sec:TMA]). For example, Frontend Bound and Backend Bound metrics are expressed as a percentage of unutilized pipeline slots due to various bottlenecks.
 
 [^2]: Although there are some exceptions. For instance, macrofused compare-and-branch instructions only require a single pipeline slot but are counted as two instructions. In some extreme cases, this may cause IPC to be greater than the machine width.

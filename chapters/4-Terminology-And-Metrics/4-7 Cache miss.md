@@ -19,7 +19,7 @@ Memory
 
 Table: Typical latency of a memory subsystem in x86-based platforms. {#tbl:mem_latency}
 
-Both instruction and data fetches can miss in cache. According to Top-down Microarchitecture Analysis (see [@sec:TMA]), an instruction cache (I-cache) miss is characterized as a Frontend stall, while a data cache (D-cache) miss is characterized as a Back-End stall. Instruction cache miss happens very early in the CPU pipeline during instruction fetch. Data cache miss happens much later during the instruction execution phase.
+Both instruction and data fetches can miss in cache. According to Top-down Microarchitecture Analysis (see [@sec:TMA]), an instruction cache (I-cache) miss is characterized as a Frontend stall, while a data cache (D-cache) miss is characterized as a Backend stall. Instruction cache miss happens very early in the CPU pipeline during instruction fetch. Data cache miss happens much later during the instruction execution phase.
 
 Linux `perf` users can collect the number of L1 cache misses by running:
 

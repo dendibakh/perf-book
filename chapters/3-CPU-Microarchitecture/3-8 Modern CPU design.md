@@ -10,7 +10,7 @@ The core is split into an in-order frontend that fetches and decodes x86 instruc
 
 ### CPU Frontend {#sec:uarchFE}
 
-The CPU Frontend consists of several functional units that fetch and decode instructions from memory. Its main purpose is to feed prepared instructions to the CPU Back-End, which is responsible for the actual execution of instructions.
+The CPU Frontend consists of several functional units that fetch and decode instructions from memory. Its main purpose is to feed prepared instructions to the CPU Backend, which is responsible for the actual execution of instructions.
 
 Technically, instruction fetch is the first stage to execute an instruction. But once a program reaches a steady state, the branch predictor unit (BPU) steers the work of the CPU Frontend. That is indiciated with the arrow that goes from the BPU to the instruction cache. The BPU predicts the target of all branch instructions and steers the next instruction fetch based on this prediction.
 
@@ -24,15 +24,15 @@ A major performance-boosting feature of the Frontend is the $\mu$op Cache. Also,
 
 Some very complicated instructions may require more $\mu$ops than decoders can handle. $\mu$ops for such instruction are served from the Microcode Sequencer (MSROM). Examples of such instructions include hardware operation support for string manipulation, encryption, synchronization, and others. Also, MSROM keeps the microcode operations to handle exceptional situations like branch misprediction (which requires a pipeline flush), floating-point assist (e.g., when an instruction operates with a denormalized floating-point value), and others. MSROM can push up to 4 $\mu$ops per cycle into the IDQ.
 
-The Instruction Decode Queue (IDQ) provides the interface between the in-order frontend and the out-of-order backend. The IDQ queues up the $\mu$ops in order and can hold 144 $\mu$ops per logical processor in single thread mode, or 72 $\mu$ops per thread when SMT is active. This is where the in-order CPU Frontend finishes and the out-of-order CPU Back-End starts.
+The Instruction Decode Queue (IDQ) provides the interface between the in-order frontend and the out-of-order backend. The IDQ queues up the $\mu$ops in order and can hold 144 $\mu$ops per logical processor in single thread mode, or 72 $\mu$ops per thread when SMT is active. This is where the in-order CPU Frontend finishes and the out-of-order CPU Backend starts.
 
-### CPU Back-End {#sec:uarchBE}
+### CPU Backend {#sec:uarchBE}
 
-The CPU Back-End employs an OOO engine that executes instructions and stores results. We repeated a part of the diagram that depicts the GoldenCove OOO engine in Figure @fig:Goldencove_OOO.
+The CPU Backend employs an OOO engine that executes instructions and stores results. We repeated a part of the diagram that depicts the GoldenCove OOO engine in Figure @fig:Goldencove_OOO.
 
 The heart of the OOO engine is the 512-entry ReOrder Buffer (ROB). It serves a few purposes. First, it provides register renaming.[^5] There are only 16 general-purpose integer and 32 floating-point/SIMD architectural registers, however, the number of physical registers is much higher.[^1] Physical registers are located in a structure called the Physical Register File (PRF). There are separate PRFs for integer and floating-point/SIMD registers. The mappings from architecture-visible registers to the physical registers are kept in the register alias table (RAT).
 
-![Block diagram of the CPU Back End of the Intel GoldenCove Microarchitecture.](../../img/uarch/goldencove_OOO.png){#fig:Goldencove_OOO width=100%}
+![Block diagram of the CPU Backend of the Intel GoldenCove Microarchitecture.](../../img/uarch/goldencove_OOO.png){#fig:Goldencove_OOO width=100%}
 
 Second, the ROB allocates execution resources. When an instruction enters the ROB, a new entry is allocated and resources are assigned to it, mainly an execution unit and the destination physical register. The ROB can allocate up to 6 $\mu$ops per cycle.
 
