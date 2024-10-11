@@ -2,7 +2,7 @@
 
 The TMA methodology was first proposed by Intel in 2014 and is supported starting from the Sandy Bridge family of processors. Intel's implementation supports nested categories for each high-level bucket that give a better understanding of the CPU performance bottlenecks in the program (see Figure @fig:TMA).
 
-The workflow is designed to "drill down" to lower levels of the TMA hierarchy until we get to the very specific classification of a performance bottleneck. For example, at first, we collect metrics for the main four buckets: `Front End Bound`, `Back End Bound`, `Retiring`, and `Bad Speculation`. Say, we found out that a big portion of the program execution was stalled by memory accesses (which is a `Back End Bound` bucket, see Figure @fig:TMA). The next step is to run the workload again and collect metrics specific to the `Memory Bound` bucket only. The process is repeated until we know the exact root cause, for example, `L3 Bound`.
+The workflow is designed to "drill down" to lower levels of the TMA hierarchy until we get to the very specific classification of a performance bottleneck. For example, at first, we collect metrics for the main four buckets: `Frontend Bound`, `Back End Bound`, `Retiring`, and `Bad Speculation`. Say, we found out that a big portion of the program execution was stalled by memory accesses (which is a `Back End Bound` bucket, see Figure @fig:TMA). The next step is to run the workload again and collect metrics specific to the `Memory Bound` bucket only. The process is repeated until we know the exact root cause, for example, `L3 Bound`.
 
 ![The TMA hierarchy of performance bottlenecks. *© Image by Ahmad Yasin.*](../../img/pmu-features/TMAM.png){#fig:TMA width=90%}
 
@@ -22,7 +22,7 @@ We ran the experiments on the machine equipped with an Intel Core i5-8259U CPU (
 
 ### Step 1: Identify the Bottleneck {.unlisted .unnumbered}
 
-As a first step, we run our microbenchmark and collect a limited set of events that will help us calculate Level 1 metrics. Here, we try to identify high-level performance bottlenecks of our application by attributing them to the four L1 buckets: `Front End Bound`, `Back End Bound`, `Retiring`, and `Bad Speculation`. It is possible to collect Level 1 metrics using the Linux `perf` tool. The `perf stat` command has a dedicated `--topdown` option, however, in the recent version it will output these metrics by default. Below is the breakdown for our benchmark. The output of all commands in this section is trimmed to save space.
+As a first step, we run our microbenchmark and collect a limited set of events that will help us calculate Level 1 metrics. Here, we try to identify high-level performance bottlenecks of our application by attributing them to the four L1 buckets: `Frontend Bound`, `Back End Bound`, `Retiring`, and `Bad Speculation`. It is possible to collect Level 1 metrics using the Linux `perf` tool. The `perf stat` command has a dedicated `--topdown` option, however, in the recent version it will output these metrics by default. Below is the breakdown for our benchmark. The output of all commands in this section is trimmed to save space.
 
 ```bash
 $ perf stat -- ./benchmark.exe
@@ -170,7 +170,7 @@ Listing: Inserting memory prefetch into main.
 
 This explicit memory prefetching hint decreases execution time from 8.5 seconds to 6.5 seconds. Also, the number of `CYCLE_ACTIVITY.STALLS_L3_MISS` events becomes almost ten times less: it goes from 19 billion down to 2 billion.
 
-TMA is an iterative process, so once we fix one problem, we need to repeat the process starting from Step 1. Likely it will move the bottleneck into another bucket, in this case, `Retiring`. This was an easy example demonstrating the workflow of TMA methodology. Analyzing real-world applications is unlikely to be that easy. Chapters in the second part of the book are organized to make them convenient for use with the TMA process. In particular, Chapter 8 covers the `Memory Bound` category, Chapter 9 covers `Core Bound`, Chapter 10 covers `Bad Speculation`, and Chapter 11 covers `FrontEnd Bound`. Such a structure is intended to form a checklist that you can use to drive code changes when you encounter a certain performance bottleneck.
+TMA is an iterative process, so once we fix one problem, we need to repeat the process starting from Step 1. Likely it will move the bottleneck into another bucket, in this case, `Retiring`. This was an easy example demonstrating the workflow of TMA methodology. Analyzing real-world applications is unlikely to be that easy. Chapters in the second part of the book are organized to make them convenient for use with the TMA process. In particular, Chapter 8 covers the `Memory Bound` category, Chapter 9 covers `Core Bound`, Chapter 10 covers `Bad Speculation`, and Chapter 11 covers `Frontend Bound`. Such a structure is intended to form a checklist that you can use to drive code changes when you encounter a certain performance bottleneck.
 
 [^2]: TMA metrics - [https://github.com/intel/perfmon/blob/main/TMA_Metrics.xlsx](https://github.com/intel/perfmon/blob/main/TMA_Metrics.xlsx).
 [^7]: PMU tools - [https://github.com/andikleen/pmu-tools](https://github.com/andikleen/pmu-tools).

@@ -24,7 +24,7 @@ void foo(bool cond1,                void foo(bool cond1,
 
 Notice, that we disable the inlining of cold functions by using the `noinline` attribute. Because without it, a compiler may decide to inline it, which will effectively undo our transformation. Alternatively, we could apply the `[[unlikely]]` macro (see [@sec:secLIKELY]) on both `cond1` and `cond2` branches to convey to the compiler that inlining `cold1` and `cold2` functions is not desired.
 
-Figure @fig:FunctionSplitting gives a graphical representation of this transformation. Because we left just a `CALL` instruction inside the hot path, the next hot instruction will likely reside in the same cache line as the previous one. This improves the utilization of CPU Front-End data structures such as I-cache and DSB.
+Figure @fig:FunctionSplitting gives a graphical representation of this transformation. Because we left just a `CALL` instruction inside the hot path, the next hot instruction will likely reside in the same cache line as the previous one. This improves the utilization of CPU Frontend data structures such as I-cache and DSB.
 
 <div id="fig:FunctionSplitting">
 ![default layout](../../img/cpu_fe_opts/FunctionSplitting_Default.png){#fig:FuncSplit_default width=50%}

@@ -1,6 +1,6 @@
 ## Function Reordering
 
-Following the principles described in previous sections, hot functions can be grouped together to further improve the utilization of caches in the CPU Front-End. When hot functions are grouped, they start sharing cache lines, which reduces the *code footprint*, the total number of cache lines a CPU needs to fetch.
+Following the principles described in previous sections, hot functions can be grouped together to further improve the utilization of caches in the CPU Frontend. When hot functions are grouped, they start sharing cache lines, which reduces the *code footprint*, the total number of cache lines a CPU needs to fetch.
 
 Figure @fig:FunctionGrouping gives a graphical representation of reordering hot functions `foo`, `bar`, and `zoo`. The arrows on the image show the most frequent call pattern, i.e., `foo` calls `zoo`, which in turn calls `bar`. In the default layout (see Figure @fig:FuncGroup_default), hot functions are not adjacent to each other with some cold functions placed between them. Thus the sequence of two function calls (`foo` &rarr; `zoo` &rarr; `bar`) requires four cache line reads.[^4]
 

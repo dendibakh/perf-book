@@ -65,7 +65,7 @@ The next four chapters are organized according to the TMA classification (see [@
 * [@sec:MemBound]. Optimizing Memory Accesses---the `TMA:MemoryBound` category.
 * [@sec:CoreBound]. Optimizing Computations---the `TMA:CoreBound` category.
 * [@sec:ChapterBadSpec]. Optimizing Branch Prediction---the `TMA:BadSpeculation` category.
-* [@sec:secFEOpt]. Machine Code Layout Optimizations---the `TMA:FrontEndBound` category.
+* [@sec:secFEOpt]. Machine Code Layout Optimizations---the `TMA:FrontendBound` category.
 
 The idea behind this classification is to offer a checklist for developers when they are using TMA methodology in their performance engineering work. Whenever TMA attributes a performance bottleneck to one of the categories mentioned above, feel free to consult one of the corresponding chapters to learn about your options.
 
