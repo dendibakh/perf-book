@@ -14,7 +14,7 @@ I hope that by the end of this book, you will be able to answer those questions.
 The book is split into two parts. The first part (chapters 2--7) teaches you how to find performance problems, and the second part (chapters 8--13) teaches you how to fix them.
 
 * Chapter 2 discusses fair performance experiments and their analysis. It introduces the best practices for performance testing and comparing results.
-* Chapter 3 introduces CPU microarchitecture, with a close look at Intel's Goldencove microarchitecture. 
+* Chapter 3 introduces CPU microarchitecture, with a close look at Intel's Golden Cove microarchitecture. 
 * Chapter 4 covers terminology and metrics used in performance analysis. At the end of the chapter, we present a case study that features various performance metrics collected on four real-world applications.
 * Chapter 5 explores the most popular performance analysis approaches. We describe how profiling tools work and what sort of data they can collect.
 * Chapter 6 examines features provided by modern Intel, AMD, and ARM-based CPUs to support and enhance performance analysis. It shows how they work and what problems they help to solve.
