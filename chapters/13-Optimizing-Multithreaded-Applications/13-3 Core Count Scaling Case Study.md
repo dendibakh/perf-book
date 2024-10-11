@@ -44,7 +44,7 @@ The problem is related to the frequency throttling. When multiple cores are util
 
 Figure @fig:FrequencyThrotlingClang shows the performance scaling of Clang workload overlaid with the CPU frequency on our platform while running with different thread count. I don't show the E-core frequency since they become active only after using four threads on P-cores. Notice that sustained frequency drops when just two P-cores are used simultaneously. By the time you start using all 16 threads, the frequency of P-cores is throttled down to `3.2GHz`, while E-cores operate at `2.6GHz`. We used Intel VTune's platform view to visualize CPU frequency as shown in [@sec:IntelVtuneOverview]. 
 
-![Frequency throttling while running Clang compilation on Intel(R) Core(TM) i7-1260P. E-cores become active only after using four threads on P-cores.](../../img/mt-perf/FrequencyThrotlingClang.png){#fig:FrequencyThrotlingClang width=100%}
+![Frequency throttling while running Clang compilation on Intel&reg; Core&trade; i7-1260P. E-cores become active only after using four threads on P-cores.](../../img/mt-perf/FrequencyThrotlingClang.png){#fig:FrequencyThrotlingClang width=100%}
 
 The tipping point of performance scaling for the Clang workload is around 10 threads. This is the point where the frequency throttling starts to have a significant impact on performance, and the benefit of adding additional threads is smaller than the penalty of running at a lower frequency.
 

@@ -9,7 +9,7 @@ To put together everything we discussed so far in this chapter, let's look at so
 
 For this exercise, we run all four benchmarks on the machine with the following characteristics:
 
-* 12th Gen Alderlake Intel(R) Core(TM) i7-1260P CPU @ 2.10GHz (4.70GHz Turbo), 4P+8E cores, 18MB L3-cache
+* 12th Gen Alderlake Intel&reg; Core&trade; i7-1260P CPU @ 2.10GHz (4.70GHz Turbo), 4P+8E cores, 18MB L3-cache
 * 16 GB RAM, DDR4 @ 2400 MT/s
 * 256GB NVMe PCIe M.2 SSD
 * 64-bit Ubuntu 22.04.1 LTS (Jammy Jellyfish)
