@@ -14,7 +14,7 @@ if (cond) { /* frequently mispredicted */   =>     int y = computeY();
 foo(a);
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-For the code on the right, the compiler can replace the branch that comes from the ternary operator, and generate a `CMOV` x86 instruction instead. A `CMOVcc` instruction checks the state of one or more of the status flags in the `EFLAGS` register (`CF, OF, PF, SF` and `ZF`) and performs a move operation if the flags are in a specified state or condition. A similar transformation can be done for floating-point numbers with `FCMOVcc, VMAXSS/VMINSS` instructions. In the ARM ISA, there is `CSEL` (conditional selection) instruction, but also `CSINC` (select and increment), `CSNEG` (select and negate), and a few other conditional instructions.
+For the code on the right, the compiler can replace the branch that comes from the ternary operator, and generate a `CMOV` x86 instruction instead. A `CMOVcc` instruction checks the state of one or more of the status flags in the `EFLAGS` register (`CF, OF, PF, SF` and `ZF`) and performs a move operation if the flags are in a specified state or condition. A similar transformation can be done for floating-point numbers with `FCMOVcc` and `VMAXSS/VMINSS` instructions. In the ARM ISA, there is the `CSEL` (conditional selection) instruction, but also `CSINC` (select and increment), `CSNEG` (select and negate), and a few other conditional instructions.
 
 Listing: Replacing Branches with Selection - x86 assembly code.
 

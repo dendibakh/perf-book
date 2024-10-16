@@ -1,6 +1,6 @@
 ## Replace Branches with Arithmetic
 
-In some scenarios, branches can be replaced with arithmetic. The code in [@lst:LookupBranches], can also be rewritten using a simple arithmetic formula, as shown in [@lst:ArithmeticBranches]. Notice, that for this code, the Clang-17 compiler replaced expensive division with much cheaper multiplication and right shift operations.
+In some scenarios, branches can be replaced with arithmetic. The code in [@lst:LookupBranches] can also be rewritten using a simple arithmetic formula, as shown in [@lst:ArithmeticBranches]. Notice, that for this code, the Clang-17 compiler replaced expensive division with much cheaper multiplication and right shift operations.
 
 Listing: Replacing branches with arithmetic.
 
