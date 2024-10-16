@@ -72,7 +72,7 @@ If the mask is zero, that means there are no `eol` characters in the current chu
 
 For an input string with a single very long line (best case scenario), the SIMD version will execute eight times fewer branch instructions. However, in the worst-case scenario with zero-length lines (i.e., only `eol` characters in the input string), the original approach is faster. We benchmarked this technique using AVX2 implementation (with chunks of 16 characters) on several different inputs, including textbooks, and source code files. The result was 5--6 times fewer branch instructions and more than 4x better performance when running on Intel Core i7-1260P (12th Gen, Alder Lake).
 
-[^1]: Assuming that compiler will avoid generating branch instructions for `std::max`.
+[^1]: Assuming that the compiler will avoid generating branch instructions for `std::max`.
 [^2]: Performance Ninja: compiler intrinsics 2 - [https://github.com/dendibakh/perf-ninja/tree/main/labs/core_bound/compiler_intrinsics_2](https://github.com/dendibakh/perf-ninja/tree/main/labs/core_bound/compiler_intrinsics_2).
 [^3]: Although in x86, there is no version of the `TZCNT` instruction that supports 8-bit inputs.
 [^4]: For example, with AVX2 (256-bit vectors), you can use `VPCMPEQB` and `VPMOVMSKB` instructions.
