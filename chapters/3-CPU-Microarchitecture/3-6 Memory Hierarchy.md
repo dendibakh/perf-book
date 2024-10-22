@@ -1,6 +1,6 @@
 ## Memory Hierarchy {#sec:MemHierar}
 
-To effectively utilize all the hardware resources provisioned in a CPU, the machine needs to be fed with the right data at the right time. Failing to do so requires fetching a variable from main memory, which takes around 100 ns. From a CPU perspective is a very long time. Understanding the memory hierarchy is critically important to delivering the performance capabilities of a CPU. Most programs exhibit the property of locality: they don’t access all code or data uniformly. A CPU memory hierarchy is built on two fundamental properties:
+To effectively utilize all the hardware resources provisioned in a CPU, the machine needs to be fed with the right data at the right time. Failing to do so requires fetching a variable from main memory, which takes around 100 ns. From a CPU perspective it is a very long time. Understanding the memory hierarchy is critically important to delivering the performance capabilities of a CPU. Most programs exhibit the property of locality: they don’t access all code or data uniformly. A CPU memory hierarchy is built on two fundamental properties:
 
 * **Temporal locality**: when a given memory location is accessed, the same location will likely be accessed again soon. Ideally, we want this information to be in the cache next time we need it.
 * **Spatial locality**: when a given memory location is accessed, nearby locations will likely be accessed soon. This refers to placing related data close to each other. When a program reads a single byte from memory, typically, a larger chunk of memory (a cache line) is fetched because very often, the program will require that data soon.
@@ -15,7 +15,7 @@ Caches are organized as blocks with a defined size, also known as *cache lines*.
 
 #### Placement of Data within the Cache.
 
-The address for a request is used to access the cache. In *direct-mapped* caches, a given block address can appear only in one location in the cache and is defined by a mapping function shown below. Dirrect-mapped caches are relatively easy to build and have high access latency, however, they have high miss rate.
+The address for a request is used to access the cache. In *direct-mapped* caches, a given block address can appear only in one location in the cache and is defined by a mapping function shown below. Dirrect-mapped caches are relatively easy to build and have fast access time, however, they have high miss rate.
 $$
 \textrm{Number of Blocks in the Cache} = \frac{\textrm{Cache Size}}{\textrm{Cache Block Size}}
 $$
@@ -39,7 +39,7 @@ Here is another example of the cache organization of the Apple M1 processor. The
 
 #### Finding Data in the Cache.
 
-Every block in the m-way set-associative cache has an address tag associated with it. In addition, the tag also contains state bits such as valid bits to indicate whether the data is valid. Tags can also contain additional bits to indicate access information, sharing information, etc., that will be described in later sections of this chapter.
+Every block in the m-way set-associative cache has an address tag associated with it. In addition, the tag also contains state bits such as a bit to indicate whether the data is valid. Tags can also contain additional bits to indicate access information, sharing information, etc.
 
 ![Address organization for cache lookup.](../../img/uarch/CacheLookup.png){#fig:CacheLookup width=90%}
 
@@ -47,7 +47,7 @@ Figure @fig:CacheLookup shows how the address generated from the pipeline is use
 
 #### Managing Misses.
 
-When a cache miss occurs, the controller must select a block in the cache to be replaced to allocate the address that incurred the miss. For a direct-mapped cache, since the new address can be allocated only in a single location, the previous entry mapping to that location is deallocated, and the new entry is installed in its place. In a set-associative cache, since the new cache block can be placed in any of the blocks of the set, a replacement algorithm is required. The typical replacement algorithm used is the LRU (least recently used) policy, where the block that was least recently accessed is evicted to make room for the new data. Another alternative is to randomly select one of the blocks as the victim block.
+When a cache miss occurs, the cache controller must select a block in the cache to be replaced to allocate the address that incurred the miss. For a direct-mapped cache, since the new address can be allocated only in a single location, the previous entry mapping to that location is deallocated, and the new entry is installed in its place. In a set-associative cache, since the new cache block can be placed in any of the blocks of the set, a replacement algorithm is required. The typical replacement algorithm used is the LRU (least recently used) policy, where the block that was least recently accessed is evicted to make room for the new data. Another alternative is to randomly select one of the blocks as the victim block.
 
 #### Managing Writes.
 
@@ -60,8 +60,8 @@ CPU designs use two basic mechanisms to handle writes that hit in the cache:
 
 Cache misses on write operations can be handled in two ways:
 
-* In a *write-allocate or fetch on write miss* cache, the data for the missed location is loaded into the cache from the lower level of the hierarchy, and the write operation is subsequently handled like a write hit.
-* If the cache uses a *no-write-allocate policy*, the cache miss transaction is sent directly to the lower levels of the hierarchy, and the block is not loaded into the cache.
+* In a *write-allocate* cache, the data for the missed location is loaded into the cache from the lower level of the hierarchy, and the write operation is subsequently handled like a write hit.
+* If the cache uses a *no-write-allocate* policy, the cache miss transaction is sent directly to the lower levels of the hierarchy, and the block is not loaded into the cache.
 
 Out of these options, most designs typically choose to implement a write-back cache with a write-allocate policy as both of these techniques try to convert subsequent write transactions into cache hits, without additional traffic to the lower levels of the hierarchy. Write-through caches typically use the no-write-allocate policy.
 
@@ -85,7 +85,7 @@ Software memory prefetching complements prefetching done by hardware. Developers
 
 Main memory is the next level of the hierarchy, downstream from the caches. Requests to load and store data are initiated by the Memory Controller Unit (MCU). In the past, this circuit was located in the northbridge chip on the motherboard. But nowadays, most processors have this component embedded, so the CPU has a dedicated memory bus connecting it to the main memory.
 
-Main memory uses DRAM (Dynamic Random Access Memory) technology that supports large capacities at reasonable cost points. When comparing DRAM modules, people usually look at memory density and memory speed, along with its price of course. Memory density defines how much memory the module has measured in GB. Obviously, the more available memory the better as it is a precious resource used by the OS and applications.
+Main memory uses DRAM (Dynamic Random Access Memory) technology that supports large capacities at reasonable cost points. When comparing DRAM modules, people usually look at memory density and memory speed, along with its price of course. Memory density defines the capacity of the module measured in GB. Obviously, the more available memory the better as it is a precious resource used by the OS and applications.
 
 The performance of the main memory is described by latency and bandwidth. Memory latency is the time elapsed between the memory access request being issued and when the data is available to use by the CPU. Memory bandwidth defines how many bytes can be fetched per some period of time, and is usually measured in gigabytes per second.
 
@@ -111,7 +111,7 @@ It is worth mentioning that DRAM chips require their memory cells to be refreshe
 
 A DRAM module is organized as a set of DRAM chips. Memory *rank* is a term that describes how many sets of DRAM chips exist on a module. For example, a single-rank (1R) memory module contains one set of DRAM chips. A dual-rank (2R) memory module has two sets of DRAM chips, therefore doubling the capacity of a single-rank module. Likewise, there are quad-rank (4R) and octa-rank (8R) memory modules available for purchase.
 
-Each rank consists of multiple DRAM chips. Memory *width* defines how wide the bus of each DRAM chip is. And since each rank is 64 bits wide (or 72 bits wide for ECC RAM), it also defines the number of DRAM chips present within the rank. Memory width can be one of three values: `x4`, `x8` or `x16`, which define how wide the bus that goes to each chip. As an example, Figure @fig:Dram_ranks shows the organization of a 2Rx16 dual-rank DRAM DDR4 module, with a total of 2GB capacity. There are four chips in each rank, with a 16-bit wide bus. Combined, the four chips provide 64-bit output. The two ranks are selected one at a time through a rank-select signal.
+Each rank consists of multiple DRAM chips. Memory *width* defines how wide the bus of each DRAM chip is. And since each rank is 64 bits wide (or 72 bits wide for ECC RAM), it also defines the number of DRAM chips present within the rank. Memory width can be one of three values: `x4`, `x8` or `x16`, and defines how wide is the bus that goes to each chip. As an example, Figure @fig:Dram_ranks shows the organization of a 2Rx16 dual-rank DRAM DDR4 module, with a total of 2GB capacity. There are four chips in each rank, with a 16-bit wide bus. Combined, the four chips provide 64-bit output. The two ranks are selected one at a time through a rank-select signal.
 
 ![Organization of a 2Rx16 dual-rank DRAM DDR4 module with a total capacity of 2GB.](../../img/uarch/DRAM_ranks.png){#fig:Dram_ranks width=90%}
 
@@ -134,7 +134,7 @@ For example, for a single-channel DDR4 configuration with a data rate of 2400 MT
 
 To enable multi-channel configuration, you need to have a CPU and motherboard that support such an architecture and install an even number of identical memory modules in the correct memory slots on the motherboard. The quickest way to check the setup on Windows is by running a hardware identification utility like `CPU-Z` or `HwInfo`; on Linux, you can use the `dmidecode` command. Alternatively, you can run memory bandwidth benchmarks like Intel MLC or Stream.
 
-To make use of multiple memory channels in a system, there is a technique called interleaving. It spreads adjacent addresses within a page across multiple memory devices. An example of a 2-way interleaving for sequential memory accesses is shown in Figure @fig:Dram_channel_interleaving. As before, we have a dual-channel memory configuration (channels A and B) with two independent memory controllers. Modern processors interleave per four cache lines (256 bytes), i.e., the first four adjacent cache lines go to channel A, and then the next set of four cache lines go to channel B.
+To make use of multiple memory channels in a system, there is a technique called *interleaving*. It spreads adjacent addresses within a page across multiple memory devices. An example of a 2-way interleaving for sequential memory accesses is shown in Figure @fig:Dram_channel_interleaving. As before, we have a dual-channel memory configuration (channels A and B) with two independent memory controllers. Modern processors interleave per four cache lines (256 bytes), i.e., the first four adjacent cache lines go to channel A, and then the next set of four cache lines go to channel B.
 
 ![2-way interleaving for sequential memory access.](../../img/uarch/DRAM_channel_interleaving.png){#fig:Dram_channel_interleaving width=80%}
 
