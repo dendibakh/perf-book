@@ -2,9 +2,9 @@
 
 ## Modern CPU Design
 
-To see how all the concepts we talked about in this chapter are used in practice, let's take a look at the implementation of Intel’s 12th-generation core, Golden Cove, which became available in 2021. This core is used as the P-core inside the Alder Lake and Sapphire Rapids platforms. Figure @fig:Goldencove_diag shows the block diagram of the Golden Cove core. Notice that this section only describes a single core, not the entire processor. So, we will skip the discussion about frequencies, core counts, L3 caches, core interconnects, memory latency and bandwidth, and other things.
+To see how all the concepts we talked about in this chapter are used in practice, let's take a look at the implementation of Intel’s 12th-generation core, Golden Cove, which became available in 2021. This core is used as the P-core inside the Alder Lake and Sapphire Rapids platforms. Figure @fig:Goldencove_diag shows the block diagram of the Golden Cove core. Notice that this section only describes a single core, not the entire processor. So, we will skip the discussion about frequencies, core counts, L3 caches, core interconnects, memory latency and bandwidth.
 
-![Block diagram of a CPU Core in the Intel Golden Cove Microarchitecture.](../../img/uarch/goldencove_block_diagram.png){#fig:Goldencove_diag width=100%}
+![Block diagram of a CPU core in the Intel Golden Cove Microarchitecture.](../../img/uarch/goldencove_block_diagram.png){#fig:Goldencove_diag width=100%}
 
 The core is split into an in-order frontend that fetches and decodes x86 instructions into $\mu$ops[^9] and a 6-wide superscalar, out-of-order backend. The Golden Cove core supports 2-way SMT. It has a 32KB first-level instruction cache (L1 I-cache), and a 48KB first-level data cache (L1 D-cache). The L1 caches are backed up by a unified 1.25MB (2MB in server chips) L2 cache. The L1 and L2 caches are private to each core. At the end of this section, we also take a look at the TLB hierarchy.
 
@@ -28,7 +28,7 @@ The Instruction Decode Queue (IDQ) provides the interface between the in-order f
 
 ### CPU Backend {#sec:uarchBE}
 
-The CPU Backend employs an OOO engine that executes instructions and stores results. We repeated a part of the diagram that depicts the Golden Cove OOO engine in Figure @fig:Goldencove_OOO.
+The CPU Backend employs an OOO engine that executes instructions and stores results. I repeated a part of the diagram that depicts the Golden Cove OOO engine in Figure @fig:Goldencove_OOO.
 
 The heart of the OOO engine is the 512-entry ReOrder Buffer (ROB). It serves a few purposes. First, it provides register renaming.[^5] There are only 16 general-purpose integer and 32 floating-point/SIMD architectural registers, however, the number of physical registers is much higher.[^1] Physical registers are located in a structure called the Physical Register File (PRF). There are separate PRFs for integer and floating-point/SIMD registers. The mappings from architecture-visible registers to the physical registers are kept in the register alias table (RAT).
 
@@ -49,7 +49,7 @@ The "Scheduler / Reservation Station" (RS) is the structure that tracks the avai
 
 We repeated a part of the diagram that depicts the Golden Cove execution engine and Load-Store unit in Figure @fig:Goldencove_BE_LSU. There are 12 execution ports:
 
-* Ports 0, 1, 5, 6, and 10 provide integer (INT) operations, and some of them handle floating-point and vector (VEC/FP) operations.
+* Ports 0, 1, 5, 6, and 10 provide integer (INT) operations, and some of them handle floating-point and vector (FP/VEC) operations.
 * Ports 2, 3, and 11 are used for address generation (AGU) and for load operations. 
 * Ports 4 and 9 are used for store operations (STD).
 * Ports 7 and 8 are used for address generation.
@@ -60,7 +60,7 @@ Instructions that require memory operations are handled by the Load-Store unit (
 
 For example, an `Integer Shift` operation can go only to either port 0 or 6, while a `Floating-Point Divide` operation can only be dispatched to port 0. In a situation when a scheduler has to dispatch two operations that require the same execution port, one of them will have to be delayed.
 
-The VEC/FP stack does floating-point scalar and *all* packed (SIMD) operations. For instance, ports 0, 1, and 5 can handle ALU operations of the following types: packed integer, packed floating-point, and scalar floating-point. Integer and Vector/FP register files are located separately. Operations that move values from the INT stack to VEC/FP and vice-versa (e.g., convert, extract or insert) incur additional penalties.
+The FP/VEC stack does floating-point scalar and *all* packed (SIMD) operations. For instance, ports 0, 1, and 5 can handle ALU operations of the following types: packed integer, packed floating-point, and scalar floating-point. Integer and Vector/FP register files are located separately. Operations that move values from the INT stack to FP/VEC and vice-versa (e.g., convert, extract or insert) incur additional penalties.
 
 ### Load-Store Unit {#sec:uarchLSU}
 
@@ -68,13 +68,11 @@ The Load-Store Unit (LSU) is responsible for operations with memory. The Golden 
 
 Notice that the AGU is required for both load and store operations to perform dynamic address calculation. For example, in the instruction `vmovss DWORD PTR [rsi+0x4],xmm0`, the AGU will be responsible for calculating `rsi+0x4`, which will be used to store data from xmm0.
 
-Once a load or a store leaves the scheduler, LSU is responsible for accessing the data. Load operations save the fetched value in a register. Store operations transfer value from a register to a location in memory. LSU has a Load Buffer (also known as Load Queue) and a Store Buffer (also known as Store Queue); their sizes are not disclosed.[^2] Both Load Buffer and Store Buffer receive operations at dispatch from the scheduler.
+Once a load or a store leaves the scheduler, the LSU is responsible for accessing the data. Load operations save the fetched value in a register. Store operations transfer value from a register to a location in memory. LSU has a Load Buffer (also known as Load Queue) and a Store Buffer (also known as Store Queue); their sizes are not disclosed.[^2] Both Load Buffer and Store Buffer receive operations at dispatch from the scheduler.
 
 When a memory load request comes, the LSU queries the L1 cache using a virtual address and looks up the physical address translation in the TLB. Those two operations are initiated simultaneously. The size of the L1 D-cache is 48KB. If both operations result in a hit, the load delivers data to the integer or floating-point register and leaves the Load Buffer. Similarly, a store would write the data to the data cache and exit the Store Buffer.
 
-In case of an L1 miss, the hardware initiates a query of the (private) L2 cache tags. While the L2 cache is being queried, a 64-byte wide fill buffer (FB) entry is allocated, which will keep the cache line once it arrives. The Golden Cove core has 16 fill buffers. As a way to lower the latency, a speculative query is sent to the L3 cache in parallel with the L2 cache lookup.
-
-If two loads access the same cache line, they will hit the same FB. Such two loads will be "glued" together and only one memory request will be initiated. LSU dynamically reorders operations, supporting both loads bypassing older loads and loads bypassing older non-conflicting stores. Also, LSU supports store-to-load forwarding when there is an older store containing all of the load's bytes, and the store's data has been produced and is available in the store queue.
+In case of an L1 miss, the hardware initiates a query of the (private) L2 cache tags. While the L2 cache is being queried, a 64-byte wide fill buffer (FB) entry is allocated, which will keep the cache line once it arrives. The Golden Cove core has 16 fill buffers. As a way to lower the latency, a speculative query is sent to the L3 cache in parallel with the L2 cache lookup. Also, if two loads access the same cache line, they will hit the same FB. Such two loads will be "glued" together and only one memory request will be initiated.
 
 In case the L2 miss is confirmed, the load continues to wait for the results of the L3 cache, which incurs much higher latency. From that point, the request leaves the core and enters the *uncore*, the term you may frequently see in profiling tools. The outstanding misses from the core are tracked in the Super Queue (SQ, not shown on the diagram), which can track up to 48 uncore requests. In a scenario of L3 miss, the processor begins to set up a memory access. Further details are beyond the scope of this chapter.
 
@@ -82,13 +80,13 @@ When a store modifies a memory location, the processor needs to load the full ca
 
 Of course, there are a few optimizations done for store operations as well. First, if we're dealing with a store or multiple adjacent stores (also known as *streaming stores*) that modify an entire cache line, there is no need to read the data first as all of the bytes will be clobbered anyway. So, the processor will try to combine writes to fill an entire cache line. If this succeeds no memory read operation is needed.
 
-Second, write combining enables multiple stores to be assembled and written further out in the cache hierarchy as a unit. So, if multiple stores modify the same cache line, only one memory write will be issued to the memory subsystem. All these optimizations are done inside the Store Buffer. A store instruction copies the data that will be written from a register into the Store Buffer. From there it may be written to the L1 cache or it may be combined with other stores to the same cache line. The Store Buffer capacity is limited, so it can hold requests for partial writing to a cache line only for some time. However, while the data sits in the Store Buffer waiting to be written, other load instructions can read the data straight from the store buffers (store-to-load forwarding).
+Second, write combining enables multiple stores to be assembled and written further out in the cache hierarchy as a unit. So, if multiple stores modify the same cache line, only one memory write will be issued to the memory subsystem. All these optimizations are done inside the Store Buffer. A store instruction copies the data that will be written from a register into the Store Buffer. From there it may be written to the L1 cache or it may be combined with other stores to the same cache line. The Store Buffer capacity is limited, so it can hold requests for partial writing to a cache line only for some time. However, while the data sits in the Store Buffer waiting to be written, other load instructions can read the data straight from the store buffers (store-to-load forwarding). Also, the LSU supports store-to-load forwarding when there is an older store containing all of the load's bytes, and the store's data has been produced and is available in the store queue.
 
 Finally, there are cases when we can improve cache utilization by using so-called *non-temporal* memory accesses. If we execute a partial store (e.g., we overwrite 8 bytes in a cache line), we need to read the cache line first. This new cache line will displace another line in the cache. However, if we know that we won't need this data again, then it would be better not to allocate space in the cache for that line. Non-temporal memory accesses are special CPU instructions that do not keep the fetched line in the cache and drop it immediately after use.
 
-During a typical program execution, there could be dozens of memory accesses in flight. In most high-performance processors, the order of load and store operations is not necessarily required to be the same as the program order, which is known as a _weakly ordered memory model_. For optimization purposes, the processor can reorder memory read and write operations. Consider a situation when a load runs into a cache miss and has to wait until the data comes from memory. The processor allows subsequent loads to proceed ahead of the load that is waiting for the data. This allows later loads to finish before the earlier load and doesn't unnecessarily block the execution. Such load/store reordering enables memory units to process multiple memory accesses in parallel, which translates directly into higher performance.
+During a typical program execution, there could be dozens of memory accesses in flight. In most high-performance processors, the order of load and store operations is not necessarily required to be the same as the program order, which is known as a _weakly ordered memory model_. For optimization purposes, the processor can reorder memory read and write operations. Consider a situation when a load runs into a cache miss and has to wait until the data comes from memory. The processor allows subsequent loads to proceed ahead of the load that is waiting for data. This allows later loads to finish before the earlier load and doesn't unnecessarily block the execution. Such load/store reordering enables memory units to process multiple memory accesses in parallel, which translates directly into higher performance.
 
-There are a few exceptions. Just like with dependencies through regular arithmetic instructions, there are memory dependencies through loads and stores. In other words, a load can depend on an earlier store and vice-versa. First of all, stores cannot be reordered with older loads:
+The LSU dynamically reorders operations, supporting both loads bypassing older loads and loads bypassing older non-conflicting stores. However, there are a few exceptions. Just like with dependencies through regular arithmetic instructions, there are memory dependencies through loads and stores. In other words, a load can depend on an earlier store and vice-versa. First of all, stores cannot be reordered with older loads:
 
 ```
 Load R1, MEM_LOC_X
@@ -100,11 +98,11 @@ If we allow the store to go before the load, then the `R1` register may read the
 Another interesting situation happens when a load consumes data from an earlier store:
 
 ```
-Store MEM_LOC_X, 0
-Load R1, MEM_LOC_X
+Store MEM_LOC, 0
+Load R1, MEM_LOC
 ```
 
-If a load consumes data from a store that hasn't yet finished, we should not allow the load to proceed. But what if we don't yet know the address of the store? In this case, the processor predicts whether there will be any potential data forwarding between loads and stores and if reordering is safe. This is known as _memory disambiguation_. When a load starts executing, it has to be checked against all older stores for potential store forwarding. There are four possible scenarios:
+If a load consumes data from a store that hasn't yet finished, we should not allow the load to proceed. But what if we don't yet know the address of the store? In this case, the processor predicts whether there will be any potential data forwarding between the load and the store and if reordering is safe. This is known as _memory disambiguation_. When a load starts executing, it has to be checked against all older stores for potential store forwarding. There are four possible scenarios:
 
 * Prediction: Not dependent; Outcome: Not dependent. This is a case of a successful memory disambiguation, which yields optimal performance.
 * Prediction: Dependent; Outcome: Not dependent. In this case, the processor was overly conservative and did not let the load go ahead of the store. This is a missed opportunity for performance optimization.
