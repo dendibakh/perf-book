@@ -2,7 +2,7 @@
 
 ## CPU Utilization
 
-CPU utilization is the percentage of time the CPU was busy during a time period. Technically, a CPU is considered utilized when it is not running the kernel `idle` thread.
+CPU utilization is the percentage of time the core was busy during a time period. Technically, a CPU is considered utilized when it is not running the kernel `idle` thread.
 
 $$
 CPU~Utilization = \frac{CPU\_CLK\_UNHALTED.REF\_TSC}{TSC},

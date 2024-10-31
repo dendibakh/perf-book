@@ -1,6 +1,6 @@
 ## Cache Miss
 
-As discussed in [@sec:MemHierar], any memory request missing in a particular level of cache must be serviced by higher-level caches or DRAM. This implies a significant increase in the latency of such memory access. The typical latency of memory subsystem components is shown in Table {@tbl:mem_latency}. There is also an [interactive view](https://colin-scott.github.io/personal_website/research/interactive_latency.html)[^1] that visualizes the latency of different operations in modern systems. Performance greatly suffers when a memory request misses in the Last Level Cache (LLC) and goes all the way down to the main memory.
+As discussed in [@sec:MemHierar], any memory request missing in a particular level of cache must be serviced by higher-level caches or DRAM. This implies a significant increase in the latency of such memory access. The typical latency of memory subsystem components is shown in Table {@tbl:mem_latency}. Performance greatly suffers when a memory request misses in the Last Level Cache (LLC) and goes all the way down to the main memory.[^3]
 
 -------------------------------------------------
 Memory Hierarchy Component   Latency (cycle/time)
@@ -19,7 +19,7 @@ Memory
 
 Table: Typical latency of a memory subsystem in x86-based platforms. {#tbl:mem_latency}
 
-Both instruction and data fetches can miss in cache. According to Top-down Microarchitecture Analysis (see [@sec:TMA]), an instruction cache (I-cache) miss is characterized as a Frontend stall, while a data cache (D-cache) miss is characterized as a Backend stall. Instruction cache miss happens very early in the CPU pipeline during instruction fetch. Data cache miss happens much later during the instruction execution phase.
+Both instruction and data fetches can miss in cache. According to Top-down Microarchitecture Analysis (see [@sec:TMA]), an instruction cache (I-cache) miss is characterized as a Frontend stall, while a data cache (D-cache) miss is characterized as a Backend stall. Instruction cache misses happen very early in the CPU pipeline during instruction fetch. Data cache misses happen much later during the instruction execution phase.
 
 Linux `perf` users can collect the number of L1 cache misses by running:
 
@@ -46,5 +46,5 @@ $ perf stat -e mem_load_retired.l1_miss,
 
 From this example, we can see that 37% of loads that missed in the L1 D-cache also missed in the L2 cache, thus the *L2 hit rate* is 63%. A breakdown for the L3 cache can be made similarly.
 
-[^1]: Interactive latency - [https://colin-scott.github.io/personal_website/research/interactive_latency.html](https://colin-scott.github.io/personal_website/research/interactive_latency.html)
 [^2]: Careful readers may notice a discrepancy in the numbers: `fb_hit + l1_hit + l1_miss = 545,820`, which doesn't exactly match `all_loads`. Most likely it's due to slight inaccuracy in hardware event collection, but we did not investigate this since the numbers are very close.
+[^3]: There is also an interactive view that visualizes the latency of different operations in modern systems - [https://colin-scott.github.io/personal_website/research/interactive_latency.html](https://colin-scott.github.io/personal_website/research/interactive_latency.html)

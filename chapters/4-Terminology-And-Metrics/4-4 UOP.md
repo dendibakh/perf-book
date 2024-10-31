@@ -2,7 +2,7 @@
 
 ## Micro-operations {#sec:sec_UOP}
 
-Microprocessors with the x86 architecture translate complex CISC instructions into simple RISC microoperations, abbreviated as $\mu$ops. A simple register-to-register addition instruction such as `ADD rax, rbx` generates only one $\mu$op, while a more complex instruction like `ADD rax, [mem]` may generate two: one for loading from the `mem` memory location into a temporary (unnamed) register, and one for adding it to the `rax` register. The instruction `ADD [mem], rax` generates three $\mu$ops: one for loading from memory, one for adding, and one for storing the result back to memory. Even though the x86 ISA is a register-memory architecture, after $\mu$ops conversion, it becomes a load-store architecture since memory is only accessed via load/store $\mu$ops.
+Microprocessors with the x86 architecture translate complex CISC instructions into simple RISC microoperations, abbreviated as $\mu$ops. A simple register-to-register addition instruction such as `ADD rax, rbx` generates only one $\mu$op, while a more complex instruction like `ADD rax, [mem]` may generate two: one for loading from the `mem` memory location into a temporary (unnamed) register, and one for adding it to the `rax` register. The instruction `ADD [mem], rax` generates three $\mu$ops: one for loading from memory, one for adding, and one for storing the result back to memory.
 
 The main advantage of splitting instructions into micro-operations is that $\mu$ops can be executed:
 
@@ -53,6 +53,6 @@ $ perf stat -e uops_issued.any,uops_executed.thread,uops_retired.slots -- ./a.ex
   2557884  uops_retired.slots
 ```
 
-The way instructions are split into micro-operations may vary across CPU generations. Usually, a lower number of $\mu$ops used for an instruction means that hardware has better support for it and is likely to have lower latency and higher throughput. For the latest Intel and AMD CPUs, the vast majority of instructions generate exactly one $\mu$op. Latency, throughput, port usage, and the number of $\mu$ops for x86 instructions on recent microarchitectures can be found at the [uops.info](https://uops.info/table.html)[^1] website.
+The way instructions are split into micro-operations may vary across CPU generations. Usually, a lower number of $\mu$ops used for an instruction means that hardware has better support for it and is likely to have lower latency and higher throughput. For the latest Intel and AMD CPUs, the vast majority of instructions generate only one $\mu$op. Latency, throughput, port usage, and the number of $\mu$ops for x86 instructions on recent microarchitectures can be found at the [uops.info](https://uops.info/table.html)[^1] website.
 
 [^1]: x86 instruction latency and throughput - [https://uops.info/table.html](https://uops.info/table.html)
