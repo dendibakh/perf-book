@@ -26,7 +26,7 @@ Figure @fig:ScalabilityMainChart shows the thread count scalability of the selec
 
 ![Thread Count Scalability chart for five selected benchmarks.](../../img/mt-perf/ScalabilityMainChart.png){#fig:ScalabilityMainChart width=100%}
 
-As you can see, most of them are very far from the linear scaling, which is quite disappointing. The benchmark with the best scaling in this case study, Blender, achieves only 6x speedup while using 16x threads. CPython, for example, enjoys no thread count scaling at all. The performance of Clang and Zstd degrades when the number of threads goes beyond 11. To understand why that happens, let's dive into the details of each benchmark.
+As you can see, most of them are very far from the linear scaling, which is quite disappointing. The benchmark with the best scaling in this case study, Blender, achieves only 6x speedup while using 16x threads. CPython, for example, enjoys no thread count scaling at all. The performance of Clang and Zstd degrades when the number of threads goes beyond 10. To understand why that happens, let's dive into the details of each benchmark.
 
 ### Blender {.unlisted .unnumbered}
 
@@ -96,7 +96,7 @@ With a quick glance at the image, we can tell that there are many `ww` periods w
 
 As we just said, the reason for the 20--40ms delays between jobs is the lack of input buffers, which are required to start preparing a new job. Zstd maintains a single memory pool, which allocates space for both input and output buffers. This memory pool is prone to fragmentation issues, as it has to provide contiguous blocks of memory. When a worker finishes a job, the output buffer is waiting to be flushed, but it still occupies memory. And to start working on another job, it will require another pair of buffers (one input and one output buffer).
 
-Limiting the capacity of the memory pool is a design decision to reduce memory consumption. In the worst case, there could be many "run-away" buffers, left by workers that have completed their jobs very fast, and move on to process the next job; meanwhile, the flush queue is still blocked by one slow job. In such a scenario, the memory consumption would be very high, which is undesirable. However, the downside here is increased wait time between the jobs.
+Limiting the capacity of the memory pool is a design decision to reduce memory consumption. In the worst case, there could be many "run-away" buffers, left by workers that have completed their jobs very fast, and move on to process the next job; meanwhile, the flush queue is still blocked by one slow job. In such a scenario, the memory consumption would be very high, which is undesirable. However, the downside of current implementation is increased wait time between the jobs.
 
 The Zstd compression algorithm is a good example of a complex interaction between threads. Visualizing worker threads on a timeline is extremely helpful in understanding how threads communicate and synchronize, and can be useful for identifying bottlenecks. It is also a good reminder that even if you have a parallelizable workload, the performance of your application can be limited by the synchronization between threads and resource availability.
 
