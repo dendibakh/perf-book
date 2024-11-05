@@ -58,31 +58,29 @@ Marco Castorina authored [@sec:Tracy] "Specialized and Hybrid Profilers" which s
 \end{wrapfigure} 
 Lally Singh has authored [@sec:MarkerAPI] about Marker APIs. Lally is currently at Tesla, his prior work includes Datadog's performance team, Google's Search performance team, low-latency trading systems, and embedded real-time control systems. Lally has a PhD in CS from Virginia Tech, focusing on scalability in distributed VR.
 
+\vspace{-1cm} \hfill \break \vspace{0.5cm}
+
+\begin{wrapfigure}{r}{2.5cm}
+\includegraphics[width=2.5cm]{../../img/contributors/DickSites_circle.png}
+\end{wrapfigure} 
+Richard L. Sites provided a technical review of the book. He is a veteran of the semiconductor industry and has spent most of his career at the boundary between hardware and software, particularly in CPU/software performance interactions. Richard invented the performance counters found in most modern processors. He had worked at DEC, Adobe, Google, and Tesla. His personal page is [https://sites.google.com/site/dicksites](https://sites.google.com/site/dicksites).
+
+\vspace{-1cm} \hfill \break \vspace{0.5cm}
+
+\begin{wrapfigure}{r}{2.5cm}
+\includegraphics[width=2.5cm]{../../img/contributors/MattGodbolt_circle.png}
+\end{wrapfigure} 
+Matt Godbolt provided a technical review of the book. Matt is a creator of Compiler Explorer, an extremely popular tool among software developers. He is a C++ developer passionate about high-performance code. Matt has over twenty years of professional experience in computer game programming, systems design, real-time embedded systems, and high-frequency trading. He is also a speaker, a blogger, and a podcaster. His personal blog is [https://xania.org](https://xania.org).
+
 \hfill \break 
 
-Jumana Mundichipparakkal from ARM, for helping me write about ARM PMU features in [@sec:PmuChapter], for your review and comments. And thanks for your support from the first edition of this book.
+Also, I would like to thank the following people. Jumana Mundichipparakkal from ARM, for helping me write about ARM PMU features in [@sec:PmuChapter]. Yann Collet, the author of Zstandard, for providing me with the information about the internal workings of Zstd for [@sec:ThreadCountScalingStudy]. Ciaran McHale, for finding tons of grammar mistakes in my initial draft. Nick Black for proofreading and editing the final version of the book. Peter Veentjer, Amir Aupov, and Charles-Francois Natali for various edits and suggestions.
 
-Yann Collet, the author of Zstandard, for providing me with the information about the internal workings of Zstd for [@sec:ThreadCountScalingStudy].
+I'm also thankful to the whole performance community for countless blog articles and papers. I was able to learn a lot from reading blogs by Travis Downs, Daniel Lemire, Andi Kleen, Agner Fog, Bruce Dawson, Brendan Gregg, and many others. I stand on the shoulders of giants, and the success of this book should not be attributed only to myself. This book is my way to thank and give back to the whole community.
 
-Ciaran McHale, for finding tons of grammar mistakes in my initial draft.
+A special "thank you" goes to my family, who were patient enough to tolerate me missing weekend trips and evening walks. Without their support, I wouldn't have finished this book.
 
-Peter Veentjer, for multiple contributions to various places in the book.
-
-Also, I would like to thank the whole performance community for countless blog articles and papers. I was able to learn a lot from reading blogs by Travis Downs, Daniel Lemire, Andi Kleen, Agner Fog, Bruce Dawson, Brendan Gregg, and many others. I stand on the shoulders of giants, and the success of this book should not be attributed only to myself. This book is my way to thank and give back to the whole community.
-
-[TODO]: images created with excalidraw.com
-
-[TODO]: cover desing by {ask permision}
-
-[TODO]: acknowledge Amir Aupov, Charles-Francois Natali
-
-[TODO]: ask for permission. I would like to thank my manager at Intel for giving me time slots to work on this book.
-
-[TODO]: acknowledge Nick Black.
-
-[TODO]: acknowledge technical reviewers.
-
-Last but not least, thanks to my family, who were patient enough to tolerate me missing weekend trips and evening walks. Without their support, I wouldn't have finished this book.
+Images were created with excalidraw.com. Cover design by Darya Antonova. The fonts used on the cover of this book are Bebas Neue and Raleway, both provided under the Open Font License. Bebas Neue was designed by Ryoichi Tsunekawa. Raleway was designed by Matt McInerney, Pablo Impallari, and Rodrigo Fuenzalida.
 
 I should also mention contributors to the first edition of this book. Below I only list names and section titles. More detailed acknowledgments are available in the first edition.
 
