@@ -8,7 +8,7 @@ Next, we will discuss several techniques to make data structures more cache-frie
 
 ### Access Data Sequentially
 
-The best way to exploit the spatial locality of the caches is to make sequential memory accesses. By doing so, we enable the hardware prefetching mechanism (see [@sec:HwPrefetch]) to recognize the memory access pattern and bring in the next chunk of data ahead of time. An example of Row-major versus Column-Major traversal is shown in [@lst:CacheFriend]. Notice, that there is only one tiny change in the code (swapped `col` and `row` subscripts), but it has a significant impact on performance.
+The best way to exploit the spatial locality of the caches is to make sequential memory accesses. By doing so, we enable the hardware prefetching mechanism (see [@sec:HwPrefetch]) to recognize the memory access pattern and bring in the next chunk of data ahead of time. An example of Row-major versus Column-Major traversal is shown in [@lst:CacheFriend]. Notice, that there is only one tiny change in the code (swapped `col` and `row` subscripts), but it has a large impact on performance.
 
 The code on the left is not cache-friendly because it skips the `NCOLS` elements on every iteration of the inner loop. This results in a very inefficient use of caches: we aren't making full use of the entire prefetched cache line before it gets evicted. In contrast, the code on the right accesses elements of the matrix in the order in which they are laid out in memory. This guarantees that the cache line will be fully used before it gets evicted. Row-major traversal exploits spatial locality and is cache-friendly. Figure @fig:ColRowMajor illustrates the difference between the two traversal patterns.
 
@@ -34,8 +34,6 @@ There is a wide variety of ready-to-use containers in almost any language. But i
 By default, stay away from data structures that rely on pointers, e.g. linked lists or trees. When traversing elements, they require additional memory accesses to follow the pointers. If the maximum number of elements is relatively small and known at compile time, C++ `std::array` might be a better option than `std::vector`. If you need an associative container but don't need to store the elements in sorted order, `std::unordered_map` should be faster than `std::map`. A good step-by-step guide for choosing appropriate C++ containers can be found in [@fogOptimizeCpp, Section 9.7 Data structures, and container classes].
 
 Sometimes, it's more efficient to store pointers to contained objects, instead of objects themselves. Consider a situation when you need to store many objects in an array while the size of each object is big. In addition, the objects are frequently shuffled, removed, and inserted. Storing objects in an array will require moving large chunks of memory every time the order of objects is changed, which is expensive. In this case, it's better to store pointers to objects in the array. This way, only the pointers are moved, which is much cheaper. However, this approach has its drawbacks. It requires additional memory for the pointers and introduces an additional level of indirection.
-
-If your data structure is accessed by multiple threads, consider using lock-free data structures. They are designed to avoid the overhead of locks and are often faster than their lock-based counterparts. However, they are much more difficult to implement and debug.
 
 ### Packing the Data
 
@@ -72,7 +70,7 @@ struct S {                               struct S {
 
 ### Field Reordering
 
-Reordering fields in a data structure can also be beneficial for another reason. Consider an example in [@lst:FieldReordering]. Suppose that the `Soldier` structure is used to track thousands of units on the battlefield of a game. The game has three phases: battle, movement, and trade. During the battle phase, the `attack`, `defense`, and `health` fields are accessed together. During the movement phase, the `coords`, and `speed` fields are accessed. During the trade phase, only the `money` field is accessed. 
+Reordering fields in a data structure can also be beneficial for another reason. Consider an example in [@lst:FieldReordering]. Suppose that the `Soldier` structure is used to trackeach one of the thousands of units on the battlefield in a game. The game has three phases: battle, movement, and trade. During the battle phase, the `attack`, `defense`, and `health` fields are used. During the movement phase, the `coords`, and `speed` fields are used. During the trade phase, only the `money` field is used.
 
 The problem with the organization of the `Soldier` struct in the code on the left is that the fields are not grouped according to the phases of the game. For example, during the battle phase, the program needs to access two different cache lines to fetch the required fields. The fields `attack` and `defense` are very likely to reside on the same cache line, but the `health` field is always pushed to the next cache line. The same applies to the movement phase (`speed` and `coords` fields).
 
@@ -93,6 +91,8 @@ struct Soldier {                                 struct Soldier {
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Since Linux kernel 6.8, there is a new functionality in the `perf` tool that allows you to find data structure reordering opportunities. The `perf mem record` command can now be used to profile data structure access patterns. The `perf annotate --data-type` command will show you the data structure layout along with profiling samples attributed to each field of the data structure. Using this information you can identify fields that are accessed together.[^5]
+
+Data-type profiling is very effective at finding opportunities to improve cache utilization. Recent Linux kernel history contains many examples of commits that reorder structures,[^1] pad fields,[^3] or pack[^2] them to improve performance.
 
 ### Other Data Structure Reorganization Techniques
 
@@ -131,8 +131,6 @@ struct GraphEdgeProperties {                  };
   // ...                                        // ...
 };                                            };
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Data-type profiling is very effective at finding opportunities to improve cache utilization. Recent Linux kernel history contains many examples of commits that reorder structures,[^1] pad fields,[^3] or pack[^2] them to improve performance.
 
 [^1]: Linux commit [54ff8ad69c6e93c0767451ae170b41c000e565dd](https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=54ff8ad69c6e93c0767451ae170b41c000e565dd)
 [^2]: Linux commit [e5598d6ae62626d261b046a2f19347c38681ff51](https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=e5598d6ae62626d261b046a2f19347c38681ff51)
