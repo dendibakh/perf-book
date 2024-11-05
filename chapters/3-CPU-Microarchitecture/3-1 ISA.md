@@ -6,4 +6,4 @@ Most modern architectures can be classified as general-purpose register-based, l
 
 Modern CPUs support 32-bit and 64-bit precision for floating-point and integer arithmetic operations. With the fast-evolving fields of machine learning and AI, the industry has a renewed interest in alternative numeric formats to drive significant performance improvements. Research has shown that machine learning models perform just as well using fewer bits to represent variables, saving on both compute and memory bandwidth. As a result, majority of mainstream ISAs have recently added support for lower precision data types such as 8-bit and 16-bit integer and floating-point types (int8, fp8, fp16, bf16), in addition to the traditional 32-bit and 64-bit formats for arithmetic operations.
 
-[^1]: In the book we sometimes write x86 for shortness, but we assume x86-64, which is a 64-bit version of the x86 instruction set, first announced in 1999.
+[^1]: In the book I often write x86 for shortness, but I assume x86-64, which is a 64-bit version of the x86 instruction set, first announced in 1999. Also, I use ARM to refer to the ISA, and Arm to refer to the company.

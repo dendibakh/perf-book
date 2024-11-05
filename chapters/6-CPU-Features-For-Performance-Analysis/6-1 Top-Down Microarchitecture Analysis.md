@@ -8,4 +8,4 @@ At a conceptual level, TMA identifies what is stalling the execution of a progra
 
 This is not how the analysis works in practice because analyzing every single microoperation ($\mu$op) would be terribly slow. Instead, TMA observes the execution of a program by monitoring a specific set of performance events and then calculates metrics based on predefined formulas. Using these metrics, TMA characterizes the program by assigning it to one of the four high-level buckets. Each of the four high-level categories has several nested levels, which CPU vendors may choose to implement differently. Each generation of processors may have different formulas for calculating those metrics, so it's better to rely on tools to do the analysis rather than trying to calculate them yourself.
 
-In the upcoming sections, we will discuss the TMA implementation in AMD, ARM, and Intel processors.
+In the upcoming sections, we will discuss the TMA implementation in AMD, Arm, and Intel processors.

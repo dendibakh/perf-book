@@ -115,4 +115,4 @@ Like code instrumentation, binary instrumentation only instruments user-level co
 [^1]: Pin - [https://software.intel.com/en-us/articles/pin-a-dynamic-binary-instrumentation-tool](https://software.intel.com/en-us/articles/pin-a-dynamic-binary-instrumentation-tool)
 [^2]: Intel SDE - [https://www.intel.com/content/www/us/en/developer/articles/tool/software-development-emulator.html](https://www.intel.com/content/www/us/en/developer/articles/tool/software-development-emulator.html)
 [^3]: I have a slightly more advanced version of this code which I usually copy-paste into whatever project I'm working on, and later delete.
-[^4]: DynamoRIO - [https://github.com/DynamoRIO/dynamorio](https://github.com/DynamoRIO/dynamorio). It supports Linux and Windows operating systems, and runs on x86 and Arm hardware.
+[^4]: DynamoRIO - [https://github.com/DynamoRIO/dynamorio](https://github.com/DynamoRIO/dynamorio). It supports Linux and Windows operating systems, and runs on x86 and ARM hardware.

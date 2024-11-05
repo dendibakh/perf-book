@@ -45,15 +45,15 @@ $ perf report
 
 where `cnt_ctl=0` counts clock cycles, `cnt_ctl=1` counts dispatched ops for an interval period; `l3missonly=1` only keeps the samples that had an L3 miss. These two parameters and a few others are described in more detail in [@AMDUprofManual, Table 25. AMDuProfCLI Collect Command Options]. Note that in both of the commands above, the `-a` option is used to collect IBS samples for all cores, otherwise `perf` would fail to collect samples on Linux kernel 6.1 or older. From version 6.2 onwards, the `-a` option is no longer needed unless you want to collect IBS samples for all cores. The `perf report` command will show samples attributed to functions and source code lines similar to regular PMU events but with added features that we will discuss later. AMD uProf command line tool can generate IBS raw data, which later can be converted to a CSV file for later postprocessing with MS Excel as described in [@AMDUprofManual, Section 7.10 ASCII Dump of IBS Samples].
 
-### SPE on ARM Platforms
+### SPE on Arm Platforms
 
-The Arm Statistical Profiling Extension (SPE) is an architectural feature designed for enhanced instruction execution profiling within Arm CPUs. The SPE feature extension is specified as part of Armv8-A architecture, with support from Arm v8.2 onwards. ARM SPE extension is architecturally optional, which means that ARM processor vendors are not required to implement it. ARM Neoverse cores have supported SPE since Neoverse N1 cores, which were introduced in 2019. 
+The Arm Statistical Profiling Extension (SPE) is an architectural feature designed for enhanced instruction execution profiling within Arm CPUs. The SPE feature extension is specified as part of Armv8-A architecture, with support from Arm v8.2 onwards. Arm SPE extension is architecturally optional, which means that Arm processor vendors are not required to implement it. Arm Neoverse cores have supported SPE since Neoverse N1 cores, which were introduced in 2019. 
 
 Compared to other solutions, SPE is more similar to AMD IBS than it is to Intel PEBS. Similar to IBS, SPE is separate from the general performance monitor counters (PMC), but instead of two flavors of IBS (fetch and execute), there is just a single mechanism.
 
-The SPE sampling process is built in as part of the instruction execution pipeline. Sample collection is still based on a configurable interval, but operations are statistically selected. Each sampled operation generates a sample record, which contains various data about the execution of this operation. SPE record saves the address of the instruction, the virtual and physical address for the data accessed by loads and stores, the source of the data access (cache or DRAM), and the timestamp to correlate with other events in the system. Also, it can give latency of various pipeline stages, such as Issue latency (from dispatch to execution), Translation latency (cycle count for a virtual-to-physical address translation), and Execution latency (latency of load/stores in the functional unit). The whitepaper [@ARMSPE] describes ARM SPE in more detail as well as shows a few optimization examples using it.
+The SPE sampling process is built in as part of the instruction execution pipeline. Sample collection is still based on a configurable interval, but operations are statistically selected. Each sampled operation generates a sample record, which contains various data about the execution of this operation. SPE record saves the address of the instruction, the virtual and physical address for the data accessed by loads and stores, the source of the data access (cache or DRAM), and the timestamp to correlate with other events in the system. Also, it can give latency of various pipeline stages, such as Issue latency (from dispatch to execution), Translation latency (cycle count for a virtual-to-physical address translation), and Execution latency (latency of load/stores in the functional unit). The whitepaper [@ARMSPE] describes Arm SPE in more detail as well as shows a few optimization examples using it.
 
-Similar to Intel PEBS and AMD IBS, ARM SPE helps to reduce the sampling overhead and enables longer collections. In addition to that, it supports postfiltering of sample records, which helps to reduce the memory required for storage. SPE profiling is supported in Linux `perf` and can be used as follows:[^6]
+Similar to Intel PEBS and AMD IBS, Arm SPE helps to reduce the sampling overhead and enables longer collections. In addition to that, it supports postfiltering of sample records, which helps to reduce the memory required for storage. SPE profiling is supported in Linux `perf` and can be used as follows:[^6]
 
 ```bash
 $ perf record -e arm_spe_0/<controls>/ -- test_program
@@ -61,7 +61,7 @@ $ perf report --stdio
 $ spe-parser perf.data -t csv
 ```
 
-where `<controls>` lets you optionally specify various controls and filters for the collection. `perf report` will give the usual output according to what the user asked for with `<controls>` options. `spe-parser`[^5] is a tool developed by ARM engineers to parse the captured perf record data and save all the SPE records into a CSV file.
+where `<controls>` lets you optionally specify various controls and filters for the collection. `perf report` will give the usual output according to what the user asked for with `<controls>` options. `spe-parser`[^5] is a tool developed by Arm engineers to parse the captured perf record data and save all the SPE records into a CSV file.
 
 ### Precise Events
 
@@ -91,9 +91,9 @@ MEM_LOAD_RETIRED.*    MEM_LOAD_L3_HIT_RETIRED.*
 
 , where `.*` means that all sub-events inside a group can be configured as precise events.
 
-With AMD IBS and ARM SPE, all the collected samples are precise by design since the hardware captures the exact instruction address. They both work in a very similar fashion. Whenever an overflow occurs, the mechanism saves the instruction causing the overflow into a dedicated buffer which is then read by the interrupt handler. As the address is preserved, the IBS and SPE sample's attribution to the instructions is precise.
+With AMD IBS and Arm SPE, all the collected samples are precise by design since the hardware captures the exact instruction address. They both work in a very similar fashion. Whenever an overflow occurs, the mechanism saves the instruction causing the overflow into a dedicated buffer which is then read by the interrupt handler. As the address is preserved, the IBS and SPE sample's attribution to the instructions is precise.
 
-Users of Linux `perf` on Intel and AMD platforms must add the `pp` suffix to one of the events listed above to enable precise tagging as shown below. However, on ARM platforms, it has no effect, so users must use the `arm_spe_0` event.
+Users of Linux `perf` on Intel and AMD platforms must add the `pp` suffix to one of the events listed above to enable precise tagging as shown below. However, on Arm platforms, it has no effect, so users must use the `arm_spe_0` event.
 
 ```bash
 $ perf record -e cycles:pp -- ./a.exe
@@ -107,12 +107,12 @@ Memory accesses are a critical factor for the performance of many applications. 
 
 In PEBS, the feature that allows this to happen is called Data Address Profiling (DLA). To provide additional information about sampled loads and stores, it uses the `Data Linear Address` and `Latency Value` fields inside the PEBS facility (see Figure @fig:PEBS_record). If the performance event supports the DLA facility, and DLA is enabled, the processor will dump the memory address and latency of the sampled memory access. You can also filter memory accesses that have latency higher than a certain threshold. This is useful for finding long-latency memory accesses, which can be a performance bottleneck for many applications.
 
-With the IBS Execute and ARM SPE sampling, you can also do an in-depth analysis of memory accesses performed by an application. One approach is to dump collected samples and process them manually. IBS saves the exact linear address, its latency, where the memory location was fetched from (cache or DRAM), and whether it hit or missed in the DTLB. SPE can be used to estimate the latency and bandwidth of the memory subsystem components, estimate memory latencies of individual loads/stores, and more.
+With the IBS Execute and Arm SPE sampling, you can also do an in-depth analysis of memory accesses performed by an application. One approach is to dump collected samples and process them manually. IBS saves the exact linear address, its latency, where the memory location was fetched from (cache or DRAM), and whether it hit or missed in the DTLB. SPE can be used to estimate the latency and bandwidth of the memory subsystem components, estimate memory latencies of individual loads/stores, and more.
 
 One of the most important use cases for these extensions is detecting True and False Sharing, which we will discuss in [@sec:TrueFalseSharing]. The Linux `perf c2c` tool heavily relies on all three mechanisms (PEBS, IBS, and SPE) to find contested memory accesses, which could experience True/False sharing: it matches load/store addresses for different threads and checks if the hit occurs in a cache line modified by other threads.
 
 [^1]: PEBS grabber tool - [https://github.com/andikleen/pmu-tools/tree/master/pebs-grabber](https://github.com/andikleen/pmu-tools/tree/master/pebs-grabber). Requires root access.
 [^2]: Performance skid - [https://easyperf.net/blog/2018/08/29/Understanding-performance-events-skid](https://easyperf.net/blog/2018/08/29/Understanding-performance-events-skid)
 [^4]: Hardware event skid - [https://software.intel.com/en-us/vtune-help-hardware-event-skid](https://software.intel.com/en-us/vtune-help-hardware-event-skid)
-[^5]: ARM SPE parser - [https://gitlab.arm.com/telemetry-solution/telemetry-solution](https://gitlab.arm.com/telemetry-solution/telemetry-solution)
+[^5]: Arm SPE parser - [https://gitlab.arm.com/telemetry-solution/telemetry-solution](https://gitlab.arm.com/telemetry-solution/telemetry-solution)
 [^6]: Linux perf driver for `arm_spe` should be installed first (see [https://developer.arm.com/documentation/ka005362/latest/](https://developer.arm.com/documentation/ka005362/latest/)). On Amazon Linux 2 and 2023, the SPE PMU is available by default on Graviton metal instances (see [https://github.com/aws/aws-graviton-getting-started/blob/main/perfrunbook/debug_hw_perf.md](https://github.com/aws/aws-graviton-getting-started/blob/main/perfrunbook/debug_hw_perf.md))

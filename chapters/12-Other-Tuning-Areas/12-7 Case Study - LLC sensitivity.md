@@ -6,7 +6,7 @@ In this case study, we run the same set of applications multiple times with vary
 
 Our analysis will help us identify applications whose performance drops significantly when decreasing the size of an LLC. We say that such applications are sensitive to the size of the LLC. Also, we identified applications that are not sensitive, i.e., LLC size doesn't have an impact on performance. This result can be applied to properly size the processor LLC, especially considering the wide range available on the market. For example, we can determine whether an application could benefit from a larger LLC, i.e., whether an investment in new hardware would be justified. Conversely, if an application has enough with a tight cache size and therefore we can buy a cheaper processor.
 
-For this case study, we use an AMD Milan processor, but other server processors such as Intel Xeon [@QoSXeon], and ARM ThunderX [@QoSThunderX], also include hardware support for users to control the allocation of both LLC space and memory read bandwidth to processor threads.
+For this case study, we use an AMD Milan processor, but other server processors such as Intel Xeon [@QoSXeon], and Arm ThunderX [@QoSThunderX], also include hardware support for users to control the allocation of both LLC space and memory read bandwidth to processor threads.
 
 ### Target machine: AMD EPYC 7313P {.unlisted .unnumbered}
 

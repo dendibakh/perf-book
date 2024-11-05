@@ -54,7 +54,7 @@ Table: List of the recent AMD microarchitectures. {#tbl:AMDUarchs}
 \newpage
 
 ------------------------------------------------------------------
-    ISA        Year of ISA      ARM uarchs         Third-party
+    ISA        Year of ISA      Arm uarchs         Third-party
                  release         (latest)            uarchs
 ------------  ---------------  --------------   ------------------
   ARMv8-A          2011          Cortex-A73        Apple A7-A10;
