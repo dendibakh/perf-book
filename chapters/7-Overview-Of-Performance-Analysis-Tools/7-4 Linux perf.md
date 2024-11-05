@@ -23,7 +23,7 @@ $ echo kernel.kptr_restrict=0 | sudo tee -a /etc/sysctl.d/local.conf
 
 ### What you can do with it: {.unlisted .unnumbered}
 
-Generally, Linux `perf` can do most of the same things that other profilers can do. Hardware vendors prioritize enabling their features in Linux `perf` so that by the time a new CPU is available on the market, `perf` already supports it. There are two main commands that most users will use. The first, `perf stat`, reports a count of specified performance events. The second, `perf record`, profiles an application or system in sampling mode and this is often followed by `perf report` to generate a report from the sampling data.
+Generally, Linux `perf` can do most of the same things that other profilers can do. Hardware vendors prioritize enabling their features in Linux `perf` so that by the time a new CPU is available on the market, `perf` already supports it. There are two main commands that most people use. The first, `perf stat`, reports a count of specified performance events. The second, `perf record`, profiles an application or system in sampling mode and is often followed by `perf report` to generate a report from the sampling data.
 
 The output of the `perf record` command is a raw dump of samples. Many tools, built on top of Linux `perf`, parse raw dump files and provide new analysis types. Here are the most notable ones:
 
@@ -33,7 +33,7 @@ The output of the `perf record` command is a raw dump of samples. Many tools, bu
 
 ### What you cannot do with it: {.unlisted .unnumbered}
 
-Linux perf is a command-line tool and lacks a GUI, which makes it hard to filter data, observe how the workload behavior changes over time, zoom into a portion of the runtime, etc. There is a limited console output provided through the `perf report` command, which is fine for quick analysis, although not as convenient as other GUI profilers. Luckily, as we just mentioned, there are GUI tools that can post-process and visualize the raw output of Linux `perf`.
+Linux perf is a command-line tool and lacks a Graphical User Interface (GUI), which makes it hard to filter data, observe how the workload behavior changes over time, zoom into a portion of the runtime, etc. There is a limited console output provided through the `perf report` command, which is fine for quick analysis, although not as convenient as other GUI profilers. Luckily, as we just mentioned, there are GUI tools that can post-process and visualize the raw output of Linux `perf`.
 
 [^1]: Linux perf wiki - [https://perf.wiki.kernel.org/index.php/Main_Page](https://perf.wiki.kernel.org/index.php/Main_Page).
 [^2]: RISCV is not supported yet as a part of the official kernel, although custom tools from vendors exist.

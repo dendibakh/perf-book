@@ -10,7 +10,7 @@ If you want to not only record but also view the recorded ETW data you need to i
 
 ### What you can do with it: {.unlisted .unnumbered}
 
-- Look at CPU hotspots with a configurable CPU sampling rate from 125 microseconds up to 10 seconds. The default is 1 millisecond which costs approximately 5--10% runtime overhead.
+- Identify hotspots with a configurable CPU sampling rate from 125 microseconds up to 10 seconds. The default is 1 millisecond which costs approximately 5--10% runtime overhead.
 - Determine what blocks a certain thread and for how long (e.g., late event signals, unnecessary thread sleep, etc).
 - Examine how fast a disk serves read/write requests and discover what initiates that work.
 - Check file access performance and patterns (including cached read/writes that lead to no disk IO).

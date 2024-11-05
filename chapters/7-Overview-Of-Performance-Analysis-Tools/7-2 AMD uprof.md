@@ -4,7 +4,7 @@ The [uProf](https://www.amd.com/en/developer/uprof.html) profiler is a tool deve
 
 ### How to configure it {.unlisted .unnumbered}
 
-On Linux, uProf uses Linux perf for data collection. On Windows, uProf uses its own sampling driver that gets installed when you install uProf, no additional configuration is required. AMD uProf supports both command-line interface (CLI) and graphical interface (GUI). The CLI interface requires two separate steps---collect and report, similar to Linux perf.
+On Linux, uProf uses Linux perf for data collection. On Windows, uProf uses its own sampling driver that gets installed when you install uProf, no additional configuration is required. AMD uProf supports both command-line interface (CLI) and graphical interface. The CLI interface requires two separate steps---collect and report, similar to Linux perf.
 
 ### What you can do with it: {.unlisted .unnumbered}
 
