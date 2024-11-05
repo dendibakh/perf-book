@@ -1,18 +1,18 @@
 ## Hardware-Based Sampling Features
 
-Major CPU vendors provide a set of additional features to enhance performance analysis. Since CPU vendors approach performance monitoring in different ways, those capabilities vary in not only how they are called but also what you can do with them. In Intel processors, it is called Processor Event-Based Sampling (PEBS), first introduced in NetBurst microarchitecture. A similar feature on AMD processors is called Instruction Based Sampling (IBS) and is available starting with the AMD Opteron Family (10h generation) of cores. Next, we will discuss those features in more detail, including their similarities and differences.
+Major CPU vendors provide a set of additional features to enhance sampling. Since CPU vendors approach performance monitoring in different ways, those capabilities vary in not only how they are called but also what you can do with them. In Intel processors, it is called Processor Event-Based Sampling (PEBS), first introduced in NetBurst microarchitecture. A similar feature on AMD processors is called Instruction Based Sampling (IBS) and is available starting with the AMD Opteron Family (10h generation) of cores. Next, we will discuss those features in more detail, including their similarities and differences.
 
 ### PEBS on Intel Platforms {#sec:secPEBS}
 
-Similar to the Last Branch Record feature, PEBS is used while profiling the program to capture additional data with every collected sample. When a performance counter is configured for PEBS, the processor saves the set of additional data, which has a defined format and is called the PEBS record. The format of a PEBS record for the Intel Skylake CPU is shown in Figure @fig:PEBS_record. The record contains the state of general-purpose registers (`EAX`, `EBX`, `ESP`, etc.), `EventingIP`, `Data Linear Address`, and `Latency value`, which we'll discuss later. The content layout of a PEBS record varies across different microarchitectures, see [@IntelOptimizationManual, Volume 3B, Chapter 20 Performance Monitoring].
+Similar to the Last Branch Record feature, PEBS is used while profiling the program to capture additional data with every collected sample. When a performance counter is configured for PEBS, the processor saves the set of additional data, which has a defined format and is called the PEBS record. The format of a PEBS record for the Intel Skylake CPU is shown in Figure @fig:PEBS_record. It contains the state of general-purpose registers (`EAX`, `EBX`, `ESP`, etc.), `EventingIP`, `Data Linear Address`, and `Latency value`, and a few other fields. The content layout of a PEBS record varies across different microarchitectures, see [@IntelOptimizationManual, Volume 3B, Chapter 20 Performance Monitoring].
 
 ![PEBS Record Format for 6th Generation, 7th Generation and 8th Generation Intel Core Processor Families. *© Source: [@IntelOptimizationManual, Volume 3B, Chapter 20].*](../../img/pmu-features/PEBS_record.png){#fig:PEBS_record width=100%}
 
-Since Skylake, the PEBS record has been enhanced to collect XMM registers and LBR records. The format has been restructured where fields are grouped into Basic group, Memory group, GPR group, XMM group, and LBR group. Performance profiling tools have the option to select data groups of interest and thus reduce the record size in memory and record generation latency. By default, the PEBS record will only contain the Basic group.
+Since Skylake, the PEBS record has been enhanced to collect XMM registers and Last Branch Record (LBR) records. The format has been restructured where fields are grouped into Basic group, Memory group, GPR group, XMM group, and LBR group. Performance profiling tools have the option to select data groups of interest and thus reduce the recording overhead. By default, the PEBS record will only contain the Basic group.
 
 One of the notable benefits of using PEBS is lower sampling overhead compared to regular interrupt-based sampling. Recall that when the counter overflows, the CPU generates an interrupt to collect one sample. Frequently generating interrupts and having an analysis tool itself capture the program state inside the interrupt service routine is very costly since it involves OS interaction. 
 
-On the other hand, PEBS keeps a buffer to temporarily store multiple PEBS records. Suppose, we are sampling on load events using PEBS. When a performance counter is configured for PEBS, an overflow condition in the counter will not trigger an interrupt, instead, it will activate the PEBS mechanism. The mechanism will then trap the next load, capture a new record, and store it in the dedicated PEBS buffer area. The mechanism also takes care of clearing the counter overflow status and reloading the counter with the initial value. Only when the dedicated buffer is full does the processor raise an interrupt, and the buffer gets flushed to memory. This mechanism lowers the sampling overhead by triggering many fewer interrupts.
+On the other hand, PEBS keeps a buffer to temporarily store multiple PEBS records. Suppose, we are sampling load instructions using PEBS. When a performance counter is configured for PEBS, an overflow condition in the counter will not trigger an interrupt, instead, it will activate the PEBS mechanism. The mechanism will then trap the next load, capture a new record, and store it in the dedicated PEBS buffer area. The mechanism also takes care of clearing the counter overflow status and reloading the counter with the initial value. Only when the dedicated buffer is full does the processor raise an interrupt, and the buffer gets flushed to memory. This mechanism lowers the sampling overhead by triggering fewer interrupts.
 
 Linux users can check if PEBS is enabled by executing `dmesg`:
 
@@ -22,7 +22,7 @@ $ dmesg | grep PEBS
 AnyThread deprecated, Alderlake Hybrid events, 32-deep LBR, full-width counters, Intel PMU driver.
 ```
 
-For LBR, Linux perf dumps the entire contents of the LBR stack with every collected sample. So, it is possible to analyze raw LBR dumps collected by Linux perf. However, for PEBS, Linux `perf` doesn't export the raw output as it does for LBR. Instead, it processes PEBS records and extracts only a subset of data depending on a particular need. So, it's not possible to access the collection of raw PEBS records with Linux `perf`. However, Linux `perf` provides some PEBS data processed from raw samples, which can be accessed by `perf report -D`. To dump raw PEBS records, one can use [`pebs-grabber`](https://github.com/andikleen/pmu-tools/tree/master/pebs-grabber)[^1] tool.
+For LBR, Linux perf dumps the entire contents of the LBR stack with every collected sample. So, it is possible to analyze raw LBR dumps collected by Linux perf. However, for PEBS, Linux `perf` doesn't export the raw output as it does for LBR. Instead, it processes PEBS records and extracts only a subset of data depending on a particular need. So, it's not possible to access the collection of raw PEBS records with Linux `perf`. However, Linux `perf` provides some PEBS data processed from raw samples, which can be accessed by `perf report -D`. To dump raw PEBS records, you can use [`pebs-grabber`](https://github.com/andikleen/pmu-tools/tree/master/pebs-grabber)[^1].
 
 ### IBS on AMD Platforms
 
@@ -38,8 +38,8 @@ Since IBS is integrated into the processor pipeline and acts as a fixed event co
 IBS is supported by Linux perf and the AMD uProf profiler. Here are sample commands to collect IBS Execute and Fetch samples:
 
 ```bash
-$ perf record -a -e ibs_op/cnt_ctl=1,l3missonly=0/ -- benchmark.exe
-$ perf record -a -e ibs_fetch/l3missonly=1/ -- benchmark.exe
+$ perf record -a -e ibs_op/cnt_ctl=1,l3missonly=1/ -- benchmark.exe
+$ perf record -a -e ibs_fetch/l3missonly=0/ -- benchmark.exe
 $ perf report
 ```
 
@@ -63,11 +63,11 @@ $ spe-parser perf.data -t csv
 
 where `<controls>` lets you optionally specify various controls and filters for the collection. `perf report` will give the usual output according to what the user asked for with `<controls>` options. `spe-parser`[^5] is a tool developed by Arm engineers to parse the captured perf record data and save all the SPE records into a CSV file.
 
+Now that we covered the advanced sampling features, let's discuss how they can be used to improve performance analysis.
+
 ### Precise Events
 
-Now that we covered the advanced sampling features, let's discuss **how** they can be used to improve performance analysis. We will start with the notion of precise events.
-
-One of the major problems in profiling is pinpointing the exact instruction that caused a particular performance event. As discussed in [@sec:profiling], interrupt-based sampling is based on counting a specific performance event and waiting until it overflows. When an overflow interrupt happens, it takes a processor some time to stop the execution and tag the instruction that caused the overflow. This is especially difficult for modern complex out-of-order CPU architectures.
+One of the major problems in sampling is pinpointing the exact instruction that caused a particular performance event. As discussed in [@sec:profiling], interrupt-based sampling is based on counting a specific performance event and waiting until it overflows. When an overflow happens, it takes a processor some time to stop the execution and tag the instruction that caused the overflow. This is especially difficult for modern complex out-of-order CPU architectures.
 
 It introduces the notion of a skid, which is defined as the distance between the IP (instruction address) that caused the event to the IP where the event is tagged. Skid makes it difficult to discover the instruction causing the performance issue. Consider an application with a large number of cache misses and a hot assembly code that looks like this:
 
@@ -91,7 +91,7 @@ MEM_LOAD_RETIRED.*    MEM_LOAD_L3_HIT_RETIRED.*
 
 , where `.*` means that all sub-events inside a group can be configured as precise events.
 
-With AMD IBS and Arm SPE, all the collected samples are precise by design since the hardware captures the exact instruction address. They both work in a very similar fashion. Whenever an overflow occurs, the mechanism saves the instruction causing the overflow into a dedicated buffer which is then read by the interrupt handler. As the address is preserved, the IBS and SPE sample's attribution to the instructions is precise.
+With AMD IBS and Arm SPE, all the collected samples are precise by design since the hardware captures the exact instruction address. They both work in a very similar fashion. Whenever an overflow occurs, the mechanism saves the instruction causing the overflow into a dedicated buffer which is then read by the interrupt handler. As the address is preserved, the IBS and SPE sample's instruction attribution is precise.
 
 Users of Linux `perf` on Intel and AMD platforms must add the `pp` suffix to one of the events listed above to enable precise tagging as shown below. However, on Arm platforms, it has no effect, so users must use the `arm_spe_0` event.
 
@@ -103,9 +103,9 @@ Precise events provide relief for performance engineers as they help to avoid mi
 
 ### Analyzing Memory Accesses {#sec:sec_PEBS_DLA}
 
-Memory accesses are a critical factor for the performance of many applications. Both PEBS and IBS enable gathering detailed information about memory accesses in a program. For instance, you can not only sample loads but also collect their target addresses and access latency. Keep in mind, that this does not trace all the stores and loads. Otherwise, the overhead would be too big. Instead, it analyzes only one out of 100,000 accesses or so. You can customize how many samples per second you want. With a large enough collection of samples, it can give an accurate statistical picture of the memory accesses.
+Memory accesses are a critical factor for the performance of many applications. Both PEBS and IBS enable gathering detailed information about memory accesses in a program. For instance, you can sample loads and collect their target addresses and access latency. Keep in mind, that this does not trace all the stores and loads. Otherwise, the overhead would be too big. Instead, it analyzes only one out of 100,000 accesses or so. You can customize how many samples per second you want. With a large enough collection of samples, it can give an accurate statistical picture.
 
-In PEBS, the feature that allows this to happen is called Data Address Profiling (DLA). To provide additional information about sampled loads and stores, it uses the `Data Linear Address` and `Latency Value` fields inside the PEBS facility (see Figure @fig:PEBS_record). If the performance event supports the DLA facility, and DLA is enabled, the processor will dump the memory address and latency of the sampled memory access. You can also filter memory accesses that have latency higher than a certain threshold. This is useful for finding long-latency memory accesses, which can be a performance bottleneck for many applications.
+In PEBS, such feature is called Data Address Profiling (DLA). To provide additional information about sampled loads and stores, it uses the `Data Linear Address` and `Latency Value` fields inside the PEBS facility (see Figure @fig:PEBS_record). If the performance event supports the DLA facility, and DLA is enabled, the processor will dump the memory address and latency of the sampled memory access. You can also filter memory accesses that have latency higher than a certain threshold. This is useful for finding long-latency memory accesses, which can be a performance bottleneck for many applications.
 
 With the IBS Execute and Arm SPE sampling, you can also do an in-depth analysis of memory accesses performed by an application. One approach is to dump collected samples and process them manually. IBS saves the exact linear address, its latency, where the memory location was fetched from (cache or DRAM), and whether it hit or missed in the DTLB. SPE can be used to estimate the latency and bandwidth of the memory subsystem components, estimate memory latencies of individual loads/stores, and more.
 
