@@ -111,7 +111,7 @@ with open(editTexFile, 'w') as g:
             g.write(line.replace("\\bibliographystyle{plainnat}", '\\bibliographystyle{apalike-ejor}'))
         else:
             # Add \tabularnewline for the table in the CPU Front-End section
-            if "\\caption{Summary of CPU Front-End optimizations" in line:
+            if "\\caption{Summary of CPU Frontend optimizations" in line:
                 startTableCPUFESummary = True
             if startTableCPUFESummary and "\\endhead" in line:
                 addTabularnewlineTableCPUFESummary = True

@@ -4,4 +4,4 @@ A *basic block* is a sequence of instructions with a single entry and a single e
 
 ![Basic Block of assembly instructions.](../../img/cpu_fe_opts/BasicBlock.png){#fig:BasicBlock width=50% }
 
-It is guaranteed that every instruction in the basic block will be executed exactly once. This is an important property that is leveraged by many compiler transformations. For example, it greatly reduces the problem of control flow graph analysis and transformations since, for some classes of problems, we can treat all instructions in the basic block as one entity.
+It is guaranteed that every instruction in the basic block will be executed only once. This is an important property that is leveraged by many compiler transformations. For example, it greatly reduces the problem of control flow graph analysis and transformations since, for some classes of problems, we can treat all instructions in the basic block as one entity.
