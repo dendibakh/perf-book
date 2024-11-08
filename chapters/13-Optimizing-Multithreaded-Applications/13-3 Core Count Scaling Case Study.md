@@ -66,7 +66,9 @@ Here is the high-level algorithm of Zstd compression:
 * Jobs are always started in order, but they can be finished in any order. Compression speed can be variable and depends on the data to compress. Some blocks are easier to compress than others.
 * After a worker finishes compressing a block, it signals to the main thread that the compressed data is ready to be flushed to the output file. The main thread is responsible for flushing the compressed data to the output file. Note that flushing must be done in order, which means that the second job is allowed to be flushed only after the first one is entirely flushed. The main thread can "partially flush" an ongoing job, i.e., it doesn't have to wait for a job to be completely finished to start flushing it.
 
-To visualize the work of the Zstd algorithm on a timeline, we instrumented the Zstd source code with VTune's ITT markers.[^2] The timeline of compressing the Silesia corpus using 8 threads is shown in Figure @fig:ZstdTimeline. Using 8 worker threads is enough to observe thread interaction in Zstd while keeping the image less noisy than when all 16 threads are active. The second half of the timeline was cut to make the image fit on the page.
+To visualize the work of the Zstd algorithm on a timeline, we instrumented the Zstd source code with VTune's Instrumentation and Tracing Technology (ITT) markers.[^2] They enable us to visualize duration of code regions and certain events on the timeline, and control the collection of trace data during execution.
+
+The timeline of compressing the Silesia corpus using 8 threads is shown in Figure @fig:ZstdTimeline. Using 8 worker threads is enough to observe thread interaction in Zstd while keeping the image less noisy than when all 16 threads are active. The second half of the timeline was cut to make the image fit on the page.
 
 ![Timeline view of compressing Silesia corpus with Zstandard using 8 threads.](../../img/mt-perf/ZstdTimelineCut.png){#fig:ZstdTimeline width=100%}
 
@@ -78,7 +80,7 @@ On the worker thread timeline (top 8 rows) we have the following markers:
 * `ww` (short for "worker wait") bars indicate a period when a worker thread is waiting for a new job.
 * Notches below job periods indicate that a thread has just finished compressing a portion of the input block and is signaling to the main thread that there is data available to be flushed (partial flushing).
 
-On the main thread timeline (row 9, TID 913273) we have the following markers:
+On the main thread timeline (the bottom row, TID 913273) we have the following markers:
 
 * `p0`--`p25` boxes indicate periods of preparing a new job. It starts when the main thread starts filling up the input buffer until it is full (but this new job is not necessarily posted on the worker queue immediately).
 * `fw` (short for "flush wait") markers indicate a period when the main thread waits for the produced data to start flushing it. This happens when the main thread has prepared the next job and has nothing else to do. During this time, the main thread is blocked.

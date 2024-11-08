@@ -67,10 +67,10 @@ It is possible to eliminate false sharing with the help of aligning/padding memo
 Listing: Data padding to avoid false sharing.
 
 ~~~~ {#lst:PadFalseSharing .cpp}
-                              #define CACHELINE_ALIGN alignas(64) 
+                              constexpr int CacheLineAlign = 64;
 struct S {                    struct S {
   int sumA;        =>           int sumA; 
-  int sumB;                     CACHELINE_ALIGN int sumB;
+  int sumB;                     alignas(CacheLineAlign) int sumB;
 };                            };
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

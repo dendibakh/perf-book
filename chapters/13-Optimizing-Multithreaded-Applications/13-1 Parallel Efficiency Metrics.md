@@ -11,6 +11,12 @@ $$
 \textrm{Effective CPU Utilization} = \frac{\sum_{i=1}^{\textrm{ThreadCount}}\textrm{Effective CPU Time(T,i)}}{\textrm{T}~\times~\textrm{ThreadCount}}
 $$
 
+$$
+\textrm{Effective CPU Time} = \textrm{CPU Time}~-~(\textrm{Overhead Time}~+~\textrm{Spin Time})
+$$
+
+Measuring overhead and spin time can be challenging, and I recommend using a performance analysis tool like Intel VTune Profiler, which can provide these metrics.
+
 ### Thread Count {.unlisted .unnumbered}
 
 Most parallel applications have a configurable number of threads, which allows them to run efficiently on platforms with a different number of cores. Running an application using a lower number of threads than is available on the system underutilizes its resources. On the other hand, running an excessive number of threads can cause *oversubscription*; some threads will be waiting for their turn to run.
