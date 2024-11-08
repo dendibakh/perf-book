@@ -17,7 +17,7 @@ The book is split into two parts. The first part (chapters 2--7) teaches you how
 * Chapter 3 introduces CPU microarchitecture, with a close look at Intel's Golden Cove microarchitecture. 
 * Chapter 4 covers terminology and metrics used in performance analysis. At the end of the chapter, we present a case study that features various performance metrics collected on four real-world applications.
 * Chapter 5 explores the most popular performance analysis approaches. We describe how profiling tools work and what sort of data they can collect.
-* Chapter 6 examines features provided by modern Intel, AMD, and Arm-based CPUs to support and enhance performance analysis. It shows how they work and what problems they help to solve.
+* Chapter 6 examines features provided by modern Intel, AMD, and ARM-based CPUs to support and enhance performance analysis. It shows how they work and what problems they help to solve.
 * Chapter 7 gives an overview of the most popular performance analysis tools available on Linux, Windows, and MacOS.
 * Chapter 8 is about optimizing memory accesses, cache-friendly code, data structure reorganization, and other techniques.
 * Chapter 9 is about optimizing computations; it explores data dependencies, function inlining, loop optimizations, and vectorization.
