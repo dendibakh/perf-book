@@ -5,7 +5,7 @@
 
 ## Windows {.unnumbered}
 
-To utilize huge pages on Windows, one needs to enable `SeLockMemoryPrivilege` [security policy](https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/lock-pages-in-memory). This can be done programmatically via the Windows API, or alternatively via the security policy GUI.
+To utilize huge pages on Windows, you need to enable `SeLockMemoryPrivilege` [security policy](https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/lock-pages-in-memory). This can be done programmatically via the Windows API, or alternatively via the security policy GUI.
 
 1. Hit start &rarr; search "secpol.msc", and launch it.
 2. On the left select "Local Policies" &rarr; "User Rights Assignment", then double-click on "Lock pages in memory".
@@ -39,21 +39,10 @@ Explicit huge pages can be reserved at system boot time or before an application
 $ echo "vm.nr_hugepages = 128" >> /etc/sysctl.conf
 ```
 
-To explicitly allocate a fixed number of huge pages after the system has booted, one can use [libhugetlbfs](https://github.com/libhugetlbfs/libhugetlbfs). The following command preallocates 128 huge pages.
-
-```bash
-$ sudo apt install libhugetlbfs-bin
-$ sudo hugeadm --create-global-mounts
-$ sudo hugeadm --pool-pages-min 2M:128
-```
-
-This is roughly the equivalent of executing the following commands which do not require `libhugetlbfs` (see the [kernel docs](https://www.kernel.org/doc/Documentation/vm/hugetlbpage.txt)):
+To explicitly allocate 128 huge pages after the system has booted, you can use the following command:
 
 ```bash
 $ echo 128 > /proc/sys/vm/nr_hugepages
-$ mount -t hugetlbfs                                                      \
-    -o uid=<value>,gid=<value>,mode=<value>,pagesize=<value>,size=<value>,\
-    min_size=<value>,nr_inodes=<value> none /mnt/huge
 ```
 
 You should be able to observe the effect in `/proc/meminfo`. Note that it is a system-wide view and not per-process:
@@ -71,7 +60,7 @@ Hugepagesize:       2048 kB
 Hugetlb:          262144 kB <== 256MB of space occupied
 ```
 
-Developers can utilize explicit huge pages in the code by calling `mmap` with the `MAP_HUGETLB` flag ([full example](https://github.com/torvalds/linux/blob/master/tools/testing/selftests/vm/map_hugetlb.c)[^25]):
+You can utilize explicit huge pages in the code by calling `mmap` with the `MAP_HUGETLB` flag ([full example](https://github.com/torvalds/linux/blob/master/tools/testing/selftests/vm/map_hugetlb.c)[^25]):
 
 ```cpp
 void ptr = mmap(nullptr, size, PROT_READ | PROT_WRITE,
@@ -87,7 +76,7 @@ Other alternatives include:
 
 ### Transparent Huge Pages {.unnumbered .unlisted}
 
-To allow applications to use Transparent Huge Pages (THP) on Linux one should ensure that `/sys/kernel/mm/transparent_hugepage/enabled` is `always` or `madvise`. The former enables system-wide usage of THPs, while the latter gives control to the user code on which memory regions should use THPs, thus avoiding the risk of consuming more memory resources. Below is an example of using the `madvise` approach:
+To allow applications to use Transparent Huge Pages (THP) on Linux you should ensure that `/sys/kernel/mm/transparent_hugepage/enabled` is `always` or `madvise`. The former enables system-wide usage of THPs, while the latter gives control to the user code on which memory regions should use THPs, thus avoiding the risk of consuming more memory resources. Below is an example of using the `madvise` approach:
 
 ```cpp
 void ptr = mmap(nullptr, size, PROT_READ | PROT_WRITE | PROT_EXEC,
@@ -106,7 +95,7 @@ HugePages_Total:     128
 HugePages_Free:      128        <== explicit huge pages are not used
 ```
 
-Also, developers can observe how their application utilizes EHPs and/or THPs by looking at the `smaps` file specific to their process:
+Also, you can observe how your application utilizes EHPs and/or THPs by looking at the `smaps` file specific to your process:
 
 ```bash
 $ watch -n1 "cat /proc/<PID_OF_PROCESS>/smaps"
