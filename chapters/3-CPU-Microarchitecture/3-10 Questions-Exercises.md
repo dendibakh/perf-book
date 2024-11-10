@@ -2,7 +2,7 @@
 
 \markright{Questions and Exercises}
 
-1. Describe pipelining, out-of-order and speculative execution.
+1. Describe pipelining, out-of-order, and speculative execution.
 2. How does register renaming help to speed up execution?
 3. Describe spatial and temporal locality.
 4. What is the size of the cache line in the majority of modern processors?
