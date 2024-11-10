@@ -61,7 +61,7 @@ if (__builtin_cpu_supports ("avx512f")) {
 }
 ```
 
-This demonstrates the use of built-in functions that are available in GCC and Clang compilers. Besides detecting supported ISA extensions, there is a `__builtin_cpu_is` function to detect an exact processor model. A compiler-agnostic way of writing CPU dispatch is to use `CPUID` instruction (x86-only), `getauxval(AT_HWCAP)` Linux system call, or `sysctlbyname` on macOS.
+This demonstrates the use of built-in functions that are available in GCC and Clang compilers. Besides detecting supported ISA extensions, there is a `__builtin_cpu_is` function to detect an exact processor model. A compiler-agnostic way of writing CPU dispatch is to use the `CPUID` instruction (x86-only), `getauxval(AT_HWCAP)` Linux system call, or `sysctlbyname` on macOS.
 
 You would typically see CPU dispatching constructs used to optimize only specific parts of the code, e.g., hot function or loop. Very often, these platform-specific implementations are written with compiler intrinsics (see [@sec:secIntrinsics]) to generate desired instructions.
 
