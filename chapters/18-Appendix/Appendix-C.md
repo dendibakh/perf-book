@@ -7,7 +7,7 @@ The Intel Processor Traces (PT) is a CPU feature that records the program execut
 
 ## Workflow {.unnumbered .unlisted}
 
-Similar to sampling techniques, PT does not require any modifications to the source code. All you need to collect traces is just to run the program under the tool that supports PT. Once PT is enabled and the benchmark launches, the analysis tool starts writing tracing PT packets to DRAM. 
+Similar to sampling techniques, PT does not require any modifications to the source code. All you need to collect traces is just to run the program under the tool that supports PT. Once PT is enabled and the benchmark launches, the analysis tool starts writing PT packets to DRAM. 
 
 Similar to LBR (Last Branch Records), Intel PT works by recording branches. At runtime, whenever a CPU encounters any branch instruction, PT will record the outcome of this branch. For a simple conditional jump instruction, a CPU will record whether it was taken (`T`) or not taken (`NT`) using just 1 bit. For an indirect call, PT will record the destination address. Note that unconditional branches are ignored since we statically know their targets. 
 
@@ -112,4 +112,4 @@ Besides Linux perf, several other tools support Intel PT. First, Intel VTune Pro
 [^3]: Postmortem debugging with Intel PT - [https://easyperf.net/blog/2019/08/30/Intel-PT-part2](https://easyperf.net/blog/2019/08/30/Intel-PT-part2)
 [^4]: When you decode traces with `perf script -F` with `+srcline` or `+srccode` to emit source code, it gets even slower.
 [^5]: magic-trace - [https://github.com/janestreet/magic-trace](https://github.com/janestreet/magic-trace)
-[^6]: Notice that there are some instructions executed as a result of the function call (denoted with `...`).
+[^6]: Notice that there are instructions executed as a result of the function call (denoted with `...`).
