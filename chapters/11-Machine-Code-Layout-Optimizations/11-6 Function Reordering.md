@@ -22,4 +22,4 @@ An interesting approach to solving the problem of grouping hot functions was int
 [^1]: HFSort - [https://github.com/facebook/hhvm/tree/master/hphp/tools/hfsort](https://github.com/facebook/hhvm/tree/master/hphp/tools/hfsort)
 [^2]: HFSort in LLD - [https://github.com/llvm-project/lld/blob/master/ELF/CallGraphSort.cpp](https://github.com/llvm-project/lld/blob/master/ELF/CallGraphSort.cpp)
 [^3]: Cache-Directed Sort in LLVM - [https://github.com/llvm/llvm-project/blob/main/llvm/lib/Transforms/Utils/CodeLayout.cpp](https://github.com/llvm/llvm-project/blob/main/llvm/lib/Transforms/Utils/CodeLayout.cpp)
-[^4]: Also, functions located in shared libraries do not participate in careful layout of machine code.
+[^4]: Also, functions located in shared libraries do not participate in the careful layout of machine code.
