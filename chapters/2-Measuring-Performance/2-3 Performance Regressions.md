@@ -1,5 +1,3 @@
-
-
 ## Continuous Benchmarking
 
 We just discussed why you should monitor performance in production. On the other hand, it is still beneficial to set up continuous "in-house" testing to catch performance problems early, even though not every performance regression can be caught in a lab.
@@ -20,7 +18,7 @@ The second option is to have a threshold, say, 2%. Every code modification that 
 
 Small regressions can pile up slowly into a bigger regression, which can be left unnoticed. Going back to Figure @fig:PerfRegress, notice a downward trend that lasted from Aug 11 to Aug 21. The period started with a score of 3000 and ended with 2600. That is roughly a 15% regression over 10 days or 1.5% per day on average. If we set a 2% threshold all regressions will be filtered out. However, as we can see, the accumulated regression is much bigger than the threshold. 
 
-Nevertheless, this option works reasonably well for many projects, especially if the level of noise in a benchmark is very low. Also, you can adjust the threshold for each test. An example of a Contiguous Integration (CI) system where each test requires setting explicit threshold values for alerting a regression is [LUCI](https://chromium.googlesource.com/chromium/src.git/+/master/docs/tour_of_luci_ui.md),[^2] which is a part of the Chromium project.
+Nevertheless, this option works reasonably well for many projects, especially if the level of noise in a benchmark is very low. Also, you can adjust the threshold for each test. An example of a Continuous Integration (CI) system where each test requires setting explicit threshold values for alerting a regression is [LUCI](https://chromium.googlesource.com/chromium/src.git/+/master/docs/tour_of_luci_ui.md),[^2] which is a part of the Chromium project.
 
 It's worth mentioning that tracking performance results over time requires that you maintain the same configuration of the machine(s) that you use to run benchmarks. A change in the configuration may invalidate all the previous performance results. You may decide to recollect all historical measurements with a new configuration, but this is very expensive.
 
