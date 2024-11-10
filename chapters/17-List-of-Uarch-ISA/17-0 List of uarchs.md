@@ -33,7 +33,7 @@ Table: List of the recent Intel Core microarchitectures. {#tbl:IntelUarchs}
 ----------------------------------------------
     Name       Year released    Supported ISA
 ------------  ---------------  ---------------
-Streamroller       2014              AVX
+ Steamroller       2014              AVX
 
   Excavator        2015              AVX2
 
