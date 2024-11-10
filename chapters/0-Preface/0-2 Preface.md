@@ -18,7 +18,7 @@ I started this book with a simple goal: educate software developers to better un
 
 When I was taking my first steps in performance engineering, the only good sources of information on the topic were software developer manuals, which are not what mainstream developers like to read. Frankly, I wish I had this book when I was trying to learn low-level performance analysis. In 2016 I started sharing things that I learned on my blog, and received some positive feedback from my readers. Some of them suggested I aggregate this information into a book. This book is their fault.
 
-Many people have asked me why I decided to self-publish. In fact, I initially tried to pitch it to several reputable publishers, but they didn't see the financial benefits of making such a book. However, I really wanted to write it, so I decided to do it anyway. In the end, it turned out quite well, so I decided to self-publish the second edition also.
+Many people have asked me why I decided to self-publish. In fact, I initially tried to pitch it to several reputable publishers, but they didn't see the financial benefits of making such a book. However, I really wanted to write it, so I decided to do it anyway. In the end, it turned out quite well, so I decided to self-publish the second edition too.
 
 The first edition was released in November 2020. It was well-received by the community, however, readers gave me a lot of constructive criticism. The most popular feedback was to include exercises for experimentation. Some readers complained that it was too focused on Intel CPUs and didn't cover other architectures like AMD and ARM. Other readers suggested that I should cover system performance, not just CPU performance. The second edition expands in all these and many other directions. It came out to be twice as big as the first book.
 
@@ -26,7 +26,7 @@ Specifically, I want to highlight the exercises that I added to the second editi
 
 I know firsthand that low-level performance optimization is not easy. I tried to explain everything as clearly as possible, but the topic is very complex. It requires experimentation and practice to fully understand the material. I encourage you to take your time, read through the chapters, and experiment with examples provided in the online course.
 
-During my carrer, I never shied away from software optimization tasks. I always got a dopamine hit whenever I managed to make my program run faster. The excitement of discovering something and feeling proud left me even more curious and craving for more. My initial performance work was very unstructured. Now it is my profession, yet I still feel very happy when I make software run faster. I hope you also experience the joy of discovering performance issues, and the satisfaction of fixing them.
+During my career, I never shied away from software optimization tasks. I always got a dopamine hit whenever I managed to make my program run faster. The excitement of discovering something and feeling proud left me even more curious and craving for more. My initial performance work was very unstructured. Now it is my profession, yet I still feel very happy when I make software run faster. I hope you also experience the joy of discovering performance issues, and the satisfaction of fixing them.
 
 I sincerely hope that this book will help you learn low-level performance analysis. If you make your application faster as a result, I will consider my mission accomplished.
 
