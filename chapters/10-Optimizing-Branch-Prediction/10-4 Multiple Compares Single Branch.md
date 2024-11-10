@@ -24,7 +24,7 @@ uint32_t longestLine(const std::string &str) {
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Consider the alternative implementation shown in [@lst:LongestLineSIMD] that tests eight characters at a time. You will typically see this idea implemented using compiler intrinsics (see [@sec:secIntrinsics]), however, I decided to show a standard C++ code for clarity. This exact case is featured in one of Performance Ninja's lab assignments,[^2] so you can try writing SIMD code yourself. Keep in mind, that the code I'm showin is incomplete as it misses a few corner cases; I provide it just to illustrate the idea.
+Consider the alternative implementation shown in [@lst:LongestLineSIMD] that tests eight characters at a time. You will typically see this idea implemented using compiler intrinsics (see [@sec:secIntrinsics]), however, I decided to show a standard C++ code for clarity. This exact case is featured in one of Performance Ninja's lab assignments,[^2] so you can try writing SIMD code yourself. Keep in mind, that the code I'm showing is incomplete as it misses a few corner cases; I provide it just to illustrate the idea.
 
 Listing: Find the longest line (8 characters at a time).
 
