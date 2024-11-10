@@ -14,7 +14,7 @@
 
 * Generally, counting and sampling incur very low runtime overhead (usually below 2%). Counting gets more expensive once you start multiplexing between different events (5--15% overhead), while sampling gets more expensive with increasing sampling frequency [@Nowak2014TheOO]. User-mode sampling can be used for analyzing long-running workloads or when you don't need very accurate data.
 
-* The Roofline Performance Model is a throughput-oriented performance model that is heavily used in the High Performance Computing (HPC) world. It visualizes the performance of an application against hardware limitations. Roofline model helps to identify performance bottlenecks, guides software optimizations, and keeps track of optimization progress.
+* The Roofline Performance Model is a throughput-oriented performance model that is heavily used in the High Performance Computing (HPC) world. It visualizes the performance of an application against hardware limitations. The Roofline model helps to identify performance bottlenecks, guides software optimizations, and keeps track of optimization progress.
 
 * There are tools that try to statically analyze the performance of code. Such tools simulate a piece of code instead of executing it. Many limitations and constraints apply to this approach, but you get a very detailed and low-level report in return.
 
