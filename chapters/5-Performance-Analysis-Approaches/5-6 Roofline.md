@@ -1,6 +1,6 @@
 ## The Roofline Performance Model {#sec:roofline}
 
-The Roofline performance model is a throughput-oriented performance model that is heavily used in the HPC world. It was developed at the University of California, Berkeley, in 2009 [@RooflinePaper]. The term "roofline" in this model expresses the fact that the performance of an application cannot exceed capabilities of a machine. Every function and every loop in a program is limited by either the computing or memory bandwidth capacity of a machine. This concept is represented in Figure @fig:RooflineIntro. The performance of an application will always be limited by a certain "roofline" function.
+The Roofline performance model is a throughput-oriented performance model that is heavily used in the HPC world. It was developed at the University of California, Berkeley, in 2009 [@RooflinePaper]. The term "roofline" in this model expresses the fact that the performance of an application cannot exceed the capabilities of a machine. Every function and every loop in a program is limited by either the computing or memory bandwidth capacity of a machine. This concept is represented in Figure @fig:RooflineIntro. The performance of an application will always be limited by a certain "roofline" function.
 
 ![The Roofline Performance Model. The maximum performance of an application is limited by the minimum between peak FLOPS (horizontal line) and the platform bandwidth multiplied by arithmetic intensity (diagonal line).](../../img/perf-analysis/Roofline-intro.png){#fig:RooflineIntro width=80%}
 
@@ -64,4 +64,4 @@ In summary, the Roofline performance model can help to:
 
 [^2]: Empirical Roofline Tool - [https://bitbucket.org/berkeleylab/cs-roofline-toolkit/src/master/](https://bitbucket.org/berkeleylab/cs-roofline-toolkit/src/master/).
 [^3]: Intel Advisor - [https://software.intel.com/content/www/us/en/develop/tools/advisor.html](https://software.intel.com/content/www/us/en/develop/tools/advisor.html).
-[^7]: The Roofline performance model is not only applicable to floating-point calculations and can be also used for integer operations. However, the majority of HPC applications involve floating-point calculations, thus the Roofline model is mostly used with FLOPs.
+[^7]: The Roofline performance model is not only applicable to floating-point calculations but can be also used for integer operations. However, the majority of HPC applications involve floating-point calculations, thus the Roofline model is mostly used with FLOPs.
