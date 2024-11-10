@@ -13,7 +13,7 @@ The main advantage of splitting instructions into micro-operations is that $\mu$
   SUB rsp, 8
   STORE [rsp], rbx
   ```
-  Often, a function prologue saves multiple registers by using multiple `PUSH` instructions. In our case, the next `PUSH` instruction can start executing after the `SUB` $\mu$op of the previous `PUSH` instruction finishes, and doesn't have to wait for the `STORE` $\mu$op, which can now execute asynchronously.
+  Often, a function prologue saves multiple registers by using multiple `PUSH` instructions. In our case, the next `PUSH` instruction can start executing after the `SUB` $\mu$op of the previous `PUSH` instruction finishes and doesn't have to wait for the `STORE` $\mu$op, which can now execute asynchronously.
 
 * **In parallel**: consider `HADDPD xmm1, xmm2` instruction, which will sum up (reduce) two double-precision floating-point values from `xmm1` and `xmm2` and store two results in `xmm1` as follows: 
   ```
@@ -42,7 +42,7 @@ Even though we were just talking about how instructions are split into smaller p
 
 \lstset{linewidth=\textwidth}
 
-Both micro- and macrofusion save bandwidth in all stages of the pipeline, from decoding to retirement. The fused operations share a single entry in the reorder buffer (ROB). The capacity of the ROB is utilized better when a fused $\mu$op uses only one entry. Such a fused ROB entry is later dispatched to two different execution ports, but is retired again as a single unit. Readers can learn more about $\mu$op fusion in [@fogMicroarchitecture].
+Both micro- and macrofusion save bandwidth in all stages of the pipeline, from decoding to retirement. The fused operations share a single entry in the reorder buffer (ROB). The capacity of the ROB is utilized better when a fused $\mu$op uses only one entry. Such a fused ROB entry is later dispatched to two different execution ports but is retired again as a single unit. Readers can learn more about $\mu$op fusion in [@fogMicroarchitecture].
 
 To collect the number of issued, executed, and retired $\mu$ops for an application, you can use Linux `perf` as follows:
 
