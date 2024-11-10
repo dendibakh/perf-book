@@ -1,5 +1,3 @@
-
-
 ## Core vs. Reference Cycles {#sec:secRefCycles}
 
 Most CPUs employ a clock signal to pace their sequential operations. The clock signal is produced by an external generator that provides a consistent number of pulses each second. The frequency of the clock pulses determines the rate at which a CPU executes instructions. Consequently, the faster the clock, the more instructions the CPU will execute each second.
@@ -19,4 +17,4 @@ $ perf stat -e cycles,ref-cycles -- ./a.exe
 
 The `ref-cycles` event counts cycles as if there were no frequency scaling. The external clock on the platform has a frequency of 100 MHz, and if we scale it by the *clock multiplier*, we will get the base frequency of the processor. The clock multiplier for the Skylake i7-6000 processor equals 34: it means that for every external pulse, the CPU executes 34 internal cycles when it's running on the base frequency (i.e., 3.4 GHz).
 
-The `cycles` event counts real CPU cycles that takes into account frequency scaling. Using the formula above we can confirm that the average operating frequency was `43340884632 cycles / 10.899 sec = 3.97 GHz`. When you compare the performance of two versions of a small piece of code, measuring the time in clock cycles is better than in nanoseconds, because you avoid the problem of the clock frequency going up and down. 
+The `cycles` event counts real CPU cycles and takes into account frequency scaling. Using the formula above we can confirm that the average operating frequency was `43340884632 cycles / 10.899 sec = 3.97 GHz`. When you compare the performance of two versions of a small piece of code, measuring the time in clock cycles is better than in nanoseconds, because you avoid the problem of the clock frequency going up and down. 
