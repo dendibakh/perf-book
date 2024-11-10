@@ -56,7 +56,7 @@ We used Tracy to debug the program and find the reason why some frames are slowe
 
 ![Tracy main timeline view. It shows the main thread and five worker threads while rendering a frame.](../../img/perf-tools/tracy/tracy_main_timeline.png){#fig:Tracy_Main_View width=100%}
 
-Right above the main panel, there is a histogram that displays the times for all the recorded frames (see Figure @fig:Tracy_Frame_Time_View). It makes it easier to spot those frames that took longer than average to complete. In this example, most frames take around 33 ms (the yellow bars). However, some frames take longer than this and are marked in red. As seen in the screenshot, a tooltip showing the details of a given frame is displayed when you point the mouse on a bar in the histogram. In this example, we are showing the details for the last frame.
+Right above the main panel, there is a histogram that displays the times for all the recorded frames (see Figure @fig:Tracy_Frame_Time_View). It makes it easier to spot those frames that took longer than average to complete. In this example, most frames take around 33 ms (the yellow bars). However, some frames take longer than this and are marked in red. As seen in the screenshot, a tooltip showing the details of a given frame is displayed when you point the mouse at a bar in the histogram. In this example, we are showing the details for the last frame.
 
 ![Tracy frame timings. You can find frames that take more time to render than other frames.](../../img/perf-tools/tracy/tracy_frame_view.png){#fig:Tracy_Frame_Time_View width=90%}
 
