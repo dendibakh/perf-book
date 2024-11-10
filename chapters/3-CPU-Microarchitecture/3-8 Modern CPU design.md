@@ -45,7 +45,7 @@ There are certain operations that processors handle in a specific manner, often 
 
 The "Scheduler / Reservation Station" (RS) is the structure that tracks the availability of all resources for a given $\mu$op and dispatches the $\mu$op to an *execution port* once it is ready. An execution port is a pathway that connects the scheduler to its execution units. Each execution port may be connected to multiple execution units. When an instruction enters the RS, the scheduler starts tracking its data dependencies. Once all the source operands become available, the RS attempts to dispatch the $\mu$op to a free execution port. The RS has fewer entries[^4] than the ROB. It can dispatch up to 6 $\mu$ops per cycle.
 
-We repeated a part of the diagram that depicts the Golden Cove execution engine and Load-Store unit in Figure @fig:Goldencove_BE_LSU. There are 12 execution ports:
+I repeated a part of the diagram that depicts the Golden Cove execution engine and Load-Store unit in Figure @fig:Goldencove_BE_LSU. There are 12 execution ports:
 
 * Ports 0, 1, 5, 6, and 10 provide integer (INT) operations, and some of them handle floating-point and vector (FP/VEC) operations.
 * Ports 2, 3, and 11 are used for address generation (AGU) and for load operations. 

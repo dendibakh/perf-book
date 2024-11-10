@@ -19,15 +19,17 @@ Similar to other sampling-based profilers, Xcode Instruments has the same blind 
 
 ### Example: Profiling Clang Compilation {.unlisted .unnumbered}
 
-In this example, we will show how to collect hardware performance counters on an Apple Mac mini with the M1 processor, macOS 13.5.1 Ventura, and 16 GB RAM. We took one of the largest files in the LLVM codebase and profiled its compilation using version 15.0 of the Clang C++ compiler. Here is the command line that we used:
+In this example, I will show how to collect hardware performance counters on an Apple Mac mini with the M1 processor, macOS 13.5.1 Ventura, and 16 GB RAM. I took one of the largest files in the LLVM codebase and profiled its compilation using version 15.0 of the Clang C++ compiler. 
+
+![Xcode Instruments: timeline and statistics panels.](../../img/perf-tools/XcodeInstrumentsView.jpg){#fig:InstrumentsView width=100% }
+
+Here is the command line that I used:
 
 ```bash
 $ clang++ -O3 -DNDEBUG -arch arm64 <other options ...> -c llvm/lib/Transforms/Vectorize/LoopVectorize.cpp
 ```
 
 Figure @fig:InstrumentsView shows the main timeline view of Xcode Instruments. This screenshot was taken after the compilation had finished. We will get back to it a bit later, but first, let us show how to start the profiling session.
-
-![Xcode Instruments: timeline and statistics panels.](../../img/perf-tools/XcodeInstrumentsView.jpg){#fig:InstrumentsView width=100% }
 
 To begin, open *Instruments* and choose the *CPU Counters* analysis type. The first step you need to do is configure the collection. Click and hold the red target icon (see \circled{1} in Figure @fig:InstrumentsView), then select *Recording Options...* from the menu. It will display the dialog window shown in Figure @fig:InstrumentsDialog. This is where you can add hardware performance monitoring events for collection. Apple has documented its hardware performance monitoring events in its manual [@AppleOptimizationGuide, Section 6.2 Performance Monitoring Events].
 

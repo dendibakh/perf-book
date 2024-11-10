@@ -33,6 +33,7 @@ real 36.20 sec
 $ perf report -n --stdio
 # Samples: 35K of event 'cpu_core/cycles/'
 # Event count (approx.): 156756064947
+
 # Overhead  Samples  Shared Object  Symbol                                                     
 # ........  .......  .............  ........................................
   7.50%     2620     x264           [.] x264_8_me_search_ref

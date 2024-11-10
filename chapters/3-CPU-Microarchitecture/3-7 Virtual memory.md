@@ -4,13 +4,13 @@ Virtual memory is the mechanism to share the physical memory attached to a CPU w
 
 In a CPU that supports virtual memory, programs use virtual addresses for their accesses. But while user code operates on virtual addresses, retrieving data from memory requires physical addresses. Also, to effectively manage the scarce physical memory, it is divided into *pages*. Thus, applications operate on a set of pages that an operating system has provided.
 
+![Virtual-to-physical address translation for 4KB pages.](../../img/uarch/VirtualMem.png){#fig:VirtualMem width=75%}
+
 Virtual-to-physical address translation is required for accessing data as well as code (instructions). The translation mechanism for a system with a page size of 4KB is shown in Figure @fig:VirtualMem. The virtual address is split into two parts. The virtual page number (52 most significant bits) is used to index into the page table to produce a mapping between the virtual page number and the corresponding physical page. The 12 least significant bits are used to offset within a 4KB page. These bits do not require translation and are used "as-is" to access the physical memory location.
 
-![Virtual-to-physical address translation for 4KB pages.](../../img/uarch/VirtualMem.png){#fig:VirtualMem width=80%}
+![Example of a 2-level page table.](../../img/uarch/L2PageTables.png){#fig:L2PageTables width=90%}
 
 The page table can be either single-level or nested. Figure @fig:L2PageTables shows one example of a 2-level page table. Notice how the address gets split into more pieces. The first thing to mention is that the 16 most significant bits are not used. This can seem like a waste of bits, but even with the remaining 48 bits we can address 256 TB of total memory (2^48^). Some applications use those unused bits to keep metadata, also known as *pointer tagging*.
-
-![Example of a 2-level page table.](../../img/uarch/L2PageTables.png){#fig:L2PageTables width=90%}
 
 A nested page table is a radix tree that keeps physical page addresses along with some metadata. To find a translation within a 2-level page table, we first use bits 32..47 as an index into the Level-1 page table also known as the *page table directory*. Every descriptor in the directory points to one of the 2^16^ blocks of Level-2 tables. Once we find the appropriate L2 block, we use bits 12..31 to find the physical page address. Concatenating it with the page offset (bits 0..11) gives us the physical address, which can be used to retrieve the data from the DRAM.
 

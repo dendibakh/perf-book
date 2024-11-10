@@ -83,7 +83,7 @@ template<typename T>
 using AlignedVector = std::vector<T, CacheLineAlignedAllocator<T> >;
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To demonstrate the effect of misaligned memory accesses, I created the [mem_alignment_1](https://github.com/dendibakh/perf-ninja/tree/main/labs/memory_bound/mem_alignment_1)[^2] lab assignment in the Performance Ninja online course. It features a very simple matrix multiplication example, where the initial version doesn't take any care of the alignment of the matrices. The assignment asks to align the matrices to the cache line boundary and measure the performance difference. Feel free to experiment with the code and measure the effect on your platform.
+To demonstrate the effect of misaligned memory accesses, I created the [mem_alignment_1](https://github.com/dendibakh/perf-ninja/tree/main/labs/memory_bound/mem_alignment_1)[^5] lab assignment in the Performance Ninja online course. It features a very simple matrix multiplication example, where the initial version doesn't take any care of the alignment of the matrices. The assignment asks to align the matrices to the cache line boundary and measure the performance difference. Feel free to experiment with the code and measure the effect on your platform.
 
 The first step to mitigate split loads/stores in this assignment is to align the starting offset of a matrix. The operating system might allocate memory for the matrix such that it is already aligned to the cache line boundary. However, you should not rely on this behavior, as it is not guaranteed. A simple way to fix this is to use `AlignedVector` from [@lst:AlignedStdVector] to allocate memory for the matrices. 
 

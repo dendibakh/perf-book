@@ -16,15 +16,6 @@ This small program simulates random particle movement. We have 1000 particles mo
 
 Given the task at hand, you decide to roll your own RNG, sine, and cosine functions to sacrifice some accuracy and make it as fast as possible. After all, this is *random* movement, so it is a good trade-off to make. You choose a medium-quality `XorShift` RNG as it only has 3 shifts and 3 XORs inside. What can be simpler? Also, you searched the web and found algorithms for sine and cosine approximation using polynomials, which are accurate enough and very fast.
 
-I compiled the code using the Clang-17 C++ compiler and ran it on a Mac mini (Apple M1, 2020). Let us examine the generated ARM assembly code:
-
-* The first three `eor` (exclusive OR) instructions combined with `lsl` (shift left) or `lsr` (shift right) correspond to the `XorShift32::gen` function.
-* Next `ucvtf` (convert unsigned integer to floating-point) and `fmul` (floating-point multiply) are used to convert the angle from degrees to radians (line 35 in the code).
-* Sine and Cosine functions both have two `fmul` instructions and one `fmadd` (floating-point fused multiply-add) instruction. Cosine also has an additional `fadd` (floating-point add) instruction.
-* Finally, we have one more pair of `fmadd` instructions to calculate x and y respectively, and an `stp` instruction to store the pair of coordinates.
-
-You expect this code to "fly", however, there is one very nasty performance problem that slows down the program. Without looking ahead in the text, can you find a recurrent dependency chain in the code?
-
 Listing: Random Particle Motion on a 2D Surface
 
 ~~~~ {#lst:DepChain .cpp .numberLines}
@@ -68,6 +59,15 @@ void particleMotion(vector<Particle> &particles,     │   fmadd  s3, s3, s4, s5
   }                                                  │
 }                                                    │
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+I compiled the code using the Clang-17 C++ compiler and ran it on a Mac mini (Apple M1, 2020). Let us examine the generated ARM assembly code:
+
+* The first three `eor` (exclusive OR) instructions combined with `lsl` (shift left) or `lsr` (shift right) correspond to the `XorShift32::gen` function.
+* Next `ucvtf` (convert unsigned integer to floating-point) and `fmul` (floating-point multiply) are used to convert the angle from degrees to radians (line 35 in the code).
+* Sine and Cosine functions both have two `fmul` instructions and one `fmadd` (floating-point fused multiply-add) instruction. Cosine also has an additional `fadd` (floating-point add) instruction.
+* Finally, we have one more pair of `fmadd` instructions to calculate x and y respectively, and an `stp` instruction to store the pair of coordinates.
+
+You expect this code to "fly", however, there is one very nasty performance problem that slows down the program. Without looking ahead in the text, can you find a recurrent dependency chain in the code?
 
 Congratulations if you've found it. There is a recurrent loop dependency on `XorShift32::val`. To generate the next random number, the generator has to produce the previous number first. The next call of method `XorShift32::gen` will generate the number based on the previous one. Figure @fig:DepChain visualizes the problematic loop-carry dependency. Notice, that the code for calculating particle coordinates (convert the angle to radians, sine, cosine, multiple results by velocity) starts executing as soon as the corresponding random number is ready, but not sooner.
 

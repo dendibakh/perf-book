@@ -37,7 +37,7 @@ When you leverage compiler auto-vectorization, it will insert all necessary runt
 
 Intrinsics are somewhat easier to use than inline assembly because the compiler performs type checking, takes care of register allocation, and makes further optimizations, e.g., peephole transformations and instruction scheduling. However, they are still often verbose and difficult to read.
 
-When you write code using non-portable platform-specific intrinsics, you should also provide a fallback option for other architectures. A list of all available intrinsics for the Intel platform can be found in this [reference](https://software.intel.com/sites/landingpage/IntrinsicsGuide/)[^11]. For ARM, you can find such a list here: [https://developer.arm.com/architectures/instruction-sets/intrinsics/](https://developer.arm.com/architectures/instruction-sets/intrinsics/).
+When you write code using non-portable platform-specific intrinsics, you should also provide a fallback option for other architectures. A list of all available intrinsics for the Intel platform can be found in this [reference](https://software.intel.com/sites/landingpage/IntrinsicsGuide/)[^11]. For ARM, you can find such a list on the Arm's website.[^14]
 
 ### Wrapper Libraries for Intrinsics {#sec:secIntrinsicLibraries}
 
@@ -99,6 +99,7 @@ Highway supports over 200 operations, which can be grouped into the following ca
 
 For the full list of operations, see its documentation.[^13] Highway is not the only library of this kind. Other libraries include nsimd, SIMDe, VCL, and xsimd. Note that a C++ standardization effort starting with the Vc library resulted in std::experimental::simd, however, it provides a very limited set of operations and as of this writing is not supported on all the major compilers.
 
-[^11]: Intel Intrinsics Guide - [https://software.intel.com/sites/landingpage/IntrinsicsGuide/](https://software.intel.com/sites/landingpage/IntrinsicsGuide/).
+[^11]: Intel intrinsics guide - [https://software.intel.com/sites/landingpage/IntrinsicsGuide/](https://software.intel.com/sites/landingpage/IntrinsicsGuide/).
 [^12]: Highway library: [https://github.com/google/highway](https://github.com/google/highway)
 [^13]: Highway Quick Reference - [https://github.com/google/highway/blob/master/g3doc/quick_reference.md](https://github.com/google/highway/blob/master/g3doc/quick_reference.md)
+[^14]: ARM intrinsics guide - [https://developer.arm.com/architectures/instruction-sets/intrinsics/](https://developer.arm.com/architectures/instruction-sets/intrinsics/)

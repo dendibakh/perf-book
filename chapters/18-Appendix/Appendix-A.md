@@ -43,18 +43,13 @@ echo 0 > /sys/devices/system/cpu/cpufreq/boost
 ```
 ## Simultaneous Multithreading {.unnumbered .unlisted}
 
-Many modern CPU cores support simultaneous multithreading (see [@sec:SMT]). SMT can be permanently disabled in BIOS. To programmatically disable SMT on Linux systems, you need root access. Here is how one can turn down a sibling thread in each core:
-
-```bash
-echo 0 > /sys/devices/system/cpu/cpuX/online
-```
-The sibling pairs of CPU threads can be found in the following files:
+Many modern CPU cores support simultaneous multithreading (see [@sec:SMT]). SMT can be permanently disabled in BIOS. To programmatically disable SMT on Linux systems, you need root access. The sibling pairs of CPU threads can be found in the following files:
 
 ```bash
 /sys/devices/system/cpu/cpuN/topology/thread_siblings_list
 ```
 
-For example, on Intel® Core™ i5-8259U, which has 4 cores and 8 threads:
+Here is how you can disable a sibling thread of core 0 on Intel® Core™ i5-8259U, which has 4 cores and 8 threads:
 
 ```bash
 # all 8 hardware threads enabled:
@@ -96,7 +91,7 @@ echo performance | sudo tee /sys/devices/system/cpu/cpufreq/policy*/scaling_gove
 
 ## CPU Affinity {.unnumbered .unlisted}
 
-[Processor affinity](https://en.wikipedia.org/wiki/Processor_affinity)[^8] enables the binding of a process to a certain CPU core(s). In Linux, one can do this with [`taskset`](https://linux.die.net/man/1/taskset)[^9] tool. Here 
+[Processor affinity](https://en.wikipedia.org/wiki/Processor_affinity)[^8] enables the binding of a process to a certain CPU core(s). In Linux, you can do this with [`taskset`](https://linux.die.net/man/1/taskset)[^9] tool.
 
 ```bash
 # no affinity

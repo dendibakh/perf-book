@@ -24,9 +24,11 @@ Listing: Example of logging branches.
 ----- 4eda2d:  jne   4eda10              <== (1)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Below is one possible branch history that can be logged with a branch recording mechanism. It shows the last 7 branch outcomes (many more not shown) at the moment we executed the `CALL` instruction. Because on the latest iteration of the loop, the `JNS` branch (`4eda14` &rarr; `4eda1e`) was not taken, it is not logged and thus does not appear in the history.
+[@lst:BranchHistory] shows one possible branch history that can be logged with a branch recording mechanism. It shows the last 7 branch outcomes (many more not shown) at the moment we executed the `CALL` instruction. Because on the latest iteration of the loop, the `JNS` branch (`4eda14` &rarr; `4eda1e`) was not taken, it is not logged and thus does not appear in the history.
 
-```
+Listing: Possible branch history.
+
+~~~~ {#lst:BranchHistory .asm}
     Source Address    Destination Address
     ...               ...
 (1) 4eda2d            4eda10    <== next iteration              │
@@ -35,7 +37,7 @@ Below is one possible branch history that can be logged with a branch recording 
 (4) 4b01cd            4eda23    <== return from a function      │ time
 (1) 4eda2d            4eda10    <== next iteration              │ 
 (3) 4eda1e            4edb26    <== latest branch               V 
-```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The fact that untaken branches are not logged might add a burden for analysis but usually, it doesn’t complicate it too much. We can still infer the complete execution path since we know that the control flow was sequential from the destination address in the entry `N-1` to the source address in the entry `N`.
 
@@ -185,6 +187,7 @@ $ perf record -e cycles -b -- ./7zip.exe b
 $ perf report -n --sort symbol_from,symbol_to -F +mispredict,srcline_from,srcline_to --stdio
 # Samples: 657K of event 'cycles'
 # Event count (approx.): 657888
+
 # Overhead  Samples  Mis  From Line  To Line  Source Sym  Target Sym
 # ........  .......  ...  .........  .......  ..........  ..........
     46.12%   303391   N   dec.c:36   dec.c:40  LzmaDec     LzmaDec
@@ -240,6 +243,8 @@ $ perf record -e cycles -b -- ./7zip.exe b
 $ perf report -n --sort symbol_from,symbol_to -F +cycles,srcline_from,srcline_to --stdio
 # Samples: 658K of event 'cycles'
 # Event count (approx.): 658240
+ 
+ 
 # Overhead  Samples  BBCycles  FromSrcLine  ToSrcLine
 # ........  .......  ........  ...........  ..........
      2.82%   18581      1      dec.c:325    dec.c:326

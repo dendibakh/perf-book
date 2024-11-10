@@ -45,23 +45,23 @@ VTune can provide very rich information about a running process. It is the right
 
 Due to the sampling nature of the tool, it will eventually miss events with a very short duration (e.g., sub-microsecond).
 
-### Examples {.unlisted .unnumbered}
+### Example {.unlisted .unnumbered}
 
 Below is a series of screenshots of VTune's most interesting features. For this example, I took POV-Ray, which is a ray tracer used to create 3D graphics. Figure @fig:VtuneHotspots shows the hotpots analysis of the built-in POV-Ray 3.7 benchmark, compiled with clang14 compiler with `-O3 -ffast-math -march=native -g` options, and run on an Intel Alder Lake system (Core i7-1260P, 4 P-cores + 8 E-cores) with 4 worker threads. 
 
-At the left part of the image, you can see a list of hot functions in the workload along with the corresponding CPU time percentage and the number of retired instructions. On the right panel, you can see the most frequent call stack that leads to calling the function `pov::Noise`. According to that screenshot, `44.4%` of the time function `pov::Noise`, was called from `pov::Evaluate_TPat`, which in turn was called from `pov::Compute_Pigment`.[^20] 
-
 ![VTune's hotspots view of povray built-in benchmark.](../../img/perf-tools/VtunePovray.png){#fig:VtuneHotspots width=100% }
+
+![VTune's source code view of povray built-in benchmark.](../../img/perf-tools/VtunePovray_SourceView.png){#fig:VtuneSourceView width=100% }
+
+At the left part of the image, you can see a list of hot functions in the workload along with the corresponding CPU time percentage and the number of retired instructions. On the right panel, you can see the most frequent call stack that leads to calling the function `pov::Noise`. According to that screenshot, `44.4%` of the time function `pov::Noise`, was called from `pov::Evaluate_TPat`, which in turn was called from `pov::Compute_Pigment`.[^20] 
 
 If you double-click on the `pov::Noise` function, you will see an image that is shown in Figure @fig:VtuneSourceView. For the interest of space, only the most important columns are shown. The left panel shows the source code and CPU time that corresponds to each line of code. On the right, you can see assembly instructions along with the CPU time that was attributed to them. Highlighted machine instructions correspond to line 476 in the left panel. The sum of all CPU time percentages (not just the ones that are visible) in each panel equals to the total CPU time attributed to the `pov::Noise` function, which is `26.8%`.
 
-![VTune's source code view of povray built-in benchmark.](../../img/perf-tools/VtunePovray_SourceView.png){#fig:VtuneSourceView width=100% }
+![VTune's perf events timeline view of povray built-in benchmark.](../../img/perf-tools/VtunePovray_EventTimeline.jpg){#fig:VtuneTimelineView width=100% }
 
 When you use VTune to profile applications running on Intel CPUs, it can collect many different performance events. To illustrate this, I ran a different analysis type, Microarchitecture Exploration. To access raw event counts, you can switch the view to Hardware Events as shown in Figure @fig:VtuneTimelineView. To enable switching views, you need to tick the mark in *Options* &rarr; *General* &rarr; *Show all applicable viewpoints*. Near the top of Figure @fig:VtuneTimelineView, you can see that the *Platform* tab is selected. Two other pages are also useful. The *Summary* page gives you the absolute number of raw performance events as collected from CPU counters. The *Event Count* page gives you the same data with a per-function breakdown.
 
 Figure @fig:VtuneTimelineView is quite busy and requires some explanation. The top panel, indicated with \circled{1}, is a timeline view that shows the behavior of our four worker threads over time with respect to L1 cache misses, plus some tiny activity of the main thread (TID: `3102135`), which spawns all the worker threads. The higher the black bar, the more events (L1 cache misses in this case) happened at any given moment. Notice occasional spikes in L1 misses for all four worker threads. We can use this view to observe different or repeatable phases of the workload. Then to figure out which functions were executed at that time, we can select an interval and click "filter in" to focus just on that portion of the running time. The region indicated with \circled{2} is an example of such filtering. To see the updated list of functions, you can go to the *Event Count* view. Such filtering and zooming features are available on all VTune timeline views.
-
-![VTune's perf events timeline view of povray built-in benchmark.](../../img/perf-tools/VtunePovray_EventTimeline.jpg){#fig:VtuneTimelineView width=100% }
 
 The region indicated with \circled{3} shows performance events that were collected and their distribution over time. This time it is not a per-thread view, but rather it shows aggregated data across all the threads. In addition to observing execution phases, you can also visually extract some interesting information. For example, we can see that the number of executed branches is high (`BR_INST_RETIRED.ALL_BRANCHES`), but the misprediction rate is quite low (`BR_MISP_RETIRED.ALL_BRANCHES`). This can lead you to the conclusion that branch misprediction is not a bottleneck for POV-Ray. If you scroll down, you will see that the number of L3 misses is zero, and L2 cache misses are very rare as well. This tells us that 99% of memory access requests are served by L1, and the rest of them are served by L2. By combining these two observations, we can conclude that the application is likely bound by compute, i.e., the CPU is busy calculating something, not waiting for memory or recovering from a misprediction.
 
