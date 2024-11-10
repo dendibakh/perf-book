@@ -8,7 +8,7 @@ I introduced the concept of memory ordering in [@sec:uarchLSU]. Memory reorderin
 
 Consider an example in [@lst:MemOrderViolation], on the left. This code snippet calculates a histogram of an 8-bit grayscale image, i.e., how many times a certain color appears in the image. Besides countless other places, this code can be found in Otsu's thresholding algorithm[^1] which is used to convert a grayscale image to a binary image. Since the input image is 8-bit grayscale, there are only 256 different colors.
 
-For each pixel on an image, you need to read the current histogram count of the color of the pixel, increment it, and store it back. This is a classic read-modify-write dependency through the memory. Imagine we have the following consecutive pixels in the image: `pixels = [0xFF,0xFF,0x00,0xFF,...]` and so on. The loaded value of the histogram count for `pixels[1]` comes from the result of the previous iteration (`pixels[0]`). The histogram count for `pixels[2]` comes from memory; it is independent and can be reordered. But then again, the histogram count for `pixels[3]` is dependent on the result of processing `pixels[1]`, and so on. Iterations 0,1, and 3 are dependent and cannot be reordered.
+For each pixel on an image, you need to read the current histogram count of the color of the pixel, increment it, and store it back. This is a classic read-modify-write dependency through the memory. Imagine we have the following consecutive pixels in the image: `pixels = [0xFF,0xFF,0x00,0xFF,...]` and so on. The loaded value of the histogram count for `pixels[1]` comes from the result of the previous iteration (`pixels[0]`). The histogram count for `pixels[2]` comes from memory; it is independent and can be reordered. But then again, the histogram count for `pixels[3]` is dependent on the result of processing `pixels[1]`, and so on. Iterations 0, 1, and 3 are dependent and cannot be reordered.
 
 Listing: Memory Order Violation Example.
 
@@ -35,7 +35,7 @@ Recall from [@sec:uarchLSU] that the processor doesn't necessarily know about a 
 
 Performance will greatly depend on the color patterns of the input image. Images with long sequences of pixels with the same color will have worse performance than images where colors don't repeat often. The performance of the initial version will be good as long as the distance between two pixels of the same color is long enough. The phrase "long enough" in this context is determined by the size of the out-of-order instruction window. Repeating read-modify-writes of the same color may trigger ordering violations if they occur within a few loop iterations of each other, but not if they occur more than a hundred loop iterations apart.
 
-A cure for the memory order violation problem is shown in [@lst:MemOrderViolation], on the right. As you can see, I duplicated the histogram and now the processing of pixels alternates between two partial histograms. In the end, we combine the two partial histograms to get a final result. This new version with two partial histograms is still prone to potentially problematic patterns, such as `0xFF 0x00 0xFF 0x00 0xFF ...` However, with this change, the original worst-case scenario (e.g., `0xFF 0xFF 0xFF ...`) will run twice as fast as before. It may be beneficial to create four or eight partial histograms depending on the color pattern of input images. This exact code is featured in the [mem_order_violation_1](https://github.com/dendibakh/perf-ninja/tree/main/labs/memory_bound/mem_order_violation_1)[^2] lab assignment of the Performance Ninja course, so feel free to experiment. 
+A cure for the memory order violation problem is shown in [@lst:MemOrderViolation], on the right. As you can see, I duplicated the histogram, and now the processing of pixels alternates between two partial histograms. In the end, we combine the two partial histograms to get a final result. This new version with two partial histograms is still prone to potentially problematic patterns, such as `0xFF 0x00 0xFF 0x00 0xFF ...` However, with this change, the original worst-case scenario (e.g., `0xFF 0xFF 0xFF ...`) will run twice as fast as before. It may be beneficial to create four or eight partial histograms depending on the color pattern of input images. This exact code is featured in the [mem_order_violation_1](https://github.com/dendibakh/perf-ninja/tree/main/labs/memory_bound/mem_order_violation_1)[^2] lab assignment of the Performance Ninja course, so feel free to experiment. 
 
 On a small set of input images, I observed from 10% to 50% speedup on various platforms. It is worth mentioning that the version on the right consumes 1 KB of additional memory, which may not be huge in this case but is something to watch out for.
 
@@ -56,7 +56,7 @@ For instance, AVX2 memory operations can access up to 32 bytes. If an array star
 Listing: Aligning data using the "alignas" keyword.
 
 ~~~~ {#lst:AligningData .cpp}
-// Array of 16-bit integers aligned at 64-byte boundary
+// Array of 16-bit integers aligned at a 64-byte boundary
 #define CACHELINE_ALIGN alignas(64) 
 CACHELINE_ALIGN int16_t a[N];
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -136,7 +136,7 @@ From the hardware perspective, handling subnormals is more difficult than handli
 
 In many cases, subnormal values are generated naturally by the algorithm and thus are unavoidable. Most processors give the option to flush subnormal values to zero and not generate subnormals in the first place. Developers of performance-critical applications perhaps would prefer to have slightly less accurate results than slowing down the code.
 
-Suppose your application doesn't need subnormal values, how do you detect and mitigate associated costs? While you can use runtime checks as shown in [@lst:Subnormals], inserting them all over the codebase is not practical. There is a better way to detect if your application is producing subnormal values using PMU (Performance Monitoring Unit). On Intel CPUs, you can collect the `FP_ASSIST.ANY` performance event, which gets incremented every time a subnormal value is used or produced. The TMA methodology classifies such bottlenecks under the `Retiring` category, and yes, this is another situation when high `Retiring` doesn't mean a good thing.
+Suppose your application doesn't need subnormal values, how do you detect and mitigate associated costs? While you can use runtime checks as shown in [@lst:Subnormals], inserting them all over the codebase is not practical. There is a better way to detect if your application is producing subnormal values using PMU (Performance Monitoring Unit). On Intel CPUs, you can collect the `FP_ASSIST.ANY` performance event, which gets incremented every time a subnormal value is used or produced. The TMA methodology classifies such bottlenecks under the `Retiring` category, and yes, this is another situation when a high `Retiring` doesn't mean a good thing.
 
 Once you confirm subnormal values are there, you can enable the FTZ and DAZ modes:
 
