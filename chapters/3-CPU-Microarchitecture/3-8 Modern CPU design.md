@@ -1,8 +1,6 @@
-
-
 ## Modern CPU Design
 
-To see how all the concepts we talked about in this chapter are used in practice, let's take a look at the implementation of Intel’s 12th-generation core, Golden Cove, which became available in 2021. This core is used as the P-core inside the Alder Lake and Sapphire Rapids platforms. Figure @fig:Goldencove_diag shows the block diagram of the Golden Cove core. Notice that this section only describes a single core, not the entire processor. So, we will skip the discussion about frequencies, core counts, L3 caches, core interconnects, memory latency and bandwidth.
+To see how all the concepts we talked about in this chapter are used in practice, let's take a look at the implementation of Intel’s 12th-generation core, Golden Cove, which became available in 2021. This core is used as the P-core inside the Alder Lake and Sapphire Rapids platforms. Figure @fig:Goldencove_diag shows the block diagram of the Golden Cove core. Notice that this section only describes a single core, not the entire processor. So, we will skip the discussion about frequencies, core counts, L3 caches, core interconnects, memory latency, and bandwidth.
 
 ![Block diagram of a CPU core in the Intel Golden Cove Microarchitecture.](../../img/uarch/goldencove_block_diagram.png){#fig:Goldencove_diag width=100%}
 
@@ -12,7 +10,7 @@ The core is split into an in-order frontend that fetches and decodes x86 instruc
 
 The CPU Frontend consists of several functional units that fetch and decode instructions from memory. Its main purpose is to feed prepared instructions to the CPU Backend, which is responsible for the actual execution of instructions.
 
-Technically, instruction fetch is the first stage to execute an instruction. But once a program reaches a steady state, the branch predictor unit (BPU) steers the work of the CPU Frontend. That is indiciated with the arrow that goes from the BPU to the instruction cache. The BPU predicts the target of all branch instructions and steers the next instruction fetch based on this prediction.
+Technically, instruction fetch is the first stage to execute an instruction. But once a program reaches a steady state, the branch predictor unit (BPU) steers the work of the CPU Frontend. That is indicated by the arrow that goes from the BPU to the instruction cache. The BPU predicts the target of all branch instructions and steers the next instruction fetch based on this prediction.
 
 The heart of the BPU is a branch target buffer (BTB) with 12K entries containing information about branches and their targets. This information is used by the prediction algorithms. Every cycle, the BPU generates the next fetch address and passes it to the CPU Frontend.
 
@@ -56,11 +54,11 @@ We repeated a part of the diagram that depicts the Golden Cove execution engine 
 
 ![Block diagram of the execution engine and the Load-Store unit in the Intel Golden Cove Microarchitecture.](../../img/uarch/goldencove_BE_LSU.png){#fig:Goldencove_BE_LSU width=100%}
 
-Instructions that require memory operations are handled by the Load-Store unit (ports 2, 3, 11, 4, 9, 7, and 8) that we will discuss in the next section. If an operation does not involve loading or storing data, then it will be dispatched to the execution engine (ports 0, 1, 5, 6, and 10). Some instructions may require two $\mu$ops that must be executed on different execution ports, e.g., load and add.
+Instructions that require memory operations are handled by the Load-Store unit (ports 2, 3, 11, 4, 9, 7, and 8) which we will discuss in the next section. If an operation does not involve loading or storing data, then it will be dispatched to the execution engine (ports 0, 1, 5, 6, and 10). Some instructions may require two $\mu$ops that must be executed on different execution ports, e.g., load and add.
 
 For example, an `Integer Shift` operation can go only to either port 0 or 6, while a `Floating-Point Divide` operation can only be dispatched to port 0. In a situation when a scheduler has to dispatch two operations that require the same execution port, one of them will have to be delayed.
 
-The FP/VEC stack does floating-point scalar and *all* packed (SIMD) operations. For instance, ports 0, 1, and 5 can handle ALU operations of the following types: packed integer, packed floating-point, and scalar floating-point. Integer and Vector/FP register files are located separately. Operations that move values from the INT stack to FP/VEC and vice-versa (e.g., convert, extract or insert) incur additional penalties.
+The FP/VEC stack does floating-point scalar and *all* packed (SIMD) operations. For instance, ports 0, 1, and 5 can handle ALU operations of the following types: packed integer, packed floating-point, and scalar floating-point. Integer and Vector/FP register files are located separately. Operations that move values from the INT stack to FP/VEC and vice-versa (e.g., convert, extract, or insert) incur additional penalties.
 
 ### Load-Store Unit {#sec:uarchLSU}
 
@@ -74,7 +72,7 @@ When a memory load request comes, the LSU queries the L1 cache using a virtual a
 
 In case of an L1 miss, the hardware initiates a query of the (private) L2 cache tags. While the L2 cache is being queried, a 64-byte wide fill buffer (FB) entry is allocated, which will keep the cache line once it arrives. The Golden Cove core has 16 fill buffers. As a way to lower the latency, a speculative query is sent to the L3 cache in parallel with the L2 cache lookup. Also, if two loads access the same cache line, they will hit the same FB. Such two loads will be "glued" together and only one memory request will be initiated.
 
-In case the L2 miss is confirmed, the load continues to wait for the results of the L3 cache, which incurs much higher latency. From that point, the request leaves the core and enters the *uncore*, the term you may frequently see in profiling tools. The outstanding misses from the core are tracked in the Super Queue (SQ, not shown on the diagram), which can track up to 48 uncore requests. In a scenario of L3 miss, the processor begins to set up a memory access. Further details are beyond the scope of this chapter.
+In case the L2 miss is confirmed, the load continues to wait for the results of the L3 cache, which incurs much higher latency. From that point, the request leaves the core and enters the *uncore*, the term you may sometimes see in profiling tools. The outstanding misses from the core are tracked in the Super Queue (SQ, not shown on the diagram), which can track up to 48 uncore requests. In a scenario of L3 miss, the processor begins to set up a memory access. Further details are beyond the scope of this chapter.
 
 When a store modifies a memory location, the processor needs to load the full cache line, change it, and then write it back to memory. If the address to write is not in the cache, it goes through a very similar mechanism as with loads to bring that data in. The store cannot be complete until the data is written to the cache hierarchy.
 
@@ -106,8 +104,8 @@ If a load consumes data from a store that hasn't yet finished, we should not all
 
 * Prediction: Not dependent; Outcome: Not dependent. This is a case of a successful memory disambiguation, which yields optimal performance.
 * Prediction: Dependent; Outcome: Not dependent. In this case, the processor was overly conservative and did not let the load go ahead of the store. This is a missed opportunity for performance optimization.
-* Prediction: Not dependent; Outcome: Dependent. This is a _memory order violation_. Similar to the case of a branch misprediction, the processor has to flush the pipeline, roll back the execution and start over. It is very costly.
-* Prediction: Dependent; Outcome: Dependent. There is a memory dependency between a load and a store, and the processor predicted it correctly. No missed opportunities.
+* Prediction: Not dependent; Outcome: Dependent. This is a _memory order violation_. Similar to the case of a branch misprediction, the processor has to flush the pipeline, roll back the execution, and start over. It is very costly.
+* Prediction: Dependent; Outcome: Dependent. There is a memory dependency between the load and the store, and the processor predicted it correctly. No missed opportunities.
 
 It's worth mentioning that forwarding from a store to a load occurs in real code quite often. In particular, any code that uses read-modify-write accesses to its data structures is likely to trigger these sorts of problems. Due to the large out-of-order window, the CPU can easily attempt to process multiple read-modify-write sequences at once, so the read of one sequence can occur before the write of the previous sequence is complete. One such example is presented in [@sec:UarchSpecificIssues].
 
@@ -125,7 +123,7 @@ The key element to speed up the page walk procedure is a set of Paging-Structure
 
 The Golden Cove microarchitecture has four dedicated page walkers, which allows it to process 4 page walks simultaneously. In the event of a TLB miss, these hardware units will issue the required loads into the memory subsystem and populate the TLB hierarchy with new entries. The page-table loads generated by the page walkers can hit in L1, L2, or L3 caches (details are not disclosed). Finally, page walkers can anticipate a future TLB miss and speculatively do a page walk to update TLB entries before a miss actually happens.
 
-The Golden Cove specification doesn't disclose how resources are shared between two SMT threads. But in general, caches, TLBs and execution units are fully shared to improve the dynamic utilization of those resources. On the other hand, buffers for staging instructions between major pipe stages are either replicated or partitioned. These buffers include IDQ, ROB, RAT, RS, Load Buffer and the Store Buffer. PRF is also replicated.
+The Golden Cove specification doesn't disclose how resources are shared between two SMT threads. But in general, caches, TLBs, and execution units are fully shared to improve the dynamic utilization of those resources. On the other hand, buffers for staging instructions between major pipe stages are either replicated or partitioned. These buffers include IDQ, ROB, RAT, RS, Load Buffer, and the Store Buffer. PRF is also replicated.
 
 [^1]: There are around 300 physical general-purpose registers (GPRs) and a similar number of vector registers. The actual number of registers is not disclosed.
 [^2]: Load Buffer and Store Buffer sizes are not disclosed, but people have measured 192 and 114 entries respectively.
