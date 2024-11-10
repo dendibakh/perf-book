@@ -1,6 +1,6 @@
 ## Static Performance Analysis
 
-Today we have extensive tooling for static code analysis. For the C and C++ languages we have well-known tools like Clang static analyzer, Klocwork, Cppcheck and others. Such tools aim at checking the correctness and semantics of code. Likewise, some tools try to address the performance aspect of code. Static performance analyzers don't execute or profile the program. Instead, they simulate the code as if it is executed on real hardware. Statically predicting performance is almost impossible, so there are many limitations to this type of analysis.
+Today we have extensive tooling for static code analysis. For the C and C++ languages, we have well-known tools like Clang static analyzer, Klocwork, Cppcheck, and others. Such tools aim at checking the correctness and semantics of code. Likewise, some tools try to address the performance aspect of code. Static performance analyzers don't execute or profile the program. Instead, they simulate the code as if it is executed on real hardware. Statically predicting performance is almost impossible, so there are many limitations to this type of analysis.
 
 First, it is not possible to statically analyze C/C++ code for performance since we don't know the machine code to which it will be compiled. So, static performance analysis works on assembly code.
 
