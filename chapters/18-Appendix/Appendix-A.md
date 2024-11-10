@@ -3,7 +3,7 @@
 
 \markboth{Appendix A}{Appendix A}
 
-Below are some examples of features that can contribute to increased non-determinism in performance measurements and a few techniques to reduce noise. I provided introduction to the topic in [@sec:secFairExperiments].
+Below are some examples of features that can contribute to increased non-determinism in performance measurements and a few techniques to reduce noise. I provided an introduction to the topic in [@sec:secFairExperiments].
 
 This section is mostly specific to the Linux operating system. Readers are encouraged to search the web for instructions on how to configure other operating systems.
 
@@ -11,7 +11,7 @@ This section is mostly specific to the Linux operating system. Readers are encou
 
 [Dynamic Frequency Scaling](https://en.wikipedia.org/wiki/Dynamic_frequency_scaling)[^11] (DFS) is a technique to increase the performance of a system by automatically raising CPU operating frequency when it runs demanding tasks. As an example of DFS implementation, Intel CPUs have a feature called Turbo Boost, and AMD CPUs employ Turbo Core functionality. 
 
-Here is an example of an impact Turbo Boost can make for a single-threaded workload running on Intel® Core™ i5-8259U:
+Here is an example of the impact Turbo Boost can make for a single-threaded workload running on Intel® Core™ i5-8259U:
 
 ```bash
 # TurboBoost enabled
@@ -88,7 +88,7 @@ Also, the `lscpu --all --extended` command can be very helpful to see the siblin
 
 ## Scaling Governor {.unnumbered .unlisted}
 
-Linux kernel can control CPU frequency for different purposes. One such purpose is to save power. In this case the scaling governor may decide to decrease the CPU frequency. For performance measurements, it is recommended to set the scaling governor policy to `performance` to avoid sub-nominal clocking. Here is how we can set it for all the cores:
+Linux kernel can control CPU frequency for different purposes. One such purpose is to save power. In this case, the scaling governor may decide to decrease the CPU frequency. For performance measurements, it is recommended to set the scaling governor policy to `performance` to avoid sub-nominal clocking. Here is how we can set it for all the cores:
 
 ```bash
 echo performance | sudo tee /sys/devices/system/cpu/cpufreq/policy*/scaling_governor
@@ -134,7 +134,7 @@ On macOS, it is not possible to pin threads to cores since the operating system 
 
 ## Process Priority {.unnumbered .unlisted}
 
-In Linux, you can increase process priority using the `nice` tool. By increasing priority the process gets more CPU time, and the scheduler favors it more in comparison with processes with normal priority. Niceness ranges from `-20` (highest priority value) to `19` (lowest priority value) with the default of `0`.
+In Linux, you can increase process priority using the `nice` tool. By increasing priority, the process gets more CPU time, and the scheduler favors it more in comparison with processes with normal priority. Niceness ranges from `-20` (highest priority value) to `19` (lowest priority value) with the default of `0`.
 
 Notice in the previous example, that the execution of the benchmarked process was interrupted by the OS more than 100 times. If we increase process priority by running the benchmark with `sudo nice -n -<N>`:
 
