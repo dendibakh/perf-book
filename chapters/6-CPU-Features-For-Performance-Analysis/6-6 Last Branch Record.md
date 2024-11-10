@@ -37,7 +37,7 @@ Below is one possible branch history that can be logged with a branch recording 
 (3) 4eda1e            4edb26    <== latest branch               V 
 ```
 
-The fact that untaken branches are not logged might add burden for analysis but usually don’t complicate it too much. We can still infer the complete execution path since we know that the control flow was sequential from the destination address in entry `N-1` to the source address in entry `N`.
+The fact that untaken branches are not logged might add a burden for analysis but usually, it doesn’t complicate it too much. We can still infer the complete execution path since we know that the control flow was sequential from the destination address in the entry `N-1` to the source address in the entry `N`.
 
 Next, we will take a look at each vendor's branch recording mechanism and then explore how they can be used in performance analysis.
 
@@ -193,7 +193,7 @@ $ perf report -n --sort symbol_from,symbol_to -F +mispredict,srcline_from,srclin
      6.33%    41665   Y   dec.c:36   dec.c:40  LzmaDec     LzmaDec
 ```
 
-In this example, the lines that correspond to function `LzmaDec` are of particular interest to us. In the output that Linux `perf` provides, we can spot two entries that correspond to the `LzmaDec` function: one with `Y` and one with `N` letters. We can conclude that the branch on source line `dec.c:36` is the most executed in the benchmark since more than 50% of samples are attributed to it. Analyzing those two entries together gives us a misprediction rate for the branch. We know that the branch on line `dec.c:36` was predicted `303391` times (corresponds to `N`) and was mispredicted `41665` times (corresponds to `Y`), which gives us `88%` prediction rate.
+In this example, the lines that correspond to function `LzmaDec` are of particular interest to us. In the output that Linux `perf` provides, we can spot two entries that correspond to the `LzmaDec` function: one with `Y` and one with `N` letters. We can conclude that the branch on source line `dec.c:36` is the most executed in the benchmark since more than 50% of samples are attributed to it. Analyzing those two entries together gives us a misprediction rate for the branch. We know that the branch on line `dec.c:36` was predicted `303391` times (corresponds to `N`) and was mispredicted `41665` times (corresponds to `Y`), which gives us an `88%` prediction rate.
 
 Linux `perf` calculates the misprediction rate by analyzing each LBR entry and extracting a misprediction bit from it. So for every branch, we have a number of times it was predicted correctly and a number of mispredictions. Again, due to the nature of sampling, some branches might have an `N` entry but no corresponding `Y` entry. It means there are no LBR entries for the branch being mispredicted, but that doesn’t necessarily mean the prediction rate is `100%`.
 
@@ -223,7 +223,7 @@ Suppose we have the following entries in the LBR stack:
   40064e    400600     3        <== LBR TOS
 ```
 
-Given that information, we have two occurrences of the basic block that starts at offset `400618`. The first once was completed in 80 cycles, while the second one took 300 cycles. If we collect enough samples like that, we could plot an occurrence rate chart of latency for that basic block.
+Given that information, we have two occurrences of the basic block that starts at offset `400618`. The first one was completed in 80 cycles, while the second one took 300 cycles. If we collect enough samples like that, we could plot an occurrence rate chart of latency for that basic block.
 
 An example of such a chart is shown in Figure @fig:LBR_timing_BB. It was compiled by analyzing relevant LBR entries. The way to read this chart is as follows: it tells what was the rate of occurrence of a given latency value. For example, the basic block latency was measured as 100 cycles roughly 2% of the time, 14% of the time we measured 280 cycles, and never saw anything between 150 and 200 cycles. Another way to read is: based on the collected data, what is the probability of seeing a certain basic block latency if you were to measure it?
 
@@ -259,7 +259,7 @@ $ perf report -n --sort symbol_from,symbol_to -F +cycles,srcline_from,srcline_to
      0.58%   3804      24      dec.c:174    dec.c:174
 ```
 
-Notice we've added the `-F +cycles` option to show cycle counts in the output (`BBCycles` column). Several insignificant lines were removed from the output of `perf report` to make it fit on the page. Let's focus on lines in which the source and destination are `dec.c:174`, there are seven such lines in the output. In the source code, the line `dec.c:174` expands a macro that has a self-contained branch. That’s why the source and destination point to the same line.
+Notice we've added the `-F +cycles` option to show cycle counts in the output (`BBCycles` column). Several insignificant lines were removed from the output of the `perf report` to make it fit on the page. Let's focus on lines in which the source and destination are `dec.c:174`, there are seven such lines in the output. In the source code, the line `dec.c:174` expands a macro that has a self-contained branch. That’s why the source and destination point to the same line.
 
 Linux `perf` sorts entries by overhead first, so we need to manually filter entries for the branch in which we are interested. Luckily, they can be grepped very easily. In fact, if we filter them, we will get the latency distribution for the basic block that ends with this branch, as shown in Table {@tbl:bb_latency}. This data can be plotted to obtain a chart similar to the one shown in Figure @fig:LBR_timing_BB.
 
