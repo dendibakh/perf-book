@@ -1,6 +1,6 @@
 # Performance Analysis Approaches {#sec:sec_PerfApproaches}
 
-When you're working on a high-level optimization, e.g., integrating a better algorithm into an application, it is usually easy to tell whether the performance improves or not since the benchmarking results are usually pronounced. Big speedups, like 2x, 3x, etc., are relatively obvious from performance analysis perspective. When you eliminate an extensive computation from a program, you expect to see a visible difference in the running time. 
+When you're working on a high-level optimization, e.g., integrating a better algorithm into an application, it is usually easy to tell whether the performance improves or not since the benchmarking results are usually pronounced. Big speedups, like 2x, 3x, etc., are relatively obvious from a performance analysis perspective. When you eliminate an extensive computation from a program, you expect to see a visible difference in the running time. 
 
 But also, there are situations when you see a small change in the execution time, say 5%, and you have no clue where it's coming from. Timing or throughput measurements alone do not provide any explanation for why performance goes up or down. In this case, we need more insights about how a program executes. That is the situation when we need to do performance analysis to understand the underlying nature of the slowdown or speedup that we observe.
 
