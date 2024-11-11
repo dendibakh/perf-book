@@ -22,8 +22,7 @@ I hope you now have a better understanding of low-level performance optimization
 
 **Happy performance tuning!**
 
-[TODO]: link
-I will post errata and other information about the book on my blog .
+I will post errata and other information about the book on my blog at the following URL: [https://easyperf.net/blog/2024/11/11/Book-Updates-Errata](https://easyperf.net/blog/2024/11/11/Book-Updates-Errata).
 
 If you haven't solved the `perf-ninja` exercises yet, I encourage you to take the time to do so. They will help you to solidify your knowledge and prepare you for real-world performance engineering challenges.
 

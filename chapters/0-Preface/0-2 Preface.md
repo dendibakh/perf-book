@@ -44,6 +44,6 @@ A minimal background in the C and C++ programming languages is necessary to unde
 
 I suggest you read the book chapter by chapter, starting from the beginning. If you consider yourself a beginner in performance analysis, I do not recommend skipping chapters. After you finish reading, you can use this book as a source of ideas whenever you face a performance issue and are unsure how to fix it. You can skim through the second part of the book to see which optimization techniques can be applied to your code.
 
-[TODO]: put a link to an errata webpage
+I will post errata and other information about the book on my blog at the following URL:  [https://easyperf.net/blog/2024/11/11/Book-Updates-Errata](https://easyperf.net/blog/2024/11/11/Book-Updates-Errata).
 
 \sectionbreak

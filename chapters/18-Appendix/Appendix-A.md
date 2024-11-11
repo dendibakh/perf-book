@@ -104,7 +104,8 @@ $ perf stat -e context-switches,cpu-migrations -r 10 -- taskset -c 0 a.exe
                102      context-switches
                  0      cpu-migrations
 ```
-notice the number of `cpu-migrations` gets down to `0`, i.e., the process never leaves the `core0`.
+
+Notice the number of `cpu-migrations` gets down to `0`, i.e., the process never leaves `core0`.
 
 Alternatively, you can use [cset](https://github.com/lpechacek/cpuset)[^10] tool to reserve CPUs for just the program you are benchmarking. If using `Linux perf`, leave at least two cores so that `perf` runs on one core, and your program runs in another. The command below will move all threads out of N1 and N2 (`-k on` means that even kernel threads are moved out):
 
