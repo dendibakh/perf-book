@@ -4,7 +4,7 @@ There are types of applications that have hotspots worth tuning heavily. However
 
 When it is absolutely necessary to generate specific assembly instructions, you should not rely on compiler autovectorization. In such cases, code can instead be written using *compiler intrinsics*. In most cases, compiler intrinsics provide a 1-to-1 mapping to assembly instructions. An example in [@lst:Intrinsics] shows how the C++ version of the horizontal sum of elements in an array (see [@lst:VectIllegal]) can be coded with compiler intrinsics.
 
-Listing: Summing elements of an array with compiler Intrinsics.
+Listing: Summing elements of an array with compiler intrinsics.
 		
 ~~~~ {#lst:Intrinsics .cpp .numberLines}
 #include <immintrin.h>
@@ -35,7 +35,7 @@ When compiling [@lst:VectIllegal] for the SSE target, compilers would generate m
 
 When you leverage compiler auto-vectorization, it will insert all necessary runtime checks. For instance, it will ensure that there are enough elements to feed the vector execution units (see [@lst:Intrinsics], line 6). Also, the compiler will generate a scalar version of the loop to process the remainder (line 19). When you use intrinsics, you have to take care of safety aspects yourself.
 
-Intrinsics are somewhat easier to use than inline assembly because the compiler performs type checking, takes care of register allocation, and makes further optimizations, e.g., peephole transformations and instruction scheduling. However, they are still often verbose and difficult to read.
+Intrinsics are better to use than inline assembly because the compiler performs type checking, takes care of register allocation, and makes further optimizations, e.g., peephole transformations and instruction scheduling. However, they are still often verbose and difficult to read.
 
 When you write code using non-portable platform-specific intrinsics, you should also provide a fallback option for other architectures. A list of all available intrinsics for the Intel platform can be found in this [reference](https://software.intel.com/sites/landingpage/IntrinsicsGuide/)[^11]. For ARM, you can find such a list on the Arm's website.[^14]
 

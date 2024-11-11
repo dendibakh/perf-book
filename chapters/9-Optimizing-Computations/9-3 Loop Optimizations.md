@@ -4,8 +4,6 @@ Loops are at the heart of nearly all high-performance programs. Since loops repr
 
 In this section, we will take a look at the most well-known loop optimizations that address the types of bottlenecks mentioned above. We first discuss low-level optimizations, in [@sec:LowLevelLoopOpts], that only move code around in a single loop. Next, in [@sec:LoopOptsHighLevel], we will take a look at high-level optimizations that restructure loops, which often affect multiple loops. Note, that what I present here is not a complete list of all known loop transformations. For more detailed information on each of the transformations discussed below, readers can refer to [@EngineeringACompilerBook] and [@OptimizingCompilersForModernArchs].
 
-Compilers can automatically recognize an opportunity to perform certain loop transformations. However, sometimes a developer's interference is required to reach the desired outcome. In [@sec:DiscoverLoopOpts], I will share some thoughts on how to discover loop optimization opportunities. 
-
 ### Low-level Optimizations. {#sec:LowLevelLoopOpts}
 
 Let's start with simple loop optimizations that transform the code inside a single loop: Loop Invariant Code Motion, Loop Unrolling, Loop Strength Reduction, and Loop Unswitching. Generally, compilers are good at doing such transformations; however, there are still cases when a compiler might need a developer's support. We will talk about that in subsequent sections.
