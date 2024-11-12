@@ -34,4 +34,4 @@ Where is Continuous Profiling headed? Thomas Dullien, co-founder of Optimyze whi
 Thankfully, a new generation of CP tools has emerged that employ AI with Large Language Model-inspired architectures to process profile samples, analyze the relationships between functions, and finally pinpoint with high accuracy the functions and libraries that directly impact overall throughput and latency. One such company that offers this today is Raven.io. As competition intensifies in this space, innovative capabilities will continue to grow so that CP tooling becomes as powerful and robust as that of typical profilers.
 
 [^1]: Parca - [https://github.com/parca-dev/parca](https://github.com/parca-dev/parca)
-[^2]: Differential flamegraph - [https://www.brendangregg.com/blog/2014-11-09/differential-flame-graphs.html]](https://www.brendangregg.com/blog/2014-11-09/differential-flame-graphs.html)
+[^2]: Differential flamegraph - [https://www.brendangregg.com/blog/2014-11-09/differential-flame-graphs.html](https://www.brendangregg.com/blog/2014-11-09/differential-flame-graphs.html)
