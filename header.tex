@@ -155,5 +155,9 @@
 \counterwithin{table}{section}
 \counterwithin{codelisting}{section}
 
+% I added this line to help resolve color printing issue by removing image transparency.
+% Not sure if it helps though.
+\pdfpageattr {/Group << /S /Transparency /I true /CS /DeviceRGB>>} 
+
 % this one to skip adding the title and the author
 \AtBeginDocument{\let\maketitle\relax}
