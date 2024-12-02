@@ -7,8 +7,9 @@ from shlex import split
 import natsort 
 import re
 
-parser = argparse.ArgumentParser(description='Export book to PDF')
+parser = argparse.ArgumentParser(description='Export book')
 parser.add_argument("-ch", type=int, help="Chapter to export", default="99")
+parser.add_argument("-pdf", help="Export for PDF print", action="store_true", default=False)
 parser.add_argument("-paperback", help="Export for paperback print", action="store_true", default=False)
 parser.add_argument("-kindle", help="Export the kindle version", action="store_true", default=False)
 parser.add_argument("-v", help="verbose", action="store_true", default=False)
@@ -58,13 +59,16 @@ elif args.kindle:
   pandoc_cmd = pandoc_cmd + "-V geometry:top=1.5cm "
   pandoc_cmd = pandoc_cmd + "-V geometry:bottom=1.5cm "
   pandoc_cmd = pandoc_cmd + "-V fontsize:12pt "
-else:
-  pandoc_cmd = pandoc_cmd + "--include-before-body cover.tex "
+elif args.pdf:
+  #pandoc_cmd = pandoc_cmd + "--include-before-body cover.tex "
+  pandoc_cmd = pandoc_cmd + "-V classoption=twoside "
+  pandoc_cmd = pandoc_cmd + "-V geometry:paperwidth=169.90mm "
+  pandoc_cmd = pandoc_cmd + "-V geometry:paperheight=244.10mm "  
   pandoc_cmd = pandoc_cmd + "-V geometry:left=2cm "
   pandoc_cmd = pandoc_cmd + "-V geometry:right=2cm "
   pandoc_cmd = pandoc_cmd + "-V geometry:top=2cm "
   pandoc_cmd = pandoc_cmd + "-V geometry:bottom=2cm "
-  pandoc_cmd = pandoc_cmd + "-V fontsize:10pt "
+  pandoc_cmd = pandoc_cmd + "-V fontsize:8pt "
 
 pandoc_cmd = pandoc_cmd + "--filter pandoc-fignos --filter pandoc-tablenos --filter pandoc-crossref --natbib -o book.tex metadata.txt "
 
@@ -102,7 +106,7 @@ with open(editTexFile, 'w') as g:
     addTabularnewlineTablePerfMetrics = False
     for line in lines:
         # change font size in listings for paperback
-        if (args.paperback or args.kindle) and "basicstyle=\\ttfamily," in line:
+        if (args.paperback or args.kindle or args.pdf) and "basicstyle=\\ttfamily," in line:
             g.write(line.replace("basicstyle=\\ttfamily,", "basicstyle=\\lst@ifdisplaystyle\\footnotesize\\fi\\ttfamily,"))
         # workaround for citations and bibliography
         elif "\\usepackage[]{natbib}" in line:
