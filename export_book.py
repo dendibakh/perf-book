@@ -33,6 +33,9 @@ def get_list_of_files(path, extension):
             continue        
         for file in files:
             if file.endswith("." + extension):
+                # don't add donation page for paperback and kindle
+                if (args.paperback or args.kindle) and "Donations.md" in file:
+                    continue
                 list_of_files.append(shlex.quote(os.path.join(root, file)))
     return list_of_files
 
@@ -60,7 +63,7 @@ elif args.kindle:
   pandoc_cmd = pandoc_cmd + "-V geometry:bottom=1.5cm "
   pandoc_cmd = pandoc_cmd + "-V fontsize:12pt "
 elif args.pdf:
-  #pandoc_cmd = pandoc_cmd + "--include-before-body cover.tex "
+  pandoc_cmd = pandoc_cmd + "--include-before-body cover.tex "
   pandoc_cmd = pandoc_cmd + "-V classoption=twoside "
   pandoc_cmd = pandoc_cmd + "-V geometry:paperwidth=169.90mm "
   pandoc_cmd = pandoc_cmd + "-V geometry:paperheight=244.10mm "  
