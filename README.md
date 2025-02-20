@@ -1,7 +1,7 @@
 [![X (formerly Twitter) Follow](https://img.shields.io/twitter/follow/dendibakh)](https://twitter.com/dendibakh)
 ![GitHub Repo stars](https://img.shields.io/github/stars/dendibakh/perf-book)
 
-# "Performance Analysis and Tuning on Modern CPU" by Denis Bakhvalov, et al.
+# "Performance Analysis and Tuning on Modern CPUs" by Denis Bakhvalov, et al.
 
 ## Building a book (pdf)
 
