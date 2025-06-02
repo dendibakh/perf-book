@@ -39,7 +39,7 @@ Using traffic with the following read-write ratios
 ALL Reads        :      349670.42
 ```
 
-There are a couple of new options here. The `-k` option specifies a list of CPU cores used for measurements. The `-Y` option tells MLC to use AVX2 loads, i.e., 32 bytes at a time. The  options  With the `-u` flag, each thread shares the same buffer and does not allocate its own. This option must be used to measure the L3 bandwidth (notice we used an 18 MB buffer, which equals to the size of the L3 cache).
+There are a couple of new options here. The `-k` option specifies a list of CPU cores used for measurements. The `-Y` option tells MLC to use AVX2 loads, i.e., 32 bytes at a time. With the `-u` flag, each thread shares the same buffer and does not allocate its own. This option must be used to measure the L3 bandwidth (notice we used an 18 MB buffer, which equals to the size of the L3 cache).
 
 ![Block diagram of the memory hierarchy of Intel Core i7-1260P and external DDR4 memory.](../../img/terms-and-metrics/MemBandwidthAndLatenciesDiagram.png){#fig:MemBandwidthAndLatenciesDiagram width=100% }
 
